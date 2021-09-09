@@ -26,6 +26,11 @@
  * ```
  */
 
-import './index.css';
+import React from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+import { Root } from "./page/root";
 
-console.log('Rendering');
+console.log("Rendering");
+
+ReactDOM.render(<Root />, document.querySelector("#app"));
