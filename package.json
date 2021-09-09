@@ -24,7 +24,7 @@
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "chaosdanmutoolview"
+            "name": "ChaosDanmuToolView"
           }
         },
         {
@@ -82,7 +82,8 @@
     "node-loader": "^2.0.0",
     "style-loader": "^3.0.0",
     "ts-loader": "^9.2.2",
-    "typescript": "^4.0.2"
+    "typescript": "^4.0.2",
+    "typescript-plugin-css-modules": "^3.4.0"
   },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0",
