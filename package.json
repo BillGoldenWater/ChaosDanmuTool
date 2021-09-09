@@ -1,8 +1,8 @@
 {
   "name": "chaosdanmutoolview",
-  "productName": "chaosdanmutoolview",
+  "productName": "ChaosDanmuToolView",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "A tool for display information processed by ChaosDanmuTool",
   "main": ".webpack/main",
   "scripts": {
     "start": "electron-forge start",
@@ -16,7 +16,7 @@
     "name": "BiliGoldenWater",
     "email": "2439577268@qq.com"
   },
-  "license": "MIT",
+  "license": "",
   "config": {
     "forge": {
       "packagerConfig": {},
