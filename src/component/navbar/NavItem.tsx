@@ -12,7 +12,10 @@ const NavItem = (props: Props) => {
   return (
     <div
       className={
-        style.navItem + (props.active ? " " + style.navItemActive : "")
+        style.navItem +
+        (props.active
+          ? " " + style.navItemActive
+          : " " + style.navItemSwitchable)
       }
       onClick={() => {
         props.onClick(props.index);

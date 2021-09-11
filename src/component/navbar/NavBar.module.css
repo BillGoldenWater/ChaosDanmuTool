@@ -17,11 +17,11 @@
   user-select: none;
 }
 
-.navItem:hover {
+.navItemSwitchable:hover {
   background: #dfdfdf;
 }
 
-.navItem:active {
+.navItemSwitchable:active {
   background: #cfcfcf;
 }
 
