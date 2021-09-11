@@ -1,8 +1,8 @@
 {
-  "name": "chaosdanmutoolview",
-  "productName": "ChaosDanmuToolView",
+  "name": "chaosdanmutool",
+  "productName": "ChaosDanmuTool",
   "version": "1.0.0",
-  "description": "A tool for display information processed by ChaosDanmuTool",
+  "description": "A tool for process/view Danmu on bilibili",
   "main": ".webpack/main",
   "scripts": {
     "start": "electron-forge start",
@@ -24,7 +24,7 @@
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "ChaosDanmuToolView"
+            "name": "ChaosDanmuTool"
           }
         },
         {
