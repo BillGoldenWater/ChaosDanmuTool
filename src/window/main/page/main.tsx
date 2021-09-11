@@ -1,6 +1,6 @@
 import React from "react";
 import { NavBar } from "../../../component/navbar/NavBar";
-import { Function } from "./function";
+import { Function } from "./function/Function";
 import { Document } from "./document";
 import { Setting } from "./setting";
 
@@ -25,7 +25,7 @@ export class Main extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      pageIndex: 0,
+      pageIndex: 1,
     };
   }
 
@@ -37,7 +37,7 @@ export class Main extends React.Component<Props, State> {
           items={pages.map((value: Page) => {
             return value.name;
           })}
-          default={0}
+          default={this.state.pageIndex}
           onSwitch={this.onPageSwitch.bind(this)}
         />
         <CurrentPage />

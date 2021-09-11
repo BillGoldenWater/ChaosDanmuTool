@@ -56,7 +56,8 @@
                   "name": "main_window"
                 }
               ]
-            }
+            },
+            "devContentSecurityPolicy": "connect-src 'self' wss://broadcastlv.chat.bilibili.com;"
           }
         ]
       ]
