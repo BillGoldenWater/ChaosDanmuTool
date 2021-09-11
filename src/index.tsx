@@ -17,7 +17,7 @@ const createWindow = (): void => {
     width: 800,
   });
 
-  mainWindow.removeMenu();
+  mainWindow.setAutoHideMenuBar(true);
 
   // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
