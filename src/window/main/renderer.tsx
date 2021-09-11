@@ -29,7 +29,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
-import { Main } from "../../page/main";
+import { Main } from "./page/main";
 
 console.log("Rendering");
 
