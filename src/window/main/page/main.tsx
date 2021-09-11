@@ -30,7 +30,7 @@ export class Main extends React.Component<Props, State> {
   }
 
   render(): JSX.Element {
-    const CPage = pages[this.state.pageIndex].pageClass;
+    const CurrentPage = pages[this.state.pageIndex].pageClass;
     return (
       <div>
         <NavBar
@@ -40,7 +40,7 @@ export class Main extends React.Component<Props, State> {
           default={0}
           onSwitch={this.onPageSwitch.bind(this)}
         />
-        <CPage />
+        <CurrentPage />
       </div>
     );
   }
