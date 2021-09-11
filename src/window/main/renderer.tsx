@@ -29,8 +29,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
-import { Root } from "./page/root";
+import { Main } from "../../page/main";
 
 console.log("Rendering");
 
-ReactDOM.render(<Root />, document.querySelector("#app"));
+ReactDOM.render(<Main />, document.querySelector("#app"));

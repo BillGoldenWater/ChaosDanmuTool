@@ -12,7 +12,7 @@ const pages: Page[] = [
   { name: "pageD" },
 ];
 
-export class Root extends React.Component {
+export class Main extends React.Component {
   render(): JSX.Element {
     return (
       <div>
