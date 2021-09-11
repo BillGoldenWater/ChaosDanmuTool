@@ -1,7 +1,7 @@
 import React from "react";
 
 export class Document extends React.Component {
-  render() {
+  render(): JSX.Element {
     return <div>Document</div>;
   }
 }
