@@ -1,5 +1,8 @@
+import Zlib from "zlib";
+import WebSocket from "ws";
+
 const DataOffset = {
-  packageLength: 0,
+  packetLength: 0,
   headerLength: 4,
   dataType: 6,
   opCode: 8,
@@ -92,25 +95,25 @@ export class DanmuReceiver {
 
   static connect(url: string, onopen?: () => void): void {
     this.connection = new WebSocket(url);
+    this.connection.binaryType = "arraybuffer";
 
-    this.connection.onopen = () => {
-      this.connection.send(this.pack(Data.join(732602, 3, "web")));
+    this.connection.on("open", () => {
       onopen ? onopen() : "";
-    };
+    });
 
-    this.connection.onmessage = (event) => {
-      console.log(event.data);
-    };
+    this.connection.on("message", async (data: ArrayBuffer) => {
+      this.unpackCompressed(this.unpack(new DataView(data)));
+    });
   }
 
   static pack(data: Data): DataView {
     const result = new DataView(new ArrayBuffer(data.getPacketLength()));
 
-    result.setUint32(DataOffset.packageLength, data.getPacketLength(), false);
-    result.setUint16(DataOffset.headerLength, data.getHeaderLength(), false);
-    result.setUint16(DataOffset.dataType, data.getDataType(), false);
-    result.setUint32(DataOffset.opCode, data.getOpCode(), false);
-    result.setUint32(DataOffset.sequenceId, 1, false);
+    result.setUint32(DataOffset.packetLength, data.getPacketLength());
+    result.setUint16(DataOffset.headerLength, data.getHeaderLength());
+    result.setUint16(DataOffset.dataType, data.getDataType());
+    result.setUint32(DataOffset.opCode, data.getOpCode());
+    result.setUint32(DataOffset.sequenceId, 1);
 
     const body = data.getBody();
     for (let i = 0; i < body.byteLength; i++) {
@@ -118,5 +121,61 @@ export class DanmuReceiver {
     }
 
     return result;
+  }
+
+  static unpack(dataView: DataView, offset?: number): Data {
+    const dataOffset = offset ? offset : 0;
+    const packetLength = dataView.getUint32(
+      DataOffset.packetLength + dataOffset
+    );
+    const headerLength = dataView.getInt16(
+      DataOffset.headerLength + dataOffset
+    );
+    const dataType = dataView.getInt16(DataOffset.dataType + dataOffset);
+    const opCode = dataView.getUint32(DataOffset.opCode + dataOffset);
+
+    const bodyLength = packetLength - headerLength;
+    const body = new DataView(new ArrayBuffer(bodyLength));
+    for (let i = 0; i < bodyLength; i++) {
+      body.setUint8(i, dataView.getUint8(DataOffset.body + i + dataOffset));
+    }
+
+    return new Data(body, opCode, dataType);
+  }
+
+  static unpackContinuous(dataView: DataView): Data[] {
+    const dataArray: Data[] = [];
+    let data: Data = this.unpack(dataView);
+
+    dataArray.push(data);
+
+    let dataLength = data.getPacketLength();
+    while (dataLength < dataView.byteLength) {
+      data = this.unpack(dataView, dataLength);
+      dataLength += data.getPacketLength();
+      dataArray.push(data);
+    }
+
+    return dataArray;
+  }
+
+  static unpackCompressed(data: Data): Data[] {
+    switch (data.getDataType()) {
+      case DataType.compressedZlib: {
+        const decompressedData = Zlib.inflateSync(data.getBody());
+        return this.unpackContinuous(
+          new DataView(decompressedData.buffer, 0, decompressedData.byteLength)
+        );
+      }
+      case DataType.compressedBrotli: {
+        const decompressedData = Zlib.brotliDecompressSync(data.getBody());
+        return this.unpackContinuous(
+          new DataView(decompressedData.buffer, 0, decompressedData.byteLength)
+        );
+      }
+      default: {
+        return [data];
+      }
+    }
   }
 }
