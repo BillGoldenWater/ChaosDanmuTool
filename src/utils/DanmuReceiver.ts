@@ -92,17 +92,39 @@ export class Data {
 
 export class DanmuReceiver {
   static connection: WebSocket;
+  static onopen: () => void;
+  static onclose: () => void;
+  static onerror: () => void;
 
-  static connect(url: string, onopen?: () => void): void {
+  static init(
+    onopen?: () => void,
+    onclose?: () => void,
+    onerror?: () => void
+  ): void {
+    this.onopen = onopen;
+    this.onclose = onclose;
+    this.onerror = onerror;
+  }
+
+  static connect(url: string, roomid: number, protocolVersion: number): void {
     this.connection = new WebSocket(url);
     this.connection.binaryType = "arraybuffer";
 
     this.connection.on("open", () => {
-      onopen ? onopen() : "";
+      this.onopen ? this.onopen() : "";
+    });
+
+    this.connection.on("close", () => {
+      this.onclose ? this.onclose() : "";
+    });
+
+    this.connection.on("error", () => {
+      this.onerror ? this.onerror() : "";
     });
 
     this.connection.on("message", async (data: ArrayBuffer) => {
       this.unpackCompressed(this.unpack(new DataView(data)));
+      // wait finish
     });
   }
 
