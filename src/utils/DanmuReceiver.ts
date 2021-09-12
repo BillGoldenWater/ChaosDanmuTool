@@ -106,6 +106,17 @@ export class DanmuReceiver {
     });
   }
 
+  static close(): boolean {
+    if (this.connection) {
+      if (this.connection.readyState == this.connection.OPEN) {
+        this.connection.close(0);
+        return true;
+      }
+      return this.connection.readyState == this.connection.CLOSED;
+    }
+    return true;
+  }
+
   static pack(data: Data): DataView {
     const result = new DataView(new ArrayBuffer(data.getPacketLength()));
 
