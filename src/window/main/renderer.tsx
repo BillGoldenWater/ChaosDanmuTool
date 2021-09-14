@@ -33,4 +33,10 @@ import { Main } from "./page/main";
 
 console.log("Rendering");
 
+declare global {
+  interface Window {
+    electron: any;
+  }
+}
+
 ReactDOM.render(<Main />, document.querySelector("#app"));
