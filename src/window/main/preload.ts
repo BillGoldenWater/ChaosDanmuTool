@@ -1,12 +1,16 @@
 import { contextBridge, ipcRenderer } from "electron";
 
-export class ApiElectron {
-  connectToServer: () => void;
+export interface ApiElectron {
+  connect: (roomid: number) => void;
+  disconnect: () => void;
 }
 
 const apiElectron: ApiElectron = {
-  connectToServer: (): void => {
-    ipcRenderer.sendSync("connectManager", "connect", 123456789);
+  connect: (roomid: number): void => {
+    ipcRenderer.sendSync("connection", "connect", roomid);
+  },
+  disconnect: (): void => {
+    ipcRenderer.sendSync("connection", "disconnect");
   },
 };
 

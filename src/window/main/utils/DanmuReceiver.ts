@@ -92,51 +92,85 @@ export class Data {
 
 export class DanmuReceiver {
   static connection: WebSocket;
-  static onopen: () => void;
-  static onclose: () => void;
-  static onerror: () => void;
+  static heartBeatId: NodeJS.Timer;
+  static heartBeatInterval: number;
 
-  static init(
-    onopen?: () => void,
-    onclose?: () => void,
-    onerror?: () => void
+  static connect(
+    url: string,
+    roomid: number,
+    heartBeatInterval: number,
+    protocolVersion?: number,
+    platform?: string
   ): void {
-    this.onopen = onopen;
-    this.onclose = onclose;
-    this.onerror = onerror;
-  }
-
-  static connect(url: string, roomid: number, protocolVersion: number): void {
+    this.heartBeatInterval = heartBeatInterval;
     this.connection = new WebSocket(url);
     this.connection.binaryType = "arraybuffer";
 
     this.connection.on("open", () => {
-      this.onopen ? this.onopen() : "";
+      this.connection.send(
+        this.pack(
+          Data.join(
+            roomid,
+            protocolVersion ? protocolVersion : 3,
+            platform ? platform : "web"
+          )
+        )
+      );
+      this.startHeartBeat();
+      console.log("onOpen");
     });
 
     this.connection.on("close", () => {
-      this.onclose ? this.onclose() : "";
+      console.log("onClose");
     });
 
     this.connection.on("error", () => {
-      this.onerror ? this.onerror() : "";
+      console.log("onError");
     });
 
     this.connection.on("message", async (data: ArrayBuffer) => {
       this.unpackCompressed(this.unpack(new DataView(data)));
+      console.log("onMessage");
       // wait finish
     });
   }
 
+  static startHeartBeat(): void {
+    this.heartBeatId = setInterval(() => {
+      console.log("heartBeat");
+      this.connection.send(this.pack(Data.heartBeat()));
+    }, this.heartBeatInterval * 1000);
+  }
+
+  static stopHeartBeat(): void {
+    clearInterval(this.heartBeatId);
+    this.heartBeatId = null;
+  }
+
   static close(): boolean {
     if (this.connection) {
-      if (this.connection.readyState == this.connection.OPEN) {
-        this.connection.close(0);
-        return true;
+      if (this.connection.readyState != WebSocket.CLOSED) {
+        this.connection.terminate();
       }
-      return this.connection.readyState == this.connection.CLOSED;
     }
+    this.heartBeatId ? this.stopHeartBeat() : "";
     return true;
+  }
+
+  static isConnecting(): boolean {
+    return this.connection.readyState == this.connection.CONNECTING;
+  }
+
+  static isOpen(): boolean {
+    return this.connection.readyState == this.connection.OPEN;
+  }
+
+  static isClosing(): boolean {
+    return this.connection.readyState == this.connection.CLOSING;
+  }
+
+  static isClosed(): boolean {
+    return this.connection.readyState == this.connection.CLOSED;
   }
 
   static pack(data: Data): DataView {
