@@ -27,10 +27,10 @@ const createWindow = (): void => {
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
   mainWindow.webContents.openDevTools();
-  mainWindow.setVisibleOnAllWorkspaces(true, {
-    skipTransformProcessType: false,
-    visibleOnFullScreen: true,
-  });
+  // mainWindow.setVisibleOnAllWorkspaces(true, {
+  //   skipTransformProcessType: false,
+  //   visibleOnFullScreen: true,
+  // });
 };
 
 // This method will be called when Electron has finished
