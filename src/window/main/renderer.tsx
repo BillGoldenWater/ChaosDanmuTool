@@ -30,12 +30,13 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import { Main } from "./page/main";
+import { ApiElectron } from "./preload";
 
 console.log("Rendering");
 
 declare global {
   interface Window {
-    electron: any;
+    electron: ApiElectron;
   }
 }
 
