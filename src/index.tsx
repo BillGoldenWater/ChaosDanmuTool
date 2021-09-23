@@ -65,6 +65,7 @@ app.on("activate", () => {
 // code. You can also put them in separate files and import them here.
 ConfigManager.init(path.join(app.getAppPath(), "config.json"));
 ConfigManager.load();
+KoaServer.init(path.join(app.getAppPath(), ".webpack", "renderer"));
 
 ipcMain.on("connection", (event, ...args) => {
   switch (args[0]) {
@@ -107,11 +108,23 @@ ipcMain.on("config", (event, ...args) => {
   event.returnValue = result;
 });
 
+ipcMain.on("koaServer", (event, ...args) => {
+  switch (args[0]) {
+    case "run": {
+      KoaServer.run(args[1]);
+      break;
+    }
+    case "close": {
+      KoaServer.close();
+      break;
+    }
+  }
+  event.returnValue = "";
+});
+
 console.log(
   "==============================================================================="
 );
-KoaServer.init(path.join(app.getAppPath(), ".webpack", "renderer"), 25554);
-KoaServer.run();
 console.log(
   "==============================================================================="
 );

@@ -6,18 +6,16 @@ export class KoaServer {
   static app: Koa;
   static server: Server;
   static root: string;
-  static port: number;
 
-  static init(root: string, port: number): void {
+  static init(root: string): void {
     this.root = root;
-    this.port = port;
     this.app = new Koa();
   }
 
-  static run(): void {
+  static run(port: number): void {
     this.close();
     this.app.use(KoaStatic(this.root));
-    this.server = this.app.listen(this.port);
+    this.server = this.app.listen(port);
   }
 
   static close(): void {

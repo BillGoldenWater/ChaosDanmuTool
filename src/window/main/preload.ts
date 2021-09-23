@@ -3,10 +3,14 @@ import { contextBridge, ipcRenderer } from "electron";
 export interface ApiElectron {
   connect: (roomid: number) => void;
   disconnect: () => void;
+
   loadConfig: () => void;
   saveConfig: () => void;
   getConfig: () => string;
   updateConfig: (config: string) => void;
+
+  runKoaServer: (port: number) => void;
+  closeKoaServer: () => void;
 }
 
 const apiElectron: ApiElectron = {
@@ -27,6 +31,12 @@ const apiElectron: ApiElectron = {
   },
   updateConfig: (config: string): void => {
     ipcRenderer.sendSync("config", "update", config);
+  },
+  runKoaServer: (port: number): void => {
+    ipcRenderer.sendSync("koaServer", "run", port);
+  },
+  closeKoaServer: (): void => {
+    ipcRenderer.sendSync("koaServer", "close");
   },
 };
 

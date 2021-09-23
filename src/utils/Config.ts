@@ -9,8 +9,13 @@ export type WebsocketServerConfig = {
   port: number;
 };
 
+export type WebServerConfig = {
+  port: number;
+};
+
 export type DanmuViewConfig = {
   websocketServer: WebsocketServerConfig;
+  webServer: WebServerConfig;
   width: number;
   height: number;
   posX: number;
@@ -117,6 +122,9 @@ export const defaultConfig: Config = {
     websocketServer: {
       host: "",
       port: 25555,
+    },
+    webServer: {
+      port: 25556,
     },
     width: 400,
     height: 600,
