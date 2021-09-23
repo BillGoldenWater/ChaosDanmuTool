@@ -11,6 +11,10 @@ export interface ApiElectron {
 
   runKoaServer: (port: number) => void;
   closeKoaServer: () => void;
+
+  runWebsocketServer: (host: string, port: number) => void;
+  closeWebsocketServer: () => void;
+  websocketBroadcast: (data: string) => void;
 }
 
 const apiElectron: ApiElectron = {
@@ -20,6 +24,7 @@ const apiElectron: ApiElectron = {
   disconnect: (): void => {
     ipcRenderer.sendSync("connection", "disconnect");
   },
+
   loadConfig: (): void => {
     ipcRenderer.sendSync("config", "load");
   },
@@ -32,11 +37,22 @@ const apiElectron: ApiElectron = {
   updateConfig: (config: string): void => {
     ipcRenderer.sendSync("config", "update", config);
   },
+
   runKoaServer: (port: number): void => {
     ipcRenderer.sendSync("koaServer", "run", port);
   },
   closeKoaServer: (): void => {
     ipcRenderer.sendSync("koaServer", "close");
+  },
+
+  runWebsocketServer: (host: string, port: number): void => {
+    ipcRenderer.sendSync("websocketServer", "run", host, port);
+  },
+  closeWebsocketServer: (): void => {
+    ipcRenderer.sendSync("websocketServer", "close");
+  },
+  websocketBroadcast: (data: string): void => {
+    ipcRenderer.sendSync("websocketServer", "broadcast", data);
   },
 };
 

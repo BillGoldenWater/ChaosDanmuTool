@@ -60,7 +60,7 @@
                 }
               ]
             },
-            "devContentSecurityPolicy": "connect-src 'self' wss://broadcastlv.chat.bilibili.com;"
+            "devContentSecurityPolicy": "connect-src *;"
           }
         ]
       ]
