@@ -1,19 +1,25 @@
-export type Status = "open" | "close" | "error";
+export type ReceiverStatus = "open" | "close" | "error";
+
+export type ReceiverStatusUpdateCmd = "receiverStatusUpdate";
 
 export type ReceiverStatusUpdate = {
-  cmd: "receiverStatusUpdate";
+  cmd: ReceiverStatusUpdateCmd;
   data: {
-    status: Status;
+    status: ReceiverStatus;
   };
 };
 
-export function getStatusUpdateMessage(status: Status): string {
+export function getStatusUpdateMessage(status: ReceiverStatus): string {
   const messageObj: ReceiverStatusUpdate = {
     cmd: "receiverStatusUpdate",
     data: {
       status: status,
     },
   };
-  
+
   return JSON.stringify(messageObj);
+}
+
+export function getStatusUpdateMessageCmd(): ReceiverStatusUpdateCmd {
+  return "receiverStatusUpdate";
 }

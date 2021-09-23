@@ -3,11 +3,24 @@ import { NavBar } from "../../../component/navbar/NavBar";
 import { Function } from "./function/Function";
 import { Document } from "./document";
 import { Setting } from "./setting";
+import { WebsocketClient } from "../utils/WebsocketClient";
+import {
+  getStatusUpdateMessageCmd,
+  ReceiverStatus,
+  ReceiverStatusUpdate,
+} from "../../../utils/command/ReceiverStatusUpdate";
+import { Config, defaultConfig } from "../../../utils/Config";
+import {
+  ConfigUpdate,
+  getConfigUpdateCmd,
+} from "../../../utils/command/ConfigUpdate";
 
 class Props {}
 
 class State {
   pageIndex: number;
+  receiverStatus: ReceiverStatus;
+  config: Config;
 }
 
 class Page {
@@ -22,11 +35,17 @@ const pages: Page[] = [
 ];
 
 export class Main extends React.Component<Props, State> {
+  websocketClient: WebsocketClient;
+
   constructor(props: Props) {
     super(props);
     this.state = {
       pageIndex: 1,
+      receiverStatus: "close",
+      config: { ...defaultConfig },
     };
+
+    this.websocketClient = new WebsocketClient(this.onMessage.bind(this));
   }
 
   render(): JSX.Element {
@@ -43,6 +62,27 @@ export class Main extends React.Component<Props, State> {
         <CurrentPage />
       </div>
     );
+  }
+
+  onMessage(event: MessageEvent): void {
+    const msgObj = JSON.parse(event.data);
+
+    switch (msgObj.cmd) {
+      case getStatusUpdateMessageCmd(): {
+        const msg: ReceiverStatusUpdate = msgObj;
+        this.setState({
+          receiverStatus: msg.data.status,
+        });
+        break;
+      }
+      case getConfigUpdateCmd(): {
+        const msg: ConfigUpdate = msgObj;
+        this.setState({
+          config: msg.data,
+        });
+        break;
+      }
+    }
   }
 
   onPageSwitch(index: number): void {

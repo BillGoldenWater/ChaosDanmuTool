@@ -1,7 +1,9 @@
 import { Config } from "../Config";
 
+export type ConfigUpdateCmd = "updateConfig";
+
 export type ConfigUpdate = {
-  cmd: "updateConfig";
+  cmd: ConfigUpdateCmd;
   data: Config;
 };
 
@@ -12,4 +14,8 @@ export function getConfigUpdateMessage(config: Config): string {
   };
 
   return JSON.stringify(messageObj);
+}
+
+export function getConfigUpdateCmd(): ConfigUpdateCmd {
+  return "updateConfig";
 }
