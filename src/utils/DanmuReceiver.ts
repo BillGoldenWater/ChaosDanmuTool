@@ -141,7 +141,6 @@ export class DanmuReceiver {
 
   static startHeartBeat(): void {
     this.heartBeatId = setInterval(() => {
-      console.log("heartBeat");
       this.connection.send(this.pack(Data.heartBeat()));
     }, this.heartBeatInterval * 1000);
   }
