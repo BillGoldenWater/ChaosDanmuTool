@@ -1,5 +1,7 @@
 import Zlib from "zlib";
 import WebSocket from "ws";
+import { WebsocketServer } from "./WebsocketServer";
+import { getStatusUpdateMessage } from "./command/ReceiverStatusUpdate";
 
 const DataOffset = {
   packetLength: 0,
@@ -117,15 +119,17 @@ export class DanmuReceiver {
         )
       );
       this.startHeartBeat();
-      console.log("onOpen");
+
+      WebsocketServer.broadcast(getStatusUpdateMessage("open"));
     });
 
     this.connection.on("close", () => {
-      console.log("onClose");
+      WebsocketServer.broadcast(getStatusUpdateMessage("close"));
     });
 
-    this.connection.on("error", () => {
-      console.log("onError");
+    this.connection.on("error", (err) => {
+      console.log(err);
+      WebsocketServer.broadcast(getStatusUpdateMessage("error"));
     });
 
     this.connection.on("message", async (data: ArrayBuffer) => {

@@ -1,4 +1,5 @@
 import { Server } from "ws";
+import { getConfigUpdateMessage } from "./command/ConfigUpdate";
 import { ConfigManager } from "./ConfigManager";
 
 export class WebsocketServer {
@@ -11,12 +12,7 @@ export class WebsocketServer {
       port: port,
     });
     this.server.on("connection", (socket) => {
-      socket.send(
-        JSON.stringify({
-          cmd: "updateConfig",
-          data: ConfigManager.config,
-        })
-      );
+      socket.send(getConfigUpdateMessage(ConfigManager.config));
     });
   }
 
