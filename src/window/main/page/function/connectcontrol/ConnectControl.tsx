@@ -1,39 +1,23 @@
 import React from "react";
+import { Button } from "../../../../../component/button/Button";
 
 class Props {}
 
-class State {
-  isOpen: boolean;
-}
-
-export class ConnectControl extends React.Component<Props, State> {
+export class ConnectControl extends React.Component<Props> {
   constructor(props: never) {
     super(props);
-    this.state = {
-      isOpen: false,
-    };
   }
 
   render(): JSX.Element {
     return (
       <div>
-        <button
-          onClick={() => {
-            window.electron.connect(123456789);
-          }}
+        房间号:
+        <input
           style={{
-            backgroundColor: this.state.isOpen ? "green" : "red",
+            padding: "0.3em",
           }}
-        >
-          连接服务器
-        </button>
-        <button
-          onClick={() => {
-            window.electron.disconnect();
-          }}
-        >
-          启动服务器
-        </button>
+        />
+        <Button>连接</Button>
       </div>
     );
   }
