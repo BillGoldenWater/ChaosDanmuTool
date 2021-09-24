@@ -14,6 +14,7 @@ import {
   ConfigUpdate,
   getConfigUpdateCmd,
 } from "../../../utils/command/ConfigUpdate";
+import { StatusBar } from "../../../component/statusbar/StatusBar";
 
 class Props {}
 
@@ -60,6 +61,43 @@ export class Main extends React.Component<Props, State> {
           onSwitch={this.onPageSwitch.bind(this)}
         />
         <CurrentPage />
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
+        <StatusBar message={"test message"}>
+          <div>item1</div>
+          <div>item2</div>
+          <div>item3</div>
+        </StatusBar>
       </div>
     );
   }

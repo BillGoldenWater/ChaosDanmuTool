@@ -1,0 +1,38 @@
+.statusBar {
+  position: fixed;
+  bottom: 0;
+  z-index: 100;
+  width: 100%;
+  background-color: white;
+}
+
+.statusBar_placeholder {
+  position: initial;
+  opacity: 0;
+}
+
+.statusBar_content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  border: 0.1em #bfbfbf solid;
+  border-radius: 0.4em;
+  padding: 0.1em;
+}
+
+.statusBar_statusMessage {
+}
+
+.statusBar_itemList {
+  display: flex;
+  flex-direction: row-reverse;
+  flex-wrap: wrap;
+}
+
+.statusBar_itemList > div {
+  margin-left: 0.25em;
+  padding-left: 0.25em;
+  border-width: 0 0 0 0.1em;
+  border-color: #bfbfbf;
+  border-style: solid;
+}

@@ -1,9 +1,12 @@
 .navBar {
+  position: sticky;
+  top: 0;
   display: flex;
   justify-content: flex-start;
   align-items: center;
   box-shadow: 0 0.25em 0.25em 0 rgba(0, 0, 0, 0.1);
   height: 2.5em;
+  background-color: white;
 }
 
 .navItem {
