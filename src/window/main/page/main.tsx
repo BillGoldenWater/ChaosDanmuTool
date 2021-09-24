@@ -63,38 +63,6 @@ export class Main extends React.Component<Props, State> {
           onSwitch={this.onPageSwitch.bind(this)}
         />
         <CurrentPage />
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
         <StatusBar message={""}>
           <ReceiverStatusIndicator status={this.state.receiverStatus} />
         </StatusBar>
