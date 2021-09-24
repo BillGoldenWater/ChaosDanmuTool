@@ -1,5 +1,27 @@
 .functionCard {
+  display: flex;
+  flex-direction: column;
   padding: 1em;
   border: 0.1em solid #bfbfbf;
   border-radius: 1em;
+}
+
+.functionCard_name {
+  position: absolute;
+  margin-top: -1.7em;
+  background-color: #f7f7f7;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  z-index: 0;
+}
+
+.functionCard_name > h5 {
+  margin: 0;
+}
+
+.functionCard_description {
+  margin-top: -0.5em;
+  margin-bottom: 0.5em;
+  font-size: 0.8em;
+  color: #505050;
 }

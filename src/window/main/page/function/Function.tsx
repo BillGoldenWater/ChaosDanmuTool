@@ -7,7 +7,7 @@ export class Function extends React.Component {
   render(): JSX.Element {
     return (
       <div className={style.function}>
-        <FunctionCard>
+        <FunctionCard className={""} name={"直播间连接"}>
           <ConnectControl />
         </FunctionCard>
       </div>
