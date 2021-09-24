@@ -1,0 +1,20 @@
+.receiverStatusIndicator {
+  display: flex;
+  justify-content: space-around;
+  border-radius: 0.25em;
+  min-width: 1.4em;
+  font-weight: 550;
+  color: #505050;
+}
+
+.receiverStatusIndicator_open {
+  background-color: #1aff1a;
+}
+
+.receiverStatusIndicator_close {
+  background-color: #ffff1a;
+}
+
+.receiverStatusIndicator_error {
+  background-color: #ff1a1a;
+}

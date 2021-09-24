@@ -15,6 +15,7 @@ import {
   getConfigUpdateCmd,
 } from "../../../utils/command/ConfigUpdate";
 import { StatusBar } from "../../../component/statusbar/StatusBar";
+import { ReceiverStatusIndicator } from "../../../component/receiverstatusindicator/ReceiverStatusIndicator";
 
 class Props {}
 
@@ -51,6 +52,7 @@ export class Main extends React.Component<Props, State> {
 
   render(): JSX.Element {
     const CurrentPage = pages[this.state.pageIndex].pageClass;
+
     return (
       <div>
         <NavBar
@@ -93,10 +95,8 @@ export class Main extends React.Component<Props, State> {
         <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
         <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
         <div>testtesttesttesttesttesttesttesttesttesttesttest</div>
-        <StatusBar message={"test message"}>
-          <div>item1</div>
-          <div>item2</div>
-          <div>item3</div>
+        <StatusBar message={""}>
+          <ReceiverStatusIndicator status={this.state.receiverStatus} />
         </StatusBar>
       </div>
     );
