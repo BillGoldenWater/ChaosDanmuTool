@@ -21,7 +21,7 @@ const NavItem = (props: Props) => {
         props.onClick(props.index);
       }}
     >
-      {props.name}
+      <h4>{props.name}</h4>
     </div>
   );
 };
