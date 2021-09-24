@@ -1,0 +1,11 @@
+.Button {
+  border: 0;
+  border-radius: 0.4em;
+  background-color: #1e90ff;
+  padding: 0.3em 0.4em;
+  font-size: 0.9em;
+}
+
+.Button:active {
+  background-color: #1b82e3;
+}
