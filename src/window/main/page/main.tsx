@@ -16,13 +16,15 @@ import {
 } from "../../../utils/command/ConfigUpdate";
 import { StatusBar } from "../../../component/statusbar/StatusBar";
 import { ReceiverStatusIndicator } from "../../../component/receiverstatusindicator/ReceiverStatusIndicator";
+import { DateFormat } from "../../../utils/DateFormat";
 
 class Props {}
 
 class State {
   pageIndex: number;
-  receiverStatus: ReceiverStatus;
   config: Config;
+  receiverStatus: ReceiverStatus;
+  statusMessage: string;
 }
 
 class Page {
@@ -43,11 +45,29 @@ export class Main extends React.Component<Props, State> {
     super(props);
     this.state = {
       pageIndex: 1,
-      receiverStatus: "close",
       config: { ...defaultConfig },
+      receiverStatus: "close",
+      statusMessage: "",
     };
 
-    this.websocketClient = new WebsocketClient(this.onMessage.bind(this));
+    this.websocketClient = new WebsocketClient(
+      this.onMessage.bind(this),
+      () => {
+        this.setState({
+          statusMessage: DateFormat() + " 服务器已连接",
+        });
+      },
+      () => {
+        this.setState({
+          statusMessage: DateFormat() + " 服务器已断开",
+        });
+      },
+      () => {
+        this.setState({
+          statusMessage: DateFormat() + " 服务器连接发生错误 已断开",
+        });
+      }
+    );
   }
 
   render(): JSX.Element {
@@ -70,8 +90,9 @@ export class Main extends React.Component<Props, State> {
             });
           }}
           receiverStatus={this.state.receiverStatus}
+          websocketClient={this.websocketClient}
         />
-        <StatusBar message={""}>
+        <StatusBar message={this.state.statusMessage}>
           <ReceiverStatusIndicator status={this.state.receiverStatus} />
         </StatusBar>
       </div>
