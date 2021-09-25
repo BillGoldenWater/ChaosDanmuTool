@@ -2,7 +2,7 @@ import React from "react";
 import { NavBar } from "../../../component/navbar/NavBar";
 import { Function } from "./function/Function";
 import { Document } from "./document";
-import { Setting } from "./setting";
+import { Setting } from "./setting/Setting";
 import { WebsocketClient } from "../utils/WebsocketClient";
 import {
   getStatusUpdateMessageCmd,
@@ -44,7 +44,7 @@ export class Main extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      pageIndex: 1,
+      pageIndex: 2,
       config: { ...defaultConfig },
       receiverStatus: "close",
       statusMessage: "",

@@ -1,0 +1,6 @@
+.setting {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    padding: 0.5em;
+}
