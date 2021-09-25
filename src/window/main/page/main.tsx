@@ -62,7 +62,15 @@ export class Main extends React.Component<Props, State> {
           default={this.state.pageIndex}
           onSwitch={this.onPageSwitch.bind(this)}
         />
-        <CurrentPage />
+        <CurrentPage
+          config={this.state.config}
+          setConfig={(config: Config): void => {
+            this.setState({
+              config: config,
+            });
+          }}
+          receiverStatus={this.state.receiverStatus}
+        />
         <StatusBar message={""}>
           <ReceiverStatusIndicator status={this.state.receiverStatus} />
         </StatusBar>
