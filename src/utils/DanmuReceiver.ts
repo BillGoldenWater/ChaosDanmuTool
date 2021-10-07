@@ -4,6 +4,8 @@ import { WebsocketServer } from "./WebsocketServer";
 import { getStatusUpdateMessage } from "./command/ReceiverStatusUpdate";
 import { getActivityUpdateMessage } from "./command/ActivityUpdate";
 import { errorCode } from "./ErrorCode";
+import { getJoinResponseMessage } from "./command/JoinResponse";
+import { getErrorMessageMessage } from "./command/ErrorMessage";
 
 const DataOffset = {
   packetLength: 0,
@@ -98,6 +100,8 @@ export class DanmuReceiver {
   static connection: WebSocket;
   static heartBeatId: NodeJS.Timer;
   static heartBeatInterval: number;
+  static textDecoder: TextDecoder;
+  static messageHistory: string[];
 
   static connect(
     url: string,
@@ -109,6 +113,8 @@ export class DanmuReceiver {
     this.heartBeatInterval = heartBeatInterval;
     this.connection = new WebSocket(url);
     this.connection.binaryType = "arraybuffer";
+    this.textDecoder = new TextDecoder("utf-8");
+    this.messageHistory = [];
 
     this.connection.on("open", () => {
       this.connection.send(
@@ -138,27 +144,50 @@ export class DanmuReceiver {
       const dataList = this.unpackCompressed(this.unpack(new DataView(data)));
       dataList.forEach((value) => {
         if (value.getDataType() != DataType.json) {
-          alert("出现了错误: " + errorCode.dataTypeIncorrect);
+          const message =
+            "出现了错误: " +
+            errorCode.dataTypeIncorrect +
+            " " +
+            value.getDataType();
+          alert(message);
+          this.messageHistory.push(getErrorMessageMessage(message, value));
           return;
         }
         switch (value.getOpCode()) {
           case OpCode.heartbeatResponse: {
             const activity = value.getBody().getInt32(0, false);
-            WebsocketServer.broadcast(getActivityUpdateMessage(activity));
+            const message = getActivityUpdateMessage(activity);
+            WebsocketServer.broadcast(message);
+            this.messageHistory.push(message);
             break;
           }
           case OpCode.joinResponse: {
+            const responseBody = JSON.parse(
+              this.textDecoder.decode(value.getBody())
+            );
+            const message = getJoinResponseMessage(responseBody["code"]);
+            WebsocketServer.broadcast(message);
+            this.messageHistory.push(message);
             break;
           }
           case OpCode.message: {
+            const message = this.textDecoder.decode(value.getBody());
+            WebsocketServer.broadcast(message);
+            this.messageHistory.push(message);
             break;
           }
           default: {
+            const message =
+              "出现了错误: " +
+              errorCode.unknownOpCode +
+              " " +
+              value.getOpCode();
+            alert(message);
+            this.messageHistory.push(getErrorMessageMessage(message, value));
             break;
           }
         }
       });
-      // wait finish
     });
   }
 
