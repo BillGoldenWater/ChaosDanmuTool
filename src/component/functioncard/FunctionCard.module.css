@@ -6,6 +6,9 @@
   border-radius: 1em;
 }
 
+.functionCard_body {
+}
+
 .functionCard_name {
   position: absolute;
   margin-top: -1.7em;

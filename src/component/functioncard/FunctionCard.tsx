@@ -22,7 +22,7 @@ export class FunctionCard extends React.Component<Props> {
         <div className={style.functionCard_description}>
           {this.props.description}
         </div>
-        {this.props.children}
+        <div className={style.functionCard_body}>{this.props.children}</div>
       </div>
     );
   }
