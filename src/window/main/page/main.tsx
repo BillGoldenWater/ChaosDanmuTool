@@ -44,7 +44,7 @@ export class Main extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      pageIndex: 2,
+      pageIndex: 1,
       config: { ...defaultConfig },
       receiverStatus: "close",
       statusMessage: "",
@@ -101,6 +101,7 @@ export class Main extends React.Component<Props, State> {
 
   onMessage(event: MessageEvent): void {
     const msgObj = JSON.parse(event.data);
+    console.log(msgObj);
 
     switch (msgObj.cmd) {
       case getStatusUpdateMessageCmd(): {

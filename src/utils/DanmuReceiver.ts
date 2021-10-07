@@ -2,6 +2,8 @@ import Zlib from "zlib";
 import WebSocket from "ws";
 import { WebsocketServer } from "./WebsocketServer";
 import { getStatusUpdateMessage } from "./command/ReceiverStatusUpdate";
+import { getActivityUpdateMessage } from "./command/ActivityUpdate";
+import { errorCode } from "./ErrorCode";
 
 const DataOffset = {
   packetLength: 0,
@@ -133,8 +135,29 @@ export class DanmuReceiver {
     });
 
     this.connection.on("message", async (data: ArrayBuffer) => {
-      this.unpackCompressed(this.unpack(new DataView(data)));
-      console.log("onMessage");
+      const dataList = this.unpackCompressed(this.unpack(new DataView(data)));
+      dataList.forEach((value) => {
+        if (value.getDataType() != DataType.json) {
+          alert("出现了错误: " + errorCode.dataTypeIncorrect);
+          return;
+        }
+        switch (value.getOpCode()) {
+          case OpCode.heartbeatResponse: {
+            const activity = value.getBody().getInt32(0, false);
+            WebsocketServer.broadcast(getActivityUpdateMessage(activity));
+            break;
+          }
+          case OpCode.joinResponse: {
+            break;
+          }
+          case OpCode.message: {
+            break;
+          }
+          default: {
+            break;
+          }
+        }
+      });
       // wait finish
     });
   }

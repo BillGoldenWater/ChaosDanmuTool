@@ -29,6 +29,22 @@ export class ServerManager extends React.Component<Props> {
         >
           关闭服务器
         </Button>
+        <Button
+          onClick={() => {
+            window.electron.runKoaServer(
+              this.props.config.danmuViewConfig.webServer.port
+            );
+          }}
+        >
+          启动网页服务器
+        </Button>
+        <Button
+          onClick={() => {
+            window.electron.closeKoaServer();
+          }}
+        >
+          关闭网页服务器
+        </Button>
         <br />
         <Button
           onClick={() => {
