@@ -10,6 +10,7 @@ import {
   ReceiverStatusUpdate,
 } from "../../../utils/command/ReceiverStatusUpdate";
 import { Config, defaultConfig } from "../../../utils/Config";
+import { ConfigContext } from "../utils/ConfigContext";
 import {
   ConfigUpdate,
   getConfigUpdateCmd,
@@ -75,26 +76,31 @@ export class Main extends React.Component<Props, State> {
 
     return (
       <div>
-        <NavBar
-          items={pages.map((value: Page) => {
-            return value.name;
-          })}
-          default={this.state.pageIndex}
-          onSwitch={this.onPageSwitch.bind(this)}
-        />
-        <CurrentPage
-          config={this.state.config}
-          setConfig={(config: Config): void => {
-            this.setState({
-              config: config,
-            });
+        <ConfigContext.Provider
+          value={{
+            config: this.state.config,
+            setConfig: (config: Config) => {
+              this.setState({
+                config: config,
+              });
+            },
           }}
-          receiverStatus={this.state.receiverStatus}
-          websocketClient={this.websocketClient}
-        />
-        <StatusBar message={this.state.statusMessage}>
-          <ReceiverStatusIndicator status={this.state.receiverStatus} />
-        </StatusBar>
+        >
+          <NavBar
+            items={pages.map((value: Page) => {
+              return value.name;
+            })}
+            default={this.state.pageIndex}
+            onSwitch={this.onPageSwitch.bind(this)}
+          />
+          <CurrentPage
+            receiverStatus={this.state.receiverStatus}
+            websocketClient={this.websocketClient}
+          />
+          <StatusBar message={this.state.statusMessage}>
+            <ReceiverStatusIndicator status={this.state.receiverStatus} />
+          </StatusBar>
+        </ConfigContext.Provider>
       </div>
     );
   }

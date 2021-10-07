@@ -1,11 +1,7 @@
 import React from "react";
 import style from "./Setting.module.css";
-import { Config } from "../../../../utils/Config";
 
-class Props {
-  config: Config;
-  setConfig: (config: Config) => void;
-}
+class Props {}
 
 export class Setting extends React.Component<Props> {
   render(): JSX.Element {

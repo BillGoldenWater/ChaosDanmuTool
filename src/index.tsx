@@ -73,7 +73,7 @@ ipcMain.on("connection", (event, ...args) => {
     case "connect": {
       DanmuReceiver.connect(
         ConfigManager.config.danmuReceiver.serverUrl,
-        ConfigManager.config.danmuReceiver.roomid,
+        args[1],
         ConfigManager.config.danmuReceiver.heartBeatInterval
       );
       break;
