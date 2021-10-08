@@ -6,6 +6,7 @@ import { getActivityUpdateMessage } from "./command/ActivityUpdate";
 import { errorCode } from "./ErrorCode";
 import { getJoinResponseMessage } from "./command/JoinResponse";
 import { getErrorMessageMessage } from "./command/ErrorMessage";
+import { getMessageLogMessage, MessageLog } from "./command/MessageLog";
 
 const DataOffset = {
   packetLength: 0,
@@ -101,7 +102,7 @@ export class DanmuReceiver {
   static heartBeatId: NodeJS.Timer;
   static heartBeatInterval: number;
   static textDecoder: TextDecoder;
-  static messageHistory: string[];
+  static messageHistory: MessageLog[];
 
   static connect(
     url: string,
@@ -149,16 +150,14 @@ export class DanmuReceiver {
             errorCode.dataTypeIncorrect +
             " " +
             value.getDataType();
-          alert(message);
-          this.messageHistory.push(getErrorMessageMessage(message, value));
+          this.alertMessage(getErrorMessageMessage(message, value));
           return;
         }
         switch (value.getOpCode()) {
           case OpCode.heartbeatResponse: {
             const activity = value.getBody().getInt32(0, false);
             const message = getActivityUpdateMessage(activity);
-            WebsocketServer.broadcast(message);
-            this.messageHistory.push(message);
+            this.broadcastMessage(message);
             break;
           }
           case OpCode.joinResponse: {
@@ -166,14 +165,12 @@ export class DanmuReceiver {
               this.textDecoder.decode(value.getBody())
             );
             const message = getJoinResponseMessage(responseBody["code"]);
-            WebsocketServer.broadcast(message);
-            this.messageHistory.push(message);
+            this.broadcastMessage(message);
             break;
           }
           case OpCode.message: {
             const message = this.textDecoder.decode(value.getBody());
-            WebsocketServer.broadcast(message);
-            this.messageHistory.push(message);
+            this.broadcastMessage(message);
             break;
           }
           default: {
@@ -182,13 +179,22 @@ export class DanmuReceiver {
               errorCode.unknownOpCode +
               " " +
               value.getOpCode();
-            alert(message);
-            this.messageHistory.push(getErrorMessageMessage(message, value));
+            this.alertMessage(getErrorMessageMessage(message, value));
             break;
           }
         }
       });
     });
+  }
+
+  static broadcastMessage(jsonMessage: string): void {
+    WebsocketServer.broadcast(jsonMessage);
+    this.messageHistory.push(getMessageLogMessage(jsonMessage));
+  }
+
+  static alertMessage(jsonMessage: string): void {
+    alert(JSON.parse(jsonMessage)["errorMessage"]);
+    this.messageHistory.push(getMessageLogMessage(jsonMessage));
   }
 
   static startHeartBeat(): void {
