@@ -1,6 +1,6 @@
 import { Server } from "ws";
-import { getConfigUpdateMessage } from "./command/ConfigUpdate";
-import { ConfigManager } from "./ConfigManager";
+import { getConfigUpdateMessage } from "../command/ConfigUpdate";
+import { ConfigManager } from "../ConfigManager";
 
 export class WebsocketServer {
   static server: Server;

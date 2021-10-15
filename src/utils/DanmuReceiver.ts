@@ -1,6 +1,6 @@
 import Zlib from "zlib";
 import WebSocket from "ws";
-import { WebsocketServer } from "./WebsocketServer";
+import { WebsocketServer } from "./server/WebsocketServer";
 import { getStatusUpdateMessage } from "./command/ReceiverStatusUpdate";
 import { getActivityUpdateMessage } from "./command/ActivityUpdate";
 import { errorCode } from "./ErrorCode";
