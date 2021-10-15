@@ -1,12 +1,12 @@
 import Zlib from "zlib";
 import WebSocket from "ws";
-import { WebsocketServer } from "./server/WebsocketServer";
-import { getStatusUpdateMessage } from "./command/ReceiverStatusUpdate";
-import { getActivityUpdateMessage } from "./command/ActivityUpdate";
-import { errorCode } from "./ErrorCode";
-import { getJoinResponseMessage } from "./command/JoinResponse";
-import { getErrorMessageMessage } from "./command/ErrorMessage";
-import { getMessageLogMessage, MessageLog } from "./command/MessageLog";
+import { WebsocketServer } from "../server/WebsocketServer";
+import { getStatusUpdateMessage } from "../command/ReceiverStatusUpdate";
+import { getActivityUpdateMessage } from "../command/ActivityUpdate";
+import { errorCode } from "../ErrorCode";
+import { getJoinResponseMessage } from "../command/JoinResponse";
+import { getErrorMessageMessage } from "../command/ErrorMessage";
+import { getMessageLogMessage, MessageLog } from "../command/MessageLog";
 
 const DataOffset = {
   packetLength: 0,

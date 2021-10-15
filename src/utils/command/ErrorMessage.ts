@@ -1,4 +1,4 @@
-import { Data } from "../DanmuReceiver";
+import { Data } from "../client/DanmuReceiver";
 
 export type ErrorMessageCmd = "errorMessage";
 

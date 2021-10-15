@@ -3,7 +3,7 @@ import { NavBar } from "../../../component/navbar/NavBar";
 import { Function } from "./function/Function";
 import { Document } from "./document";
 import { Setting } from "./setting/Setting";
-import { WebsocketClient } from "../utils/WebsocketClient";
+import { WebsocketClient } from "../../../utils/client/WebsocketClient";
 import {
   getStatusUpdateMessageCmd,
   ReceiverStatus,

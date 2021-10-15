@@ -1,5 +1,5 @@
 import {app, BrowserWindow, ipcMain} from "electron";
-import {DanmuReceiver} from "./utils/DanmuReceiver";
+import {DanmuReceiver} from "./utils/client/DanmuReceiver";
 import {ConfigManager} from "./utils/ConfigManager";
 import * as path from "path";
 import {KoaServer} from "./utils/server/KoaServer";
@@ -9,8 +9,10 @@ import {WebsocketServer} from "./utils/server/WebsocketServer";
 // whether you're running in development or production).
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
+declare const VIEWER_WEBPACK_ENTRY: string;
 
 export let mainWindow: BrowserWindow;
+export let viewerWindow: BrowserWindow;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -19,6 +21,7 @@ if (require("electron-squirrel-startup")) {
 }
 
 const createMainWindow = (): void => {
+  if (mainWindow) mainWindow.close();
   // Create the browser window.
   mainWindow = new BrowserWindow({
     height: 600,
@@ -34,16 +37,30 @@ const createMainWindow = (): void => {
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY).then();
 
   mainWindow.webContents.openDevTools();
-  // mainWindow.setVisibleOnAllWorkspaces(true, {
-  //   skipTransformProcessType: false,
-  //   visibleOnFullScreen: true,
-  // });
+};
+
+const createViewerWindow = (): void => {
+  if (viewerWindow) viewerWindow.close();
+  viewerWindow = new BrowserWindow({
+    height: 600,
+    width: 400,
+    transparent: true,
+  });
+
+  viewerWindow.setAutoHideMenuBar(true);
+
+  viewerWindow.loadURL(VIEWER_WEBPACK_ENTRY).then();
+
+  viewerWindow.setVisibleOnAllWorkspaces(true, {
+    skipTransformProcessType: false,
+    visibleOnFullScreen: true,
+  });
 };
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on("ready", createMainWindow);
+app.on("ready", createViewerWindow);
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits

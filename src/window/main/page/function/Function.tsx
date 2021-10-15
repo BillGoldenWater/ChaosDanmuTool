@@ -4,7 +4,7 @@ import { FunctionCard } from "../../../../component/functioncard/FunctionCard";
 import { ConnectControl } from "./connectcontrol/ConnectControl";
 import { ReceiverStatus } from "../../../../utils/command/ReceiverStatusUpdate";
 import { ServerManager } from "./servermanager/ServerManager";
-import { WebsocketClient } from "../../utils/WebsocketClient";
+import { WebsocketClient } from "../../../../utils/client/WebsocketClient";
 
 class Props {
   receiverStatus: ReceiverStatus;

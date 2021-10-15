@@ -57,6 +57,11 @@
                   "preload": {
                     "js": "./src/window/main/preload.ts"
                   }
+                },
+                {
+                  "html": "./src/window/viewer/index.html",
+                  "js": "./src/window/viewer/renderer.tsx",
+                  "name": "viewer"
                 }
               ]
             },
