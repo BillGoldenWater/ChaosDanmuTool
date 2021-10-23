@@ -58,7 +58,9 @@ function createViewerWindow(
   viewerWindow.setAutoHideMenuBar(true);
 
   const param =
-    "?address={{address}}&port={{port}}&maxReconnectAttemptNum={{maxReconnectAttemptNum}}"
+    "?address={{address}}" +
+    "&port={{port}}" +
+    "&maxReconnectAttemptNum={{maxReconnectAttemptNum}}"
       .replace("{{address}}", address)
       .replace("{{port}}", port.toString())
       .replace("{{maxReconnectAttemptNum}}", maxReconnectAttempt.toString());
@@ -71,10 +73,116 @@ function createViewerWindow(
   });
 }
 
+function init(): void {
+  ConfigManager.init(path.join(app.getAppPath(), "config.json"));
+  ConfigManager.load();
+  KoaServer.init(path.join(app.getAppPath(), ".webpack", "renderer"));
+
+  ipcMain.on("connection", (event, ...args) => {
+    switch (args[0]) {
+      case "connect": {
+        DanmuReceiver.connect(
+          ConfigManager.config.danmuReceiver.serverUrl,
+          args[1],
+          ConfigManager.config.danmuReceiver.heartBeatInterval
+        );
+        break;
+      }
+      case "disconnect": {
+        DanmuReceiver.close();
+        break;
+      }
+    }
+    event.returnValue = "";
+  });
+
+  ipcMain.on("config", (event, ...args) => {
+    let result = "";
+    switch (args[0]) {
+      case "load": {
+        ConfigManager.load();
+        break;
+      }
+      case "save": {
+        ConfigManager.save();
+        break;
+      }
+      case "get": {
+        result = JSON.stringify(ConfigManager.config);
+        break;
+      }
+      case "update": {
+        ConfigManager.config = JSON.parse(args[1]);
+        break;
+      }
+    }
+    event.returnValue = result;
+  });
+
+  ipcMain.on("koaServer", (event, ...args) => {
+    switch (args[0]) {
+      case "run": {
+        KoaServer.run(args[1]);
+        break;
+      }
+      case "close": {
+        KoaServer.close();
+        break;
+      }
+    }
+    event.returnValue = "";
+  });
+
+  ipcMain.on("websocketServer", (event, ...args) => {
+    switch (args[0]) {
+      case "run": {
+        WebsocketServer.run(args[1], args[2]);
+        break;
+      }
+      case "close": {
+        WebsocketServer.close();
+        break;
+      }
+      case "broadcast": {
+        WebsocketServer.broadcast(args[1]);
+        break;
+      }
+    }
+    event.returnValue = "";
+  });
+
+  ipcMain.on("windowControl", (event, ...args) => {
+    switch (args[0]) {
+      case "openViewer": {
+        createViewerWindow(
+          ConfigManager.config.danmuViewConfig.websocketServer.host,
+          ConfigManager.config.danmuViewConfig.websocketServer.port,
+          ConfigManager.config.danmuViewConfig.maxReconnectAttemptNumber
+        );
+        break;
+      }
+      case "closeViewer": {
+        viewerWindow.close();
+        break;
+      }
+    }
+    event.returnValue = "";
+  });
+
+  console.log(
+    "==============================================================================="
+  );
+  console.log(
+    "==============================================================================="
+  );
+
+  createMainWindow();
+}
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on("ready", createMainWindow);
+app.on("ready", init);
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
@@ -95,104 +203,3 @@ app.on("activate", () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
-ConfigManager.init(path.join(app.getAppPath(), "config.json"));
-ConfigManager.load();
-KoaServer.init(path.join(app.getAppPath(), ".webpack", "renderer"));
-
-ipcMain.on("connection", (event, ...args) => {
-  switch (args[0]) {
-    case "connect": {
-      DanmuReceiver.connect(
-        ConfigManager.config.danmuReceiver.serverUrl,
-        args[1],
-        ConfigManager.config.danmuReceiver.heartBeatInterval
-      );
-      break;
-    }
-    case "disconnect": {
-      DanmuReceiver.close();
-      break;
-    }
-  }
-  event.returnValue = "";
-});
-
-ipcMain.on("config", (event, ...args) => {
-  let result = "";
-  switch (args[0]) {
-    case "load": {
-      ConfigManager.load();
-      break;
-    }
-    case "save": {
-      ConfigManager.save();
-      break;
-    }
-    case "get": {
-      result = JSON.stringify(ConfigManager.config);
-      break;
-    }
-    case "update": {
-      ConfigManager.config = JSON.parse(args[1]);
-      break;
-    }
-  }
-  event.returnValue = result;
-});
-
-ipcMain.on("koaServer", (event, ...args) => {
-  switch (args[0]) {
-    case "run": {
-      KoaServer.run(args[1]);
-      break;
-    }
-    case "close": {
-      KoaServer.close();
-      break;
-    }
-  }
-  event.returnValue = "";
-});
-
-ipcMain.on("websocketServer", (event, ...args) => {
-  switch (args[0]) {
-    case "run": {
-      WebsocketServer.run(args[1], args[2]);
-      break;
-    }
-    case "close": {
-      WebsocketServer.close();
-      break;
-    }
-    case "broadcast": {
-      WebsocketServer.broadcast(args[1]);
-      break;
-    }
-  }
-  event.returnValue = "";
-});
-
-ipcMain.on("windowControl", (event, ...args) => {
-  switch (args[0]) {
-    case "openViewer": {
-      createViewerWindow(
-        ConfigManager.config.danmuViewConfig.websocketServer.host,
-        ConfigManager.config.danmuViewConfig.websocketServer.port,
-        ConfigManager.config.danmuViewConfig.maxReconnectAttemptNumber
-      );
-      break;
-    }
-    case "closeViewer": {
-      viewerWindow.close();
-      break;
-    }
-  }
-  event.returnValue = "";
-});
-
-console.log(
-  "==============================================================================="
-);
-console.log(
-  "==============================================================================="
-);

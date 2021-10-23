@@ -28,7 +28,7 @@ export class Main extends React.Component<Props, State> {
       config: defaultConfig,
       danmuList: [],
       connectState: "close",
-      connectAttemptNumber: 5,
+      connectAttemptNumber: 0,
     };
 
     this.serverAddress = getParam("address");
