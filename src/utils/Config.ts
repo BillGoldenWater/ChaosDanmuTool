@@ -69,7 +69,7 @@ export type Config = {
   danmuViewCustoms: DanmuViewCustomConfig[];
 };
 
-const defaultDanmuViewCustom: DanmuViewCustomConfig = {
+export const defaultDanmuViewCustom: DanmuViewCustomConfig = {
   name: "",
   statusBarDisplay: true,
   maxDanmuNumber: 100,

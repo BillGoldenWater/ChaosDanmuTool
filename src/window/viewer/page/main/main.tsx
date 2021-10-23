@@ -1,14 +1,20 @@
 import React from "react";
-import { Config, defaultConfig } from "../../../../utils/Config";
+import {
+  Config,
+  DanmuViewCustomConfig,
+  defaultConfig,
+  defaultDanmuViewCustom,
+} from "../../../../utils/Config";
 import { WebsocketClient } from "../../../../utils/client/WebsocketClient";
 import { getParam } from "../../utils/UrlParamGeter";
 import { LoadingPage } from "./loadingpage/LoadingPage";
 import { ConnectFail } from "./connectfail/ConnectFail";
+import { getConfigUpdateCmd } from "../../../../utils/command/ConfigUpdate";
 
 class Props {}
 
 class State {
-  config: Config;
+  config: DanmuViewCustomConfig;
   danmuList: [];
   connectState: "open" | "close" | "error";
   connectAttemptNumber: number;
@@ -25,7 +31,7 @@ export class Main extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      config: defaultConfig,
+      config: defaultDanmuViewCustom,
       danmuList: [],
       connectState: "close",
       connectAttemptNumber: 0,
@@ -82,12 +88,40 @@ export class Main extends React.Component<Props, State> {
   processCommand(commandStr: string): void {
     const command = JSON.parse(commandStr);
     console.log(command);
+    switch (command.cmd) {
+      case getConfigUpdateCmd(): {
+        const config: Config = command.config;
+        for (const i in config.danmuViewCustoms) {
+          const viewConfig = config.danmuViewCustoms[i];
+          if (viewConfig.name == getParam("name")) {
+            this.setState({
+              config: viewConfig,
+            });
+          }
+        }
+        break;
+      }
+      default: {
+        this.setState((prevState) => {
+          const list = prevState.danmuList;
+          while (
+            list.length > 0 &&
+            list.length > this.state.config.maxDanmuNumber
+          ) {
+            list.shift();
+          }
+          return {
+            ...prevState,
+            danmuList: list,
+          };
+        });
+      }
+    }
   }
 
   render(): JSX.Element {
     return (
       <div>
-        {getParam("port")}
         {this.state.connectState != "open" &&
           this.state.connectAttemptNumber < this.maxAttemptNumber && (
             <LoadingPage
