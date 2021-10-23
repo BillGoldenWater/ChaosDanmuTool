@@ -20,7 +20,7 @@ if (require("electron-squirrel-startup")) {
   app.quit();
 }
 
-const createMainWindow = (): void => {
+function createMainWindow(): void {
   if (mainWindow && !mainWindow.isDestroyed()) mainWindow.close();
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -36,14 +36,18 @@ const createMainWindow = (): void => {
   // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY).then();
 
-  mainWindow.webContents.openDevTools();
-};
+  mainWindow.on("close", () => {
+    app.quit();
+  });
 
-const createViewerWindow = (
+  mainWindow.webContents.openDevTools();
+}
+
+function createViewerWindow(
   address: string,
   port: number,
   maxReconnectAttempt: number
-): void => {
+): void {
   if (viewerWindow && !viewerWindow.isDestroyed()) viewerWindow.close();
   viewerWindow = new BrowserWindow({
     height: 600,
@@ -65,7 +69,7 @@ const createViewerWindow = (
     skipTransformProcessType: false,
     visibleOnFullScreen: true,
   });
-};
+}
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
