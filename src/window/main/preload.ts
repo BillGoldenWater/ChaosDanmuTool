@@ -15,6 +15,9 @@ export interface ApiElectron {
   runWebsocketServer: (host: string, port: number) => void;
   closeWebsocketServer: () => void;
   websocketBroadcast: (data: string) => void;
+
+  openViewer: () => void;
+  closeViewer: () => void;
 }
 
 const apiElectron: ApiElectron = {
@@ -53,6 +56,13 @@ const apiElectron: ApiElectron = {
   },
   websocketBroadcast: (data: string): void => {
     ipcRenderer.sendSync("websocketServer", "broadcast", data);
+  },
+
+  openViewer: (): void => {
+    ipcRenderer.sendSync("windowControl", "openViewer");
+  },
+  closeViewer: (): void => {
+    ipcRenderer.sendSync("windowControl", "closeViewer");
   },
 };
 

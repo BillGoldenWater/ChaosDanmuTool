@@ -5,6 +5,7 @@ import { ConnectControl } from "./connectcontrol/ConnectControl";
 import { ReceiverStatus } from "../../../../utils/command/ReceiverStatusUpdate";
 import { ServerManager } from "./servermanager/ServerManager";
 import { WebsocketClient } from "../../../../utils/client/WebsocketClient";
+import { WindowControl } from "./windowcontrol/WindowControl";
 
 class Props {
   receiverStatus: ReceiverStatus;
@@ -20,6 +21,9 @@ export class Function extends React.Component<Props> {
         </FunctionCard>
         <FunctionCard className={""} name={"直播间连接"}>
           <ConnectControl receiverStatus={this.props.receiverStatus} />
+        </FunctionCard>
+        <FunctionCard className={""} name={"弹幕查看器"}>
+          <WindowControl />
         </FunctionCard>
       </div>
     );

@@ -21,7 +21,7 @@ if (require("electron-squirrel-startup")) {
 }
 
 const createMainWindow = (): void => {
-  if (mainWindow) mainWindow.close();
+  if (mainWindow && !mainWindow.isDestroyed()) mainWindow.close();
   // Create the browser window.
   mainWindow = new BrowserWindow({
     height: 600,
@@ -39,8 +39,8 @@ const createMainWindow = (): void => {
   mainWindow.webContents.openDevTools();
 };
 
-const createViewerWindow = (): void => {
-  if (viewerWindow) viewerWindow.close();
+const createViewerWindow = (address: string, port: number): void => {
+  if (viewerWindow && !viewerWindow.isDestroyed()) viewerWindow.close();
   viewerWindow = new BrowserWindow({
     height: 600,
     width: 400,
@@ -49,7 +49,11 @@ const createViewerWindow = (): void => {
 
   viewerWindow.setAutoHideMenuBar(true);
 
-  viewerWindow.loadURL(VIEWER_WEBPACK_ENTRY).then();
+  const param = "?address={{address}}&port={{port}}"
+    .replace("{{address}}", address)
+    .replace("{{port}}", port.toString());
+
+  viewerWindow.loadURL(VIEWER_WEBPACK_ENTRY + param).then();
 
   viewerWindow.setVisibleOnAllWorkspaces(true, {
     skipTransformProcessType: false,
@@ -60,7 +64,7 @@ const createViewerWindow = (): void => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on("ready", createViewerWindow);
+app.on("ready", createMainWindow);
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
@@ -152,6 +156,23 @@ ipcMain.on("websocketServer", (event, ...args) => {
     }
     case "broadcast": {
       WebsocketServer.broadcast(args[1]);
+      break;
+    }
+  }
+  event.returnValue = "";
+});
+
+ipcMain.on("windowControl", (event, ...args) => {
+  switch (args[0]) {
+    case "openViewer": {
+      createViewerWindow(
+        ConfigManager.config.danmuViewConfig.websocketServer.host,
+        ConfigManager.config.danmuViewConfig.websocketServer.port
+      );
+      break;
+    }
+    case "closeViewer": {
+      viewerWindow.close();
       break;
     }
   }

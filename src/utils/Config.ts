@@ -120,7 +120,7 @@ export const defaultConfig: Config = {
   },
   danmuViewConfig: {
     websocketServer: {
-      host: "",
+      host: "localhost",
       port: 25555,
     },
     webServer: {

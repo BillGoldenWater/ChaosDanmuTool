@@ -1,5 +1,5 @@
 import React from "react";
-import { Config, defaultConfig } from "../../../utils/Config";
+import { Config, defaultConfig } from "./Config";
 
 export const ConfigContext = React.createContext({
   config: { ...defaultConfig },

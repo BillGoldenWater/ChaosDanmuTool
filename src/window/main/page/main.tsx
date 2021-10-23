@@ -10,7 +10,7 @@ import {
   ReceiverStatusUpdate,
 } from "../../../utils/command/ReceiverStatusUpdate";
 import { Config, defaultConfig } from "../../../utils/Config";
-import { ConfigContext } from "../utils/ConfigContext";
+import { ConfigContext } from "../../../utils/ConfigContext";
 import {
   ConfigUpdate,
   getConfigUpdateCmd,

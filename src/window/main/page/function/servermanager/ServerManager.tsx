@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "../../../../../component/button/Button";
 import { WebsocketClient } from "../../../../../utils/client/WebsocketClient";
 import { FunctionCard } from "../../../../../component/functioncard/FunctionCard";
-import { ConfigContext } from "../../../utils/ConfigContext";
+import { ConfigContext } from "../../../../../utils/ConfigContext";
 
 class Props {
   websocketClient: WebsocketClient;

@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "../../../../../component/button/Button";
 import { Config } from "../../../../../utils/Config";
 import { ReceiverStatus } from "../../../../../utils/command/ReceiverStatusUpdate";
-import { ConfigContext } from "../../../utils/ConfigContext";
+import { ConfigContext } from "../../../../../utils/ConfigContext";
 
 class Props {
   receiverStatus: ReceiverStatus;
