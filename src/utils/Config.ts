@@ -16,6 +16,7 @@ export type WebServerConfig = {
 export type DanmuViewConfig = {
   websocketServer: WebsocketServerConfig;
   webServer: WebServerConfig;
+  maxReconnectAttemptNumber: number;
   width: number;
   height: number;
   posX: number;
@@ -126,6 +127,7 @@ export const defaultConfig: Config = {
     webServer: {
       port: 25556,
     },
+    maxReconnectAttemptNumber: 5,
     width: 400,
     height: 600,
     posX: 0,

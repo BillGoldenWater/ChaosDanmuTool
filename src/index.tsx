@@ -39,7 +39,11 @@ const createMainWindow = (): void => {
   mainWindow.webContents.openDevTools();
 };
 
-const createViewerWindow = (address: string, port: number): void => {
+const createViewerWindow = (
+  address: string,
+  port: number,
+  maxReconnectAttempt: number
+): void => {
   if (viewerWindow && !viewerWindow.isDestroyed()) viewerWindow.close();
   viewerWindow = new BrowserWindow({
     height: 600,
@@ -49,9 +53,11 @@ const createViewerWindow = (address: string, port: number): void => {
 
   viewerWindow.setAutoHideMenuBar(true);
 
-  const param = "?address={{address}}&port={{port}}"
-    .replace("{{address}}", address)
-    .replace("{{port}}", port.toString());
+  const param =
+    "?address={{address}}&port={{port}}&maxReconnectAttemptNum={{maxReconnectAttemptNum}}"
+      .replace("{{address}}", address)
+      .replace("{{port}}", port.toString())
+      .replace("{{maxReconnectAttemptNum}}", maxReconnectAttempt.toString());
 
   viewerWindow.loadURL(VIEWER_WEBPACK_ENTRY + param).then();
 
@@ -167,7 +173,8 @@ ipcMain.on("windowControl", (event, ...args) => {
     case "openViewer": {
       createViewerWindow(
         ConfigManager.config.danmuViewConfig.websocketServer.host,
-        ConfigManager.config.danmuViewConfig.websocketServer.port
+        ConfigManager.config.danmuViewConfig.websocketServer.port,
+        ConfigManager.config.danmuViewConfig.maxReconnectAttemptNumber
       );
       break;
     }

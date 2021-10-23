@@ -18,6 +18,9 @@ export class WebsocketServer {
 
   static close(): void {
     if (this.server) {
+      this.server.clients.forEach((value) => {
+        value.close();
+      });
       this.server.close();
     }
     this.server = null;
