@@ -1,4 +1,5 @@
 import React from "react";
+import style from "./main.module.css";
 import {
   Config,
   DanmuViewCustomConfig,
@@ -15,6 +16,9 @@ import {
   ActivityUpdate,
   getActivityUpdateMessageCmd,
 } from "../../../../utils/command/ActivityUpdate";
+import { ConfigContext } from "../../utils/ConfigContext";
+import { StatusBar } from "../../../../component/statusbar/StatusBar";
+import { DanmuRender } from "./danmurender/DanmuRender";
 
 class Props {}
 
@@ -25,6 +29,7 @@ class State {
   connectAttemptNumber: number;
   activity: number;
   fansNumber: number;
+  statusMessage: string;
 }
 
 export class Main extends React.Component<Props, State> {
@@ -44,6 +49,7 @@ export class Main extends React.Component<Props, State> {
       connectAttemptNumber: 0,
       activity: 0,
       fansNumber: 0,
+      statusMessage: "",
     };
 
     this.serverAddress = getParam("address");
@@ -101,7 +107,8 @@ export class Main extends React.Component<Props, State> {
     console.log(this.state);
     switch (command.cmd) {
       case getConfigUpdateCmd(): {
-        const config: Config = command.config;
+        const config: Config = command.data;
+        console.log(config.danmuViewCustoms);
         for (const i in config.danmuViewCustoms) {
           const viewConfig = config.danmuViewCustoms[i];
           if (viewConfig.name == getParam("name")) {
@@ -143,7 +150,15 @@ export class Main extends React.Component<Props, State> {
 
   render(): JSX.Element {
     return (
-      <div>
+      <div className={style.main}>
+        <ConfigContext.Provider
+          value={{ config: this.state.config, setConfig: undefined }}
+        >
+          <DanmuRender danmuList={this.state.danmuList} />
+          {this.state.connectState == "open" && (
+            <StatusBar message={this.state.statusMessage}>1</StatusBar>
+          )}
+        </ConfigContext.Provider>
         {this.state.connectState != "open" &&
           this.state.connectAttemptNumber < this.maxAttemptNumber && (
             <LoadingPage

@@ -1,0 +1,8 @@
+.main {
+  overflow-y: hidden;
+  height: 100vh;
+}
+
+.main:hover {
+  overflow-y: scroll;
+}

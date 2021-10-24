@@ -112,6 +112,7 @@ export class DanmuReceiver {
     protocolVersion?: number,
     platform?: string
   ): void {
+    this.close();
     this.heartBeatInterval = heartBeatInterval;
     this.connection = new WebSocket(url);
     this.connection.binaryType = "arraybuffer";

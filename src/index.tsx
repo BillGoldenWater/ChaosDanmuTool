@@ -40,8 +40,6 @@ function createMainWindow(): void {
   mainWindow.on("close", () => {
     app.quit();
   });
-
-  mainWindow.webContents.openDevTools();
 }
 
 function createViewerWindow(
@@ -74,6 +72,8 @@ function createViewerWindow(
     skipTransformProcessType: false,
     visibleOnFullScreen: true,
   });
+
+  viewerWindow.webContents.openDevTools();
 }
 
 function init(): void {
