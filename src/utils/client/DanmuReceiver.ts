@@ -7,6 +7,7 @@ import { errorCode } from "../ErrorCode";
 import { getJoinResponseMessage } from "../command/JoinResponse";
 import { getErrorMessageMessage } from "../command/ErrorMessage";
 import { getMessageLogMessage, MessageLog } from "../command/MessageLog";
+import { getMessageCommand } from "../command/MessageCommand";
 
 const DataOffset = {
   packetLength: 0,
@@ -170,7 +171,7 @@ export class DanmuReceiver {
           }
           case OpCode.message: {
             const message = this.textDecoder.decode(value.getBody());
-            this.broadcastMessage(message);
+            this.broadcastMessage(getMessageCommand(message));
             break;
           }
           default: {

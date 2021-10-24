@@ -10,14 +10,21 @@ import { getParam } from "../../utils/UrlParamGeter";
 import { LoadingPage } from "./loadingpage/LoadingPage";
 import { ConnectFail } from "./connectfail/ConnectFail";
 import { getConfigUpdateCmd } from "../../../../utils/command/ConfigUpdate";
+import { getMessageCommandCmd } from "../../../../utils/command/MessageCommand";
+import {
+  ActivityUpdate,
+  getActivityUpdateMessageCmd,
+} from "../../../../utils/command/ActivityUpdate";
 
 class Props {}
 
 class State {
   config: DanmuViewCustomConfig;
-  danmuList: [];
+  danmuList: unknown[];
   connectState: "open" | "close" | "error";
   connectAttemptNumber: number;
+  activity: number;
+  fansNumber: number;
 }
 
 export class Main extends React.Component<Props, State> {
@@ -35,6 +42,8 @@ export class Main extends React.Component<Props, State> {
       danmuList: [],
       connectState: "close",
       connectAttemptNumber: 0,
+      activity: 0,
+      fansNumber: 0,
     };
 
     this.serverAddress = getParam("address");
@@ -44,7 +53,9 @@ export class Main extends React.Component<Props, State> {
       defaultConfig.danmuViewConfig.maxReconnectAttemptNumber;
 
     this.websocketClient = new WebsocketClient(
-      this.processCommand.bind(this),
+      (event) => {
+        this.processCommand(event.data);
+      },
       () => {
         this.setState({
           connectState: "open",
@@ -87,7 +98,7 @@ export class Main extends React.Component<Props, State> {
 
   processCommand(commandStr: string): void {
     const command = JSON.parse(commandStr);
-    console.log(command);
+    console.log(this.state);
     switch (command.cmd) {
       case getConfigUpdateCmd(): {
         const config: Config = command.config;
@@ -101,20 +112,31 @@ export class Main extends React.Component<Props, State> {
         }
         break;
       }
-      default: {
+      case getActivityUpdateMessageCmd(): {
+        const cmd: ActivityUpdate = command;
+        this.setState({
+          activity: cmd.data.activity,
+        });
+        break;
+      }
+      case getMessageCommandCmd(): {
         this.setState((prevState) => {
-          const list = prevState.danmuList;
+          const list: unknown[] = prevState.danmuList;
+          list.push(JSON.parse(command.data));
+
           while (
             list.length > 0 &&
             list.length > this.state.config.maxDanmuNumber
           ) {
             list.shift();
           }
+
           return {
             ...prevState,
             danmuList: list,
           };
         });
+        break;
       }
     }
   }
