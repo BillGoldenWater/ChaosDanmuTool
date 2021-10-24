@@ -154,10 +154,10 @@ export class Main extends React.Component<Props, State> {
         <ConfigContext.Provider
           value={{ config: this.state.config, setConfig: undefined }}
         >
-          <DanmuRender danmuList={this.state.danmuList} />
           {this.state.connectState == "open" && (
             <StatusBar message={this.state.statusMessage}>1</StatusBar>
           )}
+          <DanmuRender danmuList={this.state.danmuList} />
         </ConfigContext.Provider>
         {this.state.connectState != "open" &&
           this.state.connectAttemptNumber < this.maxAttemptNumber && (

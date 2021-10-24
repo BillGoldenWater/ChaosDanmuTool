@@ -1,6 +1,8 @@
 .main {
   overflow-y: hidden;
   height: 100vh;
+  display: flex;
+  flex-direction: column-reverse;
 }
 
 .main:hover {
