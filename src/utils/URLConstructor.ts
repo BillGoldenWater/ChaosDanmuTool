@@ -5,14 +5,15 @@ export function constructURL(
   maxReconnectAttempt: number,
   viewerName: string
 ): string {
-  const param =
+  const param = (
     "?address={{address}}" +
     "&port={{port}}" +
     "&maxReconnectAttemptNum={{maxReconnectAttemptNum}}" +
     "&name={{name}}"
-      .replace("{{address}}", address)
-      .replace("{{port}}", port.toString())
-      .replace("{{maxReconnectAttemptNum}}", maxReconnectAttempt.toString())
-      .replace("{{name}}", viewerName);
+  )
+    .replace("{{address}}", address)
+    .replace("{{port}}", port.toString())
+    .replace("{{maxReconnectAttemptNum}}", maxReconnectAttempt.toString())
+    .replace("{{name}}", viewerName);
   return url + param;
 }
