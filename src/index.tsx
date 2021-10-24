@@ -56,6 +56,7 @@ function createViewerWindow(
 
   viewerWindow.setAutoHideMenuBar(true);
 
+  // http://127.0.0.1:25556/viewer/?address=localhost&port=25555&maxReconnectAttemptNum=5&name=internal
   viewerWindow
     .loadURL(
       constructURL(

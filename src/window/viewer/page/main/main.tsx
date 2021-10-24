@@ -19,12 +19,13 @@ import {
 import { ConfigContext } from "../../utils/ConfigContext";
 import { StatusBar } from "../../../../component/statusbar/StatusBar";
 import { DanmuRender } from "./danmurender/DanmuRender";
+import { DanmuMessageWithKey } from "../../../../utils/command/DanmuMessage";
 
 class Props {}
 
 class State {
   config: DanmuViewCustomConfig;
-  danmuList: unknown[];
+  danmuList: DanmuMessageWithKey[];
   connectState: "open" | "close" | "error";
   connectAttemptNumber: number;
   activity: number;
@@ -38,6 +39,7 @@ export class Main extends React.Component<Props, State> {
   serverAddress: string;
   serverPort: number;
   reconnectId: number;
+  danmuCount: number;
 
   constructor(props: Props) {
     super(props);
@@ -57,6 +59,8 @@ export class Main extends React.Component<Props, State> {
     this.maxAttemptNumber =
       parseInt(getParam("maxReconnectAttemptNum")) ||
       defaultConfig.danmuViewConfig.maxReconnectAttemptNumber;
+
+    this.danmuCount = 0;
 
     this.websocketClient = new WebsocketClient(
       (event) => {
@@ -108,7 +112,7 @@ export class Main extends React.Component<Props, State> {
     switch (command.cmd) {
       case getConfigUpdateCmd(): {
         const config: Config = command.data;
-        console.log(config.danmuViewCustoms);
+
         for (const i in config.danmuViewCustoms) {
           const viewConfig = config.danmuViewCustoms[i];
           if (viewConfig.name == getParam("name")) {
@@ -128,8 +132,12 @@ export class Main extends React.Component<Props, State> {
       }
       case getMessageCommandCmd(): {
         this.setState((prevState) => {
-          const list: unknown[] = prevState.danmuList;
-          list.push(JSON.parse(command.data));
+          const list: DanmuMessageWithKey[] = prevState.danmuList;
+          list.push({
+            key: this.danmuCount,
+            msg: JSON.parse(command.data),
+          });
+          this.danmuCount++;
 
           while (
             list.length > 0 &&
