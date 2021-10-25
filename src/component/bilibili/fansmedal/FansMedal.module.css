@@ -1,6 +1,7 @@
 .FansMedal {
   display: flex;
   align-items: center;
+  word-break: keep-all;
 }
 
 .FansMedal > div {
