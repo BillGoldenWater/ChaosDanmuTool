@@ -1,5 +1,5 @@
 export type DanmuMessage = {
-  cmd: string;
+  cmd: string | "DANMU_MSG" | "INTERACT_WORD" | "STOP_LIVE_ROOM_LIST";
   [key: string]: unknown;
 };
 

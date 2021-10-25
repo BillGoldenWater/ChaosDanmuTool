@@ -16,10 +16,17 @@ import {
   ActivityUpdate,
   getActivityUpdateMessageCmd,
 } from "../../../../utils/command/ActivityUpdate";
+import {
+  DanmuMessage,
+  DanmuMessageWithKey,
+} from "../../../../utils/command/DanmuMessage";
+import {
+  InteractWord,
+  InteractWordType,
+} from "../../../../utils/command/bilibili/InteractWord";
 import { ConfigContext } from "../../utils/ConfigContext";
 import { StatusBar } from "../../../../component/statusbar/StatusBar";
 import { DanmuRender } from "./danmurender/DanmuRender";
-import { DanmuMessageWithKey } from "../../../../utils/command/DanmuMessage";
 
 class Props {}
 
@@ -108,7 +115,7 @@ export class Main extends React.Component<Props, State> {
 
   processCommand(commandStr: string): void {
     const command = JSON.parse(commandStr);
-    console.log(this.state);
+
     switch (command.cmd) {
       case getConfigUpdateCmd(): {
         const config: Config = command.data;
@@ -131,29 +138,67 @@ export class Main extends React.Component<Props, State> {
         break;
       }
       case getMessageCommandCmd(): {
-        this.setState((prevState) => {
-          const list: DanmuMessageWithKey[] = prevState.danmuList;
-          list.push({
-            key: this.danmuCount,
-            msg: JSON.parse(command.data),
-          });
-          this.danmuCount++;
-
-          while (
-            list.length > 0 &&
-            list.length > this.state.config.maxDanmuNumber
-          ) {
-            list.shift();
+        const msg: DanmuMessage = JSON.parse(command.data);
+        switch (msg.cmd) {
+          case "INTERACT_WORD": {
+            const interactWord: InteractWord = msg.data as InteractWord;
+            switch (interactWord.msg_type) {
+              case InteractWordType.join: {
+                this.setState({
+                  statusMessage: interactWord.uname + " 进入了直播间",
+                });
+                break;
+              }
+              case InteractWordType.follow: {
+                this.setState({
+                  statusMessage: interactWord.uname + " 关注了直播间",
+                });
+                break;
+              }
+              case InteractWordType.share: {
+                this.setState({
+                  statusMessage: interactWord.uname + " 分享了直播间",
+                });
+                break;
+              }
+              default: {
+                console.log("unknown:" + JSON.stringify(interactWord));
+                break;
+              }
+            }
+            break;
           }
-
-          return {
-            ...prevState,
-            danmuList: list,
-          };
-        });
+          default: {
+            this.addToList(msg);
+            break;
+          }
+        }
         break;
       }
     }
+  }
+
+  addToList(msg: DanmuMessage): void {
+    this.setState((prevState) => {
+      const list: DanmuMessageWithKey[] = prevState.danmuList;
+      list.push({
+        key: this.danmuCount,
+        msg: msg,
+      });
+      this.danmuCount++;
+
+      while (
+        list.length > 0 &&
+        list.length > this.state.config.maxDanmuNumber
+      ) {
+        list.shift();
+      }
+
+      return {
+        ...prevState,
+        danmuList: list,
+      };
+    });
   }
 
   render(): JSX.Element {
@@ -163,7 +208,9 @@ export class Main extends React.Component<Props, State> {
           value={{ config: this.state.config, setConfig: undefined }}
         >
           {this.state.connectState == "open" && (
-            <StatusBar message={this.state.statusMessage}>1</StatusBar>
+            <StatusBar message={this.state.statusMessage}>
+              {this.state.activity}
+            </StatusBar>
           )}
           <DanmuRender danmuList={this.state.danmuList} />
         </ConfigContext.Provider>
