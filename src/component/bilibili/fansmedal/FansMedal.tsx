@@ -9,12 +9,7 @@ class Props {
 
 export class FansMedal extends React.Component<Props> {
   render(): JSX.Element {
-    if (
-      !this.props.medalInfo ||
-      !this.props.medalInfo.is_lighted ||
-      this.props.medalInfo.is_lighted == 0
-    )
-      return null;
+    if (!this.props.medalInfo || !this.props.medalInfo.is_lighted) return null;
 
     const medal_color_border = rgbI2S(this.props.medalInfo.medal_color_border);
     const medal_color_start = rgbI2S(this.props.medalInfo.medal_color_start);
