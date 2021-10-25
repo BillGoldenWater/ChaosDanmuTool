@@ -144,8 +144,13 @@ export class Main extends React.Component<Props, State> {
             this.processInteractWord(msg.data as InteractWord);
             break;
           }
-          default: {
+          case "DANMU_MSG": {
             this.addToList(msg);
+            break;
+          }
+          default: {
+            console.log("未知的消息: ");
+            console.log(msg);
             break;
           }
         }

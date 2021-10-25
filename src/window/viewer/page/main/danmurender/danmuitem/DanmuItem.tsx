@@ -13,14 +13,7 @@ export class DanmuItem extends React.Component<Props> {
       case "DANMU_MSG": {
         return <DanmuMsg data={parseDanmuMsg(this.props.message)} />;
       }
-      case "STOP_LIVE_ROOM_LIST": {
-        return null;
-      }
-      default: {
-        console.log("未知的消息: ");
-        console.log(this.props.message);
-        return null;
-      }
     }
+    return null;
   }
 }
