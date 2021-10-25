@@ -141,31 +141,7 @@ export class Main extends React.Component<Props, State> {
         const msg: DanmuMessage = JSON.parse(command.data);
         switch (msg.cmd) {
           case "INTERACT_WORD": {
-            const interactWord: InteractWord = msg.data as InteractWord;
-            switch (interactWord.msg_type) {
-              case InteractWordType.join: {
-                this.setState({
-                  statusMessage: interactWord.uname + " 进入了直播间",
-                });
-                break;
-              }
-              case InteractWordType.follow: {
-                this.setState({
-                  statusMessage: interactWord.uname + " 关注了直播间",
-                });
-                break;
-              }
-              case InteractWordType.share: {
-                this.setState({
-                  statusMessage: interactWord.uname + " 分享了直播间",
-                });
-                break;
-              }
-              default: {
-                console.log("unknown:" + JSON.stringify(interactWord));
-                break;
-              }
-            }
+            this.processInteractWord(msg.data as InteractWord);
             break;
           }
           default: {
@@ -173,6 +149,33 @@ export class Main extends React.Component<Props, State> {
             break;
           }
         }
+        break;
+      }
+    }
+  }
+
+  processInteractWord(interactWord: InteractWord): void {
+    switch (interactWord.msg_type) {
+      case InteractWordType.join: {
+        this.setState({
+          statusMessage: interactWord.uname + " 进入了直播间",
+        });
+        break;
+      }
+      case InteractWordType.follow: {
+        this.setState({
+          statusMessage: interactWord.uname + " 关注了直播间",
+        });
+        break;
+      }
+      case InteractWordType.share: {
+        this.setState({
+          statusMessage: interactWord.uname + " 分享了直播间",
+        });
+        break;
+      }
+      default: {
+        console.log("unknown:" + JSON.stringify(interactWord));
         break;
       }
     }
