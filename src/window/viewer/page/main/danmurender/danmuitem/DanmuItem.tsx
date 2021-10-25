@@ -1,6 +1,6 @@
 import React from "react";
 import { DanmuMessage } from "../../../../../../utils/command/DanmuMessage";
-import { DanmuMsg } from "./item/DanmuMsg";
+import { DanmuMsg } from "./item/danmumsg/DanmuMsg";
 import { parseDanmuMsg } from "../../../../../../utils/command/bilibili/DanmuMsg";
 
 class Props {
@@ -17,7 +17,9 @@ export class DanmuItem extends React.Component<Props> {
         return null;
       }
       default: {
-        return <div>未知的消息: {JSON.stringify(this.props.message)}</div>;
+        console.log("未知的消息: ");
+        console.log(this.props.message);
+        return null;
       }
     }
   }
