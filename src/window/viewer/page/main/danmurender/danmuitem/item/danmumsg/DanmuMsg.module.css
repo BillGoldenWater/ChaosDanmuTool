@@ -1,3 +1,6 @@
 .DanmuMsg {
-    display: flex;
+  display: flex;
+  flex-wrap: wrap;
+  word-break: break-all;
+  align-items: center;
 }
