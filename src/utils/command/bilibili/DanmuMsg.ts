@@ -47,7 +47,7 @@ export function parseDanmuMsg(data: DanmuMessage): DanmuMsg {
     danmuMsg.isSVip = <number>userData[4];
   }
 
-  const medalInfo: unknown[] = <unknown[]>danmuMsgRaw[2];
+  const medalInfo: unknown[] = <unknown[]>danmuMsgRaw[3];
   if (medalInfo) {
     const tempMedalInfo: MedalInfo = <MedalInfo>{};
 
@@ -69,12 +69,12 @@ export function parseDanmuMsg(data: DanmuMessage): DanmuMsg {
     danmuMsg.medalInfo = tempMedalInfo;
   }
 
-  const levelInfo: unknown[] = <unknown[]>danmuMsgRaw[2];
+  const levelInfo: unknown[] = <unknown[]>danmuMsgRaw[4];
   if (levelInfo) {
     danmuMsg.userUL = <number>levelInfo[0];
   }
 
-  const titleInfo: unknown[] = <unknown[]>danmuMsgRaw[2];
+  const titleInfo: unknown[] = <unknown[]>danmuMsgRaw[5];
   if (titleInfo && titleInfo.length > 0) {
     danmuMsg.userTitle = <string>titleInfo[0];
     danmuMsg.userTitle1 = <string>titleInfo[1];
