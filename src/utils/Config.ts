@@ -64,6 +64,7 @@ export type DanmuViewCustomConfig = {
 };
 
 export type Config = {
+  forChaosDanmuTool: boolean;
   danmuReceiver: DanmuReceiverConfig;
   danmuViewConfig: DanmuViewConfig;
   danmuViewCustoms: DanmuViewCustomConfig[];
@@ -114,6 +115,7 @@ export const defaultDanmuViewCustom: DanmuViewCustomConfig = {
 };
 
 export const defaultConfig: Config = {
+  forChaosDanmuTool: true,
   danmuReceiver: {
     serverUrl: "wss://broadcastlv.chat.bilibili.com/sub",
     roomid: 0,

@@ -8,6 +8,7 @@ import { getJoinResponseMessage } from "../command/JoinResponse";
 import { getErrorMessageMessage } from "../command/ErrorMessage";
 import { getMessageLogMessage, MessageLog } from "../command/MessageLog";
 import { getMessageCommand } from "../command/MessageCommand";
+import { dialog } from "electron";
 
 const DataOffset = {
   packetLength: 0,
@@ -195,7 +196,7 @@ export class DanmuReceiver {
   }
 
   static alertMessage(jsonMessage: string): void {
-    alert(JSON.parse(jsonMessage)["errorMessage"]);
+    dialog.showErrorBox("错误", JSON.parse(jsonMessage)["errorMessage"]);
     this.messageHistory.push(getMessageLogMessage(jsonMessage));
   }
 
