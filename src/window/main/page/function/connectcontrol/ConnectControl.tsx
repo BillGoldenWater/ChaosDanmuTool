@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "../../../../../component/button/Button";
-import { Config } from "../../../../../utils/Config";
+import { Config } from "../../../../../utils/config/Config";
 import { ReceiverStatus } from "../../../../../utils/command/ReceiverStatusUpdate";
 import { ConfigContext } from "../../../utils/ConfigContext";
 

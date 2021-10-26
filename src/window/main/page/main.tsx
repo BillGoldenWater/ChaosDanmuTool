@@ -9,7 +9,7 @@ import {
   ReceiverStatus,
   ReceiverStatusUpdate,
 } from "../../../utils/command/ReceiverStatusUpdate";
-import { Config, defaultConfig } from "../../../utils/Config";
+import { Config, defaultConfig } from "../../../utils/config/Config";
 import { ConfigContext } from "../utils/ConfigContext";
 import {
   ConfigUpdate,

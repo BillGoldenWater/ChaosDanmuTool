@@ -2,7 +2,7 @@ import React from "react";
 import {
   DanmuViewCustomConfig,
   defaultDanmuViewCustom,
-} from "../../../utils/Config";
+} from "../../../utils/config/Config";
 
 export const ConfigContext = React.createContext({
   config: { ...defaultDanmuViewCustom },

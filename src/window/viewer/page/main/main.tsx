@@ -5,7 +5,7 @@ import {
   DanmuViewCustomConfig,
   defaultConfig,
   defaultDanmuViewCustom,
-} from "../../../../utils/Config";
+} from "../../../../utils/config/Config";
 import { WebsocketClient } from "../../../../utils/client/WebsocketClient";
 import { getParam } from "../../utils/UrlParamGeter";
 import { LoadingPage } from "./loadingpage/LoadingPage";
@@ -211,7 +211,10 @@ export class Main extends React.Component<Props, State> {
 
   render(): JSX.Element {
     return (
-      <div className={style.main}>
+      <div
+        className={style.main}
+        style={{ backgroundColor: this.state.config.style.backgroundColor }}
+      >
         <ConfigContext.Provider
           value={{ config: this.state.config, setConfig: undefined }}
         >

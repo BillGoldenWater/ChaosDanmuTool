@@ -164,7 +164,7 @@ export class DanmuRender extends React.Component<Props> {
             "{}",
           ],
           "message message message message",
-          [123456789, "Username", 1, 0, 0, 10000, 1, ""],
+          [123456789, "Username", 1, 1, 1, 10000, 1, ""],
           [
             88,
             "诶嘿",

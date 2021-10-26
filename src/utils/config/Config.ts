@@ -90,14 +90,14 @@ export const defaultDanmuViewCustom: DanmuViewCustomConfig = {
     vipIcon: {
       text: "爷",
       color: "#FFFFFF",
-      backgroundColor: "#e601ff",
-      borderColor: "#a302b6",
+      backgroundColor: "#DC6385",
+      borderColor: "#BC5573",
     },
     svipIcon: {
       text: "爷",
       color: "#FFFFFF",
-      backgroundColor: "#ffd700",
-      borderColor: "#bb9700",
+      backgroundColor: "#E8B800",
+      borderColor: "#DE8402",
     },
     adminIcon: {
       text: "房",

@@ -1,6 +1,6 @@
 import { Config, defaultConfig } from "./Config";
 import * as fs from "fs";
-import { errorCode } from "./ErrorCode";
+import { errorCode } from "../ErrorCode";
 import { dialog } from "electron";
 
 export class ConfigManager {
