@@ -1,5 +1,5 @@
 .FansMedal {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   word-break: keep-all;
   line-height: initial;

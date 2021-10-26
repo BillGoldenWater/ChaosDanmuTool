@@ -1,4 +1,5 @@
 import React from "react";
+import style from "./UserName.module.css";
 import { ConfigContext } from "../../../window/viewer/utils/ConfigContext";
 
 class Props {
@@ -11,6 +12,7 @@ export class UserName extends React.Component<Props> {
       <ConfigContext.Consumer>
         {({ config }) => (
           <div
+            className={style.UserName}
             style={{
               color: config.style.userName.color,
             }}

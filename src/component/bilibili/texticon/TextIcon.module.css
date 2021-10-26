@@ -1,5 +1,5 @@
 .TextIcon {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   line-height: initial;
 }
