@@ -4,6 +4,8 @@ import { StatusBarTemplate } from "./StatusBarTemplate";
 
 class Props {
   message: string;
+  backgroundColor?: string;
+  borderColor?: string;
 }
 
 export class StatusBar extends React.Component<Props> {
@@ -13,6 +15,8 @@ export class StatusBar extends React.Component<Props> {
         <StatusBarTemplate
           className={style.statusBar}
           message={this.props.message}
+          backgroundColor={this.props.backgroundColor}
+          borderColor={this.props.borderColor}
         >
           {this.props.children}
         </StatusBarTemplate>

@@ -219,7 +219,11 @@ export class Main extends React.Component<Props, State> {
           value={{ config: this.state.config, setConfig: undefined }}
         >
           {this.state.connectState == "open" && (
-            <StatusBar message={this.state.statusMessage}>
+            <StatusBar
+              message={this.state.statusMessage}
+              backgroundColor={this.state.config.style.backgroundColor}
+              borderColor={this.state.config.style.backgroundColor}
+            >
               {this.state.activity}
             </StatusBar>
           )}
