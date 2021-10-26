@@ -10,15 +10,16 @@ class Props {
 export class TextIcon extends React.Component<Props> {
   render(): JSX.Element {
     return (
-      <div
-        className={style.TextIcon}
-        style={{
-          borderColor: this.props.borderColor,
-          backgroundColor: this.props.backgroundColor,
-          color: this.props.color,
-        }}
-      >
-        {this.props.children}
+      <div className={style.TextIcon}>
+        <div
+          style={{
+            borderColor: this.props.borderColor,
+            backgroundColor: this.props.backgroundColor,
+            color: this.props.color,
+          }}
+        >
+          {this.props.children}
+        </div>
       </div>
     );
   }

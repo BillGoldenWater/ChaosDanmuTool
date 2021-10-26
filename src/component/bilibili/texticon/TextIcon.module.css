@@ -1,4 +1,10 @@
 .TextIcon {
+  display: flex;
+  align-items: center;
+  line-height: initial;
+}
+
+.TextIcon > div {
   border: 0.05em solid #1e90ff;
   border-radius: 0.4em;
   padding-left: 0.2em;

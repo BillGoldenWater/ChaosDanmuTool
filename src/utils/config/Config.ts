@@ -40,13 +40,12 @@ export type TextStyleConfig = {
 };
 
 export type DanmuViewStyleConfig = {
-  bodyMargin: string;
   listMargin: string;
   backgroundColor: string;
   zoom: number;
   fontFamily: string;
   fontWeight: string;
-  lineSpacing: string;
+  lineHeight: string;
   giftIconMaxHeight: string;
   vipIcon: TextIconStyleConfig;
   svipIcon: TextIconStyleConfig;
@@ -79,13 +78,12 @@ export const defaultDanmuViewCustom: DanmuViewCustomConfig = {
     formatFansNum: true,
   },
   style: {
-    bodyMargin: "0em",
     listMargin: "0.25em",
     backgroundColor: "#3B3B3B44",
     zoom: 1.0,
     fontFamily: "",
     fontWeight: "400",
-    lineSpacing: "0.25em",
+    lineHeight: "1.5em",
     giftIconMaxHeight: "3em",
     vipIcon: {
       text: "爷",

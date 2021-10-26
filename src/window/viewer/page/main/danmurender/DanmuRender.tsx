@@ -5,6 +5,7 @@ import {
   DanmuMessage,
   DanmuMessageWithKey,
 } from "../../../../../utils/command/DanmuMessage";
+import { ConfigContext } from "../../../utils/ConfigContext";
 
 class Props {
   danmuList: DanmuMessageWithKey[];
@@ -388,6 +389,20 @@ export class DanmuRender extends React.Component<Props> {
       return <DanmuItem key={index} message={value as DanmuMessage} />;
     });
 
-    return <div className={style.DanmuRender}>{danmuItems}</div>;
+    return (
+      <ConfigContext.Consumer>
+        {({ config }) => (
+          <div
+            className={style.DanmuRender}
+            style={{
+              margin: config.style.listMargin,
+              lineHeight: config.style.lineHeight,
+            }}
+          >
+            {danmuItems}
+          </div>
+        )}
+      </ConfigContext.Consumer>
+    );
   }
 }

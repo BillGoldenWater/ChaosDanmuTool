@@ -213,7 +213,12 @@ export class Main extends React.Component<Props, State> {
     return (
       <div
         className={style.main}
-        style={{ backgroundColor: this.state.config.style.backgroundColor }}
+        style={{
+          backgroundColor: this.state.config.style.backgroundColor,
+          zoom: this.state.config.style.zoom,
+          fontFamily: this.state.config.style.fontFamily,
+          fontWeight: this.state.config.style.fontWeight as "bold",
+        }}
       >
         <ConfigContext.Provider
           value={{ config: this.state.config, setConfig: undefined }}
