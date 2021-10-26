@@ -17,7 +17,7 @@ export class DanmuMsg extends React.Component<Props> {
         <UserInfo
           userInfo={{
             ...emptyUserInfo,
-            uname: data.uName,
+            uname: data.uName + ": ",
             manager: data.isAdmin,
             is_vip: data.isVip,
             is_svip: data.isSVip,
@@ -26,7 +26,7 @@ export class DanmuMsg extends React.Component<Props> {
           }}
           medalInfo={data.medalInfo}
         />
-        {data.uName}: {data.content}
+        {data.content}
       </div>
     );
   }

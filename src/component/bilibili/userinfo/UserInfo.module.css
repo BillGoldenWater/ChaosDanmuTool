@@ -1,0 +1,7 @@
+.UserInfo {
+  display: inline-flex;
+}
+
+.UserInfo > div {
+  margin-right: 0.5ch;
+}
