@@ -16,13 +16,13 @@ export class DanmuContent extends React.Component<Props> {
     return (
       <ConfigContext.Consumer>
         {({ config }) => (
-          <div className={style.DanmuContent}>
-            {typeof emojiData == "string" ? (
+          <div className={style.DanmuContent} style={config.style.danmuContent}>
+            {typeof emojiData == "string" || !emojiData ? (
               content
             ) : (
               <img
                 className={style.DanmuContent_emoji}
-                style={{ maxHeight: config.style.lineHeight }}
+                style={{ maxHeight: config.style.mainStyle.lineHeight }}
                 src={emojiData.url}
                 alt={content}
               />

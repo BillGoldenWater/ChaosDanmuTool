@@ -1,3 +1,5 @@
+import { CSSProperties } from "react";
+
 export type DanmuReceiverConfig = {
   serverUrl: string;
   roomid: number;
@@ -30,9 +32,7 @@ export type NumberFormatConfig = {
 
 export type TextIconStyleConfig = {
   text: string;
-  color: string;
-  backgroundColor: string;
-  borderColor: string;
+  style: CSSProperties;
 };
 
 export type TextStyleConfig = {
@@ -41,17 +41,13 @@ export type TextStyleConfig = {
 
 export type DanmuViewStyleConfig = {
   listMargin: string;
-  backgroundColor: string;
-  zoom: number;
-  fontFamily: string;
-  fontWeight: string;
-  lineHeight: string;
   giftIconMaxHeight: string;
+  mainStyle: CSSProperties;
   vipIcon: TextIconStyleConfig;
   svipIcon: TextIconStyleConfig;
   adminIcon: TextIconStyleConfig;
-  userName: TextStyleConfig;
-  danmuContent: TextStyleConfig;
+  userName: CSSProperties;
+  danmuContent: CSSProperties;
 };
 
 export type DanmuViewCustomConfig = {
@@ -79,29 +75,37 @@ export const defaultDanmuViewCustom: DanmuViewCustomConfig = {
   },
   style: {
     listMargin: "0.25em",
-    backgroundColor: "#3B3B3B44",
-    zoom: 1.0,
-    fontFamily: "",
-    fontWeight: "400",
-    lineHeight: "1.5em",
     giftIconMaxHeight: "3em",
+    mainStyle: {
+      backgroundColor: "#3B3B3B44",
+      zoom: 1.0,
+      fontFamily: "",
+      fontWeight: 400,
+      lineHeight: "1.5em",
+    },
     vipIcon: {
       text: "爷",
-      color: "#FFFFFF",
-      backgroundColor: "#DC6385",
-      borderColor: "#BC5573",
+      style: {
+        color: "#FFFFFF",
+        backgroundColor: "#DC6385",
+        borderColor: "#BC5573",
+      },
     },
     svipIcon: {
       text: "爷",
-      color: "#FFFFFF",
-      backgroundColor: "#E8B800",
-      borderColor: "#DE8402",
+      style: {
+        color: "#FFFFFF",
+        backgroundColor: "#E8B800",
+        borderColor: "#DE8402",
+      },
     },
     adminIcon: {
       text: "房",
-      color: "#FFFFFF",
-      backgroundColor: "#D2A25B",
-      borderColor: "#DE8402",
+      style: {
+        color: "#FFFFFF",
+        backgroundColor: "#D2A25B",
+        borderColor: "#DE8402",
+      },
     },
     userName: {
       color: "#00AAFF",
@@ -143,7 +147,10 @@ export const defaultConfig: Config = {
       name: "other",
       style: {
         ...defaultDanmuViewCustom.style,
-        backgroundColor: "#000000AA",
+        mainStyle: {
+          ...defaultDanmuViewCustom.style.mainStyle,
+          backgroundColor: "#000000AA",
+        },
       },
       numberFormat: {
         formatActivity: false,

@@ -397,7 +397,7 @@ export class DanmuRender extends React.Component<Props> {
             className={style.DanmuRender}
             style={{
               margin: config.style.listMargin,
-              lineHeight: config.style.lineHeight,
+              lineHeight: config.style.mainStyle.lineHeight,
             }}
           >
             {danmuItems}

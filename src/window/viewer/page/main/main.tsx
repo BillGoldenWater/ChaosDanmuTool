@@ -215,23 +215,17 @@ export class Main extends React.Component<Props, State> {
 
   render(): JSX.Element {
     return (
-      <div
-        className={style.main}
-        style={{
-          backgroundColor: this.state.config.style.backgroundColor,
-          zoom: this.state.config.style.zoom,
-          fontFamily: this.state.config.style.fontFamily,
-          fontWeight: this.state.config.style.fontWeight as "bold",
-        }}
-      >
+      <div className={style.main} style={this.state.config.style.mainStyle}>
         <ConfigContext.Provider
           value={{ config: this.state.config, setConfig: undefined }}
         >
           {this.state.connectState == "open" && (
             <StatusBar
               message={this.state.statusMessage}
-              backgroundColor={this.state.config.style.backgroundColor}
-              borderColor={this.state.config.style.backgroundColor}
+              backgroundColor={
+                this.state.config.style.mainStyle.backgroundColor
+              }
+              borderColor={this.state.config.style.mainStyle.backgroundColor}
             >
               {this.state.activity}
             </StatusBar>

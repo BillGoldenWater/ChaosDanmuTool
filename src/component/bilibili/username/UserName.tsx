@@ -11,12 +11,7 @@ export class UserName extends React.Component<Props> {
     return (
       <ConfigContext.Consumer>
         {({ config }) => (
-          <div
-            className={style.UserName}
-            style={{
-              color: config.style.userName.color,
-            }}
-          >
+          <div className={style.UserName} style={config.style.userName}>
             {this.props.name}
           </div>
         )}

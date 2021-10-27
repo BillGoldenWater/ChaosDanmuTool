@@ -7,11 +7,7 @@ export class AdminIcon extends React.Component {
     return (
       <ConfigContext.Consumer>
         {({ config }) => (
-          <TextIcon
-            borderColor={config.style.adminIcon.borderColor}
-            backgroundColor={config.style.adminIcon.backgroundColor}
-            color={config.style.adminIcon.color}
-          >
+          <TextIcon style={config.style.adminIcon.style}>
             {config.style.adminIcon.text}
           </TextIcon>
         )}
