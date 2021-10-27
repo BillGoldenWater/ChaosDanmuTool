@@ -16,7 +16,7 @@ export class DanmuItem extends React.Component<Props> {
         return <DanmuMsg data={parseDanmuMsg(msg)} />;
       }
       case "SUPER_CHAT_MESSAGE": {
-        return <SuperChatMessage data={msg} />;
+        return <SuperChatMessage msg={msg} />;
       }
     }
     return null;
