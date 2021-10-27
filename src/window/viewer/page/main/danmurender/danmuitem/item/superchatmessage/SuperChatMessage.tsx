@@ -3,6 +3,7 @@ import style from "./SuperChatMessage.module.css";
 import { DanmuMessage } from "../../../../../../../../utils/command/DanmuMessage";
 import { UserInfo } from "../../../../../../../../component/bilibili/userinfo/UserInfo";
 import { SuperChatMessage as TSuperChatMessage } from "../../../../../../../../utils/command/bilibili/SuperChatMessage";
+import { DanmuContent } from "../../../../../../../../component/bilibili/danmucontent/DanmuContent";
 
 class Props {
   msg: DanmuMessage;
@@ -19,7 +20,9 @@ export class SuperChatMessage extends React.Component<Props> {
             medalInfo={scm.data.medal_info}
           />
         </div>
-        <div>{scm.data.message}</div>
+        <div>
+          <DanmuContent content={scm.data.message} />
+        </div>
       </div>
     );
   }

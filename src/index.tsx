@@ -27,12 +27,11 @@ function createMainWindow(): void {
   mainWindow = new BrowserWindow({
     height: 600,
     width: 800,
+    autoHideMenuBar: true,
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     },
   });
-
-  mainWindow.setAutoHideMenuBar(true);
 
   // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY).then();
@@ -45,9 +44,9 @@ function createViewerWindow(): void {
     width: 400,
     transparent: true,
     frame: false,
+    alwaysOnTop: true,
+    autoHideMenuBar: true,
   });
-
-  viewerWindow.setAutoHideMenuBar(true);
 
   // http://127.0.0.1:25556/viewer/?address=localhost&port=25555&maxReconnectAttemptNum=5&name=internal
   viewerWindow
@@ -66,8 +65,6 @@ function createViewerWindow(): void {
     skipTransformProcessType: false,
     visibleOnFullScreen: true,
   });
-
-  viewerWindow.webContents.openDevTools();
 }
 
 function init(): void {
