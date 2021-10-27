@@ -36,17 +36,9 @@ function createMainWindow(): void {
 
   // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY).then();
-
-  mainWindow.on("close", () => {
-    app.quit();
-  });
 }
 
-function createViewerWindow(
-  address: string,
-  port: number,
-  maxReconnectAttempt: number
-): void {
+function createViewerWindow(): void {
   if (viewerWindow && !viewerWindow.isDestroyed()) viewerWindow.close();
   viewerWindow = new BrowserWindow({
     height: 600,
@@ -61,9 +53,9 @@ function createViewerWindow(
     .loadURL(
       constructURL(
         VIEWER_WEBPACK_ENTRY,
-        address,
-        port,
-        maxReconnectAttempt,
+        ConfigManager.config.danmuViewConfig.websocketServer.host,
+        ConfigManager.config.danmuViewConfig.websocketServer.port,
+        ConfigManager.config.danmuViewConfig.maxReconnectAttemptNumber,
         "internal"
       )
     )
@@ -158,11 +150,7 @@ function init(): void {
   ipcMain.on("windowControl", (event, ...args) => {
     switch (args[0]) {
       case "openViewer": {
-        createViewerWindow(
-          ConfigManager.config.danmuViewConfig.websocketServer.host,
-          ConfigManager.config.danmuViewConfig.websocketServer.port,
-          ConfigManager.config.danmuViewConfig.maxReconnectAttemptNumber
-        );
+        createViewerWindow();
         break;
       }
       case "closeViewer": {
