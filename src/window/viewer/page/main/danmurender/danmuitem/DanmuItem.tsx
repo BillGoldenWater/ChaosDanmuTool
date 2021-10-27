@@ -2,6 +2,7 @@ import React from "react";
 import { DanmuMessage } from "../../../../../../utils/command/DanmuMessage";
 import { DanmuMsg } from "./item/danmumsg/DanmuMsg";
 import { parseDanmuMsg } from "../../../../../../utils/command/bilibili/DanmuMsg";
+import { SuperChatMessage } from "./item/superchatmessage/SuperChatMessage";
 
 class Props {
   message: DanmuMessage;
@@ -9,9 +10,13 @@ class Props {
 
 export class DanmuItem extends React.Component<Props> {
   render(): JSX.Element {
-    switch (this.props.message.cmd) {
+    const msg: DanmuMessage = this.props.message;
+    switch (msg.cmd) {
       case "DANMU_MSG": {
-        return <DanmuMsg data={parseDanmuMsg(this.props.message)} />;
+        return <DanmuMsg data={parseDanmuMsg(msg)} />;
+      }
+      case "SUPER_CHAT_MESSAGE": {
+        return <SuperChatMessage data={msg} />;
       }
     }
     return null;

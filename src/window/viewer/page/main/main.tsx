@@ -148,6 +148,10 @@ export class Main extends React.Component<Props, State> {
             this.addToList(msg);
             break;
           }
+          case "SUPER_CHAT_MESSAGE": {
+            this.addToList(msg);
+            break;
+          }
           default: {
             console.log("未知的消息: ");
             console.log(msg);
