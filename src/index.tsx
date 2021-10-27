@@ -43,7 +43,8 @@ function createViewerWindow(): void {
   viewerWindow = new BrowserWindow({
     height: 600,
     width: 400,
-    // transparent: true,
+    transparent: true,
+    frame: false,
   });
 
   viewerWindow.setAutoHideMenuBar(true);

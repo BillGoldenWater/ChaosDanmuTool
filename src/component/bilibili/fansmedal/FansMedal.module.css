@@ -1,7 +1,7 @@
 .FansMedal {
   display: inline-flex;
   align-items: center;
-  word-break: keep-all;
+  word-break: break-all;
   line-height: initial;
 }
 

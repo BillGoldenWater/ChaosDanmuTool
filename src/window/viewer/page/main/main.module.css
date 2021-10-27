@@ -1,8 +1,10 @@
 .main {
+  -webkit-app-region: drag;
   overflow-y: hidden;
   height: 100vh;
   display: flex;
   flex-direction: column-reverse;
+  border-radius: 0.4em;
 }
 
 .main:hover {
