@@ -1,0 +1,8 @@
+.DanmuContent {
+  display: inline;
+}
+
+.DanmuContent_emoji {
+  max-height: 1.5em;
+  vertical-align: top;
+}
