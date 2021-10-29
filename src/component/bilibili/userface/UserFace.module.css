@@ -1,0 +1,8 @@
+.UserFace {
+  display: inline-flex;
+}
+
+.UserFace_face {
+  height: 1.5em;
+  border-radius: 50%;
+}
