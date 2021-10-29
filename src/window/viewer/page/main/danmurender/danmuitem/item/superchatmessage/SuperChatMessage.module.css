@@ -1,3 +1,30 @@
 .SuperChatMessage {
+}
 
+.SuperChatMessage > div {
+  border: 0.05em solid #1e90ff;
+  border-radius: 0.4em;
+  padding: 0.5em;
+}
+
+.SuperChatMessage_top {
+  display: flex;
+  justify-content: space-between;
+  border-bottom-width: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  background-color: #cfcfcf;
+  background-position: right top;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.SuperChatMessage_top_price {
+}
+
+.SuperChatMessage_bottom {
+  border-top-width: 0 !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  background-color: #1e90ff;
 }

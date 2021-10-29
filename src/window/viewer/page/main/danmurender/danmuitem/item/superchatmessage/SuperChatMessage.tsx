@@ -14,14 +14,39 @@ export class SuperChatMessage extends React.Component<Props> {
     const scm: TSuperChatMessage = this.props.msg as TSuperChatMessage;
     return (
       <div className={style.SuperChatMessage}>
-        <div>
+        <img
+          src={scm.data.background_image}
+          style={{ display: "none" }}
+          alt={""}
+        />
+        {/* load img to cache for "background-image" to bypass referrer policy */}
+        <div
+          className={style.SuperChatMessage_top}
+          style={{
+            backgroundImage: "url(" + scm.data.background_image + ")",
+            backgroundColor: scm.data.background_color,
+            borderColor: scm.data.background_bottom_color,
+          }}
+        >
           <UserInfo
             userInfo={scm.data.user_info}
             medalInfo={scm.data.medal_info}
           />
+          <div className={style.SuperChatMessage_top_price}>
+            {scm.data.price}￥
+          </div>
         </div>
-        <div>
-          <DanmuContent content={scm.data.message} />
+        <div
+          className={style.SuperChatMessage_bottom}
+          style={{
+            backgroundColor: scm.data.background_bottom_color,
+            borderColor: scm.data.background_bottom_color,
+          }}
+        >
+          <DanmuContent
+            content={scm.data.message}
+            color={scm.data.message_font_color}
+          />
         </div>
       </div>
     );

@@ -6,6 +6,7 @@ import { ConfigContext } from "../../../window/viewer/utils/ConfigContext";
 class Props {
   content?: string;
   emojiData?: EmojiData;
+  color?: string;
 }
 
 export class DanmuContent extends React.Component<Props> {
@@ -16,7 +17,10 @@ export class DanmuContent extends React.Component<Props> {
     return (
       <ConfigContext.Consumer>
         {({ config }) => (
-          <div className={style.DanmuContent} style={config.style.danmuContent}>
+          <div
+            className={style.DanmuContent}
+            style={{ ...config.style.danmuContent, color: this.props.color }}
+          >
             {typeof emojiData == "string" || !emojiData ? (
               content
             ) : (
