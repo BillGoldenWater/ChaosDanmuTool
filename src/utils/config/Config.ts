@@ -79,6 +79,7 @@ export const defaultDanmuViewCustom: DanmuViewCustomConfig = {
     mainStyle: {
       backgroundColor: "#3B3B3B44",
       zoom: 1.0,
+      fontSize: "4.5vw",
       fontFamily: "",
       fontWeight: 400,
       lineHeight: "1.5em",
