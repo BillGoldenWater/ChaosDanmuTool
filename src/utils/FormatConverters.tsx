@@ -13,6 +13,8 @@ export function formatNumber(num: number): string {
 export function rgbI2S(num: number): string {
   if (typeof num === "number") {
     return "#" + num.toString(16).padStart(6, "0");
+  } else if (typeof num == "string") {
+    return num;
   } else {
     return "#000";
   }
@@ -21,6 +23,8 @@ export function rgbI2S(num: number): string {
 export function rgbaI2S(num: number): string {
   if (typeof num === "number") {
     return "#" + num.toString(16).padStart(8, "0");
+  } else if (typeof num == "string") {
+    return num;
   } else {
     return "#000";
   }
