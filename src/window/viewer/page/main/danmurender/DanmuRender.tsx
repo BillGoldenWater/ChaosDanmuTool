@@ -42,104 +42,132 @@ export class DanmuRender extends React.Component<Props> {
       {
         cmd: "configUpdate",
         config: {
+          forChaosDanmuTool: true,
           danmuReceiver: {
             serverUrl: "wss://broadcastlv.chat.bilibili.com/sub",
             roomid: 0,
-            heartBeatPeriod: 30,
+            heartBeatInterval: 30,
           },
-          internalBrowser: {
-            webSocketServer: {
+          danmuViewConfig: {
+            websocketServer: {
+              host: "localhost",
               port: 25555,
             },
+            webServer: {
+              port: 25556,
+            },
+            maxReconnectAttemptNumber: 5,
             width: 400,
             height: 600,
-            posX: 0.0,
-            posY: 0.0,
+            posX: 0,
+            posY: 0,
           },
-          internalViewConfig: {
-            statusBarDisplay: true,
-            maxDanmuNumber: 100,
-            numberFormat: {
-              formatActivity: true,
-              formatFansNum: true,
-            },
-            style: {
-              bodyMargin: "0px",
-              listMargin: "0.3em",
-              backgroundColor: "#3B3B3B44",
-              zoom: 1.0,
-              font: "",
-              fontWeight: 400,
-              lineSpacing: "0.3em",
-              giftIconMaxHeight: "30px",
-              vipIcon: {
-                text: "爷",
-                backgroundColor: "#DC6385",
-                borderColor: "#BC5573",
-                textColor: "#FFFFFF",
+          danmuViewCustoms: [
+            {
+              name: "internal",
+              statusBarDisplay: true,
+              maxDanmuNumber: 100,
+              numberFormat: {
+                formatActivity: true,
+                formatFansNum: true,
               },
-              sVipIcon: {
-                text: "爷",
-                backgroundColor: "#E8B800",
-                borderColor: "#DE8402",
-                textColor: "#FFFFFF",
-              },
-              adminIcon: {
-                text: "房",
-                backgroundColor: "#D2A25B",
-                borderColor: "#DE8402",
-                textColor: "#FFFFFF",
-              },
-              userName: {
-                textColor: "#00AAFF",
-              },
-              danmuContent: {
-                textColor: "#FFFFFF",
-              },
-            },
-          },
-          otherViewConfig: {
-            statusBarDisplay: true,
-            maxDanmuNumber: 100,
-            numberFormat: {
-              formatActivity: false,
-              formatFansNum: false,
-            },
-            style: {
-              bodyMargin: "0px",
-              listMargin: "0.3em",
-              backgroundColor: "#000000AA",
-              zoom: 1.0,
-              font: "",
-              fontWeight: 400,
-              lineSpacing: "0.3em",
-              giftIconMaxHeight: "30px",
-              vipIcon: {
-                text: "爷",
-                backgroundColor: "#DC6385",
-                borderColor: "#BC5573",
-                textColor: "#FFFFFF",
-              },
-              sVipIcon: {
-                text: "爷",
-                backgroundColor: "#E8B800",
-                borderColor: "#DE8402",
-                textColor: "#FFFFFF",
-              },
-              adminIcon: {
-                text: "房",
-                backgroundColor: "#D2A25B",
-                borderColor: "#DE8402",
-                textColor: "#FFFFFF",
-              },
-              userName: {
-                textColor: "#00AAFF",
-              },
-              danmuContent: {
-                textColor: "#FFFFFF",
+              style: {
+                listMargin: "0.25em",
+                giftIconMaxHeight: "3em",
+                mainStyle: {
+                  backgroundColor: "#3B3B3B44",
+                  zoom: 1,
+                  fontSize: "4.5vw",
+                  fontFamily: "",
+                  fontWeight: 400,
+                  lineHeight: "1.5em",
+                  color: "#fff",
+                },
+                vipIcon: {
+                  text: "爷",
+                  style: {
+                    color: "#FFFFFF",
+                    backgroundColor: "#DC6385",
+                    borderColor: "#BC5573",
+                  },
+                },
+                svipIcon: {
+                  text: "爷",
+                  style: {
+                    color: "#FFFFFF",
+                    backgroundColor: "#E8B800",
+                    borderColor: "#DE8402",
+                  },
+                },
+                adminIcon: {
+                  text: "房",
+                  style: {
+                    color: "#FFFFFF",
+                    backgroundColor: "#D2A25B",
+                    borderColor: "#DE8402",
+                  },
+                },
+                userName: {
+                  color: "#00AAFF",
+                },
+                danmuContent: {
+                  color: "#FFFFFF",
+                },
               },
             },
-          },
+            {
+              name: "other",
+              statusBarDisplay: true,
+              maxDanmuNumber: 100,
+              numberFormat: {
+                formatActivity: false,
+                formatFansNum: false,
+              },
+              style: {
+                listMargin: "0.25em",
+                giftIconMaxHeight: "3em",
+                mainStyle: {
+                  backgroundColor: "#000000AA",
+                  zoom: 1,
+                  fontSize: "4.5vw",
+                  fontFamily: "",
+                  fontWeight: 400,
+                  lineHeight: "1.5em",
+                  color: "#fff",
+                },
+                vipIcon: {
+                  text: "爷",
+                  style: {
+                    color: "#FFFFFF",
+                    backgroundColor: "#DC6385",
+                    borderColor: "#BC5573",
+                  },
+                },
+                svipIcon: {
+                  text: "爷",
+                  style: {
+                    color: "#FFFFFF",
+                    backgroundColor: "#E8B800",
+                    borderColor: "#DE8402",
+                  },
+                },
+                adminIcon: {
+                  text: "房",
+                  style: {
+                    color: "#FFFFFF",
+                    backgroundColor: "#D2A25B",
+                    borderColor: "#DE8402",
+                  },
+                },
+                userName: {
+                  color: "#00AAFF",
+                },
+                danmuContent: {
+                  color: "#FFFFFF",
+                },
+              },
+            },
+          ],
         },
       },
       {
