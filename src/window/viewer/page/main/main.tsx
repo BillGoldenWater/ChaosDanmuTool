@@ -30,6 +30,7 @@ import { DanmuRender } from "./danmurender/DanmuRender";
 import { InteractWord } from "./danmurender/danmuitem/item/interactword/InteractWord";
 import { formatNumber } from "../../../../utils/FormatConverters";
 import { RoomRealTimeMessageUpdate } from "../../../../utils/command/bilibili/RoomRealTimeMessageUpdate";
+import { GiftConfig } from "../../../../utils/command/bilibili/giftconfig/GiftConfig";
 
 class Props {}
 
@@ -41,6 +42,7 @@ class State {
   activity: number;
   fansNumber: number;
   statusMessage: string | ReactNode;
+  giftConfig: GiftConfig;
 }
 
 export class Main extends React.Component<Props, State> {
@@ -62,6 +64,7 @@ export class Main extends React.Component<Props, State> {
       activity: 0,
       fansNumber: 0,
       statusMessage: "",
+      giftConfig: undefined,
     };
 
     this.serverAddress = getParam("address");
