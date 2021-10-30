@@ -3,7 +3,7 @@ export type GiftInfo = {
   name: string;
   price: number;
   type: number;
-  coin_type: "gold" | "sliver";
+  coin_type: "gold" | "silver";
   bag_gift: number;
   effect: number;
   corner_mark: string;
