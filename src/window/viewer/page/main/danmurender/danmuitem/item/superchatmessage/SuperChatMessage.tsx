@@ -9,11 +9,39 @@ class Props {
   msg: DanmuMessage;
 }
 
-export class SuperChatMessage extends React.Component<Props> {
+class State {
+  ts: number;
+}
+
+export class SuperChatMessage extends React.Component<Props, State> {
+  updateIntervalId: number;
+
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      ts: new Date().getTime() / 1000,
+    };
+
+    this.updateIntervalId = window.setInterval(() => {
+      this.setState({ ts: new Date().getTime() / 1000 });
+      const scm: TSuperChatMessage = this.props.msg as TSuperChatMessage;
+      if (this.state.ts > scm.data.end_time) {
+        window.clearInterval(this.updateIntervalId);
+      }
+    }, 100);
+  }
+
   render(): JSX.Element {
     const scm: TSuperChatMessage = this.props.msg as TSuperChatMessage;
     return (
-      <div className={style.SuperChatMessage}>
+      <div
+        className={
+          style.SuperChatMessage +
+          (this.state.ts <= scm.data.end_time
+            ? " " + style.SuperChatMessage_sticky
+            : "")
+        }
+      >
         <img
           src={scm.data.background_image}
           style={{ display: "none" }}
@@ -36,6 +64,12 @@ export class SuperChatMessage extends React.Component<Props> {
             {scm.data.price}￥
           </div>
         </div>
+        <progress
+          className={style.SuperChatMessage_progress}
+          max={scm.data.time}
+          value={scm.data.time - (scm.data.end_time - this.state.ts)}
+          style={{ backgroundColor: scm.data.background_bottom_color }}
+        />
         <div
           className={style.SuperChatMessage_bottom}
           style={{

@@ -1,6 +1,11 @@
 .SuperChatMessage {
 }
 
+.SuperChatMessage_sticky {
+  position: sticky;
+  top: 0;
+}
+
 .SuperChatMessage > div {
   border: 0.05em solid #1e90ff;
   border-radius: 0.4em;
@@ -17,6 +22,22 @@
   background-position: right top;
   background-size: contain;
   background-repeat: no-repeat;
+}
+
+.SuperChatMessage_progress {
+  display: block;
+  border: 0;
+  border-radius: 0;
+  width: 100%;
+  height: 0.5em;
+}
+
+.SuperChatMessage_progress::-webkit-progress-bar {
+  background-color: #0000;
+}
+
+.SuperChatMessage_progress::-webkit-progress-value {
+  background-color: #0005;
 }
 
 .SuperChatMessage_top_price {
