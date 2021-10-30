@@ -31,6 +31,7 @@ import { InteractWord } from "./danmurender/danmuitem/item/interactword/Interact
 import { formatNumber } from "../../../../utils/FormatConverters";
 import { RoomRealTimeMessageUpdate } from "../../../../utils/command/bilibili/RoomRealTimeMessageUpdate";
 import { GiftConfig } from "../../../../utils/command/bilibili/giftconfig/GiftConfig";
+import { getGiftConfigUpdateCmd } from "../../../../utils/command/GiftConfigUpdate";
 
 class Props {}
 
@@ -134,6 +135,11 @@ export class Main extends React.Component<Props, State> {
             });
           }
         }
+        break;
+      }
+      case getGiftConfigUpdateCmd(): {
+        const giftConfig: GiftConfig = command.data;
+        this.setState({ giftConfig: giftConfig });
         break;
       }
       case getActivityUpdateMessageCmd(): {
