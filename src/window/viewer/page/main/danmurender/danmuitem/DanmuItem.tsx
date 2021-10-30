@@ -7,6 +7,8 @@ import { InteractWord } from "./item/interactword/InteractWord";
 import { SendGift } from "./item/sendgift/SendGift";
 import { RoomBlockMsg } from "./item/roomblockmsg/RoomBlockMsg";
 import { RoomStatusChange } from "./item/roomstatuschange/RoomStatusChange";
+import { getStatusUpdateMessageCmd } from "../../../../../../utils/command/ReceiverStatusUpdate";
+import { StatusUpdate } from "./item/statusupdate/StatusUpdate";
 
 class Props {
   message: DanmuMessage;
@@ -16,6 +18,9 @@ export class DanmuItem extends React.Component<Props> {
   render(): JSX.Element {
     const msg: DanmuMessage = this.props.message;
     switch (msg.cmd) {
+      case getStatusUpdateMessageCmd(): {
+        return <StatusUpdate msg={msg} />;
+      }
       case "INTERACT_WORD": {
         return <InteractWord msg={msg} />;
       }

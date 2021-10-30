@@ -37,6 +37,7 @@ import {
 } from "../../../../model/giftconfig/GiftConfig";
 import { getGiftConfigUpdateCmd } from "../../../../utils/command/GiftConfigUpdate";
 import { SendGift } from "../../../../model/SendGift";
+import { getStatusUpdateMessageCmd } from "../../../../utils/command/ReceiverStatusUpdate";
 
 class Props {}
 
@@ -152,6 +153,10 @@ export class Main extends React.Component<Props, State> {
         this.setState({
           activity: cmd.data.activity,
         });
+        break;
+      }
+      case getStatusUpdateMessageCmd(): {
+        this.addToList(command);
         break;
       }
       case getMessageCommandCmd(): {
