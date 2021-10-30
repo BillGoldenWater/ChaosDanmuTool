@@ -1,11 +1,10 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import style from "./StatusBar.module.css";
 import { StatusBarTemplate } from "./StatusBarTemplate";
 
 class Props {
-  message: string;
-  backgroundColor?: string;
-  borderColor?: string;
+  message: string | ReactNode;
+  style?: React.CSSProperties;
 }
 
 export class StatusBar extends React.Component<Props> {
@@ -15,14 +14,14 @@ export class StatusBar extends React.Component<Props> {
         <StatusBarTemplate
           className={style.statusBar}
           message={this.props.message}
-          backgroundColor={this.props.backgroundColor}
-          borderColor={this.props.borderColor}
+          style={this.props.style}
         >
           {this.props.children}
         </StatusBarTemplate>
         <StatusBarTemplate
           className={style.statusBar_placeholder + " " + style.statusBar}
           message={this.props.message}
+          style={this.props.style}
         >
           {this.props.children}
         </StatusBarTemplate>

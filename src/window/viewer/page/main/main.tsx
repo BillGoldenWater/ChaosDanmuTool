@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import style from "./main.module.css";
 import {
   Config,
@@ -21,12 +21,13 @@ import {
   DanmuMessageWithKey,
 } from "../../../../utils/command/DanmuMessage";
 import {
-  InteractWord,
+  InteractWord as TInteractWord,
   InteractWordType,
 } from "../../../../utils/command/bilibili/InteractWord";
 import { ConfigContext } from "../../utils/ConfigContext";
 import { StatusBar } from "../../../../component/statusbar/StatusBar";
 import { DanmuRender } from "./danmurender/DanmuRender";
+import { InteractWord } from "./danmurender/danmuitem/item/interactword/InteractWord";
 
 class Props {}
 
@@ -37,7 +38,7 @@ class State {
   connectAttemptNumber: number;
   activity: number;
   fansNumber: number;
-  statusMessage: string;
+  statusMessage: string | ReactNode;
 }
 
 export class Main extends React.Component<Props, State> {
@@ -141,7 +142,7 @@ export class Main extends React.Component<Props, State> {
         const msg: DanmuMessage = JSON.parse(command.data);
         switch (msg.cmd) {
           case "INTERACT_WORD": {
-            this.processInteractWord(msg.data as InteractWord);
+            this.processInteractWord(msg.data as TInteractWord);
             break;
           }
           case "DANMU_MSG": {
@@ -163,28 +164,19 @@ export class Main extends React.Component<Props, State> {
     }
   }
 
-  processInteractWord(interactWord: InteractWord): void {
+  processInteractWord(interactWord: TInteractWord): void {
     switch (interactWord.msg_type) {
       case InteractWordType.join: {
         this.setState({
-          statusMessage: interactWord.uname + " 进入了直播间",
-        });
-        break;
-      }
-      case InteractWordType.follow: {
-        this.setState({
-          statusMessage: interactWord.uname + " 关注了直播间",
-        });
-        break;
-      }
-      case InteractWordType.share: {
-        this.setState({
-          statusMessage: interactWord.uname + " 分享了直播间",
+          statusMessage: <InteractWord data={interactWord} />,
         });
         break;
       }
       default: {
-        console.log("unknown:" + JSON.stringify(interactWord));
+        this.addToList({
+          ...interactWord,
+          cmd: "INTERACT_WORD",
+        } as DanmuMessage);
         break;
       }
     }
@@ -222,10 +214,12 @@ export class Main extends React.Component<Props, State> {
           {this.state.connectState == "open" && (
             <StatusBar
               message={this.state.statusMessage}
-              backgroundColor={
-                this.state.config.style.mainStyle.backgroundColor
-              }
-              borderColor={this.state.config.style.mainStyle.backgroundColor}
+              style={{
+                backgroundColor:
+                  this.state.config.style.mainStyle.backgroundColor,
+                borderColor: this.state.config.style.mainStyle.backgroundColor,
+                color: this.state.config.style.mainStyle.color,
+              }}
             >
               {this.state.activity}
             </StatusBar>
