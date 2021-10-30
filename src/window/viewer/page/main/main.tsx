@@ -227,30 +227,32 @@ export class Main extends React.Component<Props, State> {
         <ConfigContext.Provider
           value={{ config: this.state.config, setConfig: undefined }}
         >
-          {this.state.connectState == "open" && (
-            <StatusBar
-              message={this.state.statusMessage}
-              style={{
-                backgroundColor:
-                  this.state.config.style.mainStyle.backgroundColor,
-                borderColor: this.state.config.style.mainStyle.backgroundColor,
-                color: this.state.config.style.mainStyle.color,
-              }}
-            >
-              <div>
-                人气:
-                {this.state.config.numberFormat.formatActivity
-                  ? formatNumber(this.state.activity)
-                  : this.state.activity}
-              </div>
-              <div>
-                粉丝数:
-                {this.state.config.numberFormat.formatFansNum
-                  ? formatNumber(this.state.fansNumber)
-                  : this.state.fansNumber}
-              </div>
-            </StatusBar>
-          )}
+          {this.state.connectState == "open" &&
+            this.state.config.statusBarDisplay && (
+              <StatusBar
+                message={this.state.statusMessage}
+                style={{
+                  backgroundColor:
+                    this.state.config.style.mainStyle.backgroundColor,
+                  borderColor:
+                    this.state.config.style.mainStyle.backgroundColor,
+                  color: this.state.config.style.mainStyle.color,
+                }}
+              >
+                <div>
+                  人气:
+                  {this.state.config.numberFormat.formatActivity
+                    ? formatNumber(this.state.activity)
+                    : this.state.activity}
+                </div>
+                <div>
+                  粉丝数:
+                  {this.state.config.numberFormat.formatFansNum
+                    ? formatNumber(this.state.fansNumber)
+                    : this.state.fansNumber}
+                </div>
+              </StatusBar>
+            )}
           <DanmuRender danmuList={this.state.danmuList} />
         </ConfigContext.Provider>
         {this.state.connectState != "open" &&
