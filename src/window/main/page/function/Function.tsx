@@ -6,6 +6,7 @@ import { ReceiverStatus } from "../../../../utils/command/ReceiverStatusUpdate";
 import { ServerManager } from "./servermanager/ServerManager";
 import { WebsocketClient } from "../../../../utils/client/WebsocketClient";
 import { WindowControl } from "./windowcontrol/WindowControl";
+import { LinkGenerator } from "./linkgenerator/LinkGenerator";
 
 class Props {
   receiverStatus: ReceiverStatus;
@@ -16,14 +17,17 @@ export class Function extends React.Component<Props> {
   render(): JSX.Element {
     return (
       <div className={style.function}>
-        <FunctionCard className={""} name={"服务器管理"}>
+        <FunctionCard name={"服务器管理"}>
           <ServerManager websocketClient={this.props.websocketClient} />
         </FunctionCard>
-        <FunctionCard className={""} name={"直播间连接"}>
+        <FunctionCard name={"直播间连接"}>
           <ConnectControl receiverStatus={this.props.receiverStatus} />
         </FunctionCard>
-        <FunctionCard className={""} name={"弹幕查看器"}>
+        <FunctionCard name={"弹幕查看器"}>
           <WindowControl />
+        </FunctionCard>
+        <FunctionCard name={"链接生成器"}>
+          <LinkGenerator />
         </FunctionCard>
       </div>
     );
