@@ -1,6 +1,10 @@
 import { Server } from "ws";
 import { getConfigUpdateMessage } from "../command/ConfigUpdate";
 import { ConfigManager } from "../config/ConfigManager";
+import { getGiftConfigUpdateMessage } from "../command/GiftConfigUpdate";
+import { GiftConfigGetter } from "../data/GiftConfigGetter";
+import { getStatusUpdateMessage } from "../command/ReceiverStatusUpdate";
+import { DanmuReceiver } from "../client/DanmuReceiver";
 
 export class WebsocketServer {
   static server: Server;
@@ -13,6 +17,16 @@ export class WebsocketServer {
     });
     this.server.on("connection", (socket) => {
       socket.send(getConfigUpdateMessage(ConfigManager.config));
+      socket.send(getGiftConfigUpdateMessage(GiftConfigGetter.giftConfig));
+      WebsocketServer.broadcast(
+        getStatusUpdateMessage(
+          DanmuReceiver.isOpen()
+            ? "open"
+            : DanmuReceiver.isClosed()
+            ? "close"
+            : "error"
+        )
+      );
     });
   }
 

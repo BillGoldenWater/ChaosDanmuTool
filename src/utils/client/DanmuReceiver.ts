@@ -222,19 +222,30 @@ export class DanmuReceiver {
   }
 
   static isConnecting(): boolean {
-    return this.connection.readyState == this.connection.CONNECTING;
+    return (
+      this.connection &&
+      this.connection.readyState == this.connection.CONNECTING
+    );
   }
 
   static isOpen(): boolean {
-    return this.connection.readyState == this.connection.OPEN;
+    return (
+      this.connection && this.connection.readyState == this.connection.OPEN
+    );
   }
 
   static isClosing(): boolean {
-    return this.connection.readyState == this.connection.CLOSING;
+    return (
+      this.connection && this.connection.readyState == this.connection.CLOSING
+    );
   }
 
   static isClosed(): boolean {
-    return this.connection.readyState == this.connection.CLOSED;
+    if (this.connection) {
+      return this.connection.readyState == this.connection.CLOSED;
+    } else {
+      return true;
+    }
   }
 
   static pack(data: Data): DataView {
