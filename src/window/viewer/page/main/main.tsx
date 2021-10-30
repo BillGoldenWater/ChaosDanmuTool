@@ -30,7 +30,11 @@ import { DanmuRender } from "./danmurender/DanmuRender";
 import { InteractWord } from "./danmurender/danmuitem/item/interactword/InteractWord";
 import { formatNumber } from "../../../../utils/FormatConverters";
 import { RoomRealTimeMessageUpdate } from "../../../../model/RoomRealTimeMessageUpdate";
-import { GiftConfig } from "../../../../model/giftconfig/GiftConfig";
+import {
+  GiftConfig,
+  GiftConfigResponse,
+  parseGiftConfig,
+} from "../../../../model/giftconfig/GiftConfig";
 import { getGiftConfigUpdateCmd } from "../../../../utils/command/GiftConfigUpdate";
 
 class Props {}
@@ -138,8 +142,8 @@ export class Main extends React.Component<Props, State> {
         break;
       }
       case getGiftConfigUpdateCmd(): {
-        const giftConfig: GiftConfig = command.data;
-        this.setState({ giftConfig: giftConfig });
+        const giftConfig: GiftConfigResponse = command.data;
+        this.setState({ giftConfig: parseGiftConfig(giftConfig) });
         break;
       }
       case getActivityUpdateMessageCmd(): {

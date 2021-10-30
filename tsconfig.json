@@ -15,7 +15,13 @@
         "node_modules/*"
       ]
     },
-    "jsx": "react"
+    "jsx": "react",
+    "lib": [
+      "dom",
+      "es5",
+      "scripthost",
+      "es2015"
+    ]
   },
   "include": [
     "src/**/*"
