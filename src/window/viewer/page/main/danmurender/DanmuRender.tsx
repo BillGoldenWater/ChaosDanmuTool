@@ -297,7 +297,8 @@ export class DanmuRender extends React.Component<Props> {
           background_price_color: "#7DA4BD",
           color_point: 0.7,
           dmscore: 80,
-          end_time: 1629272047,
+          end_time:
+            new Date(new Date().getTime() + 120 * 1000).getTime() / 1000,
           gift: {
             gift_id: 12000,
             gift_name: "醒目留言",
