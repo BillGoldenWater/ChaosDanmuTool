@@ -17,6 +17,10 @@ export class DanmuRender extends React.Component<Props> {
   }
 
   render(): JSX.Element {
+    const danmuItems = this.props.danmuList.map((value) => {
+      return <DanmuItem key={value.key} message={value.msg} />;
+    });
+
     const medalInfo = {
       anchor_roomid: 999999999,
       anchor_uname: "诶嘿",
@@ -436,11 +440,7 @@ export class DanmuRender extends React.Component<Props> {
       },
     ];
 
-    // const danmuItems = this.props.danmuList.map((value) => {
-    //   return <DanmuItem key={value.key} message={value.msg}/>;
-    // });
-
-    const danmuItems = list.map((value, index) => {
+    const danmuItems_test = list.map((value, index) => {
       return <DanmuItem key={index} message={value as DanmuMessage} />;
     });
 
@@ -454,6 +454,7 @@ export class DanmuRender extends React.Component<Props> {
               lineHeight: config.style.mainStyle.lineHeight,
             }}
           >
+            {danmuItems_test}
             {danmuItems}
           </div>
         )}
