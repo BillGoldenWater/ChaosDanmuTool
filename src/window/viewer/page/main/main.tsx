@@ -161,26 +161,20 @@ export class Main extends React.Component<Props, State> {
             this.processInteractWord(msg.data as TInteractWord);
             break;
           }
-          case "DANMU_MSG": {
-            this.addToList(msg);
-            break;
-          }
           case "SEND_GIFT": {
             this.processSendGift(msg as SendGift);
-            break;
-          }
-          case "ROOM_BLOCK_MSG": {
-            this.addToList(msg);
-            break;
-          }
-          case "SUPER_CHAT_MESSAGE": {
-            this.addToList(msg);
             break;
           }
           case "ROOM_REAL_TIME_MESSAGE_UPDATE": {
             this.processRoomRealTimeMessageUpdate(
               msg as RoomRealTimeMessageUpdate
             );
+            break;
+          }
+          case "DANMU_MSG":
+          case "SUPER_CHAT_MESSAGE":
+          case "ROOM_BLOCK_MSG": {
+            this.addToList(msg);
             break;
           }
           default: {
