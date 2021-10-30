@@ -169,6 +169,10 @@ export class Main extends React.Component<Props, State> {
             this.processSendGift(msg as SendGift);
             break;
           }
+          case "ROOM_BLOCK_MSG": {
+            this.addToList(msg);
+            break;
+          }
           case "SUPER_CHAT_MESSAGE": {
             this.addToList(msg);
             break;

@@ -4,6 +4,7 @@ export type DanmuMessage = {
     | "DANMU_MSG"
     | "SUPER_CHAT_MESSAGE"
     | "SEND_GIFT"
+    | "ROOM_BLOCK_MSG"
     | "INTERACT_WORD"
     | "ROOM_REAL_TIME_MESSAGE_UPDATE"
     | "STOP_LIVE_ROOM_LIST";
