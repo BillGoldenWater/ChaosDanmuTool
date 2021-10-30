@@ -1,13 +1,14 @@
 export type DanmuMessage = {
   cmd:
     | string
+    | "INTERACT_WORD"
+    | "SEND_GIFT"
+    | "ROOM_REAL_TIME_MESSAGE_UPDATE"
     | "DANMU_MSG"
     | "SUPER_CHAT_MESSAGE"
-    | "SEND_GIFT"
     | "ROOM_BLOCK_MSG"
-    | "INTERACT_WORD"
-    | "ROOM_REAL_TIME_MESSAGE_UPDATE"
-    | "STOP_LIVE_ROOM_LIST";
+    | "LIVE"
+    | "PREPARING";
   [key: string]: unknown;
 };
 

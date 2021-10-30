@@ -6,6 +6,7 @@ import { SuperChatMessage } from "./item/superchatmessage/SuperChatMessage";
 import { InteractWord } from "./item/interactword/InteractWord";
 import { SendGift } from "./item/sendgift/SendGift";
 import { RoomBlockMsg } from "./item/roomblockmsg/RoomBlockMsg";
+import { RoomStatusChange } from "./item/roomstatuschange/RoomStatusChange";
 
 class Props {
   message: DanmuMessage;
@@ -18,17 +19,21 @@ export class DanmuItem extends React.Component<Props> {
       case "INTERACT_WORD": {
         return <InteractWord msg={msg} />;
       }
+      case "SEND_GIFT": {
+        return <SendGift msg={msg} />;
+      }
       case "DANMU_MSG": {
         return <DanmuMsg data={parseDanmuMsg(msg)} />;
       }
-      case "SEND_GIFT": {
-        return <SendGift msg={msg} />;
+      case "SUPER_CHAT_MESSAGE": {
+        return <SuperChatMessage msg={msg} />;
       }
       case "ROOM_BLOCK_MSG": {
         return <RoomBlockMsg msg={msg} />;
       }
-      case "SUPER_CHAT_MESSAGE": {
-        return <SuperChatMessage msg={msg} />;
+      case "PREPARING":
+      case "LIVE": {
+        return <RoomStatusChange msg={msg} />;
       }
     }
     console.log("unknown: ");

@@ -173,7 +173,9 @@ export class Main extends React.Component<Props, State> {
           }
           case "DANMU_MSG":
           case "SUPER_CHAT_MESSAGE":
-          case "ROOM_BLOCK_MSG": {
+          case "ROOM_BLOCK_MSG":
+          case "LIVE":
+          case "PREPARING": {
             this.addToList(msg);
             break;
           }

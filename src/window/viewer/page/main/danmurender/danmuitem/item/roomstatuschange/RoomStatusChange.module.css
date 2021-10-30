@@ -1,0 +1,8 @@
+.RoomStatusChange {
+  display: flex;
+  color: #f7b500;
+}
+
+.RoomStatusChange > div {
+  margin: 0 0.5ch 0 0.5ch;
+}
