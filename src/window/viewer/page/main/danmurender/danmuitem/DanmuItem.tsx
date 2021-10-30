@@ -1,10 +1,10 @@
 import React from "react";
 import { DanmuMessage } from "../../../../../../utils/command/DanmuMessage";
 import { DanmuMsg } from "./item/danmumsg/DanmuMsg";
-import { parseDanmuMsg } from "../../../../../../utils/command/bilibili/DanmuMsg";
+import { parseDanmuMsg } from "../../../../../../model/DanmuMsg";
 import { SuperChatMessage } from "./item/superchatmessage/SuperChatMessage";
 import { InteractWord } from "./item/interactword/InteractWord";
-import { InteractWord as TInteractWord } from "../../../../../../utils/command/bilibili/InteractWord";
+import { InteractWord as TInteractWord } from "../../../../../../model/InteractWord";
 
 class Props {
   message: DanmuMessage;

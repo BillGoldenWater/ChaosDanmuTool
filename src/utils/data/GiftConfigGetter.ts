@@ -1,4 +1,4 @@
-import { GiftConfig } from "../command/bilibili/giftconfig/GiftConfig";
+import { GiftConfig } from "../../model/giftconfig/GiftConfig";
 import * as https from "https";
 
 export class GiftConfigGetter {

@@ -1,6 +1,6 @@
 import React from "react";
 import style from "./DanmuContent.module.css";
-import { EmojiData } from "../../../utils/command/bilibili/EmojiData";
+import { EmojiData } from "../../../model/EmojiData";
 import { ConfigContext } from "../../../window/viewer/utils/ConfigContext";
 
 class Props {

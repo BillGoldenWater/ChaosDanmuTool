@@ -1,6 +1,6 @@
 import React from "react";
 import style from "./FansMedal.module.css";
-import { MedalInfo } from "../../../utils/command/bilibili/MedalInfo";
+import { MedalInfo } from "../../../model/MedalInfo";
 import { rgbI2S } from "../../../utils/FormatConverters";
 
 class Props {

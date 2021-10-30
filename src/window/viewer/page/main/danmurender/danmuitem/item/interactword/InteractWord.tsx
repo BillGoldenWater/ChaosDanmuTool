@@ -1,12 +1,12 @@
 import {
   InteractWord as TInteractWord,
   InteractWordType,
-} from "../../../../../../../../utils/command/bilibili/InteractWord";
+} from "../../../../../../../../model/InteractWord";
 import React, { ReactNode } from "react";
 import { UserInfo } from "../../../../../../../../component/bilibili/userinfo/UserInfo";
-import { emptyUserInfo } from "../../../../../../../../utils/command/bilibili/UserInfo";
+import { emptyUserInfo } from "../../../../../../../../model/UserInfo";
 import { DanmuContent } from "../../../../../../../../component/bilibili/danmucontent/DanmuContent";
-import { MedalInfo } from "../../../../../../../../utils/command/bilibili/MedalInfo";
+import { MedalInfo } from "../../../../../../../../model/MedalInfo";
 
 class Props {
   data: TInteractWord;

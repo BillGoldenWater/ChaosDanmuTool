@@ -2,7 +2,7 @@ import React from "react";
 import style from "./SuperChatMessage.module.css";
 import { DanmuMessage } from "../../../../../../../../utils/command/DanmuMessage";
 import { UserInfo } from "../../../../../../../../component/bilibili/userinfo/UserInfo";
-import { SuperChatMessage as TSuperChatMessage } from "../../../../../../../../utils/command/bilibili/SuperChatMessage";
+import { SuperChatMessage as TSuperChatMessage } from "../../../../../../../../model/SuperChatMessage";
 import { DanmuContent } from "../../../../../../../../component/bilibili/danmucontent/DanmuContent";
 
 class Props {

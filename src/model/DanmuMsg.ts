@@ -1,4 +1,4 @@
-import { DanmuMessage } from "../DanmuMessage";
+import { DanmuMessage } from "../utils/command/DanmuMessage";
 import { EmojiData } from "./EmojiData";
 import { MedalInfo } from "./MedalInfo";
 

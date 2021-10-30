@@ -1,4 +1,4 @@
-import { GiftConfig } from "./bilibili/giftconfig/GiftConfig";
+import { GiftConfig } from "../../model/giftconfig/GiftConfig";
 
 export type GiftConfigUpdateCmd = "updateGiftConfig";
 

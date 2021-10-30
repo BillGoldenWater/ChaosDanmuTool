@@ -1,8 +1,8 @@
 import React from "react";
 import style from "./UserInfo.module.css";
-import { UserInfo as TUserInfo } from "../../../utils/command/bilibili/UserInfo";
+import { UserInfo as TUserInfo } from "../../../model/UserInfo";
 import { FansMedal } from "../fansmedal/FansMedal";
-import { MedalInfo } from "../../../utils/command/bilibili/MedalInfo";
+import { MedalInfo } from "../../../model/MedalInfo";
 import { UserName } from "../username/UserName";
 import { AdminIcon } from "../adminicon/AdminIcon";
 import { VipIcon } from "../vipicon/VipIcon";

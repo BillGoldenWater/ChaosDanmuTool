@@ -23,14 +23,14 @@ import {
 import {
   InteractWord as TInteractWord,
   InteractWordType,
-} from "../../../../utils/command/bilibili/InteractWord";
+} from "../../../../model/InteractWord";
 import { ConfigContext } from "../../utils/ConfigContext";
 import { StatusBar } from "../../../../component/statusbar/StatusBar";
 import { DanmuRender } from "./danmurender/DanmuRender";
 import { InteractWord } from "./danmurender/danmuitem/item/interactword/InteractWord";
 import { formatNumber } from "../../../../utils/FormatConverters";
-import { RoomRealTimeMessageUpdate } from "../../../../utils/command/bilibili/RoomRealTimeMessageUpdate";
-import { GiftConfig } from "../../../../utils/command/bilibili/giftconfig/GiftConfig";
+import { RoomRealTimeMessageUpdate } from "../../../../model/RoomRealTimeMessageUpdate";
+import { GiftConfig } from "../../../../model/giftconfig/GiftConfig";
 import { getGiftConfigUpdateCmd } from "../../../../utils/command/GiftConfigUpdate";
 
 class Props {}
