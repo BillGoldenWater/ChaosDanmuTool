@@ -12,7 +12,7 @@ export class StatusUpdate extends React.Component<Props> {
     const rsu: ReceiverStatusUpdate = this.props.msg as ReceiverStatusUpdate;
     return (
       <div className={style.StatusUpdate}>
-        直播间连接状态更改为: {rsu.data.status}
+        直播间连接状态现在为: {rsu.data.status}
       </div>
     );
   }
