@@ -52,8 +52,9 @@ export type DanmuViewStyleConfig = {
 
 export type DanmuViewCustomConfig = {
   name: string;
-  statusBarDisplay: boolean;
   maxDanmuNumber: number;
+  statusBarDisplay: boolean;
+  superChatAlwaysOnTop: boolean;
   numberFormat: NumberFormatConfig;
   style: DanmuViewStyleConfig;
 };
@@ -67,8 +68,9 @@ export type Config = {
 
 export const defaultDanmuViewCustom: DanmuViewCustomConfig = {
   name: "",
-  statusBarDisplay: true,
   maxDanmuNumber: 100,
+  statusBarDisplay: true,
+  superChatAlwaysOnTop: true,
   numberFormat: {
     formatActivity: true,
     formatFansNum: true,
