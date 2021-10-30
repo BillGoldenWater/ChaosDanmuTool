@@ -7,14 +7,15 @@ import { UserInfo } from "../../../../../../../../component/bilibili/userinfo/Us
 import { emptyUserInfo } from "../../../../../../../../model/UserInfo";
 import { DanmuContent } from "../../../../../../../../component/bilibili/danmucontent/DanmuContent";
 import { MedalInfo } from "../../../../../../../../model/MedalInfo";
+import { DanmuMessage } from "../../../../../../../../utils/command/DanmuMessage";
 
 class Props {
-  data: TInteractWord;
+  msg: DanmuMessage;
 }
 
 export class InteractWord extends React.Component<Props> {
   render(): ReactNode {
-    const iw: TInteractWord = this.props.data;
+    const iw: TInteractWord = this.props.msg as unknown as TInteractWord;
 
     let action: string;
 

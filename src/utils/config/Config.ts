@@ -41,8 +41,8 @@ export type TextStyleConfig = {
 
 export type DanmuViewStyleConfig = {
   listMargin: string;
-  giftIconMaxHeight: string;
   mainStyle: CSSProperties;
+  giftIcon: CSSProperties;
   vipIcon: TextIconStyleConfig;
   svipIcon: TextIconStyleConfig;
   adminIcon: TextIconStyleConfig;
@@ -75,7 +75,6 @@ export const defaultDanmuViewCustom: DanmuViewCustomConfig = {
   },
   style: {
     listMargin: "0.25em",
-    giftIconMaxHeight: "3em",
     mainStyle: {
       backgroundColor: "#3B3B3B44",
       zoom: 1.0,
@@ -84,6 +83,9 @@ export const defaultDanmuViewCustom: DanmuViewCustomConfig = {
       fontWeight: 400,
       lineHeight: "1.5em",
       color: "#fff",
+    },
+    giftIcon: {
+      height: "2em",
     },
     vipIcon: {
       text: "爷",

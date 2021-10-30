@@ -232,7 +232,9 @@ export class Main extends React.Component<Props, State> {
     switch (interactWord.msg_type) {
       case InteractWordType.join: {
         this.setState({
-          statusMessage: <InteractWord data={interactWord} />,
+          statusMessage: (
+            <InteractWord msg={{ ...interactWord, cmd: "INTERACT_WORD" }} />
+          ),
         });
         break;
       }
