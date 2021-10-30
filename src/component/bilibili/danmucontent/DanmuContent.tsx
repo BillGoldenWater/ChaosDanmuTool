@@ -19,7 +19,12 @@ export class DanmuContent extends React.Component<Props> {
         {({ config }) => (
           <div
             className={style.DanmuContent}
-            style={{ ...config.style.danmuContent, color: this.props.color }}
+            style={{
+              ...config.style.danmuContent,
+              color: this.props.color
+                ? this.props.color
+                : config.style.danmuContent.color,
+            }}
           >
             {typeof emojiData == "string" || !emojiData ? (
               content
