@@ -28,6 +28,8 @@ import { ConfigContext } from "../../utils/ConfigContext";
 import { StatusBar } from "../../../../component/statusbar/StatusBar";
 import { DanmuRender } from "./danmurender/DanmuRender";
 import { InteractWord } from "./danmurender/danmuitem/item/interactword/InteractWord";
+import { formatNumber } from "../../../../utils/FormatConverters";
+import { RoomRealTimeMessageUpdate } from "../../../../utils/command/bilibili/RoomRealTimeMessageUpdate";
 
 class Props {}
 
@@ -153,6 +155,12 @@ export class Main extends React.Component<Props, State> {
             this.addToList(msg);
             break;
           }
+          case "ROOM_REAL_TIME_MESSAGE_UPDATE": {
+            this.processRoomRealTimeMessageUpdate(
+              msg as RoomRealTimeMessageUpdate
+            );
+            break;
+          }
           default: {
             console.log("未知的消息: ");
             console.log(msg);
@@ -162,6 +170,14 @@ export class Main extends React.Component<Props, State> {
         break;
       }
     }
+  }
+
+  processRoomRealTimeMessageUpdate(
+    roomRealTimeMessageUpdate: RoomRealTimeMessageUpdate
+  ): void {
+    this.setState({
+      fansNumber: roomRealTimeMessageUpdate.data.fans,
+    });
   }
 
   processInteractWord(interactWord: TInteractWord): void {
@@ -221,7 +237,18 @@ export class Main extends React.Component<Props, State> {
                 color: this.state.config.style.mainStyle.color,
               }}
             >
-              {this.state.activity}
+              <div>
+                人气:
+                {this.state.config.numberFormat.formatActivity
+                  ? formatNumber(this.state.activity)
+                  : this.state.activity}
+              </div>
+              <div>
+                粉丝数:
+                {this.state.config.numberFormat.formatFansNum
+                  ? formatNumber(this.state.fansNumber)
+                  : this.state.fansNumber}
+              </div>
             </StatusBar>
           )}
           <DanmuRender danmuList={this.state.danmuList} />
