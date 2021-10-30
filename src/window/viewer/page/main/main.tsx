@@ -36,6 +36,7 @@ import {
   parseGiftConfig,
 } from "../../../../model/giftconfig/GiftConfig";
 import { getGiftConfigUpdateCmd } from "../../../../utils/command/GiftConfigUpdate";
+import { SendGift } from "../../../../model/SendGift";
 
 class Props {}
 
@@ -164,6 +165,10 @@ export class Main extends React.Component<Props, State> {
             this.addToList(msg);
             break;
           }
+          case "SEND_GIFT": {
+            this.processSendGift(msg as SendGift);
+            break;
+          }
           case "SUPER_CHAT_MESSAGE": {
             this.addToList(msg);
             break;
@@ -183,6 +188,36 @@ export class Main extends React.Component<Props, State> {
         break;
       }
     }
+  }
+
+  processSendGift(sendGift: SendGift): void {
+    const needRemove: number[] = [];
+    let totalNum = 0;
+
+    for (const i in this.state.danmuList) {
+      const msg: DanmuMessage = this.state.danmuList[i].msg;
+      const key: number = this.state.danmuList[i].key;
+      if (msg.cmd == "SEND_GIFT") {
+        const sgData = (msg as SendGift).data;
+        if (
+          sgData.uid == sendGift.data.uid &&
+          sgData.giftId == sendGift.data.giftId &&
+          sendGift.data.timestamp - sgData.timestamp <=
+            sendGift.data.combo_stay_time
+        ) {
+          needRemove.push(key);
+          totalNum += sgData.num;
+        }
+      }
+    }
+
+    this.addToList(
+      {
+        ...sendGift,
+        data: { ...sendGift.data, num: sendGift.data.num + totalNum },
+      } as SendGift,
+      needRemove
+    );
   }
 
   processRoomRealTimeMessageUpdate(
@@ -211,7 +246,7 @@ export class Main extends React.Component<Props, State> {
     }
   }
 
-  addToList(msg: DanmuMessage): void {
+  addToList(msg: DanmuMessage, removeKeys?: number[]): void {
     this.setState((prevState) => {
       const list: DanmuMessageWithKey[] = prevState.danmuList;
       list.push({
@@ -229,7 +264,9 @@ export class Main extends React.Component<Props, State> {
 
       return {
         ...prevState,
-        danmuList: list,
+        danmuList: list.filter((element) => {
+          return removeKeys ? !removeKeys.includes(element.key) : true;
+        }),
       };
     });
   }
@@ -238,7 +275,10 @@ export class Main extends React.Component<Props, State> {
     return (
       <div className={style.main} style={this.state.config.style.mainStyle}>
         <ConfigContext.Provider
-          value={{ config: this.state.config, setConfig: undefined }}
+          value={{
+            config: this.state.config,
+            giftConfig: this.state.giftConfig,
+          }}
         >
           {this.state.connectState == "open" &&
             this.state.config.statusBarDisplay && (
