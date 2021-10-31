@@ -62,9 +62,12 @@ function createViewerWindow(): void {
     )
     .then();
 
-  viewerWindow.setVisibleOnAllWorkspaces(true, {
-    skipTransformProcessType: false,
-    visibleOnFullScreen: true,
+  viewerWindow.on("ready-to-show", () => {
+    viewerWindow.setVisibleOnAllWorkspaces(true, {
+      skipTransformProcessType: false,
+      visibleOnFullScreen: true,
+    });
+    app.dock ? app.dock.show().then() : "";
   });
 }
 
