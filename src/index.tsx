@@ -1,4 +1,4 @@
-import {app, BrowserWindow, ipcMain} from "electron";
+import {app, BrowserWindow, ipcMain, Menu} from "electron";
 import {DanmuReceiver} from "./utils/client/DanmuReceiver";
 import {ConfigManager} from "./utils/config/ConfigManager";
 import * as path from "path";
@@ -172,6 +172,21 @@ function init(): void {
   // console.log(
   //   "==============================================================================="
   // );
+
+  const dockMenu = Menu.buildFromTemplate([
+    {
+      label: "打开主窗口",
+      click() {
+        mainWindow && !mainWindow.isDestroyed()
+          ? mainWindow.show()
+          : createMainWindow();
+      },
+    },
+  ]);
+
+  if (process.platform == "darwin") {
+    app.dock.setMenu(dockMenu);
+  }
 
   createMainWindow();
 }
