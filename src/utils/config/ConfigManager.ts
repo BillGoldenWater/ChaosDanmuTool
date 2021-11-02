@@ -6,10 +6,13 @@ import { dialog } from "electron";
 export class ConfigManager {
   static config: Config;
   static filePath: string;
+  static inited: boolean;
+  static loaded: boolean;
 
   static init(filePath: string): void {
     this.config = JSON.parse(JSON.stringify(defaultConfig));
     this.filePath = filePath;
+    this.inited = true;
   }
 
   static load(): void {
@@ -22,6 +25,7 @@ export class ConfigManager {
     } catch (e) {
       this.config = JSON.parse(JSON.stringify(defaultConfig));
     }
+    this.loaded = true;
   }
 
   static save(): void {
@@ -47,5 +51,9 @@ export class ConfigManager {
 
   static writeToFile(): void {
     fs.writeFileSync(this.filePath, JSON.stringify(this.config, null, 2));
+  }
+
+  static isSafeToSave(): boolean {
+    return this.inited && this.loaded;
   }
 }

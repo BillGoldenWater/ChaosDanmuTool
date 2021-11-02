@@ -35,6 +35,7 @@ export class ConfigFileManager extends React.Component {
             </Button>
             <Button
               onClick={() => {
+                setConfig(JSON.parse(window.electron.getConfig()));
                 this.broadcastConfig(config);
               }}
             >

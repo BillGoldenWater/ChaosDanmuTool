@@ -45,7 +45,7 @@ export class Main extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      pageIndex: 2,
+      pageIndex: 2, //test code
       config: { ...defaultConfig },
       receiverStatus: "close",
       statusMessage: "",
