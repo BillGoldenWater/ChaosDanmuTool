@@ -185,6 +185,31 @@ export class Main extends React.Component<Props, State> {
             this.addToList(msg);
             break;
           }
+          case "STOP_LIVE_ROOM_LIST":
+          case "COMBO_SEND":
+          case "COMMON_NOTICE_DANMAKU":
+          case "LIVE_INTERACTIVE_GAME":
+          case "NOTICE_MSG":
+          case "ROOM_CHANGE":
+          case "USER_TOAST_MSG":
+          case "WIDGET_BANNER":
+          case "PK_BATTLE_END":
+          case "PK_BATTLE_ENTRANCE":
+          case "PK_BATTLE_FINAL_PROCESS":
+          case "PK_BATTLE_PRE":
+          case "PK_BATTLE_PRE_NEW":
+          case "PK_BATTLE_PROCESS":
+          case "PK_BATTLE_PROCESS_NEW":
+          case "PK_BATTLE_SETTLE":
+          case "PK_BATTLE_SETTLE_USER":
+          case "PK_BATTLE_SETTLE_V2":
+          case "PK_BATTLE_START":
+          case "PK_BATTLE_START_NEW":
+          case "ONLINE_RANK_COUNT":
+          case "ONLINE_RANK_TOP3":
+          case "ONLINE_RANK_V2": {
+            break;
+          }
           default: {
             console.log("未知的消息: ");
             console.log(msg);
