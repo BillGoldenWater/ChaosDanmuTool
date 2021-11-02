@@ -9,6 +9,10 @@ import { Config } from "../../../../utils/config/Config";
 class Props {}
 
 export class Setting extends React.Component<Props> {
+  broadcastConfig(config: Config): void {
+    window.electron.websocketBroadcast(getConfigUpdateMessage(config));
+  }
+
   render(): JSX.Element {
     return (
       <ConfigContext.Consumer>
@@ -23,9 +27,7 @@ export class Setting extends React.Component<Props> {
                       window.electron.getConfig()
                     );
                     setConfig(config);
-                    window.electron.websocketBroadcast(
-                      getConfigUpdateMessage(config)
-                    );
+                    this.broadcastConfig(config);
                   }}
                 >
                   读取
@@ -40,9 +42,7 @@ export class Setting extends React.Component<Props> {
                 </Button>
                 <Button
                   onClick={() => {
-                    window.electron.websocketBroadcast(
-                      getConfigUpdateMessage(config)
-                    );
+                    this.broadcastConfig(config);
                   }}
                 >
                   更新
