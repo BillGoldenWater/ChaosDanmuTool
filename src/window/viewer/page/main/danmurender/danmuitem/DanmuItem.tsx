@@ -9,6 +9,7 @@ import { RoomBlockMsg } from "./item/roomblockmsg/RoomBlockMsg";
 import { RoomStatusChange } from "./item/roomstatuschange/RoomStatusChange";
 import { getStatusUpdateMessageCmd } from "../../../../../../utils/command/ReceiverStatusUpdate";
 import { StatusUpdate } from "./item/statusupdate/StatusUpdate";
+import { GuardBuy } from "./item/guardbuy/GuardBuy";
 
 class Props {
   message: DanmuMessage;
@@ -39,6 +40,9 @@ export class DanmuItem extends React.Component<Props> {
       case "PREPARING":
       case "LIVE": {
         return <RoomStatusChange msg={msg} />;
+      }
+      case "GUARD_BUY": {
+        return <GuardBuy msg={msg} />;
       }
     }
     console.log("unknown: ");
