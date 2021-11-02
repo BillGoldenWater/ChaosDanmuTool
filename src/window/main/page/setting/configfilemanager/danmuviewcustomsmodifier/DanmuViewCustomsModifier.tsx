@@ -6,6 +6,7 @@ import {
   defaultDanmuViewCustom,
 } from "../../../../../../utils/config/Config";
 import { DanmuViewStyleConfigModifier } from "./danmuviewstyleconfigmodifier/DanmuViewStyleConfigModifier";
+import { Button } from "../../../../../../component/button/Button";
 
 class Props {}
 
@@ -27,8 +28,12 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
       <ConfigContext.Consumer>
         {({ config, setConfig }) => {
           if (config.danmuViewCustoms.length == 0) {
-            config.danmuViewCustoms.push(defaultDanmuViewCustom);
+            config.danmuViewCustoms.push({
+              ...defaultDanmuViewCustom,
+              name: "internal",
+            });
           }
+
           const danmuViewCustomConfig =
             config.danmuViewCustoms.filter((value) => {
               return value.name == this.state.selected;
@@ -38,10 +43,7 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
             viewCustomConfig: DanmuViewCustomConfig
           ) => {
             const tempList = config.danmuViewCustoms.filter((value) => {
-              return (
-                value.name != this.state.selected &&
-                value.name != danmuViewCustomConfig.name
-              );
+              return value.name != danmuViewCustomConfig.name;
             });
             tempList.push(viewCustomConfig);
             setConfig({ ...config, danmuViewCustoms: tempList });
@@ -55,17 +57,47 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
                 <select
                   value={this.state.selected}
                   onChange={(event) => {
+                    event.preventDefault();
                     this.setState({ selected: event.target.value });
                   }}
                 >
-                  {config.danmuViewCustoms.map((value) => {
+                  {config.danmuViewCustoms.map((value, index) => {
+                    console.log(value.name);
                     return (
-                      <option key={JSON.stringify(value)} value={value.name}>
+                      <option
+                        key={JSON.stringify(value) + index}
+                        value={value.name}
+                      >
                         {value.name}
                       </option>
                     );
                   })}
                 </select>
+                <Button
+                  onClick={() => {
+                    const tempList = config.danmuViewCustoms;
+                    tempList.push({ ...defaultDanmuViewCustom, name: "new" });
+                    setConfig({ ...config, danmuViewCustoms: tempList });
+                    this.setState({ selected: "new" });
+                  }}
+                >
+                  新建
+                </Button>
+                <Button
+                  onClick={() => {
+                    setConfig({
+                      ...config,
+                      danmuViewCustoms: config.danmuViewCustoms.filter(
+                        (value) => {
+                          return value.name != danmuViewCustomConfig.name;
+                        }
+                      ),
+                    });
+                    this.setState({ selected: "internal" });
+                  }}
+                >
+                  删除
+                </Button>
               </FunctionCard>
               <br />
 
