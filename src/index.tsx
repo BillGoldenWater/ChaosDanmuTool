@@ -32,6 +32,7 @@ function createMainWindow(): void {
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     },
+    alwaysOnTop: true,
   });
 
   // and load the index.html of the app.
