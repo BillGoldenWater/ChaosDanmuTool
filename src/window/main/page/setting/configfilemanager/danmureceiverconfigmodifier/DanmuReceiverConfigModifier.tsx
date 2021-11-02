@@ -41,7 +41,7 @@ export class DanmuReceiverConfigModifier extends React.Component {
                 }}
               />
               <br />
-              <label>心跳包间隔(影响人气更新间隔):</label>
+              <label>心跳包间隔(人气更新间隔)(秒):</label>
               <input
                 value={danmuReceiverConfig.heartBeatInterval}
                 onChange={(event) => {
