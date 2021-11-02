@@ -19,7 +19,7 @@ export class DanmuReceiverConfigModifier extends React.Component {
           };
           return (
             <FunctionCard name={"弹幕接收器"}>
-              <label>服务器URL:</label>
+              <label>服务器URL: </label>
               <input
                 value={danmuReceiverConfig.serverUrl}
                 onChange={(event) => {
@@ -30,7 +30,7 @@ export class DanmuReceiverConfigModifier extends React.Component {
                 }}
               />
               <br />
-              <label>房间号:</label>
+              <label>房间号: </label>
               <input
                 value={danmuReceiverConfig.roomid}
                 onChange={(event) => {
@@ -41,7 +41,7 @@ export class DanmuReceiverConfigModifier extends React.Component {
                 }}
               />
               <br />
-              <label>心跳包间隔(人气更新间隔)(秒):</label>
+              <label>心跳包间隔(人气更新间隔)(秒): </label>
               <input
                 value={danmuReceiverConfig.heartBeatInterval}
                 onChange={(event) => {

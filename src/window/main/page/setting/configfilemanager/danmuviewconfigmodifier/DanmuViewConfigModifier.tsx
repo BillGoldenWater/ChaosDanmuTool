@@ -14,7 +14,7 @@ export class DanmuViewConfigModifier extends React.Component {
           };
           return (
             <FunctionCard name={"弹幕查看器"}>
-              <label>弹幕转发服务器监听地址:</label>
+              <label>弹幕转发服务器监听地址: </label>
               <input
                 value={danmuViewConfig.websocketServer.host}
                 onChange={(event) => {
@@ -28,7 +28,7 @@ export class DanmuViewConfigModifier extends React.Component {
                 }}
               />
               <br />
-              <label>弹幕转发服务器监听端口:</label>
+              <label>弹幕转发服务器监听端口: </label>
               <input
                 value={danmuViewConfig.websocketServer.port}
                 onChange={(event) => {
@@ -42,7 +42,7 @@ export class DanmuViewConfigModifier extends React.Component {
                 }}
               />
               <br />
-              <label>网页服务器端口:</label>
+              <label>网页服务器端口: </label>
               <input
                 value={danmuViewConfig.webServer.port}
                 onChange={(event) => {
@@ -53,7 +53,7 @@ export class DanmuViewConfigModifier extends React.Component {
                 }}
               />
               <br />
-              <label>最大重连次数:</label>
+              <label>最大重连次数: </label>
               <input
                 value={danmuViewConfig.maxReconnectAttemptNumber}
                 onChange={(event) => {
@@ -64,7 +64,7 @@ export class DanmuViewConfigModifier extends React.Component {
                 }}
               />
               <br />
-              <label>默认宽度:</label>
+              <label>默认宽度: </label>
               <input
                 value={danmuViewConfig.width}
                 onChange={(event) => {
@@ -75,7 +75,7 @@ export class DanmuViewConfigModifier extends React.Component {
                 }}
               />
               <br />
-              <label>默认高度:</label>
+              <label>默认高度: </label>
               <input
                 value={danmuViewConfig.height}
                 onChange={(event) => {
