@@ -1,6 +1,6 @@
 import React from "react";
 import style from "./DanmuMsg.module.css";
-import { TDanmuMsg as TDanmuMsg } from "../../../../../../../../type/TDanmuMsg";
+import { TDanmuMsg } from "../../../../../../../../type/TDanmuMsg";
 import { UserInfo } from "../../../../../../../../component/bilibili/userinfo/UserInfo";
 import { emptyUserInfo } from "../../../../../../../../type/TUserInfo";
 import { DanmuContent } from "../../../../../../../../component/bilibili/danmucontent/DanmuContent";

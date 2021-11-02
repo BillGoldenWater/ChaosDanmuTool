@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { TSendGift as TSendGift } from "../../../../../../../../type/TSendGift";
+import { TSendGift } from "../../../../../../../../type/TSendGift";
 import { UserInfo } from "../../../../../../../../component/bilibili/userinfo/UserInfo";
 import { emptyUserInfo } from "../../../../../../../../type/TUserInfo";
 import { GiftIcon } from "../../../../../../../../component/bilibili/gifticon/GiftIcon";

@@ -1,6 +1,6 @@
 import {
   InteractWordType,
-  TInteractWord as TInteractWord,
+  TInteractWord,
 } from "../../../../../../../../type/TInteractWord";
 import React, { ReactNode } from "react";
 import { UserInfo } from "../../../../../../../../component/bilibili/userinfo/UserInfo";
