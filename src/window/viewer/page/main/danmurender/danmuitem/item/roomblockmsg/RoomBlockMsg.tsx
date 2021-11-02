@@ -1,9 +1,9 @@
 import React, { ReactNode } from "react";
 import style from "./RoomBlockMsg.module.css";
 import { DanmuMessage } from "../../../../../../../../utils/command/DanmuMessage";
-import { RoomBlockMsg as TRoomBlockMsg } from "../../../../../../../../model/RoomBlockMsg";
+import { TRoomBlockMsg as TRoomBlockMsg } from "../../../../../../../../model/TRoomBlockMsg";
 import { UserInfo } from "../../../../../../../../component/bilibili/userinfo/UserInfo";
-import { emptyUserInfo } from "../../../../../../../../model/UserInfo";
+import { emptyUserInfo } from "../../../../../../../../model/TUserInfo";
 
 class Props {
   msg: DanmuMessage;

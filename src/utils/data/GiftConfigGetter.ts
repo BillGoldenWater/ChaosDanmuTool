@@ -1,8 +1,8 @@
-import { GiftConfigResponse } from "../../model/giftconfig/GiftConfig";
+import { TGiftConfigResponse } from "../../model/giftconfig/TGiftConfig";
 import * as https from "https";
 
 export class GiftConfigGetter {
-  static giftConfigRes: GiftConfigResponse;
+  static giftConfigRes: TGiftConfigResponse;
   static giftConfigResStr: string;
 
   static init(): void {

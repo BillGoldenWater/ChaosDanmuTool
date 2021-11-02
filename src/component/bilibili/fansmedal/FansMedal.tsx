@@ -1,10 +1,10 @@
 import React from "react";
 import style from "./FansMedal.module.css";
-import { MedalInfo } from "../../../model/MedalInfo";
+import { TMedalInfo } from "../../../model/TMedalInfo";
 import { rgbI2S } from "../../../utils/FormatConverters";
 
 class Props {
-  medalInfo: MedalInfo;
+  medalInfo: TMedalInfo;
 }
 
 export class FansMedal extends React.Component<Props> {

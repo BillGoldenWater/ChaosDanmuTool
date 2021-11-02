@@ -1,4 +1,4 @@
-export type Preparing = {
+export type TPreparing = {
   cmd: "PREPARING";
   roomid: string;
 };

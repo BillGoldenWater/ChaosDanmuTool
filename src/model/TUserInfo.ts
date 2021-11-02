@@ -1,4 +1,4 @@
-export type UserInfo = {
+export type TUserInfo = {
   face: string;
   face_frame: string;
   guard_level: number;

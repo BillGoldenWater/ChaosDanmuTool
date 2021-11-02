@@ -8,7 +8,8 @@ export type DanmuMessage = {
     | "SUPER_CHAT_MESSAGE"
     | "ROOM_BLOCK_MSG"
     | "LIVE"
-    | "PREPARING";
+    | "PREPARING"
+    | "GUARD_BUY";
   [key: string]: unknown;
 };
 

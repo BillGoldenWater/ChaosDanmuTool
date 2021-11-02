@@ -1,4 +1,4 @@
-export type FansMedal = {
+export type TFansMedal = {
   anchor_roomid: number;
   guard_level: number;
   icon_id: number;

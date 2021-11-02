@@ -1,11 +1,11 @@
 import React from "react";
 import style from "./DanmuContent.module.css";
-import { EmojiData } from "../../../model/EmojiData";
+import { TEmojiData } from "../../../model/TEmojiData";
 import { ConfigContext } from "../../../window/viewer/utils/ConfigContext";
 
 class Props {
   content?: string;
-  emojiData?: EmojiData;
+  emojiData?: TEmojiData;
   color?: string;
 }
 

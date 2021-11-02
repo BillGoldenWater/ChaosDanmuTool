@@ -1,6 +1,6 @@
-import { MedalInfo } from "./MedalInfo";
+import { TMedalInfo } from "./TMedalInfo";
 
-export type SendGift = {
+export type TSendGift = {
   cmd: string;
   data: {
     action: string;
@@ -31,7 +31,7 @@ export type SendGift = {
     is_first: true;
     is_special_batch: number;
     magnification: number;
-    medal_info: MedalInfo;
+    medal_info: TMedalInfo;
     name_color: string;
     num: number;
     original_gift_name: string;

@@ -1,11 +1,11 @@
 import React, { ReactNode } from "react";
-import { SendGift as TSendGift } from "../../../../../../../../model/SendGift";
+import { TSendGift as TSendGift } from "../../../../../../../../model/TSendGift";
 import { UserInfo } from "../../../../../../../../component/bilibili/userinfo/UserInfo";
-import { emptyUserInfo } from "../../../../../../../../model/UserInfo";
+import { emptyUserInfo } from "../../../../../../../../model/TUserInfo";
 import { GiftIcon } from "../../../../../../../../component/bilibili/gifticon/GiftIcon";
 import { ConfigContext } from "../../../../../../utils/ConfigContext";
-import { GiftConfig } from "../../../../../../../../model/giftconfig/GiftConfig";
-import { GiftInfo } from "../../../../../../../../model/giftconfig/GiftInfo";
+import { TGiftConfig } from "../../../../../../../../model/giftconfig/TGiftConfig";
+import { TGiftInfo } from "../../../../../../../../model/giftconfig/TGiftInfo";
 import { DanmuMessage } from "../../../../../../../../utils/command/DanmuMessage";
 
 class Props {
@@ -18,8 +18,8 @@ export class SendGift extends React.Component<Props> {
     return (
       <ConfigContext.Consumer>
         {({ giftConfig }) => {
-          const gc: GiftConfig = giftConfig;
-          const gi: GiftInfo = gc ? gc.data.get(data.giftId) : undefined;
+          const gc: TGiftConfig = giftConfig;
+          const gi: TGiftInfo = gc ? gc.data.get(data.giftId) : undefined;
           return (
             <div>
               <UserInfo

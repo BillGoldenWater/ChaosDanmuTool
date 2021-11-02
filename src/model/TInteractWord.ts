@@ -1,9 +1,9 @@
-import { FansMedal } from "./FansMedal";
+import { TFansMedal } from "./TFansMedal";
 
-export type InteractWord = {
+export type TInteractWord = {
   contribution: unknown;
   dmscore: number;
-  fans_medal: FansMedal;
+  fans_medal: TFansMedal;
   identities: unknown;
   is_spread: number;
   msg_type: number;

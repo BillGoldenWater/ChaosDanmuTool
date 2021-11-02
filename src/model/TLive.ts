@@ -1,4 +1,4 @@
-export type Live = {
+export type TLive = {
   cmd: "LIVE";
   live_key: string;
   voice_background: string;

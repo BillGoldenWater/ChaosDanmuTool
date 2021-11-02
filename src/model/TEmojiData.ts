@@ -1,4 +1,4 @@
-export type EmojiData = {
+export type TEmojiData = {
   height: number;
   in_player_area: number;
   is_dynamic: number;

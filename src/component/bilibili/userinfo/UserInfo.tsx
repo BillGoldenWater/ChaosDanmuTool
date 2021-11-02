@@ -1,8 +1,8 @@
 import React from "react";
 import style from "./UserInfo.module.css";
-import { UserInfo as TUserInfo } from "../../../model/UserInfo";
+import { TUserInfo as TUserInfo } from "../../../model/TUserInfo";
 import { FansMedal } from "../fansmedal/FansMedal";
-import { MedalInfo } from "../../../model/MedalInfo";
+import { TMedalInfo } from "../../../model/TMedalInfo";
 import { UserName } from "../username/UserName";
 import { AdminIcon } from "../adminicon/AdminIcon";
 import { VipIcon } from "../vipicon/VipIcon";
@@ -10,7 +10,7 @@ import { UserFace } from "../userface/UserFace";
 
 class Props {
   userInfo: TUserInfo;
-  medalInfo?: MedalInfo;
+  medalInfo?: TMedalInfo;
 }
 
 export class UserInfo extends React.Component<Props> {

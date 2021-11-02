@@ -1,12 +1,12 @@
 import { DanmuMessage } from "../utils/command/DanmuMessage";
-import { EmojiData } from "./EmojiData";
-import { MedalInfo } from "./MedalInfo";
+import { TEmojiData } from "./TEmojiData";
+import { TMedalInfo } from "./TMedalInfo";
 
-export type DanmuMsg = {
+export type TDanmuMsg = {
   fontsize: number;
   color: number;
   timestamp: number;
-  emojiData: EmojiData;
+  emojiData: TEmojiData;
 
   content: string;
 
@@ -16,7 +16,7 @@ export type DanmuMsg = {
   isVip: number;
   isSVip: number;
 
-  medalInfo: MedalInfo;
+  medalInfo: TMedalInfo;
 
   userUL: number;
 
@@ -24,8 +24,8 @@ export type DanmuMsg = {
   userTitle1: string;
 };
 
-export function parseDanmuMsg(data: DanmuMessage): DanmuMsg {
-  const danmuMsg: DanmuMsg = <DanmuMsg>{};
+export function parseDanmuMsg(data: DanmuMessage): TDanmuMsg {
+  const danmuMsg: TDanmuMsg = <TDanmuMsg>{};
   const danmuMsgRaw: unknown[] = <unknown[]>data.info;
 
   const danmuMeta: unknown[] = <unknown[]>danmuMsgRaw[0];
@@ -33,7 +33,7 @@ export function parseDanmuMsg(data: DanmuMessage): DanmuMsg {
     danmuMsg.fontsize = <number>danmuMeta[2];
     danmuMsg.color = <number>danmuMeta[3];
     danmuMsg.timestamp = <number>danmuMeta[4];
-    danmuMsg.emojiData = <EmojiData>danmuMeta[13];
+    danmuMsg.emojiData = <TEmojiData>danmuMeta[13];
   }
 
   danmuMsg.content = <string>danmuMsgRaw[1];
@@ -49,7 +49,7 @@ export function parseDanmuMsg(data: DanmuMessage): DanmuMsg {
 
   const medalInfo: unknown[] = <unknown[]>danmuMsgRaw[3];
   if (medalInfo) {
-    const tempMedalInfo: MedalInfo = <MedalInfo>{};
+    const tempMedalInfo: TMedalInfo = <TMedalInfo>{};
 
     if (medalInfo && medalInfo.length > 0) {
       tempMedalInfo.medal_level = <number>medalInfo[0];

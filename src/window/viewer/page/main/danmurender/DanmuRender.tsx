@@ -239,7 +239,7 @@ export class DanmuRender extends React.Component<Props> {
     //         uname: "祈愿相随の",
     //       },
     //       beatId: "",
-    //       biz_source: "Live",
+    //       biz_source: "TLive",
     //       blind_gift: {
     //         blind_gift_config_id: 20,
     //         gift_action: "爆出",

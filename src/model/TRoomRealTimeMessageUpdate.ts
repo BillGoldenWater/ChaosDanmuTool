@@ -1,4 +1,4 @@
-export type RoomRealTimeMessageUpdate = {
+export type TRoomRealTimeMessageUpdate = {
   cmd: string;
   data: {
     roomid: number;

@@ -21,22 +21,22 @@ import {
   DanmuMessageWithKey,
 } from "../../../../utils/command/DanmuMessage";
 import {
-  InteractWord as TInteractWord,
   InteractWordType,
-} from "../../../../model/InteractWord";
+  TInteractWord as TInteractWord,
+} from "../../../../model/TInteractWord";
 import { ConfigContext } from "../../utils/ConfigContext";
 import { StatusBar } from "../../../../component/statusbar/StatusBar";
 import { DanmuRender } from "./danmurender/DanmuRender";
 import { InteractWord } from "./danmurender/danmuitem/item/interactword/InteractWord";
 import { formatNumber } from "../../../../utils/FormatConverters";
-import { RoomRealTimeMessageUpdate } from "../../../../model/RoomRealTimeMessageUpdate";
+import { TRoomRealTimeMessageUpdate } from "../../../../model/TRoomRealTimeMessageUpdate";
 import {
-  GiftConfig,
-  GiftConfigResponse,
   parseGiftConfig,
-} from "../../../../model/giftconfig/GiftConfig";
+  TGiftConfig,
+  TGiftConfigResponse,
+} from "../../../../model/giftconfig/TGiftConfig";
 import { getGiftConfigUpdateCmd } from "../../../../utils/command/GiftConfigUpdate";
-import { SendGift } from "../../../../model/SendGift";
+import { TSendGift } from "../../../../model/TSendGift";
 import { getStatusUpdateMessageCmd } from "../../../../utils/command/ReceiverStatusUpdate";
 
 class Props {}
@@ -49,7 +49,7 @@ class State {
   activity: number;
   fansNumber: number;
   statusMessage: string | ReactNode;
-  giftConfig: GiftConfig;
+  giftConfig: TGiftConfig;
 }
 
 export class Main extends React.Component<Props, State> {
@@ -144,7 +144,7 @@ export class Main extends React.Component<Props, State> {
         break;
       }
       case getGiftConfigUpdateCmd(): {
-        const giftConfig: GiftConfigResponse = command.data;
+        const giftConfig: TGiftConfigResponse = command.data;
         this.setState({ giftConfig: parseGiftConfig(giftConfig) });
         break;
       }
@@ -167,12 +167,12 @@ export class Main extends React.Component<Props, State> {
             break;
           }
           case "SEND_GIFT": {
-            this.processSendGift(msg as SendGift);
+            this.processSendGift(msg as TSendGift);
             break;
           }
           case "ROOM_REAL_TIME_MESSAGE_UPDATE": {
             this.processRoomRealTimeMessageUpdate(
-              msg as RoomRealTimeMessageUpdate
+              msg as TRoomRealTimeMessageUpdate
             );
             break;
           }
@@ -180,7 +180,8 @@ export class Main extends React.Component<Props, State> {
           case "SUPER_CHAT_MESSAGE":
           case "ROOM_BLOCK_MSG":
           case "LIVE":
-          case "PREPARING": {
+          case "PREPARING":
+          case "GUARD_BUY": {
             this.addToList(msg);
             break;
           }
@@ -195,7 +196,7 @@ export class Main extends React.Component<Props, State> {
     }
   }
 
-  processSendGift(sendGift: SendGift): void {
+  processSendGift(sendGift: TSendGift): void {
     const needRemove: number[] = [];
     let totalNum = 0;
 
@@ -203,7 +204,7 @@ export class Main extends React.Component<Props, State> {
       const msg: DanmuMessage = this.state.danmuList[i].msg;
       const key: number = this.state.danmuList[i].key;
       if (msg.cmd == "SEND_GIFT") {
-        const sgData = (msg as SendGift).data;
+        const sgData = (msg as TSendGift).data;
         if (
           sgData.uid == sendGift.data.uid &&
           sgData.giftId == sendGift.data.giftId &&
@@ -220,13 +221,13 @@ export class Main extends React.Component<Props, State> {
       {
         ...sendGift,
         data: { ...sendGift.data, num: sendGift.data.num + totalNum },
-      } as SendGift,
+      } as TSendGift,
       needRemove
     );
   }
 
   processRoomRealTimeMessageUpdate(
-    roomRealTimeMessageUpdate: RoomRealTimeMessageUpdate
+    roomRealTimeMessageUpdate: TRoomRealTimeMessageUpdate
   ): void {
     this.setState({
       fansNumber: roomRealTimeMessageUpdate.data.fans,

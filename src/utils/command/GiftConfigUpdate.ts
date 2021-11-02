@@ -1,14 +1,14 @@
-import { GiftConfigResponse } from "../../model/giftconfig/GiftConfig";
+import { TGiftConfigResponse } from "../../model/giftconfig/TGiftConfig";
 
 export type GiftConfigUpdateCmd = "updateGiftConfig";
 
 export type GiftConfigUpdate = {
   cmd: GiftConfigUpdateCmd;
-  data: GiftConfigResponse;
+  data: TGiftConfigResponse;
 };
 
 export function getGiftConfigUpdateMessage(
-  giftConfig: GiftConfigResponse
+  giftConfig: TGiftConfigResponse
 ): string {
   const messageObj: GiftConfigUpdate = {
     cmd: "updateGiftConfig",

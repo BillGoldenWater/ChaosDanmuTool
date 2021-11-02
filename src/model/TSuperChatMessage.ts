@@ -1,7 +1,7 @@
-import { UserInfo } from "./UserInfo";
-import { MedalInfo } from "./MedalInfo";
+import { TUserInfo } from "./TUserInfo";
+import { TMedalInfo } from "./TMedalInfo";
 
-export type SuperChatMessage = {
+export type TSuperChatMessage = {
   cmd: string;
   data: {
     background_bottom_color: string;
@@ -22,7 +22,7 @@ export type SuperChatMessage = {
     id: number;
     is_ranked: number;
     is_send_audit: string;
-    medal_info: MedalInfo;
+    medal_info: TMedalInfo;
     message: string;
     message_font_color: string;
     message_trans: string;
@@ -34,7 +34,7 @@ export type SuperChatMessage = {
     trans_mark: number;
     ts: number;
     uid: number;
-    user_info: UserInfo;
+    user_info: TUserInfo;
   };
   roomid: string;
 };

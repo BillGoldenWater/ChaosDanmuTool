@@ -1,12 +1,12 @@
 import {
-  InteractWord as TInteractWord,
+  TInteractWord as TInteractWord,
   InteractWordType,
-} from "../../../../../../../../model/InteractWord";
+} from "../../../../../../../../model/TInteractWord";
 import React, { ReactNode } from "react";
 import { UserInfo } from "../../../../../../../../component/bilibili/userinfo/UserInfo";
-import { emptyUserInfo } from "../../../../../../../../model/UserInfo";
+import { emptyUserInfo } from "../../../../../../../../model/TUserInfo";
 import { DanmuContent } from "../../../../../../../../component/bilibili/danmucontent/DanmuContent";
-import { MedalInfo } from "../../../../../../../../model/MedalInfo";
+import { TMedalInfo } from "../../../../../../../../model/TMedalInfo";
 import { DanmuMessage } from "../../../../../../../../utils/command/DanmuMessage";
 
 class Props {
@@ -45,7 +45,7 @@ export class InteractWord extends React.Component<Props> {
             uname: iw.uname,
             name_color: iw.uname_color,
           }}
-          medalInfo={iw.fans_medal as MedalInfo}
+          medalInfo={iw.fans_medal as TMedalInfo}
         />
         <DanmuContent content={action} color={"#F7B500"} />
       </div>

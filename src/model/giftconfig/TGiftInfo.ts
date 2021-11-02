@@ -1,4 +1,4 @@
-export type GiftInfo = {
+export type TGiftInfo = {
   id: number;
   name: string;
   price: number;
