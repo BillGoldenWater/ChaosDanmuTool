@@ -35,10 +35,6 @@ export type TextIconStyleConfig = {
   style: CSSProperties;
 };
 
-export type TextStyleConfig = {
-  color: string;
-};
-
 export type DanmuViewStyleConfig = {
   listMargin: string;
   mainStyle: CSSProperties;
