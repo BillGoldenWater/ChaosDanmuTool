@@ -2,6 +2,7 @@ import React from "react";
 import style from "./FansMedal.module.css";
 import { TMedalInfo } from "../../../type/TMedalInfo";
 import { rgbI2S } from "../../../utils/FormatConverters";
+import { getGuardIconUrl } from "../../../type/TGuardBuy";
 
 class Props {
   medalInfo: TMedalInfo;
@@ -9,12 +10,14 @@ class Props {
 
 export class FansMedal extends React.Component<Props> {
   render(): JSX.Element {
-    if (!this.props.medalInfo || !this.props.medalInfo.is_lighted) return null;
+    const medalInfo = this.props.medalInfo;
 
-    const medal_color_border = rgbI2S(this.props.medalInfo.medal_color_border);
-    const medal_color_start = rgbI2S(this.props.medalInfo.medal_color_start);
-    const medal_color_end = rgbI2S(this.props.medalInfo.medal_color_end);
-    const medal_color = rgbI2S(this.props.medalInfo.medal_color);
+    if (!medalInfo || !medalInfo.is_lighted) return null;
+
+    const medal_color_border = rgbI2S(medalInfo.medal_color_border);
+    const medal_color_start = rgbI2S(medalInfo.medal_color_start);
+    const medal_color_end = rgbI2S(medalInfo.medal_color_end);
+    const medal_color = rgbI2S(medalInfo.medal_color);
     return (
       <div className={style.FansMedal}>
         <div
@@ -26,7 +29,14 @@ export class FansMedal extends React.Component<Props> {
               .replace("{1}", medal_color_end),
           }}
         >
-          {this.props.medalInfo.medal_name}
+          {medalInfo.guard_level != 0 && (
+            <img
+              className={style.FansMedal_guardIcon}
+              src={getGuardIconUrl(medalInfo.guard_level)}
+              alt={""}
+            />
+          )}
+          {medalInfo.medal_name}
         </div>
         <div
           className={style.FansMedal_lvl}
@@ -35,7 +45,7 @@ export class FansMedal extends React.Component<Props> {
             color: medal_color,
           }}
         >
-          {this.props.medalInfo.medal_level}
+          {medalInfo.medal_level}
         </div>
       </div>
     );

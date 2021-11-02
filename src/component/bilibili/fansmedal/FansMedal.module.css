@@ -22,6 +22,11 @@
   color: #fff;
 }
 
+.FansMedal_guardIcon {
+  max-height: 1.2em;
+  margin-right: 0.2em;
+}
+
 .FansMedal_lvl {
   border-left-width: 0 !important;
   border-bottom-left-radius: 0 !important;
