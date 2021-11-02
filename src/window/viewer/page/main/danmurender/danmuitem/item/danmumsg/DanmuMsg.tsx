@@ -1,8 +1,8 @@
 import React from "react";
 import style from "./DanmuMsg.module.css";
-import { TDanmuMsg as TDanmuMsg } from "../../../../../../../../model/TDanmuMsg";
+import { TDanmuMsg as TDanmuMsg } from "../../../../../../../../type/TDanmuMsg";
 import { UserInfo } from "../../../../../../../../component/bilibili/userinfo/UserInfo";
-import { emptyUserInfo } from "../../../../../../../../model/TUserInfo";
+import { emptyUserInfo } from "../../../../../../../../type/TUserInfo";
 import { DanmuContent } from "../../../../../../../../component/bilibili/danmucontent/DanmuContent";
 
 class Props {

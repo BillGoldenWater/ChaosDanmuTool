@@ -1,12 +1,12 @@
 import {
-  TInteractWord as TInteractWord,
   InteractWordType,
-} from "../../../../../../../../model/TInteractWord";
+  TInteractWord as TInteractWord,
+} from "../../../../../../../../type/TInteractWord";
 import React, { ReactNode } from "react";
 import { UserInfo } from "../../../../../../../../component/bilibili/userinfo/UserInfo";
-import { emptyUserInfo } from "../../../../../../../../model/TUserInfo";
+import { emptyUserInfo } from "../../../../../../../../type/TUserInfo";
 import { DanmuContent } from "../../../../../../../../component/bilibili/danmucontent/DanmuContent";
-import { TMedalInfo } from "../../../../../../../../model/TMedalInfo";
+import { TMedalInfo } from "../../../../../../../../type/TMedalInfo";
 import { DanmuMessage } from "../../../../../../../../utils/command/DanmuMessage";
 
 class Props {

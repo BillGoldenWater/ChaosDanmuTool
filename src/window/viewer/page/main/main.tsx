@@ -23,20 +23,20 @@ import {
 import {
   InteractWordType,
   TInteractWord as TInteractWord,
-} from "../../../../model/TInteractWord";
+} from "../../../../type/TInteractWord";
 import { ConfigContext } from "../../utils/ConfigContext";
 import { StatusBar } from "../../../../component/statusbar/StatusBar";
 import { DanmuRender } from "./danmurender/DanmuRender";
 import { InteractWord } from "./danmurender/danmuitem/item/interactword/InteractWord";
 import { formatNumber } from "../../../../utils/FormatConverters";
-import { TRoomRealTimeMessageUpdate } from "../../../../model/TRoomRealTimeMessageUpdate";
+import { TRoomRealTimeMessageUpdate } from "../../../../type/TRoomRealTimeMessageUpdate";
 import {
   parseGiftConfig,
   TGiftConfig,
   TGiftConfigResponse,
-} from "../../../../model/giftconfig/TGiftConfig";
+} from "../../../../type/giftconfig/TGiftConfig";
 import { getGiftConfigUpdateCmd } from "../../../../utils/command/GiftConfigUpdate";
-import { TSendGift } from "../../../../model/TSendGift";
+import { TSendGift } from "../../../../type/TSendGift";
 import { getStatusUpdateMessageCmd } from "../../../../utils/command/ReceiverStatusUpdate";
 
 class Props {}

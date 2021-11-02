@@ -1,6 +1,6 @@
 import React from "react";
 import style from "./FansMedal.module.css";
-import { TMedalInfo } from "../../../model/TMedalInfo";
+import { TMedalInfo } from "../../../type/TMedalInfo";
 import { rgbI2S } from "../../../utils/FormatConverters";
 
 class Props {

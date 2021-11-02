@@ -1,11 +1,11 @@
 import React, { ReactNode } from "react";
-import { TSendGift as TSendGift } from "../../../../../../../../model/TSendGift";
+import { TSendGift as TSendGift } from "../../../../../../../../type/TSendGift";
 import { UserInfo } from "../../../../../../../../component/bilibili/userinfo/UserInfo";
-import { emptyUserInfo } from "../../../../../../../../model/TUserInfo";
+import { emptyUserInfo } from "../../../../../../../../type/TUserInfo";
 import { GiftIcon } from "../../../../../../../../component/bilibili/gifticon/GiftIcon";
 import { ConfigContext } from "../../../../../../utils/ConfigContext";
-import { TGiftConfig } from "../../../../../../../../model/giftconfig/TGiftConfig";
-import { TGiftInfo } from "../../../../../../../../model/giftconfig/TGiftInfo";
+import { TGiftConfig } from "../../../../../../../../type/giftconfig/TGiftConfig";
+import { TGiftInfo } from "../../../../../../../../type/giftconfig/TGiftInfo";
 import { DanmuMessage } from "../../../../../../../../utils/command/DanmuMessage";
 
 class Props {

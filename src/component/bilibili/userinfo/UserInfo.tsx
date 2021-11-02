@@ -1,8 +1,8 @@
 import React from "react";
 import style from "./UserInfo.module.css";
-import { TUserInfo as TUserInfo } from "../../../model/TUserInfo";
+import { TUserInfo as TUserInfo } from "../../../type/TUserInfo";
 import { FansMedal } from "../fansmedal/FansMedal";
-import { TMedalInfo } from "../../../model/TMedalInfo";
+import { TMedalInfo } from "../../../type/TMedalInfo";
 import { UserName } from "../username/UserName";
 import { AdminIcon } from "../adminicon/AdminIcon";
 import { VipIcon } from "../vipicon/VipIcon";

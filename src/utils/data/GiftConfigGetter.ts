@@ -1,4 +1,4 @@
-import { TGiftConfigResponse } from "../../model/giftconfig/TGiftConfig";
+import { TGiftConfigResponse } from "../../type/giftconfig/TGiftConfig";
 import * as https from "https";
 
 export class GiftConfigGetter {

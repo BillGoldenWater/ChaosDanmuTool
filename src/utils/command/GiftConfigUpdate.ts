@@ -1,4 +1,4 @@
-import { TGiftConfigResponse } from "../../model/giftconfig/TGiftConfig";
+import { TGiftConfigResponse } from "../../type/giftconfig/TGiftConfig";
 
 export type GiftConfigUpdateCmd = "updateGiftConfig";
 

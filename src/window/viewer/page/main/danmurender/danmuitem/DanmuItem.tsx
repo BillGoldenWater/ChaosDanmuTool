@@ -1,7 +1,7 @@
 import React from "react";
 import { DanmuMessage } from "../../../../../../utils/command/DanmuMessage";
 import { DanmuMsg } from "./item/danmumsg/DanmuMsg";
-import { parseDanmuMsg } from "../../../../../../model/TDanmuMsg";
+import { parseDanmuMsg } from "../../../../../../type/TDanmuMsg";
 import { SuperChatMessage } from "./item/superchatmessage/SuperChatMessage";
 import { InteractWord } from "./item/interactword/InteractWord";
 import { SendGift } from "./item/sendgift/SendGift";
