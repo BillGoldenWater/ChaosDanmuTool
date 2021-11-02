@@ -12,3 +12,7 @@ export type TGuardBuy = {
     end_time: number;
   };
 };
+
+export function getGuardIconUrl(level: number): string {
+  return `https://i0.hdslb.com/bfs/activity-plat/static/20200716/1d0c5a1b042efb59f46d4ba1286c6727/icon-guard${level}.png`;
+}
