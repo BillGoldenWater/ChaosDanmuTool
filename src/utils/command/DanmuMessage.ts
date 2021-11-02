@@ -33,7 +33,15 @@ export type DanmuMessage = {
     | "PK_BATTLE_START_NEW"
     | "ONLINE_RANK_COUNT"
     | "ONLINE_RANK_TOP3"
-    | "ONLINE_RANK_V2";
+    | "ONLINE_RANK_V2"
+    //planToDo
+    | "ENTRY_EFFECT"
+    | "ANCHOR_LOT_AWARD"
+    | "ANCHOR_LOT_CHECKSTATUS"
+    | "ANCHOR_LOT_END"
+    | "ANCHOR_LOT_START"
+    | "HOT_RANK_CHANGED"
+    | "HOT_RANK_SETTLEMENT";
   [key: string]: unknown;
 };
 

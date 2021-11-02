@@ -185,7 +185,7 @@ export class Main extends React.Component<Props, State> {
             this.addToList(msg);
             break;
           }
-          case "STOP_LIVE_ROOM_LIST":
+          case "STOP_LIVE_ROOM_LIST": //ignore
           case "COMBO_SEND":
           case "COMMON_NOTICE_DANMAKU":
           case "LIVE_INTERACTIVE_GAME":
@@ -207,7 +207,14 @@ export class Main extends React.Component<Props, State> {
           case "PK_BATTLE_START_NEW":
           case "ONLINE_RANK_COUNT":
           case "ONLINE_RANK_TOP3":
-          case "ONLINE_RANK_V2": {
+          case "ONLINE_RANK_V2":
+          case "ENTRY_EFFECT": // planToDo
+          case "ANCHOR_LOT_AWARD":
+          case "ANCHOR_LOT_CHECKSTATUS":
+          case "ANCHOR_LOT_END":
+          case "ANCHOR_LOT_START":
+          case "HOT_RANK_CHANGED":
+          case "HOT_RANK_SETTLEMENT": {
             break;
           }
           default: {
