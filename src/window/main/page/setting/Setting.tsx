@@ -1,7 +1,7 @@
 import React from "react";
 import style from "./Setting.module.css";
 import { ConfigFileManager } from "./configfilemanager/ConfigFileManager";
-import { ConfigModifier } from "./ConfigModifier";
+import { ConfigModifier } from "./configmodifier/ConfigModifier";
 
 class Props {}
 
