@@ -38,6 +38,7 @@ import {
 import { getGiftConfigUpdateCmd } from "../../../../utils/command/GiftConfigUpdate";
 import { TSendGift } from "../../../../type/TSendGift";
 import { getStatusUpdateMessageCmd } from "../../../../utils/command/ReceiverStatusUpdate";
+import { TSuperChatMessage } from "../../../../type/TSuperChatMessage";
 
 class Props {}
 
@@ -288,25 +289,39 @@ export class Main extends React.Component<Props, State> {
 
   addToList(msg: DanmuMessage, removeKeys?: number[]): void {
     this.setState((prevState) => {
-      const list: DanmuMessageWithKey[] = prevState.danmuList;
+      let list: DanmuMessageWithKey[] = prevState.danmuList;
       list.push({
         key: this.danmuCount,
         msg: msg,
       });
       this.danmuCount++;
 
-      while (
-        list.length > 0 &&
-        list.length > this.state.config.maxDanmuNumber
-      ) {
-        list.shift();
-      }
+      list = list.filter((element, index, array) => {
+        let needKeep = false;
+
+        switch (element.msg.cmd) {
+          case "SUPER_CHAT_MESSAGE": {
+            const superChatMessage: TSuperChatMessage =
+              element.msg as TSuperChatMessage;
+            needKeep =
+              superChatMessage.data.end_time > new Date().getTime() / 1000;
+            break;
+          }
+        }
+
+        return (
+          index + 1 > array.length - this.state.config.maxDanmuNumber ||
+          needKeep
+        );
+      }); // 移除超出上限的
+
+      list = list.filter((element) => {
+        return removeKeys ? !removeKeys.includes(element.key) : true;
+      }); // 移除 removeKeys 里指定的
 
       return {
         ...prevState,
-        danmuList: list.filter((element) => {
-          return removeKeys ? !removeKeys.includes(element.key) : true;
-        }),
+        danmuList: list,
       };
     });
   }
