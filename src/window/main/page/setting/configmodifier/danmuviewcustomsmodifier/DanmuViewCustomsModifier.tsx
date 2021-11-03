@@ -62,7 +62,6 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
                   }}
                 >
                   {config.danmuViewCustoms.map((value, index) => {
-                    console.log(value.name);
                     return (
                       <option
                         key={JSON.stringify(value) + index}
