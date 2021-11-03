@@ -1,5 +1,6 @@
 .RoomStatusChange {
   display: flex;
+  flex-wrap: wrap;
   color: #f7b500;
 }
 
