@@ -1,8 +1,9 @@
 .DanmuContent {
   display: inline;
+  vertical-align: bottom;
 }
 
 .DanmuContent_emoji {
   height: 1.5em;
-  vertical-align: top;
+  vertical-align: bottom;
 }

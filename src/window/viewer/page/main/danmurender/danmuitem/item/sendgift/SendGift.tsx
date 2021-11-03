@@ -1,12 +1,13 @@
 import React, { ReactNode } from "react";
+import style from "./SendGift.module.css";
 import { TSendGift } from "../../../../../../../../type/TSendGift";
 import { UserInfo } from "../../../../../../../../component/bilibili/userinfo/UserInfo";
 import { emptyUserInfo } from "../../../../../../../../type/TUserInfo";
-import { GiftIcon } from "../../../../../../../../component/bilibili/gifticon/GiftIcon";
 import { ConfigContext } from "../../../../../../utils/ConfigContext";
 import { TGiftConfig } from "../../../../../../../../type/giftconfig/TGiftConfig";
 import { TGiftInfo } from "../../../../../../../../type/giftconfig/TGiftInfo";
 import { DanmuMessage } from "../../../../../../../../utils/command/DanmuMessage";
+import { GiftContent } from "../../../../../../../../component/bilibili/giftcontent/GiftContent";
 
 class Props {
   msg: DanmuMessage;
@@ -21,7 +22,7 @@ export class SendGift extends React.Component<Props> {
           const gc: TGiftConfig = giftConfig;
           const gi: TGiftInfo = gc ? gc.data.get(data.giftId) : undefined;
           return (
-            <div>
+            <div className={style.SendGift}>
               <UserInfo
                 userInfo={{
                   ...emptyUserInfo,
@@ -30,14 +31,20 @@ export class SendGift extends React.Component<Props> {
                 }}
                 medalInfo={data.medal_info}
               />
-              {data.action} {data.giftName}
-              <GiftIcon src={gi ? gi.webp || gi.img_basic : ""} /> 共 {data.num}{" "}
-              个{" "}
-              {gi
-                ? gi.coin_type == "gold"
-                  ? ((gi.price / 1000) * data.num).toFixed(2).toString() + "￥"
-                  : ""
-                : ""}
+              <GiftContent
+                action={data.action}
+                name={data.giftName}
+                iconUrl={gi ? gi.webp || gi.img_basic : ""}
+                num={data.num}
+                price={
+                  gi
+                    ? gi.coin_type == "gold"
+                      ? ((gi.price / 1000) * data.num).toFixed(2).toString() +
+                        "￥"
+                      : ""
+                    : ""
+                }
+              />
             </div>
           );
         }}
