@@ -18,7 +18,7 @@ export class WebsocketServer {
     this.server.on("connection", (socket) => {
       socket.send(getConfigUpdateMessage(ConfigManager.config));
       socket.send(getGiftConfigUpdateMessage(GiftConfigGetter.giftConfigRes));
-      WebsocketServer.broadcast(
+      socket.send(
         getStatusUpdateMessage(
           DanmuReceiver.isOpen()
             ? "open"

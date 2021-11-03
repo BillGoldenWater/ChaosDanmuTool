@@ -79,6 +79,7 @@ function createViewerWindow(): void {
 
   viewerWindow.on("move", () => {
     [danmuViewConfig.posX, danmuViewConfig.posY] = viewerWindow.getPosition();
+    ConfigManager.onChange();
   });
 }
 
@@ -124,6 +125,7 @@ function init(): void {
       }
       case "update": {
         ConfigManager.config = JSON.parse(args[1]);
+        ConfigManager.onChange();
         break;
       }
     }

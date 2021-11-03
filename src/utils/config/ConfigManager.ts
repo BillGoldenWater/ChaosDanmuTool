@@ -2,6 +2,8 @@ import { Config, defaultConfig } from "./Config";
 import * as fs from "fs";
 import { errorCode } from "../ErrorCode";
 import { dialog } from "electron";
+import { WebsocketServer } from "../server/WebsocketServer";
+import { getConfigUpdateMessage } from "../command/ConfigUpdate";
 
 export class ConfigManager {
   static config: Config;
@@ -55,5 +57,10 @@ export class ConfigManager {
 
   static isSafeToSave(): boolean {
     return this.inited && this.loaded;
+  }
+
+  static onChange(): void {
+    WebsocketServer.broadcast(getConfigUpdateMessage(this.config));
+    this.config.autoSaveOnChange ? this.save() : "";
   }
 }

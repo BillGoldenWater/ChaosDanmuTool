@@ -83,6 +83,7 @@ export class Main extends React.Component<Props, State> {
               this.setState({
                 config: config,
               });
+              window.electron.updateConfig(JSON.stringify(config));
             },
           }}
         >
