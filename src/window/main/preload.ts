@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer } from "electron";
+import { clipboard, contextBridge, ipcRenderer } from "electron";
 
 export interface ApiElectron {
   connect: (roomid: number) => void;
@@ -18,6 +18,8 @@ export interface ApiElectron {
 
   openViewer: () => void;
   closeViewer: () => void;
+
+  writeClipboard: (text: string) => void;
 }
 
 const apiElectron: ApiElectron = {
@@ -63,6 +65,10 @@ const apiElectron: ApiElectron = {
   },
   closeViewer: (): void => {
     ipcRenderer.sendSync("windowControl", "closeViewer");
+  },
+
+  writeClipboard: (text: string): void => {
+    clipboard.writeText(text);
   },
 };
 
