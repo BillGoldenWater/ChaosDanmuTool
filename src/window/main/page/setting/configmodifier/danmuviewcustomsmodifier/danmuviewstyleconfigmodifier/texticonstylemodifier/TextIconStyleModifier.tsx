@@ -28,6 +28,7 @@ export class TextIconStyleModifier extends React.Component<Props> {
         <label>文字颜色: </label>
         <input
           value={style.style.color}
+          type={"color"}
           onChange={(event) => {
             setStyle({
               ...style,
@@ -39,6 +40,7 @@ export class TextIconStyleModifier extends React.Component<Props> {
         <label>背景颜色: </label>
         <input
           value={style.style.backgroundColor}
+          type={"color"}
           onChange={(event) => {
             setStyle({
               ...style,
@@ -50,6 +52,7 @@ export class TextIconStyleModifier extends React.Component<Props> {
         <label>边框颜色: </label>
         <input
           value={style.style.borderColor}
+          type={"color"}
           onChange={(event) => {
             setStyle({
               ...style,

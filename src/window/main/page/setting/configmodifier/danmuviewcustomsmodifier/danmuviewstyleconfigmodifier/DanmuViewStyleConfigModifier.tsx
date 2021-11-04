@@ -102,6 +102,7 @@ export class DanmuViewStyleConfigModifier extends React.Component<Props> {
         <label>文字颜色: </label>
         <input
           value={style.mainStyle.color}
+          type={"color"}
           onChange={(event) => {
             setStyle({
               ...style,
@@ -158,6 +159,7 @@ export class DanmuViewStyleConfigModifier extends React.Component<Props> {
         <label>用户名颜色: </label>
         <input
           value={style.userName.color}
+          type={"color"}
           onChange={(event) => {
             setStyle({
               ...style,
@@ -169,6 +171,7 @@ export class DanmuViewStyleConfigModifier extends React.Component<Props> {
         <label>弹幕内容颜色: </label>
         <input
           value={style.danmuContent.color}
+          type={"color"}
           onChange={(event) => {
             setStyle({
               ...style,
