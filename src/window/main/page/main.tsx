@@ -9,7 +9,7 @@ import {
   ReceiverStatus,
   ReceiverStatusUpdate,
 } from "../../../utils/command/ReceiverStatusUpdate";
-import { Config, defaultConfig } from "../../../utils/config/Config";
+import { Config } from "../../../utils/config/Config";
 import { ConfigContext } from "../utils/ConfigContext";
 import {
   ConfigUpdate,
@@ -46,7 +46,7 @@ export class Main extends React.Component<Props, State> {
     super(props);
     this.state = {
       pageIndex: 1,
-      config: { ...defaultConfig },
+      config: JSON.parse(window.electron.getConfig()),
       receiverStatus: "close",
       statusMessage: "",
     };
@@ -60,7 +60,7 @@ export class Main extends React.Component<Props, State> {
       },
       () => {
         this.setState({
-          statusMessage: DateFormat() + " 服务器已断开",
+          statusMessage: DateFormat() + " 服务器已断开 ",
         });
       },
       () => {
@@ -68,6 +68,14 @@ export class Main extends React.Component<Props, State> {
           statusMessage: DateFormat() + " 服务器连接发生错误 已断开",
         });
       }
+    );
+
+    const websocketServerConfig =
+      this.state.config.danmuViewConfig.websocketServer;
+
+    this.websocketClient.connect(
+      websocketServerConfig.host,
+      websocketServerConfig.port
     );
   }
 
