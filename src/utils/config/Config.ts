@@ -82,7 +82,7 @@ export const defaultDanmuViewCustom: DanmuViewCustomConfig = {
       fontFamily: "",
       fontWeight: 400,
       lineHeight: "1.5em",
-      color: "#fff",
+      color: "#ffffff",
     },
     giftIcon: {
       height: "2em",
