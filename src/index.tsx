@@ -53,7 +53,6 @@ function createViewerWindow(): void {
     frame: false,
     alwaysOnTop: true,
     autoHideMenuBar: true,
-    fullscreenable: false,
   });
 
   // http://127.0.0.1:25556/viewer/?address=localhost&port=25555&maxReconnectAttemptNum=5&name=internal
@@ -80,6 +79,10 @@ function createViewerWindow(): void {
   viewerWindow.on("move", () => {
     [danmuViewConfig.posX, danmuViewConfig.posY] = viewerWindow.getPosition();
     ConfigManager.onChange();
+  });
+
+  viewerWindow.on("enter-full-screen", () => {
+    viewerWindow.setFullScreen(false);
   });
 }
 
