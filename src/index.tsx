@@ -185,18 +185,18 @@ function init(): void {
     event.returnValue = "";
   });
 
-  const dockMenu = Menu.buildFromTemplate([
-    {
-      label: "打开主窗口",
-      click() {
-        mainWindow && !mainWindow.isDestroyed()
-          ? mainWindow.show()
-          : createMainWindow();
-      },
-    },
-  ]);
-
   if (process.platform == "darwin") {
+    const dockMenu = Menu.buildFromTemplate([
+      {
+        label: "打开主窗口",
+        click() {
+          mainWindow && !mainWindow.isDestroyed()
+            ? mainWindow.show()
+            : createMainWindow();
+        },
+      },
+    ]);
+
     app.dock.setMenu(dockMenu);
   }
 
