@@ -14,12 +14,6 @@ ChaosDanmuTool
 
 wait test on macOS:
 
-- 链接复制按钮
-- 配置文件重置按钮
-- 调色板
-- 点击Dock图标时显示/创建主窗口
-- 自动启动服务器 自动连接服务器
-
 done:
 
 - Mac-VisibleOnAllWorkspaces
@@ -30,3 +24,8 @@ done:
 - 自动重连(转发服务器)
 - 断连提示(B站)
 - sc置顶
+- 链接复制按钮
+- 配置文件重置按钮
+- 调色板
+- 点击Dock图标时显示/创建主窗口
+- 自动启动服务器 自动连接服务器
