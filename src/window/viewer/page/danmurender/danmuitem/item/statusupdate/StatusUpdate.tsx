@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react";
 import style from "./StatusUpdate.module.css";
-import { DanmuMessage } from "../../../../../../../../utils/command/DanmuMessage";
-import { ReceiverStatusUpdate } from "../../../../../../../../utils/command/ReceiverStatusUpdate";
+import { DanmuMessage } from "../../../../../../../utils/command/DanmuMessage";
+import { ReceiverStatusUpdate } from "../../../../../../../utils/command/ReceiverStatusUpdate";
 
 class Props {
   msg: DanmuMessage;

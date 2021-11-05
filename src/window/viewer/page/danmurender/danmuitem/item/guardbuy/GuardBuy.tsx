@@ -1,12 +1,12 @@
 import React, { ReactNode } from "react";
-import { DanmuMessage } from "../../../../../../../../utils/command/DanmuMessage";
+import { DanmuMessage } from "../../../../../../../utils/command/DanmuMessage";
 import {
   getGuardIconUrl,
   TGuardBuy,
-} from "../../../../../../../../type/TGuardBuy";
-import { UserInfo } from "../../../../../../../../component/bilibili/userinfo/UserInfo";
-import { emptyUserInfo } from "../../../../../../../../type/TUserInfo";
-import { GiftContent } from "../../../../../../../../component/bilibili/giftcontent/GiftContent";
+} from "../../../../../../../type/TGuardBuy";
+import { UserInfo } from "../../../../../../../component/bilibili/userinfo/UserInfo";
+import { emptyUserInfo } from "../../../../../../../type/TUserInfo";
+import { GiftContent } from "../../../../../../../component/bilibili/giftcontent/GiftContent";
 
 class Props {
   msg: DanmuMessage;

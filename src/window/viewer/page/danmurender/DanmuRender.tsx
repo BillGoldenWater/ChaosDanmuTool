@@ -1,8 +1,8 @@
 import React from "react";
 import style from "./DanmuRender.module.css";
 import { DanmuItem } from "./danmuitem/DanmuItem";
-import { DanmuMessageWithKey } from "../../../../../utils/command/DanmuMessage";
-import { ConfigContext } from "../../../utils/ConfigContext";
+import { DanmuMessageWithKey } from "../../../../utils/command/DanmuMessage";
+import { ConfigContext } from "../../utils/ConfigContext";
 
 class Props {
   danmuList: DanmuMessageWithKey[];

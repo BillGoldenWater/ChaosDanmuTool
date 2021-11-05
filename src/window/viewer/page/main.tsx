@@ -5,40 +5,40 @@ import {
   DanmuViewCustomConfig,
   defaultConfig,
   defaultDanmuViewCustom,
-} from "../../../../utils/config/Config";
-import { WebsocketClient } from "../../../../utils/client/WebsocketClient";
-import { getParam } from "../../utils/UrlParamGeter";
+} from "../../../utils/config/Config";
+import { WebsocketClient } from "../../../utils/client/WebsocketClient";
+import { getParam } from "../utils/UrlParamGeter";
 import { LoadingPage } from "./loadingpage/LoadingPage";
 import { ConnectFail } from "./connectfail/ConnectFail";
-import { getConfigUpdateCmd } from "../../../../utils/command/ConfigUpdate";
-import { getMessageCommandCmd } from "../../../../utils/command/MessageCommand";
+import { getConfigUpdateCmd } from "../../../utils/command/ConfigUpdate";
+import { getMessageCommandCmd } from "../../../utils/command/MessageCommand";
 import {
   ActivityUpdate,
   getActivityUpdateMessageCmd,
-} from "../../../../utils/command/ActivityUpdate";
+} from "../../../utils/command/ActivityUpdate";
 import {
   DanmuMessage,
   DanmuMessageWithKey,
-} from "../../../../utils/command/DanmuMessage";
+} from "../../../utils/command/DanmuMessage";
 import {
   InteractWordType,
   TInteractWord as TInteractWord,
-} from "../../../../type/TInteractWord";
-import { ConfigContext } from "../../utils/ConfigContext";
-import { StatusBar } from "../../../../component/statusbar/StatusBar";
+} from "../../../type/TInteractWord";
+import { ConfigContext } from "../utils/ConfigContext";
+import { StatusBar } from "../../../component/statusbar/StatusBar";
 import { DanmuRender } from "./danmurender/DanmuRender";
 import { InteractWord } from "./danmurender/danmuitem/item/interactword/InteractWord";
-import { formatNumber } from "../../../../utils/FormatConverters";
-import { TRoomRealTimeMessageUpdate } from "../../../../type/TRoomRealTimeMessageUpdate";
+import { formatNumber } from "../../../utils/FormatConverters";
+import { TRoomRealTimeMessageUpdate } from "../../../type/TRoomRealTimeMessageUpdate";
 import {
   parseGiftConfig,
   TGiftConfig,
   TGiftConfigResponse,
-} from "../../../../type/giftconfig/TGiftConfig";
-import { getGiftConfigUpdateCmd } from "../../../../utils/command/GiftConfigUpdate";
-import { TSendGift } from "../../../../type/TSendGift";
-import { getStatusUpdateMessageCmd } from "../../../../utils/command/ReceiverStatusUpdate";
-import { TSuperChatMessage } from "../../../../type/TSuperChatMessage";
+} from "../../../type/giftconfig/TGiftConfig";
+import { getGiftConfigUpdateCmd } from "../../../utils/command/GiftConfigUpdate";
+import { TSendGift } from "../../../type/TSendGift";
+import { getStatusUpdateMessageCmd } from "../../../utils/command/ReceiverStatusUpdate";
+import { TSuperChatMessage } from "../../../type/TSuperChatMessage";
 
 class Props {}
 

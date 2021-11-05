@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react";
 import style from "./RoomStatusChange.module.css";
-import { DanmuMessage } from "../../../../../../../../utils/command/DanmuMessage";
-import { ConfigContext } from "../../../../../../utils/ConfigContext";
+import { DanmuMessage } from "../../../../../../../utils/command/DanmuMessage";
+import { ConfigContext } from "../../../../../utils/ConfigContext";
 
 class Props {
   msg: DanmuMessage;

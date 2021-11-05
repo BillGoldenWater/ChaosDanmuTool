@@ -1,13 +1,13 @@
 import {
   InteractWordType,
   TInteractWord,
-} from "../../../../../../../../type/TInteractWord";
+} from "../../../../../../../type/TInteractWord";
 import React, { ReactNode } from "react";
-import { UserInfo } from "../../../../../../../../component/bilibili/userinfo/UserInfo";
-import { emptyUserInfo } from "../../../../../../../../type/TUserInfo";
-import { DanmuContent } from "../../../../../../../../component/bilibili/danmucontent/DanmuContent";
-import { TMedalInfo } from "../../../../../../../../type/TMedalInfo";
-import { DanmuMessage } from "../../../../../../../../utils/command/DanmuMessage";
+import { UserInfo } from "../../../../../../../component/bilibili/userinfo/UserInfo";
+import { emptyUserInfo } from "../../../../../../../type/TUserInfo";
+import { DanmuContent } from "../../../../../../../component/bilibili/danmucontent/DanmuContent";
+import { TMedalInfo } from "../../../../../../../type/TMedalInfo";
+import { DanmuMessage } from "../../../../../../../utils/command/DanmuMessage";
 
 class Props {
   msg: DanmuMessage;

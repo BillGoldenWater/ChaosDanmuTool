@@ -1,13 +1,13 @@
 import React from "react";
-import { DanmuMessage } from "../../../../../../utils/command/DanmuMessage";
+import { DanmuMessage } from "../../../../../utils/command/DanmuMessage";
 import { DanmuMsg } from "./item/danmumsg/DanmuMsg";
-import { parseDanmuMsg } from "../../../../../../type/TDanmuMsg";
+import { parseDanmuMsg } from "../../../../../type/TDanmuMsg";
 import { SuperChatMessage } from "./item/superchatmessage/SuperChatMessage";
 import { InteractWord } from "./item/interactword/InteractWord";
 import { SendGift } from "./item/sendgift/SendGift";
 import { RoomBlockMsg } from "./item/roomblockmsg/RoomBlockMsg";
 import { RoomStatusChange } from "./item/roomstatuschange/RoomStatusChange";
-import { getStatusUpdateMessageCmd } from "../../../../../../utils/command/ReceiverStatusUpdate";
+import { getStatusUpdateMessageCmd } from "../../../../../utils/command/ReceiverStatusUpdate";
 import { StatusUpdate } from "./item/statusupdate/StatusUpdate";
 import { GuardBuy } from "./item/guardbuy/GuardBuy";
 

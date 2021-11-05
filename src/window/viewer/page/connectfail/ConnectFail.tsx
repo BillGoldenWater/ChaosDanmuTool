@@ -1,6 +1,6 @@
 import React from "react";
 import style from "./ConnectFail.module.css";
-import { Button } from "../../../../../component/button/Button";
+import { Button } from "../../../../component/button/Button";
 
 class Props {
   connectMethod?: () => void;
