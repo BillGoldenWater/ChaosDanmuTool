@@ -51,10 +51,11 @@ function createViewerWindow(): void {
     y: danmuViewConfig.posY,
     transparent: true,
     frame: false,
-    alwaysOnTop: true,
     autoHideMenuBar: true,
     hasShadow: false,
   });
+
+  viewerWindow.setAlwaysOnTop(true, "pop-up-menu");
 
   // http://127.0.0.1:25556/viewer/?address=localhost&port=25555&maxReconnectAttemptNum=5&name=internal
   viewerWindow
