@@ -83,6 +83,11 @@ function createViewerWindow(): void {
     ConfigManager.onChange();
   });
 
+  viewerWindow.on("resize", () => {
+    [danmuViewConfig.width, danmuViewConfig.height] = viewerWindow.getSize();
+    ConfigManager.onChange();
+  });
+
   viewerWindow.on("enter-full-screen", () => {
     setTimeout(() => {
       viewerWindow.setFullScreen(false);

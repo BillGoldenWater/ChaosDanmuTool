@@ -64,7 +64,7 @@ export class DanmuViewConfigModifier extends React.Component {
                 }}
               />
               <br />
-              <label>默认宽度: </label>
+              <label>宽度: </label>
               <input
                 value={danmuViewConfig.width}
                 onChange={(event) => {
@@ -75,7 +75,7 @@ export class DanmuViewConfigModifier extends React.Component {
                 }}
               />
               <br />
-              <label>默认高度: </label>
+              <label>高度: </label>
               <input
                 value={danmuViewConfig.height}
                 onChange={(event) => {
