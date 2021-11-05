@@ -53,6 +53,7 @@ function createViewerWindow(): void {
     frame: false,
     alwaysOnTop: true,
     autoHideMenuBar: true,
+    hasShadow: false,
   });
 
   // http://127.0.0.1:25556/viewer/?address=localhost&port=25555&maxReconnectAttemptNum=5&name=internal
@@ -82,7 +83,9 @@ function createViewerWindow(): void {
   });
 
   viewerWindow.on("enter-full-screen", () => {
-    viewerWindow.setFullScreen(false);
+    setTimeout(() => {
+      viewerWindow.setFullScreen(false);
+    }, 100);
   });
 }
 
