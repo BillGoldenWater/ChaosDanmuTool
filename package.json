@@ -1,7 +1,7 @@
 {
   "name": "chaosdanmutool",
   "productName": "ChaosDanmuTool",
-  "version": "1.0.0",
+  "version": "0.1.0-alpha",
   "description": "A tool for process/view Danmu on bilibili",
   "main": ".webpack/main",
   "scripts": {

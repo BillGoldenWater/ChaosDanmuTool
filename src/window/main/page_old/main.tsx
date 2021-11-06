@@ -1,35 +1,51 @@
-import { Config } from "../../../utils/config/Config";
+import React from "react";
+import { NavBar } from "../../../component/navbar/NavBar";
+import { Function } from "./function/Function";
+import { Document } from "./document";
+import { Setting } from "./setting/Setting";
+import { WebsocketClient } from "../../../utils/client/WebsocketClient";
 import {
   getStatusUpdateMessageCmd,
   ReceiverStatus,
   ReceiverStatusUpdate,
 } from "../../../utils/command/ReceiverStatusUpdate";
-import React, { ReactNode } from "react";
+import { Config } from "../../../utils/config/Config";
 import { ConfigContext } from "../utils/ConfigContext";
-import { ReceiverStatusIndicator } from "../../../component/receiverstatusindicator/ReceiverStatusIndicator";
-import { StatusBar } from "../../../component/statusbar/StatusBar";
 import {
   ConfigUpdate,
   getConfigUpdateCmd,
 } from "../../../utils/command/ConfigUpdate";
-import { WebsocketClient } from "../../../utils/client/WebsocketClient";
+import { StatusBar } from "../../../component/statusbar/StatusBar";
+import { ReceiverStatusIndicator } from "../../../component/receiverstatusindicator/ReceiverStatusIndicator";
 import { DateFormat } from "../../../utils/DateFormat";
 
 class Props {}
 
 class State {
+  pageIndex: number;
   config: Config;
   receiverStatus: ReceiverStatus;
   statusMessage: string;
 }
+
+class Page {
+  name: string;
+  pageClass: typeof React.Component;
+}
+
+const pages: Page[] = [
+  { name: "文档", pageClass: Document },
+  { name: "功能", pageClass: Function },
+  { name: "设置", pageClass: Setting },
+];
 
 export class Main extends React.Component<Props, State> {
   websocketClient: WebsocketClient;
 
   constructor(props: Props) {
     super(props);
-
     this.state = {
+      pageIndex: 1,
       config: JSON.parse(window.electron.getConfig()),
       receiverStatus: "close",
       statusMessage: "",
@@ -63,6 +79,41 @@ export class Main extends React.Component<Props, State> {
     );
   }
 
+  render(): JSX.Element {
+    const CurrentPage = pages[this.state.pageIndex].pageClass;
+
+    return (
+      <div>
+        <ConfigContext.Provider
+          value={{
+            config: this.state.config,
+            setConfig: (config: Config) => {
+              this.setState({
+                config: config,
+              });
+              window.electron.updateConfig(JSON.stringify(config));
+            },
+          }}
+        >
+          <NavBar
+            items={pages.map((value: Page) => {
+              return value.name;
+            })}
+            default={this.state.pageIndex}
+            onSwitch={this.onPageSwitch.bind(this)}
+          />
+          <CurrentPage
+            receiverStatus={this.state.receiverStatus}
+            websocketClient={this.websocketClient}
+          />
+          <StatusBar message={this.state.statusMessage}>
+            <ReceiverStatusIndicator status={this.state.receiverStatus} />
+          </StatusBar>
+        </ConfigContext.Provider>
+      </div>
+    );
+  }
+
   onMessage(event: MessageEvent): void {
     const msgObj = JSON.parse(event.data);
     console.log(msgObj);
@@ -85,24 +136,7 @@ export class Main extends React.Component<Props, State> {
     }
   }
 
-  render(): ReactNode {
-    const configContext = {
-      config: this.state.config,
-      setConfig: (config: Config) => {
-        this.setState({
-          config: config,
-        });
-        window.electron.updateConfig(JSON.stringify(config));
-      },
-    };
-
-    return (
-      <ConfigContext.Provider value={configContext}>
-        <div>1</div>
-        <StatusBar message={this.state.statusMessage}>
-          <ReceiverStatusIndicator status={this.state.receiverStatus} />
-        </StatusBar>
-      </ConfigContext.Provider>
-    );
+  onPageSwitch(index: number): void {
+    this.setState({ pageIndex: index });
   }
 }
