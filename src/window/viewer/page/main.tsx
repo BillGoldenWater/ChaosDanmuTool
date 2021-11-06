@@ -81,6 +81,10 @@ export class Main extends React.Component<Props, State> {
       parseInt(getParam("maxReconnectAttemptNum")) ||
       defaultConfig.danmuViewConfig.maxReconnectAttemptNumber;
 
+    if (!this.serverPort) {
+      this.serverPort = parseInt(window.location.port);
+    }
+
     this.danmuCount = 0;
 
     this.websocketClient = new WebsocketClient(

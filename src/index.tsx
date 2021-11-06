@@ -62,6 +62,7 @@ function createViewerWindow(): void {
     .loadURL(
       constructURL(
         VIEWER_WEBPACK_ENTRY,
+        danmuViewConfig.httpServerPort,
         danmuViewConfig.maxReconnectAttemptNumber,
         "internal"
       )
