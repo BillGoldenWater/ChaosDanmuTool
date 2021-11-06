@@ -58,7 +58,6 @@ export class Main extends React.Component<Props, State> {
 
   onMessage(event: MessageEvent): void {
     const msgObj = JSON.parse(event.data);
-    console.log(msgObj);
 
     switch (msgObj.cmd) {
       case getStatusUpdateMessageCmd(): {
@@ -93,6 +92,10 @@ export class Main extends React.Component<Props, State> {
         this.setState({
           config: msg.data,
         });
+        break;
+      }
+      default: {
+        console.log(msgObj);
         break;
       }
     }
