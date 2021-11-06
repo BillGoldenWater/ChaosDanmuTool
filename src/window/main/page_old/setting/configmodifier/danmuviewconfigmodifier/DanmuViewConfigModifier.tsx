@@ -14,41 +14,13 @@ export class DanmuViewConfigModifier extends React.Component {
           };
           return (
             <FunctionCard name={"弹幕查看器"}>
-              <label>弹幕转发服务器监听地址: </label>
+              <label>服务器端口: </label>
               <input
-                value={danmuViewConfig.websocketServer.host}
+                value={danmuViewConfig.httpServerPort}
                 onChange={(event) => {
                   setDanmuViewConfig({
                     ...danmuViewConfig,
-                    websocketServer: {
-                      ...danmuViewConfig.websocketServer,
-                      host: event.target.value,
-                    },
-                  });
-                }}
-              />
-              <br />
-              <label>弹幕转发服务器监听端口: </label>
-              <input
-                value={danmuViewConfig.websocketServer.port}
-                onChange={(event) => {
-                  setDanmuViewConfig({
-                    ...danmuViewConfig,
-                    websocketServer: {
-                      ...danmuViewConfig.websocketServer,
-                      port: parseInt(event.target.value, 10),
-                    },
-                  });
-                }}
-              />
-              <br />
-              <label>网页服务器端口: </label>
-              <input
-                value={danmuViewConfig.webServer.port}
-                onChange={(event) => {
-                  setDanmuViewConfig({
-                    ...danmuViewConfig,
-                    webServer: { port: parseInt(event.target.value, 10) },
+                    httpServerPort: parseInt(event.target.value, 10),
                   });
                 }}
               />

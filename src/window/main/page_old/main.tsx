@@ -70,12 +70,9 @@ export class Main extends React.Component<Props, State> {
       }
     );
 
-    const websocketServerConfig =
-      this.state.config.danmuViewConfig.websocketServer;
-
     this.websocketClient.connect(
-      websocketServerConfig.host,
-      websocketServerConfig.port
+      "localhost",
+      this.state.config.danmuViewConfig.httpServerPort
     );
   }
 

@@ -1,26 +1,21 @@
 import { Config } from "../../../utils/config/Config";
 import {
   getStatusUpdateMessageCmd,
-  ReceiverStatus,
   ReceiverStatusUpdate,
 } from "../../../utils/command/ReceiverStatusUpdate";
 import React, { ReactNode } from "react";
 import { ConfigContext } from "../utils/ConfigContext";
-import { ReceiverStatusIndicator } from "../../../component/receiverstatusindicator/ReceiverStatusIndicator";
-import { StatusBar } from "../../../component/statusbar/StatusBar";
 import {
   ConfigUpdate,
   getConfigUpdateCmd,
 } from "../../../utils/command/ConfigUpdate";
 import { WebsocketClient } from "../../../utils/client/WebsocketClient";
-import { DateFormat } from "../../../utils/DateFormat";
+import { Layout, notification } from "antd";
 
 class Props {}
 
 class State {
   config: Config;
-  receiverStatus: ReceiverStatus;
-  statusMessage: string;
 }
 
 export class Main extends React.Component<Props, State> {
@@ -31,35 +26,33 @@ export class Main extends React.Component<Props, State> {
 
     this.state = {
       config: JSON.parse(window.electron.getConfig()),
-      receiverStatus: "close",
-      statusMessage: "",
     };
 
     this.websocketClient = new WebsocketClient(
       this.onMessage.bind(this),
       () => {
-        this.setState({
-          statusMessage: DateFormat() + " 服务器已连接",
+        notification.success({
+          message: "连接服务器成功",
+          description: "已连接到指令转发服务器",
         });
       },
       () => {
-        this.setState({
-          statusMessage: DateFormat() + " 服务器已断开 ",
+        notification.warn({
+          message: "已断开服务器连接",
+          description: "已断开到指令转发服务器的连接",
         });
       },
       () => {
-        this.setState({
-          statusMessage: DateFormat() + " 服务器连接发生错误 已断开",
+        notification.error({
+          message: "服务器连接发生错误",
+          description: `到指令转发服务器的连接发生了错误`,
         });
       }
     );
 
-    const websocketServerConfig =
-      this.state.config.danmuViewConfig.websocketServer;
-
     this.websocketClient.connect(
-      websocketServerConfig.host,
-      websocketServerConfig.port
+      "localhost",
+      this.state.config.danmuViewConfig.httpServerPort
     );
   }
 
@@ -70,9 +63,29 @@ export class Main extends React.Component<Props, State> {
     switch (msgObj.cmd) {
       case getStatusUpdateMessageCmd(): {
         const msg: ReceiverStatusUpdate = msgObj;
-        this.setState({
-          receiverStatus: msg.data.status,
-        });
+        switch (msg.data.status) {
+          case "open": {
+            notification.success({
+              message: "直播间连接状态更新",
+              description: "当前状态为: 已连接",
+            });
+            break;
+          }
+          case "close": {
+            notification.warn({
+              message: "直播间连接状态更新",
+              description: "当前状态为: 已断开",
+            });
+            break;
+          }
+          case "error": {
+            notification.error({
+              message: "直播间连接状态更新",
+              description: "当前状态为: 发生了错误",
+            });
+            break;
+          }
+        }
         break;
       }
       case getConfigUpdateCmd(): {
@@ -98,10 +111,7 @@ export class Main extends React.Component<Props, State> {
 
     return (
       <ConfigContext.Provider value={configContext}>
-        <div>1</div>
-        <StatusBar message={this.state.statusMessage}>
-          <ReceiverStatusIndicator status={this.state.receiverStatus} />
-        </StatusBar>
+        <Layout>1</Layout>
       </ConfigContext.Provider>
     );
   }

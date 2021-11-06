@@ -12,7 +12,7 @@ export interface ApiElectron {
   runKoaServer: (port: number) => void;
   closeKoaServer: () => void;
 
-  runWebsocketServer: (host: string, port: number) => void;
+  runWebsocketServer: (port: number) => void;
   closeWebsocketServer: () => void;
   websocketBroadcast: (data: string) => void;
 
@@ -50,8 +50,8 @@ const apiElectron: ApiElectron = {
     ipcRenderer.sendSync("koaServer", "close");
   },
 
-  runWebsocketServer: (host: string, port: number): void => {
-    ipcRenderer.sendSync("websocketServer", "run", host, port);
+  runWebsocketServer: (port: number): void => {
+    ipcRenderer.sendSync("websocketServer", "run", port);
   },
   closeWebsocketServer: (): void => {
     ipcRenderer.sendSync("websocketServer", "close");

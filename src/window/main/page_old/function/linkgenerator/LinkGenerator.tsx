@@ -31,12 +31,8 @@ export class LinkGenerator extends React.Component<Props, State> {
 
           const link =
             "http://localhost:" +
-            config.danmuViewConfig.webServer.port +
+            config.danmuViewConfig.httpServerPort +
             "/viewer?" +
-            "address=" +
-            config.danmuViewConfig.websocketServer.host +
-            "&port=" +
-            config.danmuViewConfig.websocketServer.port +
             "&maxReconnectAttemptNum=" +
             config.danmuViewConfig.maxReconnectAttemptNumber +
             "&name=" +

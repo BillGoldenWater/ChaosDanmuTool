@@ -6,18 +6,8 @@ export type DanmuReceiverConfig = {
   heartBeatInterval: number;
 };
 
-export type WebsocketServerConfig = {
-  host: string;
-  port: number;
-};
-
-export type WebServerConfig = {
-  port: number;
-};
-
 export type DanmuViewConfig = {
-  websocketServer: WebsocketServerConfig;
-  webServer: WebServerConfig;
+  httpServerPort: number;
   maxReconnectAttemptNumber: number;
   width: number;
   height: number;
@@ -130,13 +120,7 @@ export const defaultConfig: Config = {
     heartBeatInterval: 30,
   },
   danmuViewConfig: {
-    websocketServer: {
-      host: "localhost",
-      port: 25555,
-    },
-    webServer: {
-      port: 25556,
-    },
+    httpServerPort: 25555,
     maxReconnectAttemptNumber: 5,
     width: 400,
     height: 600,
