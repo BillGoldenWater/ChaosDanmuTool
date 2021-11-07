@@ -14,7 +14,7 @@
   resolved "https://registry.npmmirror.com/@ant-design/icons-svg/download/@ant-design/icons-svg-4.2.1.tgz#8630da8eb4471a4aabdaed7d1ff6a97dcb2cf05a"
   integrity sha1-hjDajrRHGkqr2u19H/apfcss8Fo=
 
-"@ant-design/icons@^4.6.3":
+"@ant-design/icons@^4.6.3", "@ant-design/icons@^4.7.0":
   version "4.7.0"
   resolved "https://registry.npmmirror.com/@ant-design/icons/download/@ant-design/icons-4.7.0.tgz#8c3cbe0a556ba92af5dc7d1e70c0b25b5179af0f"
   integrity sha1-jDy+ClVrqSr13H0ecMCyW1F5rw8=
