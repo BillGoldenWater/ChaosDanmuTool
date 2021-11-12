@@ -16,15 +16,21 @@ export class WebsocketServer {
       port: port,
     });
     this.server.on("connection", (socket) => {
-      socket.send(getConfigUpdateMessage(ConfigManager.config));
-      socket.send(getGiftConfigUpdateMessage(GiftConfigGetter.giftConfigRes));
+      socket.send(JSON.stringify(getConfigUpdateMessage(ConfigManager.config)));
       socket.send(
-        getStatusUpdateMessage(
-          DanmuReceiver.isOpen()
-            ? "open"
-            : DanmuReceiver.isClosed()
-            ? "close"
-            : "error"
+        JSON.stringify(
+          getGiftConfigUpdateMessage(GiftConfigGetter.giftConfigRes)
+        )
+      );
+      socket.send(
+        JSON.stringify(
+          getStatusUpdateMessage(
+            DanmuReceiver.isOpen()
+              ? "open"
+              : DanmuReceiver.isClosed()
+              ? "close"
+              : "error"
+          )
         )
       );
     });
