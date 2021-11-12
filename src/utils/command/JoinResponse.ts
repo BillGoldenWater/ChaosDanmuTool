@@ -7,14 +7,13 @@ export type JoinResponse = {
   };
 };
 
-export function getJoinResponseMessage(code: number): string {
-  const messageObj: JoinResponse = {
+export function getJoinResponseMessage(code: number): JoinResponse {
+  return {
     cmd: "joinResponse",
     data: {
       code: code,
     },
   };
-  return JSON.stringify(messageObj);
 }
 
 export function getJoinResponseMessageCmd(): JoinResponseCmd {

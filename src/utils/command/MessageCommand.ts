@@ -5,12 +5,11 @@ export type MessageCommand = {
   data: string;
 };
 
-export function getMessageCommand(data: string): string {
-  const messageObj: MessageCommand = {
+export function getMessageCommand(data: string): MessageCommand {
+  return {
     cmd: "messageCommand",
     data: data,
   };
-  return JSON.stringify(messageObj);
 }
 
 export function getMessageCommandCmd(): MessageCommandCmd {

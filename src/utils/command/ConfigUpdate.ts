@@ -7,13 +7,11 @@ export type ConfigUpdate = {
   data: Config;
 };
 
-export function getConfigUpdateMessage(config: Config): string {
-  const messageObj: ConfigUpdate = {
+export function getConfigUpdateMessage(config: Config): ConfigUpdate {
+  return {
     cmd: "updateConfig",
     data: config,
   };
-
-  return JSON.stringify(messageObj);
 }
 
 export function getConfigUpdateCmd(): ConfigUpdateCmd {

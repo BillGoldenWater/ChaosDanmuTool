@@ -9,13 +9,11 @@ export type GiftConfigUpdate = {
 
 export function getGiftConfigUpdateMessage(
   giftConfig: TGiftConfigResponse
-): string {
-  const messageObj: GiftConfigUpdate = {
+): GiftConfigUpdate {
+  return {
     cmd: "updateGiftConfig",
     data: giftConfig,
   };
-
-  return JSON.stringify(messageObj);
 }
 
 export function getGiftConfigUpdateCmd(): GiftConfigUpdateCmd {

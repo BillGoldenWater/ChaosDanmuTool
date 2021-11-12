@@ -4,11 +4,11 @@ export type MessageLog = {
   cmd: MessageLogCmd;
   data: {
     timestamp: number;
-    message: string;
+    message: unknown;
   };
 };
 
-export function getMessageLogMessage(message: string): MessageLog {
+export function getMessageLogMessage(message: unknown): MessageLog {
   return {
     cmd: "messageLog",
     data: {

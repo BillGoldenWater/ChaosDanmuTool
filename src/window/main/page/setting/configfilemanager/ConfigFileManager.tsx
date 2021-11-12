@@ -7,7 +7,9 @@ import { ConfigContext } from "../../../utils/ConfigContext";
 
 export class ConfigFileManager extends React.Component {
   broadcastConfig(config: Config): void {
-    window.electron.websocketBroadcast(getConfigUpdateMessage(config));
+    window.electron.websocketBroadcast(
+      JSON.stringify(getConfigUpdateMessage(config))
+    );
   }
 
   render(): ReactNode {

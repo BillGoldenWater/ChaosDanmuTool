@@ -9,15 +9,15 @@ export type ReceiverStatusUpdate = {
   };
 };
 
-export function getStatusUpdateMessage(status: ReceiverStatus): string {
-  const messageObj: ReceiverStatusUpdate = {
+export function getStatusUpdateMessage(
+  status: ReceiverStatus
+): ReceiverStatusUpdate {
+  return {
     cmd: "receiverStatusUpdate",
     data: {
       status: status,
     },
   };
-
-  return JSON.stringify(messageObj);
 }
 
 export function getStatusUpdateMessageCmd(): ReceiverStatusUpdateCmd {

@@ -7,14 +7,13 @@ export type ActivityUpdate = {
   };
 };
 
-export function getActivityUpdateMessage(activity: number): string {
-  const messageObj: ActivityUpdate = {
+export function getActivityUpdateMessage(activity: number): ActivityUpdate {
+  return {
     cmd: "activityUpdate",
     data: {
       activity: activity,
     },
   };
-  return JSON.stringify(messageObj);
 }
 
 export function getActivityUpdateMessageCmd(): ActivityUpdateCmd {

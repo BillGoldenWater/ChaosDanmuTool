@@ -5,7 +5,7 @@ import { getStatusUpdateMessage } from "../command/ReceiverStatusUpdate";
 import { getActivityUpdateMessage } from "../command/ActivityUpdate";
 import { errorCode } from "../ErrorCode";
 import { getJoinResponseMessage } from "../command/JoinResponse";
-import { getErrorMessageMessage } from "../command/ErrorMessage";
+import { ErrorMessage, getErrorMessageMessage } from "../command/ErrorMessage";
 import { getMessageLogMessage, MessageLog } from "../command/MessageLog";
 import { getMessageCommand } from "../command/MessageCommand";
 import { dialog } from "electron";
@@ -132,16 +132,16 @@ export class DanmuReceiver {
       );
       this.startHeartBeat();
 
-      WebsocketServer.broadcast(getStatusUpdateMessage("open"));
+      this.broadcastMessage(getStatusUpdateMessage("open"));
     });
 
     this.connection.on("close", () => {
-      WebsocketServer.broadcast(getStatusUpdateMessage("close"));
+      this.broadcastMessage(getStatusUpdateMessage("close"));
     });
 
     this.connection.on("error", (err) => {
       console.log(err);
-      WebsocketServer.broadcast(getStatusUpdateMessage("error"));
+      this.broadcastMessage(getStatusUpdateMessage("error"));
     });
 
     this.connection.on("message", async (data: ArrayBuffer) => {
@@ -190,13 +190,13 @@ export class DanmuReceiver {
     });
   }
 
-  static broadcastMessage(jsonMessage: string): void {
-    WebsocketServer.broadcast(jsonMessage);
-    this.messageHistory.push(getMessageLogMessage(jsonMessage));
+  static broadcastMessage(message: unknown): void {
+    WebsocketServer.broadcast(JSON.stringify(message));
+    this.messageHistory.push(getMessageLogMessage(message));
   }
 
-  static alertMessage(jsonMessage: string): void {
-    dialog.showErrorBox("错误", JSON.parse(jsonMessage)["errorMessage"]);
+  static alertMessage(jsonMessage: ErrorMessage): void {
+    dialog.showErrorBox("错误", jsonMessage["data"]["errorMessage"]);
     this.messageHistory.push(getMessageLogMessage(jsonMessage));
   }
 

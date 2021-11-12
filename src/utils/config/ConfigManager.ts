@@ -60,7 +60,9 @@ export class ConfigManager {
   }
 
   static onChange(): void {
-    WebsocketServer.broadcast(getConfigUpdateMessage(this.config));
+    WebsocketServer.broadcast(
+      JSON.stringify(getConfigUpdateMessage(this.config))
+    );
     this.config.autoSaveOnChange ? this.save() : "";
   }
 }

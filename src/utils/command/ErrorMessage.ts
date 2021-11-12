@@ -13,15 +13,14 @@ export type ErrorMessage = {
 export function getErrorMessageMessage(
   errorMessage: string,
   errorData: Data
-): string {
-  const messageObj: ErrorMessage = {
+): ErrorMessage {
+  return {
     cmd: "errorMessage",
     data: {
       errorMessage: errorMessage,
       errorData: errorData,
     },
   };
-  return JSON.stringify(messageObj);
 }
 
 export function getErrorMessageMessageCmd(): ErrorMessageCmd {
