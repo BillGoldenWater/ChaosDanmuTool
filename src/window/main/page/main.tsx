@@ -1,9 +1,11 @@
+import React, { ReactNode } from "react";
+import style from "./main.module.css";
 import { Config } from "../../../utils/config/Config";
 import {
   getStatusUpdateMessageCmd,
+  ReceiverStatus,
   ReceiverStatusUpdate,
 } from "../../../utils/command/ReceiverStatusUpdate";
-import React, { ReactNode } from "react";
 import { ConfigContext } from "../utils/ConfigContext";
 import {
   ConfigUpdate,
@@ -17,7 +19,7 @@ import {
   SettingOutlined,
 } from "@ant-design/icons";
 import SubMenu from "antd/lib/menu/SubMenu";
-import { Document } from "../page_old/document";
+import { ConnectRoom } from "./connectroom/ConnectRoom";
 
 const { Sider, Content } = Layout;
 
@@ -27,15 +29,8 @@ class State {
   config: Config;
   siderCollapsed: boolean;
   pageKey: string;
+  receiverStatus: ReceiverStatus;
 }
-
-class Pages {
-  [key: string]: ReactNode;
-}
-
-const pages: Pages = {
-  document: <Document />,
-};
 
 export class Main extends React.Component<Props, State> {
   websocketClient: WebsocketClient;
@@ -47,6 +42,7 @@ export class Main extends React.Component<Props, State> {
       config: JSON.parse(window.electron.getConfig()),
       siderCollapsed: true,
       pageKey: "connectRoom",
+      receiverStatus: "close",
     };
 
     this.websocketClient = new WebsocketClient(
@@ -83,6 +79,8 @@ export class Main extends React.Component<Props, State> {
     switch (msgObj.cmd) {
       case getStatusUpdateMessageCmd(): {
         const msg: ReceiverStatusUpdate = msgObj;
+
+        this.setState({ receiverStatus: msg.data.status });
         switch (msg.data.status) {
           case "open": {
             notification.success({
@@ -135,6 +133,17 @@ export class Main extends React.Component<Props, State> {
       },
     };
 
+    let currentPage = null;
+
+    switch (state.pageKey) {
+      case "connectRoom": {
+        currentPage = (
+          <ConnectRoom receiverStatus={this.state.receiverStatus} />
+        );
+        break;
+      }
+    }
+
     return (
       <ConfigContext.Provider value={configContext}>
         <ConfigProvider>
@@ -179,7 +188,7 @@ export class Main extends React.Component<Props, State> {
               </Menu>
             </Sider>
             <Content style={{ minHeight: "100vh" }}>
-              {pages[state.pageKey]}
+              <div className={style.main_content}>{currentPage}</div>
             </Content>
           </Layout>
         </ConfigProvider>
