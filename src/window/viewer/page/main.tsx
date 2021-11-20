@@ -3,8 +3,8 @@ import style from "./main.module.css";
 import {
   Config,
   DanmuViewCustomConfig,
-  defaultConfig,
   defaultDanmuViewCustom,
+  getDefaultConfig,
 } from "../../../utils/config/Config";
 import { WebsocketClient } from "../../../utils/client/WebsocketClient";
 import { getParam } from "../utils/UrlParamGeter";
@@ -79,7 +79,7 @@ export class Main extends React.Component<Props, State> {
     this.serverPort = parseInt(getParam("port"));
     this.maxAttemptNumber =
       parseInt(getParam("maxReconnectAttemptNum")) ||
-      defaultConfig.danmuViewConfig.maxReconnectAttemptNumber;
+      getDefaultConfig().danmuViewConfig.maxReconnectAttemptNumber;
 
     if (!this.serverPort) {
       this.serverPort = parseInt(window.location.port);

@@ -1,4 +1,4 @@
-import { Config, defaultConfig } from "./Config";
+import { Config, getDefaultConfig } from "./Config";
 import * as fs from "fs";
 import { errorCode } from "../ErrorCode";
 import { dialog } from "electron";
@@ -12,7 +12,7 @@ export class ConfigManager {
   static loaded: boolean;
 
   static init(filePath: string): void {
-    this.config = JSON.parse(JSON.stringify(defaultConfig));
+    this.config = getDefaultConfig();
     this.filePath = filePath;
     this.inited = true;
   }
@@ -23,9 +23,9 @@ export class ConfigManager {
         flag: "r",
         encoding: "utf-8",
       });
-      this.config = JSON.parse(configStr);
+      this.config = getDefaultConfig(JSON.parse(configStr));
     } catch (e) {
-      this.config = JSON.parse(JSON.stringify(defaultConfig));
+      this.config = getDefaultConfig();
     }
     this.loaded = true;
   }

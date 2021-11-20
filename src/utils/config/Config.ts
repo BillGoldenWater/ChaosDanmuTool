@@ -149,3 +149,16 @@ export const defaultConfig: Config = {
     },
   ],
 };
+
+export function getDefaultConfig(config?: Config): Config {
+  if (!config) return { ...defaultConfig };
+
+  return {
+    ...defaultConfig,
+    danmuReceiver: { ...defaultConfig.danmuReceiver, ...config.danmuReceiver },
+    danmuViewConfig: {
+      ...defaultConfig.danmuViewConfig,
+      ...config.danmuViewConfig,
+    },
+  };
+}

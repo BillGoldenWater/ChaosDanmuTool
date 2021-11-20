@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react";
 import { FunctionCard } from "../../../../../component/functioncard/FunctionCard";
 import { Button } from "../../../../../component/button/Button";
-import { Config, defaultConfig } from "../../../../../utils/config/Config";
+import { Config, getDefaultConfig } from "../../../../../utils/config/Config";
 import { getConfigUpdateMessage } from "../../../../../utils/command/ConfigUpdate";
 import { ConfigContext } from "../../../utils/ConfigContext";
 
@@ -33,7 +33,7 @@ export class ConfigFileManager extends React.Component {
             </Button>
             <Button
               onClick={() => {
-                setConfig(defaultConfig);
+                setConfig(getDefaultConfig());
               }}
             >
               重置
