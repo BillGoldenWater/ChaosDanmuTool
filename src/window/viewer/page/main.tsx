@@ -75,7 +75,7 @@ export class Main extends React.Component<Props, State> {
       giftConfig: undefined,
     };
 
-    this.serverAddress = getParam("address");
+    this.serverAddress = window.location.hostname;
     this.serverPort = parseInt(getParam("port"));
     this.maxAttemptNumber =
       parseInt(getParam("maxReconnectAttemptNum")) ||
