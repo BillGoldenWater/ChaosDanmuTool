@@ -10,12 +10,21 @@ import {
   getConfigUpdateCmd,
 } from "../../../utils/command/ConfigUpdate";
 import { WebsocketClient } from "../../../utils/client/WebsocketClient";
-import { Layout, notification } from "antd";
+import { ConfigProvider, Layout, Menu, notification } from "antd";
+import {
+  AppstoreOutlined,
+  HistoryOutlined,
+  SettingOutlined,
+} from "@ant-design/icons";
+import SubMenu from "antd/lib/menu/SubMenu";
+
+const { Sider, Content } = Layout;
 
 class Props {}
 
 class State {
   config: Config;
+  siderCollapsed: boolean;
 }
 
 export class Main extends React.Component<Props, State> {
@@ -26,6 +35,7 @@ export class Main extends React.Component<Props, State> {
 
     this.state = {
       config: JSON.parse(window.electron.getConfig()),
+      siderCollapsed: true,
     };
 
     this.websocketClient = new WebsocketClient(
@@ -102,6 +112,8 @@ export class Main extends React.Component<Props, State> {
   }
 
   render(): ReactNode {
+    const state = this.state;
+
     const configContext = {
       config: this.state.config,
       setConfig: (config: Config) => {
@@ -114,7 +126,43 @@ export class Main extends React.Component<Props, State> {
 
     return (
       <ConfigContext.Provider value={configContext}>
-        <Layout>1</Layout>
+        <ConfigProvider>
+          <Layout>
+            <Sider
+              collapsible={true}
+              collapsedWidth={"4em"}
+              collapsed={state.siderCollapsed}
+              theme={"light"}
+              onMouseEnter={() => {
+                this.setState({ siderCollapsed: false });
+              }}
+              onMouseLeave={() => {
+                this.setState({ siderCollapsed: true });
+              }}
+              onCollapse={(collapsed) => {
+                this.setState({ siderCollapsed: collapsed });
+              }}
+            >
+              <Menu mode={"inline"}>
+                <SubMenu
+                  key={"functionList"}
+                  icon={<AppstoreOutlined />}
+                  title={"功能"}
+                >
+                  <Menu.Item>功能1</Menu.Item>
+                  <Menu.Item>功能2</Menu.Item>
+                </SubMenu>
+                <Menu.Item key={"danmuHistory"} icon={<HistoryOutlined />}>
+                  弹幕历史记录
+                </Menu.Item>
+                <Menu.Item key={"settings"} icon={<SettingOutlined />}>
+                  设置
+                </Menu.Item>
+              </Menu>
+            </Sider>
+            <Content style={{ minHeight: "100vh" }}>Content</Content>
+          </Layout>
+        </ConfigProvider>
       </ConfigContext.Provider>
     );
   }
