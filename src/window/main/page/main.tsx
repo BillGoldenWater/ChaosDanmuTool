@@ -90,7 +90,7 @@ export class Main extends React.Component<Props, State> {
           case "close": {
             notification.warn({
               message: "直播间连接状态更新",
-              description: "当前状态为: 已断开",
+              description: "当前状态为: 未连接",
             });
             break;
           }
