@@ -17,6 +17,7 @@ import {
   SettingOutlined,
 } from "@ant-design/icons";
 import SubMenu from "antd/lib/menu/SubMenu";
+import { Document } from "../page_old/document";
 
 const { Sider, Content } = Layout;
 
@@ -25,7 +26,16 @@ class Props {}
 class State {
   config: Config;
   siderCollapsed: boolean;
+  pageKey: string;
 }
+
+class Pages {
+  [key: string]: ReactNode;
+}
+
+const pages: Pages = {
+  document: <Document />,
+};
 
 export class Main extends React.Component<Props, State> {
   websocketClient: WebsocketClient;
@@ -36,6 +46,7 @@ export class Main extends React.Component<Props, State> {
     this.state = {
       config: JSON.parse(window.electron.getConfig()),
       siderCollapsed: true,
+      pageKey: "connectRoom",
     };
 
     this.websocketClient = new WebsocketClient(
@@ -143,14 +154,21 @@ export class Main extends React.Component<Props, State> {
                 this.setState({ siderCollapsed: collapsed });
               }}
             >
-              <Menu mode={"inline"} style={{ userSelect: "none" }}>
+              <Menu
+                mode={"inline"}
+                style={{ userSelect: "none" }}
+                onClick={(event) => {
+                  this.setState({ pageKey: event.key });
+                }}
+                defaultSelectedKeys={["connectRoom"]}
+              >
                 <SubMenu
                   key={"functionList"}
                   icon={<AppstoreOutlined />}
                   title={"功能"}
                 >
-                  <Menu.Item>功能1</Menu.Item>
-                  <Menu.Item>功能2</Menu.Item>
+                  <Menu.Item key={"connectRoom"}>连接直播间</Menu.Item>
+                  <Menu.Item key={"danmuViewControl"}>弹幕查看器</Menu.Item>
                 </SubMenu>
                 <Menu.Item key={"danmuHistory"} icon={<HistoryOutlined />}>
                   弹幕历史记录
@@ -160,7 +178,9 @@ export class Main extends React.Component<Props, State> {
                 </Menu.Item>
               </Menu>
             </Sider>
-            <Content style={{ minHeight: "100vh" }}>Content</Content>
+            <Content style={{ minHeight: "100vh" }}>
+              {pages[state.pageKey]}
+            </Content>
           </Layout>
         </ConfigProvider>
       </ConfigContext.Provider>
