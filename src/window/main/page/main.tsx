@@ -143,7 +143,7 @@ export class Main extends React.Component<Props, State> {
                 this.setState({ siderCollapsed: collapsed });
               }}
             >
-              <Menu mode={"inline"}>
+              <Menu mode={"inline"} style={{ userSelect: "none" }}>
                 <SubMenu
                   key={"functionList"}
                   icon={<AppstoreOutlined />}
