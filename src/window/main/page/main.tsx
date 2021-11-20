@@ -42,7 +42,7 @@ export class Main extends React.Component<Props, State> {
     this.state = {
       config: JSON.parse(window.electron.getConfig()),
       siderCollapsed: true,
-      pageKey: "connectRoom",
+      pageKey: "danmuViewerControl",
       receiverStatus: "close",
     };
 
@@ -68,10 +68,7 @@ export class Main extends React.Component<Props, State> {
       }
     );
 
-    this.websocketClient.connect(
-      "localhost",
-      this.state.config.danmuViewConfig.httpServerPort
-    );
+    this.websocketClient.connect("localhost", this.state.config.httpServerPort);
   }
 
   onMessage(event: MessageEvent): void {

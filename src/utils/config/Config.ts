@@ -7,7 +7,6 @@ export type DanmuReceiverConfig = {
 };
 
 export type DanmuViewConfig = {
-  httpServerPort: number;
   maxReconnectAttemptNumber: number;
   width: number;
   height: number;
@@ -49,6 +48,7 @@ export type Config = {
   forChaosDanmuTool: boolean;
   autoSaveOnQuit: boolean;
   autoSaveOnChange: boolean;
+  httpServerPort: number;
   danmuReceiver: DanmuReceiverConfig;
   danmuViewConfig: DanmuViewConfig;
   danmuViewCustoms: DanmuViewCustomConfig[];
@@ -114,13 +114,13 @@ export const defaultConfig: Config = {
   forChaosDanmuTool: true,
   autoSaveOnQuit: true,
   autoSaveOnChange: true,
+  httpServerPort: 25555,
   danmuReceiver: {
     serverUrl: "wss://broadcastlv.chat.bilibili.com/sub",
     roomid: 0,
     heartBeatInterval: 30,
   },
   danmuViewConfig: {
-    httpServerPort: 25555,
     maxReconnectAttemptNumber: 5,
     width: 400,
     height: 600,

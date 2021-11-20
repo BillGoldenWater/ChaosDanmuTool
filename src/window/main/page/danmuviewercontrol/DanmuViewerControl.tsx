@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import { ConfigContext } from "../../utils/ConfigContext";
-import { Button, Space } from "antd";
+import { Button, Divider, Space } from "antd";
 
 export class DanmuViewerControl extends React.Component {
   render(): ReactNode {
@@ -25,6 +25,7 @@ export class DanmuViewerControl extends React.Component {
                   关闭
                 </Button>
               </Space>
+              <Divider orientation={"left"}>设置</Divider>
             </div>
           );
         }}

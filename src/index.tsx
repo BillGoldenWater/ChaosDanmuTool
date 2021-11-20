@@ -62,7 +62,7 @@ function createViewerWindow(): void {
     .loadURL(
       constructURL(
         VIEWER_WEBPACK_ENTRY,
-        danmuViewConfig.httpServerPort,
+        ConfigManager.config.httpServerPort,
         danmuViewConfig.maxReconnectAttemptNumber,
         "internal"
       )
@@ -211,7 +211,7 @@ function init(): void {
     app.dock.setMenu(dockMenu);
   }
 
-  KoaServer.run(ConfigManager.config.danmuViewConfig.httpServerPort);
+  KoaServer.run(ConfigManager.config.httpServerPort);
   WebsocketServer.run(KoaServer.server);
 
   createMainWindow();

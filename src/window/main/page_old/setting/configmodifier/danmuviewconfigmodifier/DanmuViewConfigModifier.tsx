@@ -14,17 +14,17 @@ export class DanmuViewConfigModifier extends React.Component {
           };
           return (
             <FunctionCard name={"弹幕查看器"}>
-              <label>服务器端口: </label>
-              <input
-                value={danmuViewConfig.httpServerPort}
-                onChange={(event) => {
-                  setDanmuViewConfig({
-                    ...danmuViewConfig,
-                    httpServerPort: parseInt(event.target.value, 10),
-                  });
-                }}
-              />
-              <br />
+              {/*<label>服务器端口: </label>*/}
+              {/*<input*/}
+              {/*  value={danmuViewConfig.httpServerPort}*/}
+              {/*  onChange={(event) => {*/}
+              {/*    setDanmuViewConfig({*/}
+              {/*      ...danmuViewConfig,*/}
+              {/*      httpServerPort: parseInt(event.target.value, 10),*/}
+              {/*    });*/}
+              {/*  }}*/}
+              {/*/>*/}
+              {/*<br />*/}
               <label>最大重连次数: </label>
               <input
                 value={danmuViewConfig.maxReconnectAttemptNumber}
