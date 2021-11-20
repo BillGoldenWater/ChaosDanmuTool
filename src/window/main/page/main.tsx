@@ -20,6 +20,7 @@ import {
 } from "@ant-design/icons";
 import SubMenu from "antd/lib/menu/SubMenu";
 import { ConnectRoom } from "./connectroom/ConnectRoom";
+import { DanmuViewerControl } from "./danmuviewercontrol/DanmuViewerControl";
 
 const { Sider, Content } = Layout;
 
@@ -142,6 +143,10 @@ export class Main extends React.Component<Props, State> {
         );
         break;
       }
+      case "danmuViewerControl": {
+        currentPage = <DanmuViewerControl />;
+        break;
+      }
     }
 
     return (
@@ -177,7 +182,7 @@ export class Main extends React.Component<Props, State> {
                   title={"功能"}
                 >
                   <Menu.Item key={"connectRoom"}>连接直播间</Menu.Item>
-                  <Menu.Item key={"danmuViewControl"}>弹幕查看器</Menu.Item>
+                  <Menu.Item key={"danmuViewerControl"}>弹幕查看器</Menu.Item>
                 </SubMenu>
                 <Menu.Item key={"danmuHistory"} icon={<HistoryOutlined />}>
                   弹幕历史记录
