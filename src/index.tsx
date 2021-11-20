@@ -67,7 +67,10 @@ function createViewerWindow(): void {
         "internal"
       )
     )
-    .then();
+    .then()
+    .catch(() => {
+      return;
+    });
 
   viewerWindow.on("ready-to-show", () => {
     viewerWindow.setVisibleOnAllWorkspaces(true, {
