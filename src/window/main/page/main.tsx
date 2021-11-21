@@ -21,6 +21,7 @@ import {
 import SubMenu from "antd/lib/menu/SubMenu";
 import { ConnectRoom } from "./connectroom/ConnectRoom";
 import { DanmuViewerControl } from "./danmuviewercontrol/DanmuViewerControl";
+import { Settings } from "./settings/Settings";
 
 const { Sider, Content } = Layout;
 
@@ -42,7 +43,7 @@ export class Main extends React.Component<Props, State> {
     this.state = {
       config: JSON.parse(window.electron.getConfig()),
       siderCollapsed: true,
-      pageKey: "connectRoom",
+      pageKey: "settings",
       receiverStatus: "close",
     };
 
@@ -63,7 +64,7 @@ export class Main extends React.Component<Props, State> {
       () => {
         notification.error({
           message: "服务器连接发生错误",
-          description: `到指令转发服务器的连接发生了错误`,
+          description: "到指令转发服务器的连接发生了错误",
         });
       }
     );
@@ -148,6 +149,10 @@ export class Main extends React.Component<Props, State> {
       }
       case "danmuViewerControl": {
         currentPage = <DanmuViewerControl />;
+        break;
+      }
+      case "settings": {
+        currentPage = <Settings />;
         break;
       }
     }
