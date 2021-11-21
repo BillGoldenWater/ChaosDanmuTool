@@ -15,11 +15,6 @@ ChaosDanmuTool
 
 wait test on macOS:
 
-- 修复残影
-- 自动保存弹幕查看器大小
-- 主题切换
-- 中文配置名
-
 done:
 
 - Mac-VisibleOnAllWorkspaces
@@ -35,3 +30,7 @@ done:
 - 调色板
 - 点击Dock图标时显示/创建主窗口
 - 自动启动服务器 自动连接服务器
+- 修复残影
+- 自动保存弹幕查看器大小
+- 主题切换
+- 中文配置名
