@@ -157,6 +157,7 @@ export function getDefaultConfig(config?: Config): Config {
 
   return {
     ...defaultConfig,
+    ...config,
     danmuReceiver: { ...defaultConfig.danmuReceiver, ...config.danmuReceiver },
     danmuViewConfig: {
       ...defaultConfig.danmuViewConfig,
