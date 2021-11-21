@@ -1,6 +1,5 @@
 import React, { ReactNode } from "react";
 import { Button, Divider, Form, Select, Space, Typography } from "antd";
-import { DanmuViewConfigModifier } from "../settings/configmodifier/danmuviewconfigmodifier/DanmuViewConfigModifier";
 import { ConfigContext } from "../../utils/ConfigContext";
 import { defaultConfig } from "../../../../utils/config/Config";
 
@@ -123,9 +122,6 @@ export class DanmuViewerControl extends React.Component<Props, State> {
                 <Typography.Text>链接: </Typography.Text>
                 <Typography.Text copyable>{link}</Typography.Text>
               </Typography.Paragraph>
-
-              <Divider orientation={"left"}>设置</Divider>
-              <DanmuViewConfigModifier />
             </div>
           );
         }}

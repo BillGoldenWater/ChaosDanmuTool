@@ -103,7 +103,7 @@ export class MainConfigModifier extends React.Component {
                   </Form.Item>
                   <Alert
                     type={"warning"}
-                    message={"修改后需要重新打开以应用设置"}
+                    message={"修改后需要重启应用才能生效"}
                   />
                 </Collapse.Panel>
               </Collapse>
