@@ -140,7 +140,10 @@ export class Main extends React.Component<Props, State> {
 
         for (const i in config.danmuViewCustoms) {
           const viewConfig = config.danmuViewCustoms[i];
-          if (viewConfig.name == getParam("name")) {
+          if (
+            viewConfig.name == decodeURI(getParam("name")) ||
+            viewConfig.name == "internal"
+          ) {
             this.setState({
               config: viewConfig,
             });
