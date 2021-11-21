@@ -121,6 +121,12 @@ export class Main extends React.Component<Props, State> {
   render(): ReactNode {
     const state = this.state;
 
+    if (this.state.config.darkTheme) {
+      import("./main.dark.module.css");
+    } else {
+      import("./main.light.module.css");
+    }
+
     const configContext = {
       config: this.state.config,
       setConfig: (config: Config) => {
@@ -154,7 +160,7 @@ export class Main extends React.Component<Props, State> {
               collapsible={true}
               collapsedWidth={"4em"}
               collapsed={state.siderCollapsed}
-              theme={"light"}
+              theme={state.config.darkTheme ? "dark" : "light"}
               onMouseEnter={() => {
                 this.setState({ siderCollapsed: false });
               }}
@@ -190,7 +196,16 @@ export class Main extends React.Component<Props, State> {
               </Menu>
             </Sider>
             <Content style={{ minHeight: "100vh" }}>
-              <div className={style.main_content}>{currentPage}</div>
+              <div
+                className={style.main_content}
+                style={
+                  state.config.darkTheme
+                    ? { backgroundColor: "#1f1f1f" }
+                    : { backgroundColor: "#fff" }
+                }
+              >
+                {currentPage}
+              </div>
             </Content>
           </Layout>
         </ConfigProvider>

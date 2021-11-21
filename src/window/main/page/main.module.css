@@ -1,7 +1,6 @@
 .main_content {
     margin: 1em;
     padding: 2em;
-    background-color: #fff;
     min-height: calc(100vh - 2em);
     border-bottom-right-radius: 0.4em;
 }

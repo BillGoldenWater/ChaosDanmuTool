@@ -49,6 +49,7 @@ export type Config = {
   autoSaveOnQuit: boolean;
   autoSaveOnChange: boolean;
   httpServerPort: number;
+  darkTheme: boolean;
   danmuReceiver: DanmuReceiverConfig;
   danmuViewConfig: DanmuViewConfig;
   danmuViewCustoms: DanmuViewCustomConfig[];
@@ -115,6 +116,7 @@ export const defaultConfig: Config = {
   autoSaveOnQuit: true,
   autoSaveOnChange: true,
   httpServerPort: 25555,
+  darkTheme: true,
   danmuReceiver: {
     serverUrl: "wss://broadcastlv.chat.bilibili.com/sub",
     roomid: 0,
