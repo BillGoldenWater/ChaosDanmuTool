@@ -17,6 +17,7 @@ wait test on macOS:
 
 - 修复残影
 - 自动保存弹幕查看器大小
+- 主题切换
 
 done:
 
