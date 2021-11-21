@@ -2,6 +2,7 @@ import React, { ReactNode } from "react";
 import { Button, Divider, Form, Select, Space, Typography } from "antd";
 import { DanmuViewConfigModifier } from "../settings/configmodifier/danmuviewconfigmodifier/DanmuViewConfigModifier";
 import { ConfigContext } from "../../utils/ConfigContext";
+import { defaultConfig } from "../../../../utils/config/Config";
 
 class Props {}
 
@@ -42,6 +43,27 @@ export class DanmuViewerControl extends React.Component<Props, State> {
             : styleNameList.length > 0
             ? styleNameList[0]
             : "";
+
+          let link = `http://localhost:${config.httpServerPort}/viewer`;
+          const param = new URLSearchParams();
+
+          if (
+            config.danmuViewConfig.maxReconnectAttemptNumber !=
+            defaultConfig.danmuViewConfig.maxReconnectAttemptNumber
+          ) {
+            param.append(
+              "maxReconnectAttemptNum",
+              config.danmuViewConfig.maxReconnectAttemptNumber.toString(10)
+            );
+          }
+          if (state.selectedStyle != "internal") {
+            param.append("name", this.state.selectedStyle);
+          }
+
+          if (param.toString().length > 0) {
+            link += "?";
+            link += param.toString();
+          }
 
           return (
             <div>
@@ -99,11 +121,7 @@ export class DanmuViewerControl extends React.Component<Props, State> {
 
               <Typography.Paragraph>
                 <Typography.Text>链接: </Typography.Text>
-                <Typography.Text copyable>
-                  {`http://localhost:${config.httpServerPort}/viewer` +
-                    `?maxReconnectAttemptNum=${config.danmuViewConfig.maxReconnectAttemptNumber}` +
-                    `&name=${state.selectedStyle}`}
-                </Typography.Text>
+                <Typography.Text copyable>{link}</Typography.Text>
               </Typography.Paragraph>
 
               <Divider orientation={"left"}>设置</Divider>
