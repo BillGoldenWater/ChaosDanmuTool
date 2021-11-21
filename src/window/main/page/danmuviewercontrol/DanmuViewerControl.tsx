@@ -89,7 +89,7 @@ export class DanmuViewerControl extends React.Component<Props, State> {
               <Divider orientation={"left"}>在其他应用中查看弹幕</Divider>
 
               <Typography.Paragraph type={"secondary"}>
-                选择你想使用的样式后复制链接至其他应用中
+                选择你想使用的配置后复制链接至其他应用中
               </Typography.Paragraph>
               <Typography.Paragraph type={"secondary"}>
                 OBS: 添加浏览器源后将链接复制至URL栏中,
@@ -106,7 +106,7 @@ export class DanmuViewerControl extends React.Component<Props, State> {
                 确保防火墙中放行端口 {config.httpServerPort}
               </Typography.Paragraph>
 
-              <Form.Item label={"要使用的样式"}>
+              <Form.Item label={"要使用的配置"}>
                 <Select
                   showSearch
                   value={verifiedSelectedStyle}
