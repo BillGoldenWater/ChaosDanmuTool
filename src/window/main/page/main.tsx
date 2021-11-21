@@ -178,6 +178,7 @@ export class Main extends React.Component<Props, State> {
                   this.setState({ pageKey: event.key });
                 }}
                 defaultSelectedKeys={["connectRoom"]}
+                theme={state.config.darkTheme ? "dark" : "light"}
               >
                 <SubMenu
                   key={"functionList"}
