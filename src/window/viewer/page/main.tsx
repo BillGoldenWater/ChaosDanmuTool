@@ -3,8 +3,8 @@ import style from "./main.module.css";
 import {
   Config,
   DanmuViewCustomConfig,
-  defaultConfig,
   defaultDanmuViewCustom,
+  getDefaultConfig,
 } from "../../../utils/config/Config";
 import { WebsocketClient } from "../../../utils/client/WebsocketClient";
 import { getParam } from "../utils/UrlParamGeter";
@@ -75,11 +75,15 @@ export class Main extends React.Component<Props, State> {
       giftConfig: undefined,
     };
 
-    this.serverAddress = getParam("address");
+    this.serverAddress = window.location.hostname;
     this.serverPort = parseInt(getParam("port"));
     this.maxAttemptNumber =
       parseInt(getParam("maxReconnectAttemptNum")) ||
-      defaultConfig.danmuViewConfig.maxReconnectAttemptNumber;
+      getDefaultConfig().danmuViewConfig.maxReconnectAttemptNumber;
+
+    if (!this.serverPort) {
+      this.serverPort = parseInt(window.location.port);
+    }
 
     this.danmuCount = 0;
 
@@ -136,7 +140,10 @@ export class Main extends React.Component<Props, State> {
 
         for (const i in config.danmuViewCustoms) {
           const viewConfig = config.danmuViewCustoms[i];
-          if (viewConfig.name == getParam("name")) {
+          if (
+            viewConfig.name == decodeURI(getParam("name")) ||
+            viewConfig.name == "internal"
+          ) {
             this.setState({
               config: viewConfig,
             });

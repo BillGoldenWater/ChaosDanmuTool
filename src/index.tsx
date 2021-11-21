@@ -62,13 +62,15 @@ function createViewerWindow(): void {
     .loadURL(
       constructURL(
         VIEWER_WEBPACK_ENTRY,
-        danmuViewConfig.websocketServer.host,
-        danmuViewConfig.websocketServer.port,
+        ConfigManager.config.httpServerPort,
         danmuViewConfig.maxReconnectAttemptNumber,
         "internal"
       )
     )
-    .then();
+    .then()
+    .catch(() => {
+      return;
+    });
 
   viewerWindow.on("ready-to-show", () => {
     viewerWindow.setVisibleOnAllWorkspaces(true, {
@@ -161,7 +163,11 @@ function init(): void {
   ipcMain.on("websocketServer", (event, ...args) => {
     switch (args[0]) {
       case "run": {
-        WebsocketServer.run(args[1], args[2]);
+        if (KoaServer.server && KoaServer.server.listening) {
+          WebsocketServer.run(KoaServer.server);
+        } else {
+          KoaServer.run(args[1]);
+        }
         break;
       }
       case "close": {
@@ -205,11 +211,8 @@ function init(): void {
     app.dock.setMenu(dockMenu);
   }
 
-  WebsocketServer.run(
-    ConfigManager.config.danmuViewConfig.websocketServer.host,
-    ConfigManager.config.danmuViewConfig.websocketServer.port
-  );
-  KoaServer.run(ConfigManager.config.danmuViewConfig.webServer.port);
+  KoaServer.run(ConfigManager.config.httpServerPort);
+  WebsocketServer.run(KoaServer.server);
 
   createMainWindow();
 }

@@ -1,11 +1,5 @@
 body {
   margin: 0;
   padding: 0;
-  background: #f7f7f7ff;
-}
-
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  margin: 0;
-  appearance: none;
+  background: #ffffff;
 }

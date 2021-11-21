@@ -1,4 +1,5 @@
 import { Server } from "ws";
+import { Server as HttpServer } from "http";
 import { getConfigUpdateMessage } from "../command/ConfigUpdate";
 import { ConfigManager } from "../config/ConfigManager";
 import { getGiftConfigUpdateMessage } from "../command/GiftConfigUpdate";
@@ -9,12 +10,9 @@ import { DanmuReceiver } from "../client/DanmuReceiver";
 export class WebsocketServer {
   static server: Server;
 
-  static run(host: string, port: number): void {
+  static run(server: HttpServer): void {
     this.close();
-    this.server = new Server({
-      host: host,
-      port: port,
-    });
+    this.server = new Server({ server });
     this.server.on("connection", (socket) => {
       socket.send(JSON.stringify(getConfigUpdateMessage(ConfigManager.config)));
       socket.send(

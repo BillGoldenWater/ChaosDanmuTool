@@ -6,18 +6,7 @@ export type DanmuReceiverConfig = {
   heartBeatInterval: number;
 };
 
-export type WebsocketServerConfig = {
-  host: string;
-  port: number;
-};
-
-export type WebServerConfig = {
-  port: number;
-};
-
 export type DanmuViewConfig = {
-  websocketServer: WebsocketServerConfig;
-  webServer: WebServerConfig;
   maxReconnectAttemptNumber: number;
   width: number;
   height: number;
@@ -59,6 +48,8 @@ export type Config = {
   forChaosDanmuTool: boolean;
   autoSaveOnQuit: boolean;
   autoSaveOnChange: boolean;
+  httpServerPort: number;
+  darkTheme: boolean;
   danmuReceiver: DanmuReceiverConfig;
   danmuViewConfig: DanmuViewConfig;
   danmuViewCustoms: DanmuViewCustomConfig[];
@@ -124,19 +115,14 @@ export const defaultConfig: Config = {
   forChaosDanmuTool: true,
   autoSaveOnQuit: true,
   autoSaveOnChange: true,
+  httpServerPort: 25555,
+  darkTheme: true,
   danmuReceiver: {
     serverUrl: "wss://broadcastlv.chat.bilibili.com/sub",
     roomid: 0,
     heartBeatInterval: 30,
   },
   danmuViewConfig: {
-    websocketServer: {
-      host: "localhost",
-      port: 25555,
-    },
-    webServer: {
-      port: 25556,
-    },
     maxReconnectAttemptNumber: 5,
     width: 400,
     height: 600,
@@ -165,3 +151,17 @@ export const defaultConfig: Config = {
     },
   ],
 };
+
+export function getDefaultConfig(config?: Config): Config {
+  if (!config) return { ...defaultConfig };
+
+  return {
+    ...defaultConfig,
+    ...config,
+    danmuReceiver: { ...defaultConfig.danmuReceiver, ...config.danmuReceiver },
+    danmuViewConfig: {
+      ...defaultConfig.danmuViewConfig,
+      ...config.danmuViewConfig,
+    },
+  };
+}

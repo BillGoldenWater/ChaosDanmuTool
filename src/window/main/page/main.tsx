@@ -1,129 +1,108 @@
-import React from "react";
-import { NavBar } from "../../../component/navbar/NavBar";
-import { Function } from "./function/Function";
-import { Document } from "./document";
-import { Setting } from "./setting/Setting";
-import { WebsocketClient } from "../../../utils/client/WebsocketClient";
+import React, { ReactNode } from "react";
+import style from "./main.module.css";
+import { Config } from "../../../utils/config/Config";
 import {
   getStatusUpdateMessageCmd,
   ReceiverStatus,
   ReceiverStatusUpdate,
 } from "../../../utils/command/ReceiverStatusUpdate";
-import { Config } from "../../../utils/config/Config";
 import { ConfigContext } from "../utils/ConfigContext";
 import {
   ConfigUpdate,
   getConfigUpdateCmd,
 } from "../../../utils/command/ConfigUpdate";
-import { StatusBar } from "../../../component/statusbar/StatusBar";
-import { ReceiverStatusIndicator } from "../../../component/receiverstatusindicator/ReceiverStatusIndicator";
-import { DateFormat } from "../../../utils/DateFormat";
+import { WebsocketClient } from "../../../utils/client/WebsocketClient";
+import { ConfigProvider, Layout, Menu, notification } from "antd";
+import {
+  AppstoreOutlined,
+  HistoryOutlined,
+  SettingOutlined,
+} from "@ant-design/icons";
+import SubMenu from "antd/lib/menu/SubMenu";
+import { ConnectRoom } from "./connectroom/ConnectRoom";
+import { DanmuViewerControl } from "./danmuviewercontrol/DanmuViewerControl";
+import { Settings } from "./settings/Settings";
+
+const { Sider, Content } = Layout;
 
 class Props {}
 
 class State {
-  pageIndex: number;
   config: Config;
+  siderCollapsed: boolean;
+  pageKey: string;
   receiverStatus: ReceiverStatus;
-  statusMessage: string;
 }
-
-class Page {
-  name: string;
-  pageClass: typeof React.Component;
-}
-
-const pages: Page[] = [
-  { name: "文档", pageClass: Document },
-  { name: "功能", pageClass: Function },
-  { name: "设置", pageClass: Setting },
-];
 
 export class Main extends React.Component<Props, State> {
   websocketClient: WebsocketClient;
 
   constructor(props: Props) {
     super(props);
+
     this.state = {
-      pageIndex: 1,
       config: JSON.parse(window.electron.getConfig()),
+      siderCollapsed: true,
+      pageKey: "connectRoom",
       receiverStatus: "close",
-      statusMessage: "",
     };
 
     this.websocketClient = new WebsocketClient(
       this.onMessage.bind(this),
       () => {
-        this.setState({
-          statusMessage: DateFormat() + " 服务器已连接",
+        notification.success({
+          message: "连接服务器成功",
+          description: "已连接到指令转发服务器",
         });
       },
       () => {
-        this.setState({
-          statusMessage: DateFormat() + " 服务器已断开 ",
+        notification.warn({
+          message: "已断开服务器连接",
+          description: "已断开到指令转发服务器的连接",
         });
       },
       () => {
-        this.setState({
-          statusMessage: DateFormat() + " 服务器连接发生错误 已断开",
+        notification.error({
+          message: "服务器连接发生错误",
+          description: "到指令转发服务器的连接发生了错误",
         });
       }
     );
 
-    const websocketServerConfig =
-      this.state.config.danmuViewConfig.websocketServer;
-
-    this.websocketClient.connect(
-      websocketServerConfig.host,
-      websocketServerConfig.port
-    );
-  }
-
-  render(): JSX.Element {
-    const CurrentPage = pages[this.state.pageIndex].pageClass;
-
-    return (
-      <div>
-        <ConfigContext.Provider
-          value={{
-            config: this.state.config,
-            setConfig: (config: Config) => {
-              this.setState({
-                config: config,
-              });
-              window.electron.updateConfig(JSON.stringify(config));
-            },
-          }}
-        >
-          <NavBar
-            items={pages.map((value: Page) => {
-              return value.name;
-            })}
-            default={this.state.pageIndex}
-            onSwitch={this.onPageSwitch.bind(this)}
-          />
-          <CurrentPage
-            receiverStatus={this.state.receiverStatus}
-            websocketClient={this.websocketClient}
-          />
-          <StatusBar message={this.state.statusMessage}>
-            <ReceiverStatusIndicator status={this.state.receiverStatus} />
-          </StatusBar>
-        </ConfigContext.Provider>
-      </div>
-    );
+    this.websocketClient.connect("localhost", this.state.config.httpServerPort);
   }
 
   onMessage(event: MessageEvent): void {
     const msgObj = JSON.parse(event.data);
-    console.log(msgObj);
 
     switch (msgObj.cmd) {
       case getStatusUpdateMessageCmd(): {
         const msg: ReceiverStatusUpdate = msgObj;
-        this.setState({
-          receiverStatus: msg.data.status,
-        });
+
+        this.setState({ receiverStatus: msg.data.status });
+        switch (msg.data.status) {
+          case "open": {
+            notification.success({
+              message: "直播间连接状态更新",
+              description: "当前状态为: 已连接",
+            });
+            break;
+          }
+          case "close": {
+            notification.warn({
+              message: "直播间连接状态更新",
+              description: "当前状态为: 未连接",
+            });
+            break;
+          }
+          case "error": {
+            notification.error({
+              message: "直播间连接状态更新",
+              description: "当前状态为: 发生了错误",
+            });
+            break;
+          }
+        }
         break;
       }
       case getConfigUpdateCmd(): {
@@ -133,10 +112,110 @@ export class Main extends React.Component<Props, State> {
         });
         break;
       }
+      default: {
+        console.log(msgObj);
+        break;
+      }
     }
   }
 
-  onPageSwitch(index: number): void {
-    this.setState({ pageIndex: index });
+  render(): ReactNode {
+    const state = this.state;
+
+    if (this.state.config.darkTheme) {
+      import("./main.dark.module.css");
+    } else {
+      import("./main.light.module.css");
+    }
+
+    const configContext = {
+      config: this.state.config,
+      setConfig: (config: Config) => {
+        this.setState({
+          config: config,
+        });
+        window.electron.updateConfig(JSON.stringify(config));
+      },
+    };
+
+    let currentPage = null;
+
+    switch (state.pageKey) {
+      case "connectRoom": {
+        currentPage = (
+          <ConnectRoom receiverStatus={this.state.receiverStatus} />
+        );
+        break;
+      }
+      case "danmuViewerControl": {
+        currentPage = <DanmuViewerControl />;
+        break;
+      }
+      case "settings": {
+        currentPage = <Settings />;
+        break;
+      }
+    }
+
+    return (
+      <ConfigContext.Provider value={configContext}>
+        <ConfigProvider>
+          <Layout>
+            <Sider
+              collapsible={true}
+              collapsedWidth={"4em"}
+              collapsed={state.siderCollapsed}
+              theme={state.config.darkTheme ? "dark" : "light"}
+              onMouseEnter={() => {
+                this.setState({ siderCollapsed: false });
+              }}
+              onMouseLeave={() => {
+                this.setState({ siderCollapsed: true });
+              }}
+              onCollapse={(collapsed) => {
+                this.setState({ siderCollapsed: collapsed });
+              }}
+            >
+              <Menu
+                mode={"inline"}
+                style={{ userSelect: "none" }}
+                onClick={(event) => {
+                  this.setState({ pageKey: event.key });
+                }}
+                defaultSelectedKeys={["connectRoom"]}
+                theme={state.config.darkTheme ? "dark" : "light"}
+              >
+                <SubMenu
+                  key={"functionList"}
+                  icon={<AppstoreOutlined />}
+                  title={"功能"}
+                >
+                  <Menu.Item key={"connectRoom"}>连接直播间</Menu.Item>
+                  <Menu.Item key={"danmuViewerControl"}>弹幕查看器</Menu.Item>
+                </SubMenu>
+                <Menu.Item key={"danmuHistory"} icon={<HistoryOutlined />}>
+                  弹幕历史记录
+                </Menu.Item>
+                <Menu.Item key={"settings"} icon={<SettingOutlined />}>
+                  设置
+                </Menu.Item>
+              </Menu>
+            </Sider>
+            <Content style={{ minHeight: "100vh" }}>
+              <div
+                className={style.main_content}
+                style={
+                  state.config.darkTheme
+                    ? { backgroundColor: "#1f1f1f" }
+                    : { backgroundColor: "#fff" }
+                }
+              >
+                {currentPage}
+              </div>
+            </Content>
+          </Layout>
+        </ConfigProvider>
+      </ConfigContext.Provider>
+    );
   }
 }
