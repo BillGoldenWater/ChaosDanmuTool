@@ -43,7 +43,7 @@ export class Main extends React.Component<Props, State> {
     this.state = {
       config: JSON.parse(window.electron.getConfig()),
       siderCollapsed: true,
-      pageKey: "settings",
+      pageKey: "connectRoom",
       receiverStatus: "close",
     };
 
