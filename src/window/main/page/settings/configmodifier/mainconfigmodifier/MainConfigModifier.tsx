@@ -89,7 +89,10 @@ export class MainConfigModifier extends React.Component {
                       <Popover
                         content={
                           <div>
-                            仅当端口冲突时需要修改(提示: 已断开服务器连接 或
+                            用于 其他应用查看弹幕, 直播间连接状态更新,
+                            动态配置文件更新
+                            <br />
+                            仅当端口冲突时需要修改(当提示: 已断开服务器连接 或
                             服务器连接发生错误)
                           </div>
                         }
