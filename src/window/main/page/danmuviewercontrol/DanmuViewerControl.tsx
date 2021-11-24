@@ -107,15 +107,18 @@ export class DanmuViewerControl extends React.Component<Props, State> {
               </Typography.Paragraph>
 
               <Form.Item label={"要使用的配置"}>
-                <Select
-                  showSearch
-                  value={verifiedSelectedStyle}
-                  onChange={(value) => {
-                    this.setState({ selectedStyle: value });
-                  }}
-                >
-                  {styleOptionList}
-                </Select>
+                <Space>
+                  <Select
+                    showSearch
+                    style={{ minWidth: "7em" }}
+                    value={verifiedSelectedStyle}
+                    onChange={(value) => {
+                      this.setState({ selectedStyle: value });
+                    }}
+                  >
+                    {styleOptionList}
+                  </Select>
+                </Space>
               </Form.Item>
 
               <Typography.Paragraph>
