@@ -201,9 +201,7 @@ function init(): void {
       {
         label: "打开主窗口",
         click() {
-          mainWindow && !mainWindow.isDestroyed()
-            ? mainWindow.show()
-            : createMainWindow();
+          showMainWindow();
         },
       },
     ]);
@@ -211,47 +209,62 @@ function init(): void {
     app.dock.setMenu(dockMenu);
   }
 
+  app.on("second-instance", () => {
+    showMainWindow();
+  });
+
   KoaServer.run(ConfigManager.config.httpServerPort);
   WebsocketServer.run(KoaServer.server);
 
   createMainWindow();
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.on("ready", init);
-
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
-app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    app.quit();
-  }
-});
-
-app.on("activate", () => {
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
+function showMainWindow(): void {
   if (mainWindow) {
     if (mainWindow.isDestroyed()) {
       createMainWindow();
+    } else if (mainWindow.isMinimized()) {
+      mainWindow.restore();
     } else {
       mainWindow.show();
     }
   } else {
     createMainWindow();
   }
-});
+  mainWindow.focus();
+}
 
-app.on("quit", () => {
-  if (ConfigManager.isSafeToSave() && ConfigManager.config.autoSaveOnQuit) {
-    ConfigManager.save();
-  }
-  WebsocketServer.close();
-  KoaServer.close();
-});
+if (!app.requestSingleInstanceLock()) {
+  app.quit();
+} else {
+  // This method will be called when Electron has finished
+  // initialization and is ready to create browser windows.
+  // Some APIs can only be used after this event occurs.
+  app.on("ready", init);
+
+  // Quit when all windows are closed, except on macOS. There, it's common
+  // for applications and their menu bar to stay active until the user quits
+  // explicitly with Cmd + Q.
+  app.on("window-all-closed", () => {
+    if (process.platform !== "darwin") {
+      app.quit();
+    }
+  });
+
+  app.on("activate", () => {
+    // On OS X it's common to re-create a window in the app when the
+    // dock icon is clicked and there are no other windows open.
+    showMainWindow();
+  });
+
+  app.on("quit", () => {
+    if (ConfigManager.isSafeToSave() && ConfigManager.config.autoSaveOnQuit) {
+      ConfigManager.save();
+    }
+    WebsocketServer.close();
+    KoaServer.close();
+  });
+}
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
