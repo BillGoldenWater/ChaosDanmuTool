@@ -1,7 +1,7 @@
 {
   "name": "chaosdanmutool",
   "productName": "ChaosDanmuTool",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A tool for process/view Danmu on bilibili",
   "main": ".webpack/main",
   "scripts": {
@@ -30,7 +30,8 @@
         {
           "name": "@electron-forge/maker-zip",
           "platforms": [
-            "darwin"
+            "darwin",
+            "win32"
           ]
         },
         {

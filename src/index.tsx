@@ -98,7 +98,12 @@ function createViewerWindow(): void {
 }
 
 function init(): void {
-  ConfigManager.init(path.join(app.getAppPath(), "config.json"));
+  ConfigManager.init(
+    path.join(
+      app.isPackaged ? app.getPath("userData") : app.getAppPath(),
+      "config.json"
+    )
+  );
   ConfigManager.load();
   KoaServer.init(path.join(app.getAppPath(), ".webpack", "renderer"));
 
