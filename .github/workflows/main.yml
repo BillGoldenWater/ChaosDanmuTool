@@ -46,25 +46,20 @@ jobs:
         run: |
           yarn
 
-      - name: Package
-        if: success()
-        run: |
-          yarn package
-
       - name: Make for linux
         if: success()
         run: |
-          yarn make --skip-package
+          yarn make
 
       - name: Make for win32
         if: success()
         run: |
-          yarn make --skip-package -p win32
+          yarn make -p win32
 
       - name: Make for darwin
         if: success()
         run: |
-          yarn make --skip-package -p darwin
+          yarn make -p darwin
 
       - name: Get current date
         if: success()
@@ -83,6 +78,18 @@ jobs:
           draft: false
           prerelease: false
 
+      - name: Upload Release Asset - linux
+        if: success()
+        id: upload-release-asset-linux
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./out/make/zip/linux/x64/ChaosDanmuTool-linux-x64-${{ github.ref }}.zip
+          asset_name: ChaosDanmuTool-linux-x64-${{ github.ref }}.zip
+          asset_content_type: application/zip
+
       - name: Upload Release Asset - win32
         if: success()
         id: upload-release-asset-win32
@@ -93,18 +100,6 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
           asset_path: ./out/make/zip/win32/x64/ChaosDanmuTool-win32-x64-${{ github.ref }}.zip
           asset_name: ChaosDanmuTool-win32-x64-${{ github.ref }}.zip
-          asset_content_type: application/zip
-
-      - name: Upload Release Asset - linux
-        if: success()
-        id: upload-release-asset-linux
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ./out/make/zip/linux/x64/ChaosDanmuTool-linux-x64-${{ github.ref }}.zip
-          asset_name: ChaosDanmuTool-linux-x64-${{ github.ref }}.zip
           asset_content_type: application/zip
 
       - name: Upload Release Asset - darwin
