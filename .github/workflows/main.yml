@@ -6,9 +6,9 @@ name: Package and Release
 on:
   push:
     # Pattern matched against refs/tags
-    tags:        
+    tags:
       - '*'
-  
+
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -34,20 +34,32 @@ jobs:
       - name: Install Yarn
         run: |
           npm install -g yarn
-      
-      - name: Package and Make
+
+      - name: Preparing Yarn
         run: |
           yarn
+
+      - name: Package
+        run: |
           yarn package
+
+      - name: Make for linux
+        run: |
           yarn make --skip-package -p linux
+      
+      - name: Make for win32
+        run: |
           yarn make --skip-package -p win32
+
+      - name: Make for darwin
+        run: |
           yarn make --skip-package -p darwin
-          
+
       - name: Get current date
         if: success()
         id: date
         run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
-          
+
       - name: Create Release
         if: success()
         id: create_release
@@ -59,7 +71,7 @@ jobs:
           release_name: ${{ steps.date.outputs.date }} ${{ github.ref }}
           draft: false
           prerelease: false
-          
+
       - name: Upload Release Asset - win32
         if: success()
         id: upload-release-asset-win32
@@ -71,7 +83,7 @@ jobs:
           asset_path: ./out/make/zip/win32/x64/ChaosDanmuTool-win32-x64-${{ github.ref }}.zip
           asset_name: ChaosDanmuTool-win32-x64-${{ github.ref }}.zip
           asset_content_type: application/zip
-      
+
       - name: Upload Release Asset - linux
         if: success()
         id: upload-release-asset-linux
@@ -83,7 +95,7 @@ jobs:
           asset_path: ./out/make/zip/linux/x64/ChaosDanmuTool-linux-x64-${{ github.ref }}.zip
           asset_name: ChaosDanmuTool-linux-x64-${{ github.ref }}.zip
           asset_content_type: application/zip
-      
+
       - name: Upload Release Asset - darwin
         if: success()
         id: upload-release-asset-darwin
