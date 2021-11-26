@@ -6,4 +6,12 @@ const changeLog = fs.readFileSync("changeLog.md", {
   encoding: "utf-8",
 });
 
-console.log(/[\s|\S]+?(?=\*\*\*)/.exec(changeLog)[0].trimEnd());
+console.log(
+  "::set-output name=changelog::" +
+    /[\s|\S]+?(?=\*\*\*)/
+      .exec(changeLog)[0]
+      .trimEnd()
+      .replaceAll("%", "%25")
+      .replaceAll("\n", "%0A")
+      .replaceAll("\r", "%0D")
+);
