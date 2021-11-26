@@ -32,26 +32,32 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Install Yarn
+        if: success()
         run: |
           npm install -g yarn
 
       - name: Preparing Yarn
+        if: success()
         run: |
           yarn
 
       - name: Package
+        if: success()
         run: |
           yarn package
 
       - name: Make for linux
+        if: success()
         run: |
           yarn make --skip-package -p linux
-      
+
       - name: Make for win32
+        if: success()
         run: |
           yarn make --skip-package -p win32
 
       - name: Make for darwin
+        if: success()
         run: |
           yarn make --skip-package -p darwin
 
