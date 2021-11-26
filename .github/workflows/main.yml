@@ -1,0 +1,97 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Package and Release
+
+# Controls when the workflow will run
+on:
+  push:
+    # Pattern matched against refs/tags
+    tags:        
+      - '*'
+  
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Runs a single command using the runners shell
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: "14.x"
+
+      # Runs a set of commands using the runners shell
+      - name: Install Yarn
+        run: |
+          npm install -g yarn
+      
+      - name: Package and Make
+        run: |
+          yarn
+          yarn package
+          yarn make --skip-package -p linux
+          yarn make --skip-package -p win32
+          yarn make --skip-package -p darwin
+          
+      - name: Get current date
+        if: success()
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+          
+      - name: Create Release
+        if: success()
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ steps.date.outputs.date }} ${{ github.ref }}
+          draft: false
+          prerelease: false
+          
+      - name: Upload Release Asset - win32
+        if: success()
+        id: upload-release-asset-win32
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ./out/make/zip/win32/x64/ChaosDanmuTool-win32-x64-${{ github.ref }}.zip
+          asset_name: ChaosDanmuTool-win32-x64-${{ github.ref }}.zip
+          asset_content_type: application/zip
+      
+      - name: Upload Release Asset - linux
+        if: success()
+        id: upload-release-asset-linux
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ./out/make/zip/linux/x64/ChaosDanmuTool-linux-x64-${{ github.ref }}.zip
+          asset_name: ChaosDanmuTool-linux-x64-${{ github.ref }}.zip
+          asset_content_type: application/zip
+      
+      - name: Upload Release Asset - darwin
+        if: success()
+        id: upload-release-asset-darwin
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ./out/make/zip/linux/x64/ChaosDanmuTool-darwin-x64-${{ github.ref }}.zip
+          asset_name: ChaosDanmuTool-darwin-x64-${{ github.ref }}.zip
+          asset_content_type: application/zip
