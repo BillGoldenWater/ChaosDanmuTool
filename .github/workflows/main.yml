@@ -36,9 +36,6 @@ jobs:
         id: get_change_log
         run: node getLastChangeLog.js
 
-      - name: debug changelog
-        run: echo "${{ steps.get_change_log.outputs.changelog }}"
-
       - name: Cache node modules
         uses: actions/cache@v2
         env:
@@ -99,7 +96,7 @@ jobs:
         with:
           tag_name: ${{ env.TAG }}
           release_name: ${{ steps.date.outputs.date }} ${{ env.TAG }}
-          body: ${{ join(steps.get_change_log.outputs.*, '\n') }}
+          body: ${{ steps.get_change_log.outputs.changelog }}
           draft: false
           prerelease: false
 
