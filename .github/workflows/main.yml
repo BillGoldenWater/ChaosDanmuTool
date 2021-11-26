@@ -39,11 +39,8 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
 
-      - name: Get the version
-        id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
-        env:
-          VERSION: ${{ steps.get_version.outputs.VERSION }}
+      - name: Get the tag name
+        run: echo "TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
 
       # Runs a single command using the runners shell
       - name: Use Node.js 14.x
@@ -94,8 +91,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${ VERSION }
-          release_name: ${{ steps.date.outputs.date }} ${ VERSION }
+          tag_name: ${{ env.TAG }}
+          release_name: ${{ steps.date.outputs.date }} ${{ env.TAG }}
           draft: false
           prerelease: false
 
@@ -107,8 +104,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: ./out/make/zip/linux/x64/ChaosDanmuTool-linux-x64-${ VERSION }.zip
-          asset_name: ChaosDanmuTool-linux-x64-${ VERSION }.zip
+          asset_path: ./out/make/zip/linux/x64/ChaosDanmuTool-linux-x64-${{ env.TAG }}.zip
+          asset_name: ChaosDanmuTool-linux-x64-${{ env.TAG }}.zip
           asset_content_type: application/zip
 
       - name: Upload Release Asset - win32
@@ -119,8 +116,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ./out/make/zip/win32/x64/ChaosDanmuTool-win32-x64-${ VERSION }.zip
-          asset_name: ChaosDanmuTool-win32-x64-${ VERSION }.zip
+          asset_path: ./out/make/zip/win32/x64/ChaosDanmuTool-win32-x64-${{ env.TAG }}.zip
+          asset_name: ChaosDanmuTool-win32-x64-${{ env.TAG }}.zip
           asset_content_type: application/zip
 
       - name: Upload Release Asset - darwin
@@ -131,6 +128,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ./out/make/zip/darwin/x64/ChaosDanmuTool-darwin-x64-${ VERSION }.zip
-          asset_name: ChaosDanmuTool-darwin-x64-${ VERSION }.zip
+          asset_path: ./out/make/zip/darwin/x64/ChaosDanmuTool-darwin-x64-${{ env.TAG }}.zip
+          asset_name: ChaosDanmuTool-darwin-x64-${{ env.TAG }}.zip
           asset_content_type: application/zip
