@@ -172,10 +172,12 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
                     disabled={state.selectedStyle == "internal"}
                     value={cDvc.name}
                     onChange={(event) => {
-                      if (event.target.value != "") {
-                        setDvc({ ...cDvc, name: event.target.value });
-                      } else {
+                      if (event.target.value == "") {
                         message.warning("名称不能为空").then();
+                      } else if (styleNameList.includes(event.target.value)) {
+                        message.warning("名称不能重复").then();
+                      } else {
+                        setDvc({ ...cDvc, name: event.target.value });
                       }
                     }}
                   />
