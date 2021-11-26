@@ -37,7 +37,7 @@ jobs:
         run: node getLastChangeLog.js
 
       - name: debug changelog
-        run: echo ${{ join(steps.get_change_log.outputs.*, '\n') }}
+        run: echo "${{ join(steps.get_change_log.outputs.*, '\n') }}"
 
       - name: Cache node modules
         uses: actions/cache@v2
