@@ -24,6 +24,11 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: "14.x"
+
       - name: Get the tag name
         run: echo "TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
 
@@ -48,12 +53,6 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-
-      # Runs a single command using the runners shell
-      - name: Use Node.js 14.x
-        uses: actions/setup-node@v1
-        with:
-          node-version: "14.x"
 
       # Runs a set of commands using the runners shell
       - name: Install Yarn
