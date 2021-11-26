@@ -97,7 +97,7 @@ jobs:
         with:
           tag_name: ${{ env.TAG }}
           release_name: ${{ steps.date.outputs.date }} ${{ env.TAG }}
-          body: ${{ steps.get_change_log.outputs }}
+          body: "${{ steps.get_change_log.outputs }}"
           draft: false
           prerelease: false
 
