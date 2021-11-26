@@ -34,6 +34,9 @@
             "win32",
             "linux"
           ]
+        },
+        {
+          "name": "@electron-forge/maker-deb"
         }
       ],
       "plugins": [

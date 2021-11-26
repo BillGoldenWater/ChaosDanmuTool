@@ -51,11 +51,6 @@ jobs:
         run: |
           npm install -g yarn
 
-      - name: Install Wine
-        if: success()
-        run: |
-          sudo apt install -y wine wine32
-
       - name: Preparing Yarn
         if: success()
         run: |
@@ -64,17 +59,17 @@ jobs:
       - name: Make for linux
         if: success()
         run: |
-          yarn make -p linux
+          yarn make -p linux --targets @electron-forge/maker-zip
 
       - name: Make for win32
         if: success()
         run: |
-          yarn make -p win32
+          yarn make -p win32 --targets @electron-forge/maker-zip
 
       - name: Make for darwin
         if: success()
         run: |
-          yarn make -p darwin
+          yarn make -p darwin --targets @electron-forge/maker-zip
 
       - name: Get current date
         if: success()
