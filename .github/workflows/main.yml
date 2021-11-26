@@ -24,6 +24,21 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: |
+            ~/.cache/yarn
+            ~/.cache/electron
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
       # Runs a single command using the runners shell
       - name: Use Node.js 14.x
         uses: actions/setup-node@v1
@@ -49,7 +64,7 @@ jobs:
       - name: Make for linux
         if: success()
         run: |
-          yarn make
+          yarn make -p linux
 
       - name: Make for win32
         if: success()
