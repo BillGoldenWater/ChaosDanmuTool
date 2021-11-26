@@ -54,7 +54,7 @@ jobs:
       - name: Install Wine
         if: success()
         run: |
-          sudo apt install -y wine
+          sudo apt install -y wine wine32
 
       - name: Preparing Yarn
         if: success()
