@@ -51,11 +51,6 @@ jobs:
         run: |
           npm install -g yarn
 
-      - name: Install dpkg and fakeroot
-        if: success()
-        run: |
-          sudo apt install dpkg fakeroot
-
       - name: Preparing Yarn
         if: success()
         run: |
