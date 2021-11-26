@@ -43,7 +43,8 @@ jobs:
         run: echo "TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
 
       - name: Get change log
-        run: node getLastChangeLog.js >> $GITHUB_ENV
+        id: get_change_log
+        run: node getLastChangeLog.js
 
       # Runs a single command using the runners shell
       - name: Use Node.js 14.x
@@ -96,7 +97,7 @@ jobs:
         with:
           tag_name: ${{ env.TAG }}
           release_name: ${{ steps.date.outputs.date }} ${{ env.TAG }}
-          body: ${{ env.CHANGE_LOG }}
+          body: ${{ steps.get_change_log.outputs }}
           draft: false
           prerelease: false
 
