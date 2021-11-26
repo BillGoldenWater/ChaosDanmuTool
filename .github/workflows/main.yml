@@ -51,6 +51,11 @@ jobs:
         run: |
           npm install -g yarn
 
+      - name: Install Wine
+        if: success()
+        run: |
+          sudo apt install -y wine
+
       - name: Preparing Yarn
         if: success()
         run: |
