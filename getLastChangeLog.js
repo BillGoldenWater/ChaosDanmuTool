@@ -9,8 +9,8 @@ const changeLog = fs.readFileSync("changeLog.md", {
 const output = /[\s|\S]+?(?=\*\*\*)/
   .exec(changeLog)[0]
   .trimEnd()
-  .replaceAll("%", "%25")
-  .replaceAll("\n", "%0A")
-  .replaceAll("\r", "%0D");
+  .replace(/%/g, "%25")
+  .replace(/\n/g, "%0A")
+  .replace(/\r/g, "%0D");
 
 console.log("::set-output name=changelog::" + output);
