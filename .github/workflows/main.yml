@@ -24,6 +24,16 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
+      - name: Get the tag name
+        run: echo "TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+
+      - name: Get change log
+        id: get_change_log
+        run: node getLastChangeLog.js
+
+      - name: debug changelog
+        run: echo ${{ join(steps.get_change_log.outputs.*, '\n') }}
+
       - name: Cache node modules
         uses: actions/cache@v2
         env:
@@ -38,13 +48,6 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-
-      - name: Get the tag name
-        run: echo "TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
-
-      - name: Get change log
-        id: get_change_log
-        run: node getLastChangeLog.js
 
       # Runs a single command using the runners shell
       - name: Use Node.js 14.x
