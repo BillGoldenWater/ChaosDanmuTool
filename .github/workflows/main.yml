@@ -36,6 +36,11 @@ jobs:
         run: |
           npm install -g yarn
 
+      - name: Install dpkg and fakeroot
+        if: success()
+        run: |
+          sudo apt install dpkg fakeroot
+
       - name: Preparing Yarn
         if: success()
         run: |
@@ -49,7 +54,7 @@ jobs:
       - name: Make for linux
         if: success()
         run: |
-          yarn make --skip-package -p linux
+          yarn make --skip-package
 
       - name: Make for win32
         if: success()
