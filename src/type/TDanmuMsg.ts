@@ -1,6 +1,7 @@
 import { DanmuMessage } from "../utils/command/DanmuMessage";
 import { TEmojiData } from "./TEmojiData";
-import { TMedalInfo } from "./TMedalInfo";
+import { parseMedalInfo, TMedalInfo } from "./TMedalInfo";
+import { TMedal } from "./TMedal";
 
 export type TDanmuMsg = {
   fontsize: number;
@@ -47,27 +48,8 @@ export function parseDanmuMsg(data: DanmuMessage): TDanmuMsg {
     danmuMsg.isSVip = <number>userData[4];
   }
 
-  const medalInfo: unknown[] = <unknown[]>danmuMsgRaw[3];
-  if (medalInfo) {
-    const tempMedalInfo: TMedalInfo = <TMedalInfo>{};
-
-    if (medalInfo && medalInfo.length > 0) {
-      tempMedalInfo.medal_level = <number>medalInfo[0];
-      tempMedalInfo.medal_name = <string>medalInfo[1];
-      tempMedalInfo.anchor_uname = <string>medalInfo[2];
-      tempMedalInfo.anchor_roomid = <number>medalInfo[3];
-      tempMedalInfo.medal_color = <number>medalInfo[4];
-      tempMedalInfo.medal_color_border = <number>medalInfo[7];
-      tempMedalInfo.medal_color_start = <number>medalInfo[8];
-      tempMedalInfo.medal_color_end = <number>medalInfo[9];
-      tempMedalInfo.guard_level = <number>medalInfo[10];
-      tempMedalInfo.is_lighted = <number>medalInfo[11];
-    } else {
-      tempMedalInfo.is_lighted = 0;
-    }
-
-    danmuMsg.medalInfo = tempMedalInfo;
-  }
+  const medalInfo: TMedal = <TMedal>danmuMsgRaw[3];
+  danmuMsg.medalInfo = parseMedalInfo(medalInfo);
 
   const levelInfo: unknown[] = <unknown[]>danmuMsgRaw[4];
   if (levelInfo) {
