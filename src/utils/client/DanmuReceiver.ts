@@ -9,6 +9,8 @@ import { ErrorMessage, getErrorMessageMessage } from "../command/ErrorMessage";
 import { getMessageLogMessage, MessageLog } from "../command/MessageLog";
 import { getMessageCommand } from "../command/MessageCommand";
 import { dialog } from "electron";
+import { ConfigManager } from "../config/ConfigManager";
+import { createViewerWindow, showWindow, viewerWindow } from "../../index";
 
 const DataOffset = {
   packetLength: 0,
@@ -133,6 +135,10 @@ export class DanmuReceiver {
       this.startHeartBeat();
 
       this.broadcastMessage(getStatusUpdateMessage("open"));
+
+      if (ConfigManager.config.danmuViewConfig.autoOpenWhenConnect) {
+        showWindow(viewerWindow, createViewerWindow);
+      }
     });
 
     this.connection.on("close", () => {

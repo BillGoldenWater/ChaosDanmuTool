@@ -8,6 +8,7 @@ import {
   InputNumber,
   Popover,
   Space,
+  Switch,
 } from "antd";
 import {
   DanmuReceiverConfig,
@@ -85,6 +86,14 @@ export class DanmuViewConfigModifier extends React.Component {
                   key={"danmuViewer"}
                   header={"弹幕查看器悬浮窗设置"}
                 >
+                  <Form.Item label={"在连接直播间时自动打开"}>
+                    <Switch
+                      checked={dvc.autoOpenWhenConnect}
+                      onChange={(value) => {
+                        setDvc({ ...dvc, autoOpenWhenConnect: value });
+                      }}
+                    />
+                  </Form.Item>
                   <Space>
                     <Button
                       onClick={() => {

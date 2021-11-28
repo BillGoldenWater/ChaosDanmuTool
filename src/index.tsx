@@ -23,8 +23,16 @@ if (require("electron-squirrel-startup")) {
   app.quit();
 }
 
+export function isExists(window: BrowserWindow): boolean {
+  return window && !window.isDestroyed();
+}
+
+function closeWindow(window: BrowserWindow): void {
+  if (isExists(window)) window.close();
+}
+
 function createMainWindow(): void {
-  if (mainWindow && !mainWindow.isDestroyed()) mainWindow.close();
+  closeWindow(mainWindow);
   // Create the browser window.
   mainWindow = new BrowserWindow({
     height: 600,
@@ -39,8 +47,8 @@ function createMainWindow(): void {
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY).then();
 }
 
-function createViewerWindow(): void {
-  if (viewerWindow && !viewerWindow.isDestroyed()) viewerWindow.close();
+export function createViewerWindow(): void {
+  closeWindow(viewerWindow);
 
   const danmuViewConfig: DanmuViewConfig = ConfigManager.config.danmuViewConfig;
 
@@ -194,7 +202,7 @@ function init(): void {
         break;
       }
       case "closeViewer": {
-        if (viewerWindow && !viewerWindow.isDestroyed()) viewerWindow.close();
+        closeWindow(viewerWindow);
         break;
       }
     }
@@ -206,7 +214,7 @@ function init(): void {
       {
         label: "打开主窗口",
         click() {
-          showMainWindow();
+          showWindow(mainWindow, createMainWindow);
         },
       },
     ]);
@@ -215,7 +223,7 @@ function init(): void {
   }
 
   app.on("second-instance", () => {
-    showMainWindow();
+    showWindow(mainWindow, createMainWindow);
   });
 
   KoaServer.run(ConfigManager.config.httpServerPort);
@@ -224,19 +232,20 @@ function init(): void {
   createMainWindow();
 }
 
-function showMainWindow(): void {
-  if (mainWindow) {
-    if (mainWindow.isDestroyed()) {
-      createMainWindow();
-    } else if (mainWindow.isMinimized()) {
-      mainWindow.restore();
+export function showWindow(
+  window: BrowserWindow,
+  createWindow: () => void
+): void {
+  if (isExists(window)) {
+    if (window.isMinimized()) {
+      window.restore();
     } else {
-      mainWindow.show();
+      window.show();
     }
+    window.focus();
   } else {
-    createMainWindow();
+    createWindow();
   }
-  mainWindow.focus();
 }
 
 if (!app.requestSingleInstanceLock()) {
@@ -259,10 +268,12 @@ if (!app.requestSingleInstanceLock()) {
   app.on("activate", () => {
     // On OS X it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
-    showMainWindow();
+    showWindow(mainWindow, createMainWindow);
   });
 
   app.on("quit", () => {
+    console.log("[Event] app.quit");
+
     if (ConfigManager.isSafeToSave() && ConfigManager.config.autoSaveOnQuit) {
       ConfigManager.save();
     }

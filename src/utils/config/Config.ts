@@ -7,6 +7,7 @@ export type DanmuReceiverConfig = {
 };
 
 export type DanmuViewConfig = {
+  autoOpenWhenConnect: boolean;
   maxReconnectAttemptNumber: number;
   width: number;
   height: number;
@@ -123,6 +124,7 @@ export const defaultConfig: Config = {
     heartBeatInterval: 30,
   },
   danmuViewConfig: {
+    autoOpenWhenConnect: true,
     maxReconnectAttemptNumber: 5,
     width: 400,
     height: 600,
