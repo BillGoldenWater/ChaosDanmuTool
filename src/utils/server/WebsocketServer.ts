@@ -6,6 +6,8 @@ import { getGiftConfigUpdateMessage } from "../command/GiftConfigUpdate";
 import { GiftConfigGetter } from "../data/GiftConfigGetter";
 import { getStatusUpdateMessage } from "../command/ReceiverStatusUpdate";
 import { DanmuReceiver } from "../client/DanmuReceiver";
+import { DanmuHistoryGetter } from "../data/DanmuHistoryGetter";
+import { getMessageCommand } from "../command/MessageCommand";
 
 export class WebsocketServer {
   static server: Server;
@@ -30,6 +32,16 @@ export class WebsocketServer {
               : "error"
           )
         )
+      );
+      new DanmuHistoryGetter().get(
+        ConfigManager.config.danmuReceiver.roomid,
+        (history) => {
+          history.forEach((value) => {
+            socket.send(
+              JSON.stringify(getMessageCommand(JSON.stringify(value)))
+            );
+          });
+        }
       );
     });
   }

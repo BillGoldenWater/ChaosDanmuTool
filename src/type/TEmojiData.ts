@@ -1,7 +1,12 @@
 export type TEmojiData = {
-  height: number;
-  in_player_area: number;
-  is_dynamic: number;
+  id: number;
+  emoticon_unique: string;
+  text: string;
+  perm: number;
   url: string;
+  in_player_area: number;
+  bulge_display: number;
+  is_dynamic: number;
+  height: number;
   width: number;
 };

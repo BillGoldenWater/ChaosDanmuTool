@@ -2,6 +2,7 @@ import { DanmuMessage } from "../utils/command/DanmuMessage";
 import { TEmojiData } from "./TEmojiData";
 import { parseMedalInfo, TMedalInfo } from "./TMedalInfo";
 import { TMedal } from "./TMedal";
+import { getUserUL, TUserLevel } from "./TUserLevel";
 
 export type TDanmuMsg = {
   fontsize: number;
@@ -26,6 +27,10 @@ export type TDanmuMsg = {
 };
 
 export function parseDanmuMsg(data: DanmuMessage): TDanmuMsg {
+  if (data.data) {
+    return <TDanmuMsg>data.data;
+  }
+
   const danmuMsg: TDanmuMsg = <TDanmuMsg>{};
   const danmuMsgRaw: unknown[] = <unknown[]>data.info;
 
@@ -51,10 +56,8 @@ export function parseDanmuMsg(data: DanmuMessage): TDanmuMsg {
   const medalInfo: TMedal = <TMedal>danmuMsgRaw[3];
   danmuMsg.medalInfo = parseMedalInfo(medalInfo);
 
-  const levelInfo: unknown[] = <unknown[]>danmuMsgRaw[4];
-  if (levelInfo) {
-    danmuMsg.userUL = <number>levelInfo[0];
-  }
+  const levelInfo: TUserLevel = <TUserLevel>danmuMsgRaw[4];
+  danmuMsg.userUL = getUserUL(levelInfo);
 
   const titleInfo: unknown[] = <unknown[]>danmuMsgRaw[5];
   if (titleInfo && titleInfo.length > 0) {
