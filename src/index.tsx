@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Menu } from "electron";
+import { app, BrowserWindow, ipcMain, Menu, screen, Display } from "electron";
 import { DanmuReceiver } from "./utils/client/DanmuReceiver";
 import { ConfigManager } from "./utils/config/ConfigManager";
 import * as path from "path";
@@ -17,6 +17,8 @@ declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 declare const VIEWER_WEBPACK_ENTRY: string;
 
+export let allDisplay: Display[];
+
 export let mainWindow: BrowserWindow;
 export let viewerWindow: BrowserWindow;
 
@@ -30,8 +32,71 @@ export function isExists(window: BrowserWindow): boolean {
   return window && !window.isDestroyed();
 }
 
+export function showWindow(
+  window: BrowserWindow,
+  createWindow: () => void
+): void {
+  if (isExists(window)) {
+    if (window.isMinimized()) {
+      window.restore();
+    } else {
+      window.show();
+    }
+    window.focus();
+  } else {
+    createWindow();
+  }
+}
+
 function closeWindow(window: BrowserWindow): void {
   if (isExists(window)) window.close();
+}
+
+function snapWindow(window: BrowserWindow): number[] {
+  allDisplay = screen.getAllDisplays();
+
+  const pos = window.getPosition();
+  const [x, y] = pos;
+  const displayBounds = allDisplay.find((value) => {
+    const bounds = value.bounds;
+
+    return (
+      bounds.x <= Math.abs(x) &&
+      bounds.y <= Math.abs(y) &&
+      bounds.x + bounds.width >= Math.abs(x) &&
+      bounds.y + bounds.height >= Math.abs(y)
+    );
+  }).bounds;
+  const range = {
+    ...displayBounds,
+    xMax: displayBounds.x + displayBounds.width,
+    yMax: displayBounds.y + displayBounds.height,
+  };
+
+  const windowBounds = window.getBounds();
+  const [TLx, TLy, BRx, BRy] = [
+    x - range.x, // top left
+    y - range.y,
+    x + windowBounds.width - range.xMax, // bottom right
+    y + windowBounds.height - range.yMax,
+  ];
+
+  const snapDistance = 10;
+  if (snapDistance >= Math.abs(TLx)) {
+    pos[0] = range.x;
+  }
+  if (snapDistance >= Math.abs(TLy)) {
+    pos[1] = range.y;
+  }
+  if (snapDistance >= Math.abs(BRx)) {
+    pos[0] = range.xMax - windowBounds.width;
+  }
+  if (snapDistance >= Math.abs(BRy)) {
+    pos[1] = range.yMax - windowBounds.height;
+  }
+
+  window.setPosition(pos[0], pos[1], true);
+  return pos;
 }
 
 function createMainWindow(): void {
@@ -92,7 +157,7 @@ export function createViewerWindow(): void {
   });
 
   viewerWindow.on("move", () => {
-    [danmuViewConfig.posX, danmuViewConfig.posY] = viewerWindow.getPosition();
+    [danmuViewConfig.posX, danmuViewConfig.posY] = snapWindow(viewerWindow);
     ConfigManager.onChange();
   });
 
@@ -109,6 +174,8 @@ export function createViewerWindow(): void {
 }
 
 function init(): void {
+  allDisplay = screen.getAllDisplays();
+
   ConfigManager.init(
     path.join(
       app.isPackaged ? app.getPath("userData") : app.getAppPath(),
@@ -233,22 +300,6 @@ function init(): void {
   WebsocketServer.run(KoaServer.server);
 
   createMainWindow();
-}
-
-export function showWindow(
-  window: BrowserWindow,
-  createWindow: () => void
-): void {
-  if (isExists(window)) {
-    if (window.isMinimized()) {
-      window.restore();
-    } else {
-      window.show();
-    }
-    window.focus();
-  } else {
-    createWindow();
-  }
 }
 
 if (!app.requestSingleInstanceLock()) {
