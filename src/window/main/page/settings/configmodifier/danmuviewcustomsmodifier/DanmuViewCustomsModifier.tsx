@@ -17,6 +17,7 @@ import {
   DanmuViewCustomConfig,
   DanmuViewStyleConfig,
   defaultDanmuViewCustom,
+  defaultViewCustomInternalName,
 } from "../../../../../../utils/config/Config";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { TextIconModifier } from "./texticonmodifier/TextIconModifier";
@@ -32,7 +33,7 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      selectedStyle: "internal",
+      selectedStyle: defaultViewCustomInternalName,
     };
   }
 
@@ -150,7 +151,7 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
                   </Button>
                   <Button
                     disabled={
-                      state.selectedStyle == "internal" ||
+                      state.selectedStyle == defaultViewCustomInternalName ||
                       state.selectedStyle == ""
                     }
                     onClick={() => {
@@ -158,7 +159,9 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
                       message
                         .success(`成功的删除了配置 "${state.selectedStyle}"`)
                         .then();
-                      this.setState({ selectedStyle: "internal" });
+                      this.setState({
+                        selectedStyle: defaultViewCustomInternalName,
+                      });
                     }}
                   >
                     删除
@@ -169,7 +172,9 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
               <Form.Item label={"配置名"}>
                 <Space>
                   <Input
-                    disabled={state.selectedStyle == "internal"}
+                    disabled={
+                      state.selectedStyle == defaultViewCustomInternalName
+                    }
                     value={cDvc.name}
                     onChange={(event) => {
                       if (event.target.value == "") {

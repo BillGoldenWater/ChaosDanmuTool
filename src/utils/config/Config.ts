@@ -112,6 +112,9 @@ export const defaultDanmuViewCustom: DanmuViewCustomConfig = {
   },
 };
 
+export const defaultViewCustomInternalName = "内置弹幕查看器";
+export const defaultViewCustomOtherName = "其他";
+
 export const defaultConfig: Config = {
   forChaosDanmuTool: true,
   autoSaveOnQuit: true,
@@ -134,11 +137,11 @@ export const defaultConfig: Config = {
   danmuViewCustoms: [
     {
       ...defaultDanmuViewCustom,
-      name: "internal",
+      name: defaultViewCustomInternalName,
     },
     {
       ...defaultDanmuViewCustom,
-      name: "other",
+      name: defaultViewCustomOtherName,
       style: {
         ...defaultDanmuViewCustom.style,
         mainStyle: {

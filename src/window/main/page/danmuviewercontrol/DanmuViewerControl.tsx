@@ -1,7 +1,10 @@
 import React, { ReactNode } from "react";
 import { Button, Divider, Form, Select, Space, Typography } from "antd";
 import { ConfigContext } from "../../utils/ConfigContext";
-import { defaultConfig } from "../../../../utils/config/Config";
+import {
+  defaultConfig,
+  defaultViewCustomInternalName,
+} from "../../../../utils/config/Config";
 
 class Props {}
 
@@ -14,7 +17,7 @@ export class DanmuViewerControl extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      selectedStyle: "internal",
+      selectedStyle: defaultViewCustomInternalName,
     };
   }
 
@@ -55,7 +58,7 @@ export class DanmuViewerControl extends React.Component<Props, State> {
               config.danmuViewConfig.maxReconnectAttemptNumber.toString(10)
             );
           }
-          if (state.selectedStyle != "internal") {
+          if (state.selectedStyle != defaultViewCustomInternalName) {
             param.append("name", this.state.selectedStyle);
           }
 

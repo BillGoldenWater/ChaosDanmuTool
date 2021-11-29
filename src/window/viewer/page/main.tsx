@@ -4,6 +4,7 @@ import {
   Config,
   DanmuViewCustomConfig,
   defaultDanmuViewCustom,
+  defaultViewCustomInternalName,
   getDefaultConfig,
 } from "../../../utils/config/Config";
 import { WebsocketClient } from "../../../utils/client/WebsocketClient";
@@ -142,7 +143,7 @@ export class Main extends React.Component<Props, State> {
           const viewConfig = config.danmuViewCustoms[i];
           if (
             viewConfig.name == decodeURI(getParam("name")) ||
-            viewConfig.name == "internal"
+            viewConfig.name == defaultViewCustomInternalName
           ) {
             this.setState({
               config: viewConfig,
