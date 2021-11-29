@@ -14,7 +14,9 @@ import {
 import { WebsocketClient } from "../../../utils/client/WebsocketClient";
 import { ConfigProvider, Layout, Menu, notification } from "antd";
 import {
+  ApiOutlined,
   AppstoreOutlined,
+  EyeOutlined,
   HistoryOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
@@ -53,18 +55,21 @@ export class Main extends React.Component<Props, State> {
         notification.success({
           message: "连接服务器成功",
           description: "已连接到指令转发服务器",
+          placement: "bottomRight",
         });
       },
       () => {
         notification.warn({
           message: "已断开服务器连接",
           description: "已断开到指令转发服务器的连接",
+          placement: "bottomRight",
         });
       },
       () => {
         notification.error({
           message: "服务器连接发生错误",
           description: "到指令转发服务器的连接发生了错误",
+          placement: "bottomRight",
         });
       }
     );
@@ -85,6 +90,7 @@ export class Main extends React.Component<Props, State> {
             notification.success({
               message: "直播间连接状态更新",
               description: "当前状态为: 已连接",
+              placement: "bottomRight",
             });
             break;
           }
@@ -92,6 +98,7 @@ export class Main extends React.Component<Props, State> {
             notification.warn({
               message: "直播间连接状态更新",
               description: "当前状态为: 未连接",
+              placement: "bottomRight",
             });
             break;
           }
@@ -99,6 +106,7 @@ export class Main extends React.Component<Props, State> {
             notification.error({
               message: "直播间连接状态更新",
               description: "当前状态为: 发生了错误",
+              placement: "bottomRight",
             });
             break;
           }
@@ -166,12 +174,6 @@ export class Main extends React.Component<Props, State> {
               collapsedWidth={"4em"}
               collapsed={state.siderCollapsed}
               theme={state.config.darkTheme ? "dark" : "light"}
-              onMouseEnter={() => {
-                this.setState({ siderCollapsed: false });
-              }}
-              onMouseLeave={() => {
-                this.setState({ siderCollapsed: true });
-              }}
               onCollapse={(collapsed) => {
                 this.setState({ siderCollapsed: collapsed });
               }}
@@ -190,8 +192,12 @@ export class Main extends React.Component<Props, State> {
                   icon={<AppstoreOutlined />}
                   title={"功能"}
                 >
-                  <Menu.Item key={"connectRoom"}>连接直播间</Menu.Item>
-                  <Menu.Item key={"danmuViewerControl"}>弹幕查看器</Menu.Item>
+                  <Menu.Item key={"connectRoom"} icon={<ApiOutlined />}>
+                    连接直播间
+                  </Menu.Item>
+                  <Menu.Item key={"danmuViewerControl"} icon={<EyeOutlined />}>
+                    弹幕查看器
+                  </Menu.Item>
                 </SubMenu>
                 <Menu.Item key={"danmuHistory"} icon={<HistoryOutlined />}>
                   弹幕历史记录
