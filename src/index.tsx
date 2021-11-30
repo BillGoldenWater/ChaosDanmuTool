@@ -1,11 +1,11 @@
-import {app, BrowserWindow, ipcMain, Menu, screen, Display} from "electron";
-import {DanmuReceiver} from "./utils/client/DanmuReceiver";
-import {ConfigManager} from "./utils/config/ConfigManager";
+import { app, BrowserWindow, ipcMain, Menu, screen, Display } from "electron";
+import { DanmuReceiver } from "./utils/client/DanmuReceiver";
+import { ConfigManager } from "./utils/config/ConfigManager";
 import * as path from "path";
-import {KoaServer} from "./utils/server/KoaServer";
-import {WebsocketServer} from "./utils/server/WebsocketServer";
-import {constructURL} from "./utils/URLConstructor";
-import {GiftConfigGetter} from "./utils/data/GiftConfigGetter";
+import { KoaServer } from "./utils/server/KoaServer";
+import { WebsocketServer } from "./utils/server/WebsocketServer";
+import { constructURL } from "./utils/URLConstructor";
+import { GiftConfigGetter } from "./utils/data/GiftConfigGetter";
 import {
   DanmuViewConfig,
   defaultViewCustomInternalName,
@@ -151,7 +151,7 @@ function snapWindow(
     return new Date().getTime();
   };
   const resetCount = () => {
-    windowTryMove[name] = {count: 0, lastTS: getTimeInSecond()};
+    windowTryMove[name] = { count: 0, lastTS: getTimeInSecond() };
   };
   const tryPreventDefault = () => {
     if (
@@ -421,8 +421,7 @@ function init(): void {
   KoaServer.run(ConfigManager.config.httpServerPort);
   WebsocketServer.run(KoaServer.server);
 
-  // createMainWindow();
-  showWindow(viewerWindow, createViewerWindow);
+  createMainWindow();
 }
 
 if (!app.requestSingleInstanceLock()) {
