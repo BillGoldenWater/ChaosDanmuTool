@@ -1,11 +1,11 @@
-import { app, BrowserWindow, ipcMain, Menu, screen, Display } from "electron";
-import { DanmuReceiver } from "./utils/client/DanmuReceiver";
-import { ConfigManager } from "./utils/config/ConfigManager";
+import {app, BrowserWindow, ipcMain, Menu, screen, Display} from "electron";
+import {DanmuReceiver} from "./utils/client/DanmuReceiver";
+import {ConfigManager} from "./utils/config/ConfigManager";
 import * as path from "path";
-import { KoaServer } from "./utils/server/KoaServer";
-import { WebsocketServer } from "./utils/server/WebsocketServer";
-import { constructURL } from "./utils/URLConstructor";
-import { GiftConfigGetter } from "./utils/data/GiftConfigGetter";
+import {KoaServer} from "./utils/server/KoaServer";
+import {WebsocketServer} from "./utils/server/WebsocketServer";
+import {constructURL} from "./utils/URLConstructor";
+import {GiftConfigGetter} from "./utils/data/GiftConfigGetter";
 import {
   DanmuViewConfig,
   defaultViewCustomInternalName,
@@ -16,6 +16,14 @@ import {
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 declare const VIEWER_WEBPACK_ENTRY: string;
+
+export type WindowTryMove = {
+  [key: string]: {
+    count: number;
+    lastTS: number;
+  };
+};
+export const windowTryMove: WindowTryMove = {};
 
 export let allDisplay: Display[];
 
@@ -52,51 +60,161 @@ function closeWindow(window: BrowserWindow): void {
   if (isExists(window)) window.close();
 }
 
-function snapWindow(window: BrowserWindow): number[] {
+function snapWindow(
+  name: string,
+  window: BrowserWindow,
+  event: Electron.Event,
+  newBounds: Electron.Rectangle
+): void {
   allDisplay = screen.getAllDisplays();
 
-  const pos = window.getPosition();
-  const [x, y] = pos;
-  const displayBounds = allDisplay.find((value) => {
+  const nB = newBounds;
+  const lB = window.getBounds();
+
+  const centerX = lB.x + Math.round(lB.width / 2);
+  const centerY = lB.y + Math.round(lB.height / 2);
+
+  const display = allDisplay.find((value) => {
     const bounds = value.bounds;
 
     return (
-      bounds.x <= Math.abs(x) &&
-      bounds.y <= Math.abs(y) &&
-      bounds.x + bounds.width >= Math.abs(x) &&
-      bounds.y + bounds.height >= Math.abs(y)
+      bounds.x <= centerX &&
+      bounds.y <= centerY &&
+      bounds.x + bounds.width >= centerX &&
+      bounds.y + bounds.height >= centerY
     );
-  }).bounds;
+  });
+  if (!display) {
+    window.setPosition(0, 0, true);
+    event.preventDefault();
+    return;
+  }
+  const displayBounds = display.bounds;
   const range = {
     ...displayBounds,
     xMax: displayBounds.x + displayBounds.width,
     yMax: displayBounds.y + displayBounds.height,
   };
 
-  const windowBounds = window.getBounds();
-  const [TLx, TLy, BRx, BRy] = [
-    x - range.x, // top left
-    y - range.y,
-    x + windowBounds.width - range.xMax, // bottom right
-    y + windowBounds.height - range.yMax,
+  // last position
+  const lP = [
+    lB.x, // top left
+    lB.y,
+    lB.x + lB.width, // bottom right
+    lB.y + lB.height,
+  ];
+  // new position
+  const nP = [
+    nB.x, // top left
+    nB.y,
+    nB.x + nB.width, // bottom right
+    nB.y + nB.height,
+  ];
+  // last distance
+  const lD = [
+    lP[0] - range.x, // left distance
+    lP[1] - range.y, // top distance
+    range.xMax - lP[2], // right distance
+    range.yMax - lP[3], // bottom distance
+  ];
+  // new distance
+  const nD = [
+    nP[0] - range.x, // left distance
+    nP[1] - range.y, // top distance
+    range.xMax - nP[2], // right distance
+    range.yMax - nP[3], // bottom distance
   ];
 
-  const snapDistance = 10;
-  if (snapDistance >= Math.abs(TLx)) {
-    pos[0] = range.x;
-  }
-  if (snapDistance >= Math.abs(TLy)) {
-    pos[1] = range.y;
-  }
-  if (snapDistance >= Math.abs(BRx)) {
-    pos[0] = range.xMax - windowBounds.width;
-  }
-  if (snapDistance >= Math.abs(BRy)) {
-    pos[1] = range.yMax - windowBounds.height;
-  }
+  // move direction
+  // not detected:0  in: 1  out: 2  no change: 3
+  const detectDistance = 50;
+  const moveD = lD.map((value, index) => {
+    // last value
+    const lV = Math.min(value, detectDistance);
+    const nV = Math.min(nD[index], detectDistance);
 
-  window.setPosition(pos[0], pos[1], true);
-  return pos;
+    if (lV == 50 && nV == 50) return 0;
+    if (nV > lV) {
+      return 1;
+    } else if (nV < lV) {
+      return 2;
+    } else {
+      return 3;
+    }
+  });
+
+  const resetWaitTime = 1000; // ms
+  const maxLockDistance = 50; // pixel
+  const noLockDistance = 5; // no lock after maxLockDistance reached
+
+  const getTimeInSecond = () => {
+    return new Date().getTime();
+  };
+  const resetCount = () => {
+    windowTryMove[name] = {count: 0, lastTS: getTimeInSecond()};
+  };
+  const tryPreventDefault = () => {
+    if (
+      windowTryMove[name] == null ||
+      windowTryMove[name].lastTS < getTimeInSecond() - resetWaitTime
+    ) {
+      resetCount();
+    }
+    windowTryMove[name].count++;
+    if (windowTryMove[name].count >= maxLockDistance) {
+      if (windowTryMove[name].count >= maxLockDistance + noLockDistance) {
+        resetCount();
+      }
+      return;
+    }
+
+    event.preventDefault();
+    windowTryMove[name].lastTS = getTimeInSecond();
+  };
+
+  let noXMove = false;
+  let noYMove = false;
+  const fP = lP.map((value) => value);
+  lD.forEach((value, index) => {
+    if (value != 0) return;
+
+    if (moveD[index] == 2 && lD[index] <= 0) {
+      tryPreventDefault();
+      switch (index) {
+        case 0: // x
+        case 2: {
+          fP[0] = lP[0];
+          noXMove = true;
+          break;
+        }
+        case 1: // y
+        case 3: {
+          fP[1] = lP[1];
+          noYMove = true;
+          break;
+        }
+      }
+    } else if (moveD[index] == 3) {
+      tryPreventDefault();
+      switch (index) {
+        case 0: // x
+        case 2: {
+          if (!noYMove) {
+            fP[1] = nP[1];
+          }
+          break;
+        }
+        case 1: // y
+        case 3: {
+          if (!noXMove) {
+            fP[0] = nP[0];
+          }
+          break;
+        }
+      }
+    }
+  });
+  window.setPosition(fP[0], fP[1]);
 }
 
 function createMainWindow(): void {
@@ -156,8 +274,12 @@ export function createViewerWindow(): void {
     app.dock ? app.dock.show().then() : "";
   });
 
+  viewerWindow.on("will-move", (event, newBounds) => {
+    snapWindow("viewerWindow", viewerWindow, event, newBounds);
+  });
+
   viewerWindow.on("move", () => {
-    [danmuViewConfig.posX, danmuViewConfig.posY] = snapWindow(viewerWindow);
+    [danmuViewConfig.posX, danmuViewConfig.posY] = viewerWindow.getPosition();
     ConfigManager.onChange();
   });
 
@@ -299,7 +421,8 @@ function init(): void {
   KoaServer.run(ConfigManager.config.httpServerPort);
   WebsocketServer.run(KoaServer.server);
 
-  createMainWindow();
+  // createMainWindow();
+  showWindow(viewerWindow, createViewerWindow);
 }
 
 if (!app.requestSingleInstanceLock()) {
