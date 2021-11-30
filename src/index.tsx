@@ -249,7 +249,10 @@ export function createViewerWindow(): void {
     hasShadow: false,
   });
 
-  viewerWindow.setAlwaysOnTop(true, "pop-up-menu");
+  viewerWindow.setAlwaysOnTop(
+    true,
+    process.platform == "darwin" ? "floating" : "pop-up-menu"
+  );
 
   // http://127.0.0.1:25556/viewer/?address=localhost&port=25555&maxReconnectAttemptNum=5&name=internal
   viewerWindow
@@ -274,10 +277,6 @@ export function createViewerWindow(): void {
     app.dock ? app.dock.show().then() : "";
   });
 
-  viewerWindow.on("will-move", (event, newBounds) => {
-    snapWindow("viewerWindow", viewerWindow, event, newBounds);
-  });
-
   viewerWindow.on("move", () => {
     [danmuViewConfig.posX, danmuViewConfig.posY] = viewerWindow.getPosition();
     ConfigManager.onChange();
@@ -293,6 +292,12 @@ export function createViewerWindow(): void {
       viewerWindow.setFullScreen(false);
     }, 100);
   });
+
+  if (process.platform == "win32") {
+    viewerWindow.on("will-move", (event, newBounds) => {
+      snapWindow("viewerWindow", viewerWindow, event, newBounds);
+    });
+  }
 }
 
 function init(): void {
