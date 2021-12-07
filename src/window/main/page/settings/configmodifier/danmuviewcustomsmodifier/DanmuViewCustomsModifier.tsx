@@ -18,6 +18,7 @@ import {
   DanmuViewStyleConfig,
   defaultDanmuViewCustom,
   defaultViewCustomInternalName,
+  getDefaultDanmuViewCustomConfig,
 } from "../../../../../../utils/config/Config";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { TextIconModifier } from "./texticonmodifier/TextIconModifier";
@@ -105,7 +106,10 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
             return value.name == verifiedSelectedStyle;
           });
 
-          const cDvc = cDvcL.length > 0 ? cDvcL[0] : defaultDanmuViewCustom;
+          const cDvc =
+            cDvcL.length > 0
+              ? getDefaultDanmuViewCustomConfig(cDvcL[0])
+              : defaultDanmuViewCustom;
 
           const setDvc = (viewCustomConfig: DanmuViewCustomConfig) => {
             const tempList = config.danmuViewCustoms.filter((value) => {
@@ -233,6 +237,105 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
               </Form.Item>
 
               <Collapse>
+                <Collapse.Panel key={"tts"} header={"语音播报"}>
+                  <Form.Item label={"启用"}>
+                    <Switch
+                      checked={cDvc.tts.enable}
+                      onChange={(value) => {
+                        setDvc({
+                          ...cDvc,
+                          tts: {
+                            ...cDvc.tts,
+                            enable: value,
+                          },
+                        });
+                      }}
+                    />
+                  </Form.Item>
+
+                  <Form.Item label={"播放列表长度上限"}>
+                    <Space>
+                      <InputNumber
+                        min={1}
+                        defaultValue={cDvc.tts.maxPlayListItemNum}
+                        onChange={(value) => {
+                          setDvc({
+                            ...cDvc,
+                            tts: {
+                              ...cDvc.tts,
+                              maxPlayListItemNum: value,
+                            },
+                          });
+                        }}
+                      />
+
+                      <Popover
+                        content={
+                          <div>当播放列表长度达到上限时会忽略新的弹幕</div>
+                        }
+                      >
+                        <QuestionCircleOutlined />
+                      </Popover>
+                    </Space>
+                  </Form.Item>
+
+                  <Form.Item label={"播报用户名"}>
+                    <Space>
+                      <Switch
+                        checked={cDvc.tts.danmu.speakUserName}
+                        onChange={(value) => {
+                          setDvc({
+                            ...cDvc,
+                            tts: {
+                              ...cDvc.tts,
+                              danmu: {
+                                ...cDvc.tts.danmu,
+                                speakUserName: value,
+                              },
+                            },
+                          });
+                        }}
+                      />
+                      <Popover content={<div>在播报时带上 "xxx说"</div>}>
+                        <QuestionCircleOutlined />
+                      </Popover>
+                    </Space>
+                  </Form.Item>
+
+                  <Form.Item label={"过滤同内容弹幕的延迟"}>
+                    <Space>
+                      <InputNumber
+                        min={1}
+                        defaultValue={
+                          cDvc.tts.danmu.filterDuplicateContentDelay
+                        }
+                        onChange={(value) => {
+                          setDvc({
+                            ...cDvc,
+                            tts: {
+                              ...cDvc.tts,
+                              danmu: {
+                                ...cDvc.tts.danmu,
+                                filterDuplicateContentDelay: value,
+                              },
+                            },
+                          });
+                        }}
+                      />
+                      <Popover
+                        content={
+                          <div>
+                            单位: 秒
+                            <br />
+                            过滤指定时间内的重复弹幕 (即使不同用户)
+                          </div>
+                        }
+                      >
+                        <QuestionCircleOutlined />
+                      </Popover>
+                    </Space>
+                  </Form.Item>
+                </Collapse.Panel>
                 <Collapse.Panel key={"numberFormat"} header={"数字格式化"}>
                   <Typography.Paragraph type={"secondary"}>
                     例: 10000 格式化后为 1万

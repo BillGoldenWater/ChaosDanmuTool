@@ -6,6 +6,7 @@ import {
   defaultDanmuViewCustom,
   defaultViewCustomInternalName,
   getDefaultConfig,
+  getDefaultDanmuViewCustomConfig,
 } from "../../../utils/config/Config";
 import { WebsocketClient } from "../../../utils/client/WebsocketClient";
 import { getParam } from "../utils/UrlParamGeter";
@@ -40,6 +41,8 @@ import { getGiftConfigUpdateCmd } from "../../../utils/command/GiftConfigUpdate"
 import { TSendGift } from "../../../type/TSendGift";
 import { getStatusUpdateMessageCmd } from "../../../utils/command/ReceiverStatusUpdate";
 import { TSuperChatMessage } from "../../../type/TSuperChatMessage";
+import { parseDanmuMsg } from "../../../type/TDanmuMsg";
+import { TextToSpeech } from "../utils/TextToSpeech";
 
 class Props {}
 
@@ -56,6 +59,7 @@ class State {
 
 export class Main extends React.Component<Props, State> {
   websocketClient: WebsocketClient;
+  tts: TextToSpeech;
   maxAttemptNumber: number;
   serverAddress: string;
   serverPort: number;
@@ -115,6 +119,8 @@ export class Main extends React.Component<Props, State> {
     );
 
     this.websocketClient.connect(this.serverAddress, this.serverPort);
+
+    this.tts = new TextToSpeech();
   }
 
   tryReconnect(): void {
@@ -145,9 +151,13 @@ export class Main extends React.Component<Props, State> {
             viewConfig.name == decodeURI(getParam("name")) ||
             viewConfig.name == defaultViewCustomInternalName
           ) {
+            const dvc = getDefaultDanmuViewCustomConfig(viewConfig);
             this.setState({
-              config: viewConfig,
+              config: dvc,
             });
+
+            this.tts.updateConfig(dvc.tts);
+            break;
           }
         }
         break;
@@ -191,6 +201,9 @@ export class Main extends React.Component<Props, State> {
           case "LIVE":
           case "PREPARING":
           case "GUARD_BUY": {
+            if (msg.cmd == "DANMU_MSG" && msg.info) {
+              this.tts.speakDanmu(parseDanmuMsg(msg));
+            }
             this.addToList(msg);
             break;
           }

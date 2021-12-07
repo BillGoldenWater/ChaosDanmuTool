@@ -36,12 +36,25 @@ export type DanmuViewStyleConfig = {
   danmuContent: CSSProperties;
 };
 
+export type DanmuToSpeechConfig = {
+  speakUserName: boolean;
+  filterDuplicateContentDelay: number;
+};
+
+export type TextToSpeechConfig = {
+  enable: boolean;
+  maxPlayListItemNum: number;
+
+  danmu: DanmuToSpeechConfig;
+};
+
 export type DanmuViewCustomConfig = {
   name: string;
   maxDanmuNumber: number;
   statusBarDisplay: boolean;
   superChatAlwaysOnTop: boolean;
   numberFormat: NumberFormatConfig;
+  tts: TextToSpeechConfig;
   style: DanmuViewStyleConfig;
 };
 
@@ -64,6 +77,14 @@ export const defaultDanmuViewCustom: DanmuViewCustomConfig = {
   numberFormat: {
     formatActivity: true,
     formatFansNum: true,
+  },
+  tts: {
+    enable: false,
+    maxPlayListItemNum: 2,
+    danmu: {
+      speakUserName: false,
+      filterDuplicateContentDelay: 30,
+    },
   },
   style: {
     listMargin: "0.25em",
@@ -138,6 +159,10 @@ export const defaultConfig: Config = {
     {
       ...defaultDanmuViewCustom,
       name: defaultViewCustomInternalName,
+      tts: {
+        ...defaultDanmuViewCustom.tts,
+        enable: true,
+      },
     },
     {
       ...defaultDanmuViewCustom,
@@ -167,6 +192,25 @@ export function getDefaultConfig(config?: Config): Config {
     danmuViewConfig: {
       ...defaultConfig.danmuViewConfig,
       ...config.danmuViewConfig,
+    },
+  };
+}
+
+export function getDefaultDanmuViewCustomConfig(
+  danmuViewCustomConfig?: DanmuViewCustomConfig
+): DanmuViewCustomConfig {
+  if (!danmuViewCustomConfig) return { ...defaultDanmuViewCustom };
+
+  return {
+    ...defaultDanmuViewCustom,
+    ...danmuViewCustomConfig,
+    tts: {
+      ...defaultDanmuViewCustom.tts,
+      ...danmuViewCustomConfig.tts,
+    },
+    style: {
+      ...defaultDanmuViewCustom.style,
+      ...danmuViewCustomConfig.style,
     },
   };
 }
