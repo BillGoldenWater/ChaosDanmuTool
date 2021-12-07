@@ -57,6 +57,11 @@ jobs:
         run: |
           npm install -g yarn
 
+      - name: apt update
+        if: success()
+        run: |
+          sudo apt update
+
       - name: Install Wine
         if: success()
         run: |
