@@ -150,12 +150,11 @@ export class Main extends React.Component<Props, State> {
             viewConfig.name == decodeURI(getParam("name")) ||
             viewConfig.name == defaultViewCustomInternalName
           ) {
-            const dvc = getDefaultDanmuViewCustomConfig(viewConfig);
             this.setState({
-              config: dvc,
+              config: viewConfig,
             });
 
-            this.tts.updateConfig(dvc.tts);
+            this.tts.updateConfig(viewConfig.tts);
             break;
           }
         }
