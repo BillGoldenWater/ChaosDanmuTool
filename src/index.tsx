@@ -254,7 +254,7 @@ export function createViewerWindow(): void {
     process.platform == "darwin" ? "floating" : "pop-up-menu"
   );
 
-  // http://127.0.0.1:25556/viewer/?address=localhost&port=25555&maxReconnectAttemptNum=5&name=internal
+  // http://127.0.0.1:25556/viewer/?port=25555&maxReconnectAttemptNum=5&name=internal
   viewerWindow
     .loadURL(
       constructURL(

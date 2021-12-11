@@ -17,27 +17,48 @@ export class ConfigManager {
     this.inited = true;
   }
 
+  static loadDefault(config?: Config): void {
+    this.config = getDefaultConfig(config);
+  }
+
   static load(): void {
+    if (!this.inited) return;
+
     try {
       const configStr = fs.readFileSync(this.filePath, {
         flag: "r",
         encoding: "utf-8",
       });
-      this.config = getDefaultConfig(JSON.parse(configStr));
+
+      const config: Config = JSON.parse(configStr);
+
+      if (config && config.forChaosDanmuTool) {
+        this.loadDefault(config);
+      } else {
+        this.loadDefault();
+      }
     } catch (e) {
-      this.config = getDefaultConfig();
+      if (fs.existsSync(this.filePath)) {
+        dialog.showErrorBox("读取失败", `${errorCode.readException}`);
+      }
+
+      this.loadDefault();
     }
     this.loaded = true;
   }
 
   static save(): void {
+    if (!this.isSafeToSave()) return;
+
     if (fs.existsSync(this.filePath)) {
       try {
         const configStr = fs.readFileSync(this.filePath, {
           flag: "r",
           encoding: "utf-8",
         });
+
         const rConfig: Config = JSON.parse(configStr);
+
         if (rConfig.forChaosDanmuTool) {
           this.writeToFile();
         } else {

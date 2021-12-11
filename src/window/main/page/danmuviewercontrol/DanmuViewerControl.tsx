@@ -2,7 +2,7 @@ import React, { ReactNode } from "react";
 import { Button, Divider, Form, Select, Space, Typography } from "antd";
 import { ConfigContext } from "../../utils/ConfigContext";
 import {
-  defaultConfig,
+  getDefaultConfig,
   defaultViewCustomInternalName,
 } from "../../../../utils/config/Config";
 
@@ -51,7 +51,7 @@ export class DanmuViewerControl extends React.Component<Props, State> {
 
           if (
             config.danmuViewConfig.maxReconnectAttemptNumber !=
-            defaultConfig.danmuViewConfig.maxReconnectAttemptNumber
+            getDefaultConfig().danmuViewConfig.maxReconnectAttemptNumber
           ) {
             param.append(
               "maxReconnectAttemptNum",

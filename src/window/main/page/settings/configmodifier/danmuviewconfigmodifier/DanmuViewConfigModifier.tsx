@@ -13,7 +13,7 @@ import {
 import {
   DanmuReceiverConfig,
   DanmuViewConfig,
-  defaultConfig,
+  getDefaultConfig,
 } from "../../../../../../utils/config/Config";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 
@@ -23,7 +23,7 @@ export class DanmuViewConfigModifier extends React.Component {
       <ConfigContext.Consumer>
         {({ config, setConfig }) => {
           const dvc = config.danmuViewConfig;
-          const dDvc = defaultConfig.danmuViewConfig;
+          const dDvc = getDefaultConfig().danmuViewConfig;
           const setDvc = (danmuViewConfig: DanmuViewConfig) => {
             setConfig({ ...config, danmuViewConfig: danmuViewConfig });
           };

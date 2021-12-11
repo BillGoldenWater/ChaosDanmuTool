@@ -16,7 +16,6 @@ import {
 import {
   DanmuViewCustomConfig,
   DanmuViewStyleConfig,
-  defaultDanmuViewCustom,
   defaultViewCustomInternalName,
   getDefaultDanmuViewCustomConfig,
 } from "../../../../../../utils/config/Config";
@@ -52,7 +51,7 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
       return "已有同名配置";
     }
 
-    dvc.push({ ...defaultDanmuViewCustom, name: name });
+    dvc.push({ ...getDefaultDanmuViewCustomConfig(), name: name });
 
     setDvc(dvc);
 
@@ -107,9 +106,7 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
           });
 
           const cDvc =
-            cDvcL.length > 0
-              ? getDefaultDanmuViewCustomConfig(cDvcL[0])
-              : defaultDanmuViewCustom;
+            cDvcL.length > 0 ? cDvcL[0] : getDefaultDanmuViewCustomConfig();
 
           const setDvc = (viewCustomConfig: DanmuViewCustomConfig) => {
             const tempList = config.danmuViewCustoms.filter((value) => {

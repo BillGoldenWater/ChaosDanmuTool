@@ -3,7 +3,6 @@ import style from "./main.module.css";
 import {
   Config,
   DanmuViewCustomConfig,
-  defaultDanmuViewCustom,
   defaultViewCustomInternalName,
   getDefaultConfig,
   getDefaultDanmuViewCustomConfig,
@@ -70,7 +69,7 @@ export class Main extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      config: defaultDanmuViewCustom,
+      config: getDefaultDanmuViewCustomConfig(),
       danmuList: [],
       connectState: "close",
       connectAttemptNumber: 0,

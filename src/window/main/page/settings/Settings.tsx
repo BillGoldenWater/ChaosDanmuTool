@@ -4,7 +4,7 @@ import { MainConfigModifier } from "./configmodifier/mainconfigmodifier/MainConf
 import { DanmuViewConfigModifier } from "./configmodifier/danmuviewconfigmodifier/DanmuViewConfigModifier";
 import { DanmuViewCustomsModifier } from "./configmodifier/danmuviewcustomsmodifier/DanmuViewCustomsModifier";
 import { ConfigContext } from "../../utils/ConfigContext";
-import { defaultConfig } from "../../../../utils/config/Config";
+import { getDefaultConfig } from "../../../../utils/config/Config";
 
 export class Settings extends React.Component {
   render(): ReactNode {
@@ -31,7 +31,7 @@ export class Settings extends React.Component {
                 </Button>
                 <Button
                   onClick={() => {
-                    setConfig(defaultConfig);
+                    setConfig(getDefaultConfig());
                     message.success("重置成功").then();
                   }}
                 >
