@@ -39,7 +39,10 @@ export class ConfigManager {
       }
     } catch (e) {
       if (fs.existsSync(this.filePath)) {
-        dialog.showErrorBox("读取失败", `${errorCode.readException}`);
+        dialog.showErrorBox(
+          "读取失败",
+          `${errorCode.readException}\n配置文件存在但无法读取\n可能的原因: 被其他应用程序占用, 无读取权限`
+        );
       }
 
       this.loadDefault();
@@ -62,10 +65,16 @@ export class ConfigManager {
         if (rConfig.forChaosDanmuTool) {
           this.writeToFile();
         } else {
-          dialog.showErrorBox("保存失败", errorCode.unknownExistsFile);
+          dialog.showErrorBox(
+            "保存失败",
+            `${errorCode.unknownExistsFile}\n存在未知的同名文件`
+          );
         }
       } catch (e) {
-        dialog.showErrorBox("保存失败", errorCode.unknownExistsFile);
+        dialog.showErrorBox(
+          "保存失败",
+          `${errorCode.unknownExistsFile}\n存在未知的同名文件`
+        );
       }
     } else {
       this.writeToFile();
