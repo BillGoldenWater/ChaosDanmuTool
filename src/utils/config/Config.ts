@@ -91,10 +91,10 @@ const defaultDanmuViewCustom: DanmuViewCustomConfig = {
     mainStyle: {
       backgroundColor: "#3B3B3B44",
       zoom: 1.0,
-      fontSize: "4.5vw",
+      fontSize: "3.5vw",
       fontFamily: "",
       fontWeight: 400,
-      lineHeight: "1.5em",
+      lineHeight: "1.8em",
       color: "#ffffff",
     },
     giftIcon: {
