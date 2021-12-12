@@ -169,10 +169,6 @@ const defaultConfig: Config = {
       name: defaultViewCustomOtherName,
       style: {
         ...defaultDanmuViewCustom.style,
-        mainStyle: {
-          ...defaultDanmuViewCustom.style.mainStyle,
-          backgroundColor: "#000000AA",
-        },
       },
       numberFormat: {
         formatActivity: false,

@@ -9,6 +9,10 @@ export function parseGiftConfig(
 ): TGiftConfig {
   const giftConfig: TGiftConfig = { data: new Map<number, TGiftInfo>() };
 
+  if (giftConfigRes == <TGiftConfigResponse>{}) {
+    return giftConfig;
+  }
+
   for (const i in giftConfigRes.data.list) {
     const giftInfo: TGiftInfo = giftConfigRes.data.list[i];
     giftConfig.data.set(giftInfo.id, giftInfo);
