@@ -9,34 +9,28 @@ export class GiftConfigGetter {
 
   static init(): void {
     this.giftConfigResStr = "";
-    try {
-      https
-        .get(
-          "https://api.live.bilibili.com/xlive/web-room/v1/giftPanel/giftConfig?platform=pc",
-          {},
-          (res) => {
-            res.on("data", (data) => {
-              this.giftConfigResStr += data.toString();
-            });
-            res.on("end", () => {
-              this.giftConfigRes = JSON.parse(this.giftConfigResStr);
-              if (this.giftConfigRes["code"] != 0) {
-                this.onGiftConfigGetException(
-                  errorCode.giftConfigGetException_1
-                );
-              }
-            });
-          }
-        )
-        .on("error", (e) => {
-          this.onGiftConfigGetException(
-            errorCode.giftConfigGetException_2,
-            e.message
-          );
-        });
-    } catch (e) {
-      this.onGiftConfigGetException(errorCode.giftConfigGetException_3);
-    }
+    https
+      .get(
+        "https://api.live.bilibili.com/xlive/web-room/v1/giftPanel/giftConfig?platform=pc",
+        {},
+        (res) => {
+          res.on("data", (data) => {
+            this.giftConfigResStr += data.toString();
+          });
+          res.on("end", () => {
+            this.giftConfigRes = JSON.parse(this.giftConfigResStr);
+            if (this.giftConfigRes["code"] != 0) {
+              this.onGiftConfigGetException(errorCode.giftConfigGetException_1);
+            }
+          });
+        }
+      )
+      .on("error", (e) => {
+        this.onGiftConfigGetException(
+          errorCode.giftConfigGetException_2,
+          e.message
+        );
+      });
   }
 
   private static onGiftConfigGetException(
