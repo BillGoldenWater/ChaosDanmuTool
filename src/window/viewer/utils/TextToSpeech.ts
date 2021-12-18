@@ -36,6 +36,11 @@ export class TextToSpeech {
     if (this.playListNum >= this.config.maxPlayListItemNum) return;
 
     const ssu = new SpeechSynthesisUtterance(text);
+
+    ssu.rate = eval(this.config.rate.toString());
+    ssu.pitch = eval(this.config.pitch.toString());
+    ssu.volume = eval(this.config.volume.toString());
+
     ssu.onend = () => {
       this.playListNum--;
     };

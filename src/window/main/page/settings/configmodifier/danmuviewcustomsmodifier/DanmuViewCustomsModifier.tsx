@@ -276,6 +276,87 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
                     </Space>
                   </Form.Item>
 
+                  <Form.Item label={"速度"}>
+                    <Space>
+                      <Input
+                        value={cDvc.tts.rate}
+                        onChange={(event) => {
+                          setDvc({
+                            ...cDvc,
+                            tts: {
+                              ...cDvc.tts,
+                              rate: event.target.value,
+                            },
+                          });
+                        }}
+                      />
+                    </Space>
+                    <Popover
+                      content={
+                        <div>
+                          数字或表达式 <br />
+                          text: 播报内容
+                        </div>
+                      }
+                    >
+                      <QuestionCircleOutlined />
+                    </Popover>
+                  </Form.Item>
+
+                  <Form.Item label={"音高"}>
+                    <Space>
+                      <Input
+                        value={cDvc.tts.pitch}
+                        onChange={(event) => {
+                          setDvc({
+                            ...cDvc,
+                            tts: {
+                              ...cDvc.tts,
+                              pitch: event.target.value,
+                            },
+                          });
+                        }}
+                      />
+                    </Space>
+                    <Popover
+                      content={
+                        <div>
+                          数字或表达式 <br />
+                          text: 播报内容
+                        </div>
+                      }
+                    >
+                      <QuestionCircleOutlined />
+                    </Popover>
+                  </Form.Item>
+
+                  <Form.Item label={"音量"}>
+                    <Space>
+                      <Input
+                        value={cDvc.tts.volume}
+                        onChange={(event) => {
+                          setDvc({
+                            ...cDvc,
+                            tts: {
+                              ...cDvc.tts,
+                              volume: event.target.value,
+                            },
+                          });
+                        }}
+                      />
+                    </Space>
+                    <Popover
+                      content={
+                        <div>
+                          数字或表达式 <br />
+                          text: 播报内容
+                        </div>
+                      }
+                    >
+                      <QuestionCircleOutlined />
+                    </Popover>
+                  </Form.Item>
+
                   <Form.Item label={"播报用户名"}>
                     <Space>
                       <Switch

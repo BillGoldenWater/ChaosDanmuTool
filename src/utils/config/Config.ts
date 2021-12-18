@@ -44,6 +44,9 @@ export type DanmuToSpeechConfig = {
 export type TextToSpeechConfig = {
   enable: boolean;
   maxPlayListItemNum: number;
+  rate: number | string;
+  pitch: number | string;
+  volume: number | string;
 
   danmu: DanmuToSpeechConfig;
 };
@@ -81,6 +84,9 @@ const defaultDanmuViewCustom: DanmuViewCustomConfig = {
   tts: {
     enable: false,
     maxPlayListItemNum: 2,
+    rate: "1+(text.length/40)",
+    pitch: 1,
+    volume: 1,
     danmu: {
       speakUserName: false,
       filterDuplicateContentDelay: 30,
@@ -293,6 +299,9 @@ export function getDefaultDanmuViewCustomConfig(
       cT.maxPlayListItemNum != null
         ? cT.maxPlayListItemNum
         : rT.maxPlayListItemNum;
+    rT.rate = cT.rate != null ? cT.rate : rT.rate;
+    rT.pitch = cT.pitch != null ? cT.pitch : rT.pitch;
+    rT.volume = cT.volume != null ? cT.volume : rT.volume;
 
     if (cT.danmu != null && typeof cT.danmu == "object") {
       const rD = rT.danmu;
