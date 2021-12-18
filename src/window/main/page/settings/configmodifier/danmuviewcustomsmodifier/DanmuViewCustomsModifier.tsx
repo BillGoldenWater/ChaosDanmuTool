@@ -4,13 +4,9 @@ import {
   Button,
   Collapse,
   Form,
-  Input,
-  InputNumber,
   message,
-  Popover,
   Select,
   Space,
-  Switch,
   Typography,
 } from "antd";
 import {
@@ -19,8 +15,8 @@ import {
   defaultViewCustomInternalName,
   getDefaultDanmuViewCustomConfig,
 } from "../../../../../../utils/config/Config";
-import { QuestionCircleOutlined } from "@ant-design/icons";
 import { TextIconModifier } from "./texticonmodifier/TextIconModifier";
+import { ConfigItem } from "../../../../../../component/configitem/ConfigItem";
 
 class Props {}
 
@@ -170,282 +166,230 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
                 </Space>
               </Form.Item>
 
-              <Form.Item label={"配置名"}>
-                <Space>
-                  <Input
-                    disabled={
-                      state.selectedStyle == defaultViewCustomInternalName
-                    }
-                    value={cDvc.name}
-                    onChange={(event) => {
-                      if (event.target.value == "") {
-                        message.warning("名称不能为空").then();
-                      } else if (styleNameList.includes(event.target.value)) {
-                        message.warning("名称不能重复").then();
-                      } else {
-                        setDvc({ ...cDvc, name: event.target.value });
-                      }
-                    }}
-                  />
-                </Space>
-              </Form.Item>
+              <ConfigItem
+                type={"string"}
+                disabled={state.selectedStyle == defaultViewCustomInternalName}
+                name={"配置名"}
+                value={cDvc.name}
+                setString={(value) => {
+                  if (value == "") {
+                    message.warning("名称不能为空").then();
+                  } else if (styleNameList.includes(value)) {
+                    message.warning("名称不能重复").then();
+                  } else {
+                    setDvc({ ...cDvc, name: value });
+                  }
+                }}
+              />
 
-              <Form.Item label={"最大弹幕数:"}>
-                <Space>
-                  <InputNumber
-                    min={1}
-                    defaultValue={cDvc.maxDanmuNumber}
-                    onChange={(value) => {
-                      setDvc({ ...cDvc, maxDanmuNumber: value });
-                    }}
-                  />
-                  <Popover content={<div>弹幕查看器中保留的最大弹幕数</div>}>
-                    <QuestionCircleOutlined />
-                  </Popover>
-                </Space>
-              </Form.Item>
+              <ConfigItem
+                type={"number"}
+                name={"最大弹幕数"}
+                description={<div>弹幕查看器中保留的最大弹幕数</div>}
+                value={cDvc.maxDanmuNumber}
+                min={1}
+                setNumber={(value) => {
+                  setDvc({ ...cDvc, maxDanmuNumber: value });
+                }}
+              />
 
-              <Form.Item label={"显示状态栏"}>
-                <Space>
-                  <Switch
-                    checked={cDvc.statusBarDisplay}
-                    onChange={(value) => {
-                      setDvc({ ...cDvc, statusBarDisplay: value });
-                    }}
-                  />
-                  <Popover content={<div>在弹幕查看器底部显示信息</div>}>
-                    <QuestionCircleOutlined />
-                  </Popover>
-                </Space>
-              </Form.Item>
+              <ConfigItem
+                type={"boolean"}
+                name={"显示状态栏"}
+                description={<div>在弹幕查看器底部显示信息</div>}
+                value={cDvc.statusBarDisplay}
+                setBoolean={(value) => {
+                  setDvc({ ...cDvc, statusBarDisplay: value });
+                }}
+              />
 
-              <Form.Item label={"置顶SC"}>
-                <Space>
-                  <Switch
-                    checked={cDvc.superChatAlwaysOnTop}
-                    onChange={(value) => {
-                      setDvc({ ...cDvc, superChatAlwaysOnTop: value });
-                    }}
-                  />
-                  <Popover content={<div>在SC持续时间内保持SC的显示</div>}>
-                    <QuestionCircleOutlined />
-                  </Popover>
-                </Space>
-              </Form.Item>
+              <ConfigItem
+                type={"boolean"}
+                name={"置顶SC"}
+                description={<div>在SC持续时间内保持SC的显示</div>}
+                value={cDvc.superChatAlwaysOnTop}
+                setBoolean={(value) => {
+                  setDvc({ ...cDvc, superChatAlwaysOnTop: value });
+                }}
+              />
 
               <Collapse>
                 <Collapse.Panel key={"tts"} header={"语音播报"}>
-                  <Form.Item label={"启用"}>
-                    <Switch
-                      checked={cDvc.tts.enable}
-                      onChange={(value) => {
-                        setDvc({
-                          ...cDvc,
-                          tts: {
-                            ...cDvc.tts,
-                            enable: value,
+                  <ConfigItem
+                    type={"boolean"}
+                    name={"启用"}
+                    value={cDvc.tts.enable}
+                    setBoolean={(value) => {
+                      setDvc({
+                        ...cDvc,
+                        tts: {
+                          ...cDvc.tts,
+                          enable: value,
+                        },
+                      });
+                    }}
+                  />
+
+                  <ConfigItem
+                    type={"number"}
+                    name={"播放列表长度上限"}
+                    description={
+                      <div>当播放列表长度达到上限时会忽略新的弹幕</div>
+                    }
+                    value={cDvc.tts.maxPlayListItemNum}
+                    min={1}
+                    setNumber={(value) => {
+                      setDvc({
+                        ...cDvc,
+                        tts: {
+                          ...cDvc.tts,
+                          maxPlayListItemNum: value,
+                        },
+                      });
+                    }}
+                  />
+
+                  <ConfigItem
+                    type={"string"}
+                    name={"速度"}
+                    description={
+                      <div>
+                        数字或表达式 <br />
+                        text: 播报内容
+                      </div>
+                    }
+                    value={cDvc.tts.rate}
+                    setString={(value) => {
+                      setDvc({
+                        ...cDvc,
+                        tts: {
+                          ...cDvc.tts,
+                          rate: value,
+                        },
+                      });
+                    }}
+                  />
+
+                  <ConfigItem
+                    type={"string"}
+                    name={"音高"}
+                    description={
+                      <div>
+                        数字或表达式 <br />
+                        text: 播报内容
+                      </div>
+                    }
+                    value={cDvc.tts.pitch}
+                    setString={(value) => {
+                      setDvc({
+                        ...cDvc,
+                        tts: {
+                          ...cDvc.tts,
+                          pitch: value,
+                        },
+                      });
+                    }}
+                  />
+
+                  <ConfigItem
+                    type={"string"}
+                    name={"音量"}
+                    description={
+                      <div>
+                        数字或表达式 <br />
+                        text: 播报内容
+                      </div>
+                    }
+                    value={cDvc.tts.volume}
+                    setString={(value) => {
+                      setDvc({
+                        ...cDvc,
+                        tts: {
+                          ...cDvc.tts,
+                          volume: value,
+                        },
+                      });
+                    }}
+                  />
+
+                  <ConfigItem
+                    type={"boolean"}
+                    name={"播报用户名"}
+                    description={<div>在播报时带上 "xxx说"</div>}
+                    value={cDvc.tts.danmu.speakUserName}
+                    setBoolean={(value) => {
+                      setDvc({
+                        ...cDvc,
+                        tts: {
+                          ...cDvc.tts,
+                          danmu: {
+                            ...cDvc.tts.danmu,
+                            speakUserName: value,
                           },
-                        });
-                      }}
-                    />
-                  </Form.Item>
+                        },
+                      });
+                    }}
+                  />
 
-                  <Form.Item label={"播放列表长度上限"}>
-                    <Space>
-                      <InputNumber
-                        min={1}
-                        defaultValue={cDvc.tts.maxPlayListItemNum}
-                        onChange={(value) => {
-                          setDvc({
-                            ...cDvc,
-                            tts: {
-                              ...cDvc.tts,
-                              maxPlayListItemNum: value,
-                            },
-                          });
-                        }}
-                      />
-
-                      <Popover
-                        content={
-                          <div>当播放列表长度达到上限时会忽略新的弹幕</div>
-                        }
-                      >
-                        <QuestionCircleOutlined />
-                      </Popover>
-                    </Space>
-                  </Form.Item>
-
-                  <Form.Item label={"速度"}>
-                    <Space>
-                      <Input
-                        value={cDvc.tts.rate}
-                        onChange={(event) => {
-                          setDvc({
-                            ...cDvc,
-                            tts: {
-                              ...cDvc.tts,
-                              rate: event.target.value,
-                            },
-                          });
-                        }}
-                      />
-                    </Space>
-                    <Popover
-                      content={
-                        <div>
-                          数字或表达式 <br />
-                          text: 播报内容
-                        </div>
-                      }
-                    >
-                      <QuestionCircleOutlined />
-                    </Popover>
-                  </Form.Item>
-
-                  <Form.Item label={"音高"}>
-                    <Space>
-                      <Input
-                        value={cDvc.tts.pitch}
-                        onChange={(event) => {
-                          setDvc({
-                            ...cDvc,
-                            tts: {
-                              ...cDvc.tts,
-                              pitch: event.target.value,
-                            },
-                          });
-                        }}
-                      />
-                    </Space>
-                    <Popover
-                      content={
-                        <div>
-                          数字或表达式 <br />
-                          text: 播报内容
-                        </div>
-                      }
-                    >
-                      <QuestionCircleOutlined />
-                    </Popover>
-                  </Form.Item>
-
-                  <Form.Item label={"音量"}>
-                    <Space>
-                      <Input
-                        value={cDvc.tts.volume}
-                        onChange={(event) => {
-                          setDvc({
-                            ...cDvc,
-                            tts: {
-                              ...cDvc.tts,
-                              volume: event.target.value,
-                            },
-                          });
-                        }}
-                      />
-                    </Space>
-                    <Popover
-                      content={
-                        <div>
-                          数字或表达式 <br />
-                          text: 播报内容
-                        </div>
-                      }
-                    >
-                      <QuestionCircleOutlined />
-                    </Popover>
-                  </Form.Item>
-
-                  <Form.Item label={"播报用户名"}>
-                    <Space>
-                      <Switch
-                        checked={cDvc.tts.danmu.speakUserName}
-                        onChange={(value) => {
-                          setDvc({
-                            ...cDvc,
-                            tts: {
-                              ...cDvc.tts,
-                              danmu: {
-                                ...cDvc.tts.danmu,
-                                speakUserName: value,
-                              },
-                            },
-                          });
-                        }}
-                      />
-                      <Popover content={<div>在播报时带上 "xxx说"</div>}>
-                        <QuestionCircleOutlined />
-                      </Popover>
-                    </Space>
-                  </Form.Item>
-
-                  <Form.Item label={"过滤同内容弹幕的延迟"}>
-                    <Space>
-                      <InputNumber
-                        min={1}
-                        defaultValue={
-                          cDvc.tts.danmu.filterDuplicateContentDelay
-                        }
-                        onChange={(value) => {
-                          setDvc({
-                            ...cDvc,
-                            tts: {
-                              ...cDvc.tts,
-                              danmu: {
-                                ...cDvc.tts.danmu,
-                                filterDuplicateContentDelay: value,
-                              },
-                            },
-                          });
-                        }}
-                      />
-                      <Popover
-                        content={
-                          <div>
-                            单位: 秒
-                            <br />
-                            过滤指定时间内的重复弹幕 (即使不同用户)
-                          </div>
-                        }
-                      >
-                        <QuestionCircleOutlined />
-                      </Popover>
-                    </Space>
-                  </Form.Item>
+                  <ConfigItem
+                    type={"number"}
+                    name={"过滤同内容弹幕的延迟"}
+                    description={
+                      <div>
+                        单位: 秒
+                        <br />
+                        过滤指定时间内的重复弹幕 (即使不同用户)
+                      </div>
+                    }
+                    value={cDvc.tts.danmu.filterDuplicateContentDelay}
+                    min={1}
+                    setNumber={(value) => {
+                      setDvc({
+                        ...cDvc,
+                        tts: {
+                          ...cDvc.tts,
+                          danmu: {
+                            ...cDvc.tts.danmu,
+                            filterDuplicateContentDelay: value,
+                          },
+                        },
+                      });
+                    }}
+                  />
                 </Collapse.Panel>
                 <Collapse.Panel key={"numberFormat"} header={"数字格式化"}>
                   <Typography.Paragraph type={"secondary"}>
                     例: 10000 格式化后为 1万
                   </Typography.Paragraph>
-                  <Form.Item label={"格式化人气"}>
-                    <Switch
-                      checked={cDvc.numberFormat.formatActivity}
-                      onChange={(value) => {
-                        setDvc({
-                          ...cDvc,
-                          numberFormat: {
-                            ...cDvc.numberFormat,
-                            formatActivity: value,
-                          },
-                        });
-                      }}
-                    />
-                  </Form.Item>
-                  <Form.Item label={"格式化粉丝数"}>
-                    <Switch
-                      checked={cDvc.numberFormat.formatFansNum}
-                      onChange={(value) => {
-                        setDvc({
-                          ...cDvc,
-                          numberFormat: {
-                            ...cDvc.numberFormat,
-                            formatFansNum: value,
-                          },
-                        });
-                      }}
-                    />
-                  </Form.Item>
+                  <ConfigItem
+                    type={"boolean"}
+                    name={"格式化人气"}
+                    value={cDvc.numberFormat.formatActivity}
+                    setBoolean={(value) => {
+                      setDvc({
+                        ...cDvc,
+                        numberFormat: {
+                          ...cDvc.numberFormat,
+                          formatActivity: value,
+                        },
+                      });
+                    }}
+                  />
+
+                  <ConfigItem
+                    type={"boolean"}
+                    name={"格式化粉丝数"}
+                    value={cDvc.numberFormat.formatFansNum}
+                    setBoolean={(value) => {
+                      setDvc({
+                        ...cDvc,
+                        numberFormat: {
+                          ...cDvc.numberFormat,
+                          formatFansNum: value,
+                        },
+                      });
+                    }}
+                  />
                 </Collapse.Panel>
                 <Collapse.Panel key={"style"} header={"外观"}>
                   <Typography.Paragraph type={"secondary"}>
@@ -456,219 +400,186 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
                     vw/vh: 相对于窗口宽度/高度 1vw为1%窗口宽度
                   </Typography.Paragraph>
 
-                  <Form.Item label={"列表外边距"}>
-                    <Space>
-                      <Input
-                        value={dvcStyle.listMargin}
-                        onChange={(event) => {
-                          setDvcStyle({
-                            ...dvcStyle,
-                            listMargin: event.target.value,
-                          });
-                        }}
-                      />
-                      <Popover content={<div>弹幕列表的外边距</div>}>
-                        <QuestionCircleOutlined />
-                      </Popover>
-                    </Space>
-                  </Form.Item>
+                  <ConfigItem
+                    type={"string"}
+                    name={"列表外边距"}
+                    description={<div>弹幕列表的外边距</div>}
+                    value={dvcStyle.listMargin}
+                    setString={(value) => {
+                      setDvcStyle({
+                        ...dvcStyle,
+                        listMargin: value,
+                      });
+                    }}
+                  />
 
-                  <Form.Item label={"背景颜色"}>
-                    <Space>
-                      <Input
-                        value={dvcStyle.mainStyle.backgroundColor}
-                        onChange={(event) => {
-                          setDvcStyle({
-                            ...dvcStyle,
-                            mainStyle: {
-                              ...dvcStyle.mainStyle,
-                              backgroundColor: event.target.value,
-                            },
-                          });
-                        }}
-                      />
-                      <Popover
-                        content={
-                          <div>
-                            弹幕查看器的背景颜色 16进制 格式为rrggbbaa
-                            a为Alpha通道(透明度)
-                            <br />
-                            第三方
-                            <Typography.Text
-                              copyable={{
-                                text: "https://developer.mozilla.org/zh-CN/docs/Web/CSS/CSS_Colors/Color_picker_tool",
-                                tooltips: [
-                                  <div>复制链接</div>,
-                                  <div>复制成功</div>,
-                                ],
-                              }}
-                            >
-                              编辑器
-                            </Typography.Text>
-                          </div>
-                        }
-                      >
-                        <QuestionCircleOutlined />
-                      </Popover>
-                    </Space>
-                  </Form.Item>
+                  <ConfigItem
+                    type={"string"}
+                    name={"背景颜色"}
+                    description={
+                      <div>
+                        弹幕查看器的背景颜色 16进制 格式为rrggbbaa
+                        a为Alpha通道(透明度)
+                        <br />
+                        第三方
+                        <Typography.Text
+                          copyable={{
+                            text: "https://developer.mozilla.org/zh-CN/docs/Web/CSS/CSS_Colors/Color_picker_tool",
+                            tooltips: [
+                              <div>复制链接</div>,
+                              <div>复制成功</div>,
+                            ],
+                          }}
+                        >
+                          编辑器
+                        </Typography.Text>
+                      </div>
+                    }
+                    value={dvcStyle.mainStyle.backgroundColor}
+                    setString={(value) => {
+                      setDvcStyle({
+                        ...dvcStyle,
+                        mainStyle: {
+                          ...dvcStyle.mainStyle,
+                          backgroundColor: value,
+                        },
+                      });
+                    }}
+                  />
 
-                  <Form.Item label={"缩放"}>
-                    <InputNumber
-                      min={0.1}
-                      defaultValue={dvcStyle.mainStyle.zoom}
-                      step={0.1}
-                      onChange={(value) => {
-                        setDvcStyle({
-                          ...dvcStyle,
-                          mainStyle: { ...dvcStyle.mainStyle, zoom: value },
-                        });
-                      }}
-                    />
-                  </Form.Item>
+                  <ConfigItem
+                    type={"number"}
+                    name={"缩放"}
+                    value={dvcStyle.mainStyle.zoom}
+                    min={0.1}
+                    step={0.1}
+                    setNumber={(value) => {
+                      setDvcStyle({
+                        ...dvcStyle,
+                        mainStyle: { ...dvcStyle.mainStyle, zoom: value },
+                      });
+                    }}
+                  />
 
-                  <Form.Item label={"行高"}>
-                    <Space>
-                      <Input
-                        value={dvcStyle.mainStyle.lineHeight}
-                        onChange={(event) => {
-                          setDvcStyle({
-                            ...dvcStyle,
-                            mainStyle: {
-                              ...dvcStyle.mainStyle,
-                              lineHeight: event.target.value,
-                            },
-                          });
-                        }}
-                      />
-                    </Space>
-                  </Form.Item>
+                  <ConfigItem
+                    type={"string"}
+                    name={"行高"}
+                    value={dvcStyle.mainStyle.lineHeight}
+                    setString={(value) => {
+                      setDvcStyle({
+                        ...dvcStyle,
+                        mainStyle: {
+                          ...dvcStyle.mainStyle,
+                          lineHeight: value,
+                        },
+                      });
+                    }}
+                  />
 
-                  <Form.Item label={"礼物图标高度"}>
-                    <Space>
-                      <Input
-                        value={dvcStyle.giftIcon.height}
-                        onChange={(event) => {
-                          setDvcStyle({
-                            ...dvcStyle,
-                            giftIcon: {
-                              ...dvcStyle.giftIcon,
-                              height: event.target.value,
-                            },
-                          });
-                        }}
-                      />
-                    </Space>
-                  </Form.Item>
+                  <ConfigItem
+                    type={"string"}
+                    name={"礼物图标高度"}
+                    value={dvcStyle.giftIcon.height}
+                    setString={(value) => {
+                      setDvcStyle({
+                        ...dvcStyle,
+                        giftIcon: {
+                          ...dvcStyle.giftIcon,
+                          height: value,
+                        },
+                      });
+                    }}
+                  />
 
-                  <Form.Item label={"文字颜色"}>
-                    <Space>
-                      <Input
-                        type={"color"}
-                        style={{ minWidth: "5em" }}
-                        value={dvcStyle.mainStyle.color}
-                        onChange={(event) => {
-                          setDvcStyle({
-                            ...dvcStyle,
-                            mainStyle: {
-                              ...dvcStyle.mainStyle,
-                              color: event.target.value,
-                            },
-                          });
-                        }}
-                      />
-                    </Space>
-                  </Form.Item>
+                  <ConfigItem
+                    type={"color"}
+                    name={"文字颜色"}
+                    value={dvcStyle.mainStyle.color}
+                    setString={(value) => {
+                      setDvcStyle({
+                        ...dvcStyle,
+                        mainStyle: {
+                          ...dvcStyle.mainStyle,
+                          color: value,
+                        },
+                      });
+                    }}
+                  />
 
-                  <Form.Item label={"用户名颜色"}>
-                    <Space>
-                      <Input
-                        type={"color"}
-                        style={{ minWidth: "5em" }}
-                        value={dvcStyle.userName.color}
-                        onChange={(event) => {
-                          setDvcStyle({
-                            ...dvcStyle,
-                            userName: {
-                              ...dvcStyle.userName,
-                              color: event.target.value,
-                            },
-                          });
-                        }}
-                      />
-                    </Space>
-                  </Form.Item>
+                  <ConfigItem
+                    type={"color"}
+                    name={"用户名颜色"}
+                    value={dvcStyle.userName.color}
+                    setString={(value) => {
+                      setDvcStyle({
+                        ...dvcStyle,
+                        userName: {
+                          ...dvcStyle.userName,
+                          color: value,
+                        },
+                      });
+                    }}
+                  />
 
-                  <Form.Item label={"弹幕文字颜色"}>
-                    <Space>
-                      <Input
-                        type={"color"}
-                        style={{ minWidth: "5em" }}
-                        value={dvcStyle.danmuContent.color}
-                        onChange={(event) => {
-                          setDvcStyle({
-                            ...dvcStyle,
-                            danmuContent: {
-                              ...dvcStyle.danmuContent,
-                              color: event.target.value,
-                            },
-                          });
-                        }}
-                      />
-                    </Space>
-                  </Form.Item>
-
+                  <ConfigItem
+                    type={"color"}
+                    name={"弹幕文字颜色"}
+                    value={dvcStyle.danmuContent.color}
+                    setString={(value) => {
+                      setDvcStyle({
+                        ...dvcStyle,
+                        danmuContent: {
+                          ...dvcStyle.danmuContent,
+                          color: value,
+                        },
+                      });
+                    }}
+                  />
                   <Collapse>
                     <Collapse.Panel key={"fontSettings"} header={"字体设置"}>
-                      <Form.Item label={"字体"}>
-                        <Space>
-                          <Input
-                            value={dvcStyle.mainStyle.fontFamily}
-                            onChange={(event) => {
-                              setDvcStyle({
-                                ...dvcStyle,
-                                mainStyle: {
-                                  ...dvcStyle.mainStyle,
-                                  fontFamily: event.target.value,
-                                },
-                              });
-                            }}
-                          />
-                        </Space>
-                      </Form.Item>
-                      <Form.Item label={"字体大小"}>
-                        <Space>
-                          <Input
-                            value={dvcStyle.mainStyle.fontSize}
-                            onChange={(event) => {
-                              setDvcStyle({
-                                ...dvcStyle,
-                                mainStyle: {
-                                  ...dvcStyle.mainStyle,
-                                  fontSize: event.target.value,
-                                },
-                              });
-                            }}
-                          />
-                        </Space>
-                      </Form.Item>
-                      <Form.Item label={"字重"}>
-                        <Space>
-                          <InputNumber
-                            min={0}
-                            value={dvcStyle.mainStyle.fontWeight}
-                            onChange={(value) => {
-                              setDvcStyle({
-                                ...dvcStyle,
-                                mainStyle: {
-                                  ...dvcStyle.mainStyle,
-                                  fontWeight: value,
-                                },
-                              });
-                            }}
-                          />
-                        </Space>
-                      </Form.Item>
+                      <ConfigItem
+                        type={"string"}
+                        name={"字体"}
+                        value={dvcStyle.mainStyle.fontFamily}
+                        setString={(value) => {
+                          setDvcStyle({
+                            ...dvcStyle,
+                            mainStyle: {
+                              ...dvcStyle.mainStyle,
+                              fontFamily: value,
+                            },
+                          });
+                        }}
+                      />
+                      <ConfigItem
+                        type={"string"}
+                        name={"字体大小"}
+                        value={dvcStyle.mainStyle.fontSize}
+                        setString={(value) => {
+                          setDvcStyle({
+                            ...dvcStyle,
+                            mainStyle: {
+                              ...dvcStyle.mainStyle,
+                              fontSize: value,
+                            },
+                          });
+                        }}
+                      />
+                      <ConfigItem
+                        type={"number"}
+                        name={"字重"}
+                        value={dvcStyle.mainStyle.fontWeight}
+                        min={0}
+                        setNumber={(value) => {
+                          setDvcStyle({
+                            ...dvcStyle,
+                            mainStyle: {
+                              ...dvcStyle.mainStyle,
+                              fontWeight: value,
+                            },
+                          });
+                        }}
+                      />
                     </Collapse.Panel>
                     <Collapse.Panel key={"iconSettings"} header={"图标设置"}>
                       <TextIconModifier
