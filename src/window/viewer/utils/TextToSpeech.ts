@@ -35,6 +35,31 @@ export class TextToSpeech {
     if (!this.config.enable) return;
     if (this.playListNum >= this.config.maxPlayListItemNum) return;
 
+    //region 黑名单匹配
+    const matchResult = this.config.blackListMatch.map((value) => {
+      if (value.isRegExp) {
+        return text.match(RegExp(value.searchValue, "g")) !== null;
+      } else {
+        return text.includes(value.searchValue);
+      }
+    });
+
+    if (matchResult.includes(true)) return;
+    //endregion
+
+    //region 文本替换
+    this.config.textReplacer.forEach((value) => {
+      if (value.isRegExp) {
+        text = text.replaceAll(
+          RegExp(value.searchValue, "g"),
+          value.replaceValue
+        );
+      } else {
+        text = text.replaceAll(value.searchValue, value.replaceValue);
+      }
+    });
+    //endregion
+
     const ssu = new SpeechSynthesisUtterance(text);
 
     ssu.rate = eval(this.config.rate.toString());
