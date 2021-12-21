@@ -17,6 +17,8 @@ import {
 } from "../../../../../../utils/config/Config";
 import { TextIconModifier } from "./texticonmodifier/TextIconModifier";
 import { ConfigItem } from "../../../../../../component/configitem/ConfigItem";
+import { TextReplacerModifier } from "./textreplacermodifier/TextReplacerModifier";
+import { BlackListMatchModifier } from "./blacklistmatchmodifier/BlackListMatchModifier";
 
 class Props {}
 
@@ -312,50 +314,83 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
                     }}
                   />
 
-                  <ConfigItem
-                    type={"boolean"}
-                    name={"播报用户名"}
-                    description={<div>在播报时带上 "xxx说"</div>}
-                    value={cDvc.tts.danmu.speakUserName}
-                    setBoolean={(value) => {
-                      setDvc({
-                        ...cDvc,
-                        tts: {
-                          ...cDvc.tts,
-                          danmu: {
-                            ...cDvc.tts.danmu,
-                            speakUserName: value,
-                          },
-                        },
-                      });
-                    }}
-                  />
+                  <Collapse>
+                    <Collapse.Panel
+                      key={"textReplacer"}
+                      header={"文本替换"}
+                      style={{ padding: "0" }}
+                    >
+                      <TextReplacerModifier
+                        list={cDvc.tts.textReplacer}
+                        setList={(value) => {
+                          setDvc({
+                            ...cDvc,
+                            tts: { ...cDvc.tts, textReplacer: value },
+                          });
+                        }}
+                      />
+                    </Collapse.Panel>
+                    <Collapse.Panel
+                      key={"blackListMatch"}
+                      header={"黑名单匹配"}
+                    >
+                      <BlackListMatchModifier
+                        list={cDvc.tts.blackListMatch}
+                        setList={(value) => {
+                          setDvc({
+                            ...cDvc,
+                            tts: { ...cDvc.tts, blackListMatch: value },
+                          });
+                        }}
+                      />
+                    </Collapse.Panel>
+                    <Collapse.Panel key={"danmuSetting"} header={"弹幕相关"}>
+                      <ConfigItem
+                        type={"boolean"}
+                        name={"播报用户名"}
+                        description={<div>在播报时带上 "xxx说"</div>}
+                        value={cDvc.tts.danmu.speakUserName}
+                        setBoolean={(value) => {
+                          setDvc({
+                            ...cDvc,
+                            tts: {
+                              ...cDvc.tts,
+                              danmu: {
+                                ...cDvc.tts.danmu,
+                                speakUserName: value,
+                              },
+                            },
+                          });
+                        }}
+                      />
 
-                  <ConfigItem
-                    type={"number"}
-                    name={"过滤同内容弹幕的延迟"}
-                    description={
-                      <div>
-                        单位: 秒
-                        <br />
-                        过滤指定时间内的重复弹幕 (即使不同用户)
-                      </div>
-                    }
-                    value={cDvc.tts.danmu.filterDuplicateContentDelay}
-                    min={1}
-                    setNumber={(value) => {
-                      setDvc({
-                        ...cDvc,
-                        tts: {
-                          ...cDvc.tts,
-                          danmu: {
-                            ...cDvc.tts.danmu,
-                            filterDuplicateContentDelay: value,
-                          },
-                        },
-                      });
-                    }}
-                  />
+                      <ConfigItem
+                        type={"number"}
+                        name={"过滤同内容弹幕的延迟"}
+                        description={
+                          <div>
+                            单位: 秒
+                            <br />
+                            过滤指定时间内的重复弹幕 (即使不同用户)
+                          </div>
+                        }
+                        value={cDvc.tts.danmu.filterDuplicateContentDelay}
+                        min={1}
+                        setNumber={(value) => {
+                          setDvc({
+                            ...cDvc,
+                            tts: {
+                              ...cDvc.tts,
+                              danmu: {
+                                ...cDvc.tts.danmu,
+                                filterDuplicateContentDelay: value,
+                              },
+                            },
+                          });
+                        }}
+                      />
+                    </Collapse.Panel>
+                  </Collapse>
                 </Collapse.Panel>
                 <Collapse.Panel key={"numberFormat"} header={"数字格式化"}>
                   <Typography.Paragraph type={"secondary"}>
