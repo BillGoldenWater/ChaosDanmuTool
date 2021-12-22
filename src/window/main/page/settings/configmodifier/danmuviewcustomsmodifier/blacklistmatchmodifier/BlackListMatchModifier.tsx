@@ -3,7 +3,7 @@ import {
   BlackListMatchConfig,
   getDefaultBlackListMatchConfig,
 } from "../../../../../../../utils/config/Config";
-import { Button, Space } from "antd";
+import { Button, Divider } from "antd";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import { Columns, SortableTable } from "../sortabletable/SortableTable";
 
@@ -28,7 +28,7 @@ export class BlackListMatchModifier extends React.Component<Props> {
     ];
 
     return (
-      <Space direction={"vertical"}>
+      <div>
         <Button
           icon={<PlusCircleOutlined />}
           onClick={() => {
@@ -39,13 +39,14 @@ export class BlackListMatchModifier extends React.Component<Props> {
             ]);
           }}
         />
+        <Divider />
         <SortableTable
           list={this.props.list}
           setList={this.props.setList}
           columns={columns}
           delBtn
         />
-      </Space>
+      </div>
     );
   }
 }
