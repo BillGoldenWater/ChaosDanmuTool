@@ -29,10 +29,16 @@ const { Sider, Content } = Layout;
 
 class Props {}
 
+type PageKey =
+  | "connectRoom"
+  | "danmuViewerControl"
+  | "settings"
+  | "danmuHistory";
+
 class State {
   config: Config;
   siderCollapsed: boolean;
-  pageKey: string;
+  pageKey: PageKey;
   receiverStatus: ReceiverStatus;
 }
 
@@ -182,7 +188,7 @@ export class Main extends React.Component<Props, State> {
                 mode={"inline"}
                 style={{ userSelect: "none" }}
                 onClick={(event) => {
-                  this.setState({ pageKey: event.key });
+                  this.setState({ pageKey: event.key as PageKey });
                 }}
                 defaultSelectedKeys={["connectRoom"]}
                 theme={state.config.darkTheme ? "dark" : "light"}
