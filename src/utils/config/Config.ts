@@ -188,7 +188,7 @@ const defaultConfig: Config = {
   },
   danmuViewConfig: {
     autoOpenWhenConnect: true,
-    maxReconnectAttemptNumber: 5,
+    maxReconnectAttemptNumber: -1,
     width: 400,
     height: 600,
     posX: 0,

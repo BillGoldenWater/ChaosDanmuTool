@@ -60,6 +60,7 @@ export class Main extends React.Component<Props, State> {
   websocketClient: WebsocketClient;
   tts: TextToSpeech;
   maxAttemptNumber: number;
+  infiniteAttempt: boolean;
   serverAddress: string;
   serverPort: number;
   reconnectId: number;
@@ -84,6 +85,7 @@ export class Main extends React.Component<Props, State> {
     this.maxAttemptNumber =
       parseInt(getParam("maxReconnectAttemptNum")) ||
       getDefaultConfig().danmuViewConfig.maxReconnectAttemptNumber;
+    this.infiniteAttempt = this.maxAttemptNumber == -1;
 
     if (!this.serverPort) {
       this.serverPort = parseInt(window.location.port);
@@ -123,18 +125,29 @@ export class Main extends React.Component<Props, State> {
   }
 
   tryReconnect(): void {
-    window.clearInterval(this.reconnectId);
-    this.reconnectId = window.setInterval(() => {
-      if (this.state.connectAttemptNumber >= this.maxAttemptNumber) return;
-      this.websocketClient.connect(this.serverAddress, this.serverPort);
-      this.setState((prevState) => {
-        return {
-          ...prevState,
-          connectAttemptNumber: prevState.connectAttemptNumber + 1,
-        };
-      });
-      window.clearInterval(this.reconnectId);
-    }, 500);
+    window.clearTimeout(this.reconnectId); // 清除之前的计时器 防止同时运行
+    this.reconnectId = window.setTimeout(
+      () => {
+        if (!this.infiniteAttempt) {
+          // 非无限尝试时
+          // 如果当前尝试次数达到最大次数
+          if (this.state.connectAttemptNumber >= this.maxAttemptNumber) {
+            return;
+          }
+        }
+
+        this.websocketClient.connect(this.serverAddress, this.serverPort); // 连接
+
+        // 更新当前尝试次数
+        this.setState((prevState) => {
+          return {
+            ...prevState,
+            connectAttemptNumber: prevState.connectAttemptNumber + 1,
+          };
+        });
+      },
+      this.infiniteAttempt ? 1000 : 500 // 如果小于0 每秒一次 否则0.5秒一次
+    );
   }
 
   processCommand(commandStr: string): void {
@@ -346,50 +359,48 @@ export class Main extends React.Component<Props, State> {
   }
 
   render(): JSX.Element {
-    return (
-      <div className={style.main} style={this.state.config.style.mainStyle}>
-        <ConfigContext.Provider
-          value={{
-            config: this.state.config,
-            giftConfig: this.state.giftConfig,
-          }}
-        >
-          {this.state.connectState == "open" &&
-            this.state.config.statusBarDisplay && (
-              <StatusBar
-                message={this.state.statusMessage}
-                style={{
-                  backgroundColor:
-                    this.state.config.style.mainStyle.backgroundColor,
-                  borderColor:
-                    this.state.config.style.mainStyle.backgroundColor,
-                  color: this.state.config.style.mainStyle.color,
-                }}
-              >
-                <div>
-                  人气:
-                  {this.state.config.numberFormat.formatActivity
-                    ? formatNumber(this.state.activity)
-                    : this.state.activity}
-                </div>
-                <div>
-                  粉丝数:
-                  {this.state.config.numberFormat.formatFansNum
-                    ? formatNumber(this.state.fansNumber)
-                    : this.state.fansNumber}
-                </div>
-              </StatusBar>
-            )}
-          <DanmuRender danmuList={this.state.danmuList} />
-        </ConfigContext.Provider>
-        {this.state.connectState != "open" &&
-          this.state.connectAttemptNumber < this.maxAttemptNumber && (
-            <LoadingPage
-              action={"连接中"}
-              description={"尝试次数: " + this.state.connectAttemptNumber}
-            />
-          )}
-        {this.state.connectAttemptNumber >= this.maxAttemptNumber && (
+    let status = null;
+
+    if (this.state.connectState == "open") {
+      if (this.state.config.statusBarDisplay) {
+        status = (
+          <StatusBar
+            message={this.state.statusMessage}
+            style={{
+              backgroundColor:
+                this.state.config.style.mainStyle.backgroundColor,
+              borderColor: this.state.config.style.mainStyle.backgroundColor,
+              color: this.state.config.style.mainStyle.color,
+            }}
+          >
+            <div>
+              人气:
+              {this.state.config.numberFormat.formatActivity
+                ? formatNumber(this.state.activity)
+                : this.state.activity}
+            </div>
+            <div>
+              粉丝数:
+              {this.state.config.numberFormat.formatFansNum
+                ? formatNumber(this.state.fansNumber)
+                : this.state.fansNumber}
+            </div>
+          </StatusBar>
+        );
+      }
+    } else {
+      if (
+        this.state.connectAttemptNumber < this.maxAttemptNumber ||
+        this.infiniteAttempt
+      ) {
+        status = (
+          <LoadingPage
+            action={"连接中"}
+            description={"尝试次数: " + this.state.connectAttemptNumber}
+          />
+        );
+      } else {
+        status = (
           <ConnectFail
             connectMethod={() => {
               this.setState((prevState) => {
@@ -401,7 +412,21 @@ export class Main extends React.Component<Props, State> {
               this.tryReconnect();
             }}
           />
-        )}
+        );
+      }
+    }
+
+    return (
+      <div className={style.main} style={this.state.config.style.mainStyle}>
+        <ConfigContext.Provider
+          value={{
+            config: this.state.config,
+            giftConfig: this.state.giftConfig,
+          }}
+        >
+          {status}
+          <DanmuRender danmuList={this.state.danmuList} />
+        </ConfigContext.Provider>
       </div>
     );
   }

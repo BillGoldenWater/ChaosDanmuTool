@@ -50,10 +50,12 @@ export class DanmuViewConfigModifier extends React.Component {
                 description={
                   <div>
                     当弹幕查看器 无法连接到应用 或 断开连接 后尝试连接的最大次数
+                    <br />
+                    设置为-1为无限尝试 间隔1秒
                   </div>
                 }
                 value={dvc.maxReconnectAttemptNumber}
-                min={1}
+                min={-1}
                 setNumber={(value) => {
                   setDvc({ ...dvc, maxReconnectAttemptNumber: value });
                 }}
