@@ -271,3 +271,25 @@ export function getDefaultDanmuViewCustomConfig(
 
   return result;
 }
+
+export function getDefaultTextReplacerConfig(
+  config?: TextReplacerConfig
+): TextReplacerConfig {
+  if (!config) return cloneDeep(defaultTextReplacer);
+
+  const result: TextReplacerConfig = cloneDeep(config);
+  defaultsDeep(result, defaultTextReplacer);
+
+  return result;
+}
+
+export function getDefaultBlackListMatchConfig(
+  config?: BlackListMatchConfig
+): BlackListMatchConfig {
+  if (!config) return cloneDeep(defaultBlackListMatch);
+
+  const result: BlackListMatchConfig = cloneDeep(config);
+  defaultsDeep(result, defaultBlackListMatch);
+
+  return result;
+}
