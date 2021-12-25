@@ -317,7 +317,6 @@ function init(): void {
     "https://api.github.com/repos/BiliGoldenWater/ChaosDanmuTool/releases",
     "https://raw.githubusercontent.com/BiliGoldenWater/ChaosDanmuTool/master/changeLog.md"
   );
-
   GiftConfigGetter.init();
 
   ipcMain.on("connection", (event, ...args) => {
