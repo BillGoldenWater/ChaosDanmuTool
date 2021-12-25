@@ -317,12 +317,6 @@ function init(): void {
     "https://api.github.com/repos/BiliGoldenWater/ChaosDanmuTool/releases",
     "https://raw.githubusercontent.com/BiliGoldenWater/ChaosDanmuTool/master/changeLog.md"
   );
-  Update.getChangeLog().then((value) => {
-    console.log("\n\n");
-    console.log(value);
-    console.log("\n\n");
-    app.quit();
-  });
 
   GiftConfigGetter.init();
 
