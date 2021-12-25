@@ -12,7 +12,18 @@ import {
   getConfigUpdateCmd,
 } from "../../../utils/command/ConfigUpdate";
 import { WebsocketClient } from "../../../utils/client/WebsocketClient";
-import { ConfigProvider, Layout, Menu, notification } from "antd";
+import {
+  Button,
+  Card,
+  Collapse,
+  ConfigProvider,
+  Layout,
+  Menu,
+  message,
+  Modal,
+  notification,
+  Typography,
+} from "antd";
 import {
   ApiOutlined,
   AppstoreOutlined,
@@ -24,6 +35,9 @@ import SubMenu from "antd/lib/menu/SubMenu";
 import { ConnectRoom } from "./connectroom/ConnectRoom";
 import { DanmuViewerControl } from "./danmuviewercontrol/DanmuViewerControl";
 import { Settings } from "./settings/Settings";
+import { TGithubReleases } from "../../../type/TGithubReleases";
+import { TGithubRelease } from "../../../type/TGithubRelease";
+import MarkdownIt from "markdown-it";
 
 const { Sider, Content } = Layout;
 
@@ -40,9 +54,15 @@ class State {
   siderCollapsed: boolean;
   pageKey: PageKey;
   receiverStatus: ReceiverStatus;
+  showUpdate: boolean;
+  updateRedirecting: boolean;
+  updateDownloadLink: string;
+  latestGithubRelease: TGithubRelease;
+  changeLog: string;
 }
 
 export class Main extends React.Component<Props, State> {
+  markdownIt: MarkdownIt;
   websocketClient: WebsocketClient;
 
   constructor(props: Props) {
@@ -53,6 +73,11 @@ export class Main extends React.Component<Props, State> {
       siderCollapsed: true,
       pageKey: "connectRoom",
       receiverStatus: "close",
+      showUpdate: false,
+      updateRedirecting: false,
+      updateDownloadLink: "",
+      latestGithubRelease: null,
+      changeLog: "",
     };
 
     this.websocketClient = new WebsocketClient(
@@ -80,7 +105,52 @@ export class Main extends React.Component<Props, State> {
       }
     );
 
+    this.markdownIt = new MarkdownIt();
+
     this.websocketClient.connect("localhost", this.state.config.httpServerPort);
+    this.checkUpdate();
+  }
+
+  checkUpdate(fromUser?: boolean): void {
+    window.electron.checkUpdate().then((hasUpdate: boolean) => {
+      if (hasUpdate) {
+        window.electron.getChangeLog().then((changeLog: string) => {
+          this.setState({
+            changeLog: changeLog,
+          });
+          window.electron
+            .getReleasesInfo()
+            .then((releasesInfo: TGithubReleases) => {
+              const latestRelease = releasesInfo[0];
+
+              if (
+                latestRelease.tag_name == this.state.config.update.ignoreVersion
+              ) {
+                if (!fromUser) {
+                  return;
+                }
+              }
+
+              const assets = latestRelease.assets;
+              const platform = window.electron.getPlatform();
+              const assetForCurrentPlatform = assets.find((value) => {
+                return value.name.includes(platform);
+              });
+              const link = assetForCurrentPlatform.browser_download_url;
+
+              this.setState({
+                showUpdate: hasUpdate,
+                updateDownloadLink: link,
+                latestGithubRelease: latestRelease,
+              });
+            });
+        });
+      } else {
+        if (fromUser) {
+          message.success("当前已是最新版本").then();
+        }
+      }
+    });
   }
 
   onMessage(event: MessageEvent): void {
@@ -171,9 +241,83 @@ export class Main extends React.Component<Props, State> {
       }
     }
 
+    let updateInfo = null;
+    if (this.state.showUpdate) {
+      updateInfo = (
+        <Modal
+          title={"新的版本!"}
+          visible={this.state.showUpdate}
+          closable={false}
+          footer={[
+            <Button // download
+              key={"link"}
+              href={this.state.updateDownloadLink}
+              type={"primary"}
+              loading={this.state.updateRedirecting}
+              onClick={() => {
+                this.setState({ updateRedirecting: true });
+                setTimeout(() => {
+                  this.setState({
+                    showUpdate: false,
+                    updateRedirecting: false,
+                  });
+                }, 3000);
+              }}
+            >
+              下载
+            </Button>,
+            <Button // skip
+              onClick={() => {
+                this.setState({ showUpdate: false });
+                configContext.setConfig({
+                  ...this.state.config,
+                  update: {
+                    ...this.state.config.update,
+                    ignoreVersion: this.state.latestGithubRelease.tag_name,
+                  },
+                });
+              }}
+            >
+              跳过此版本
+            </Button>,
+            <Button // close
+              onClick={() => {
+                this.setState({ showUpdate: false });
+              }}
+            >
+              关闭
+            </Button>,
+          ]}
+        >
+          <Typography.Title level={3}>
+            {this.state.latestGithubRelease.name}
+          </Typography.Title>
+          <Card>
+            <div
+              dangerouslySetInnerHTML={{
+                __html: this.markdownIt.render(
+                  this.state.latestGithubRelease.body
+                ),
+              }}
+            />
+          </Card>
+          <Collapse>
+            <Collapse.Panel key={"changeLog"} header={"历史更新记录"}>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: this.markdownIt.render(this.state.changeLog),
+                }}
+              />
+            </Collapse.Panel>
+          </Collapse>
+        </Modal>
+      );
+    }
+
     return (
       <ConfigContext.Provider value={configContext}>
         <ConfigProvider>
+          {updateInfo}
           <Layout>
             <Sider
               collapsible={true}

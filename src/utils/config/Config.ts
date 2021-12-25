@@ -1,6 +1,10 @@
 import { CSSProperties } from "react";
 import { cloneDeep, defaultsDeep } from "lodash-es";
 
+export type UpdateConfig = {
+  ignoreVersion: string;
+};
+
 export type DanmuReceiverConfig = {
   serverUrl: string;
   roomid: number;
@@ -81,6 +85,7 @@ export type Config = {
   autoSaveOnChange: boolean;
   httpServerPort: number;
   darkTheme: boolean;
+  update: UpdateConfig;
   danmuReceiver: DanmuReceiverConfig;
   danmuViewConfig: DanmuViewConfig;
   danmuViewCustoms: DanmuViewCustomConfig[];
@@ -181,6 +186,9 @@ const defaultConfig: Config = {
   autoSaveOnChange: true,
   httpServerPort: 25555,
   darkTheme: true,
+  update: {
+    ignoreVersion: "",
+  },
   danmuReceiver: {
     serverUrl: "wss://broadcastlv.chat.bilibili.com/sub",
     roomid: 0,
