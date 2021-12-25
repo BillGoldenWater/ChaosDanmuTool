@@ -27,7 +27,7 @@ export class ConfigItem extends React.Component<Props> {
         item = (
           <InputNumber
             disabled={props.disabled}
-            defaultValue={props.value as number}
+            value={props.value as number}
             min={props.min}
             max={props.max}
             step={props.step}
@@ -40,7 +40,7 @@ export class ConfigItem extends React.Component<Props> {
         item = (
           <Input
             disabled={props.disabled}
-            defaultValue={props.value as string}
+            value={props.value as string}
             onChange={(value) => props.setString(value.target.value)}
           />
         );
@@ -62,7 +62,7 @@ export class ConfigItem extends React.Component<Props> {
             disabled={props.disabled}
             type={"color"}
             style={{ minWidth: "5em" }}
-            defaultValue={props.value as string}
+            value={props.value as string}
             onChange={(value) => props.setString(value.target.value)}
           />
         );

@@ -20,7 +20,7 @@ export class ConnectRoom extends React.Component<Props> {
                 <Space>
                   <InputNumber
                     min={0}
-                    defaultValue={config.danmuReceiver.roomid}
+                    value={config.danmuReceiver.roomid}
                     onChange={(value) => {
                       setConfig({
                         ...config,
