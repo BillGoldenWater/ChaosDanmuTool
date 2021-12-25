@@ -1,4 +1,12 @@
-import { app, BrowserWindow, ipcMain, Menu, screen, Display } from "electron";
+import {
+  app,
+  BrowserWindow,
+  ipcMain,
+  Menu,
+  screen,
+  Display,
+  IpcMainEvent,
+} from "electron";
 import { DanmuReceiver } from "./utils/client/DanmuReceiver";
 import { ConfigManager } from "./utils/config/ConfigManager";
 import * as path from "path";
@@ -320,6 +328,14 @@ function init(): void {
   GiftConfigGetter.init();
 
   //region ipcMain
+  function callCallback(
+    event: IpcMainEvent,
+    callbackId: string,
+    ...args: unknown[]
+  ): void {
+    event.reply("callback", callbackId, ...args);
+  }
+
   //region app
   ipcMain.on("app", (event, ...args) => {
     switch (args[0]) {
@@ -444,19 +460,18 @@ function init(): void {
 
   //region update
   //incoming: name, callbackID
-  //reply: callbackID,...args
   ipcMain.on("update", async (event, ...args) => {
     switch (args[0]) {
       case "checkUpdate": {
-        event.reply("callback", args[1], await Update.checkUpdate());
+        callCallback(event, args[1], await Update.checkUpdate());
         break;
       }
       case "getReleasesInfo": {
-        event.reply("callback", args[1], await Update.getReleasesInfo());
+        callCallback(event, args[1], await Update.getReleasesInfo());
         break;
       }
       case "getChangeLog": {
-        event.reply("callback", args[1], await Update.getChangeLog());
+        callCallback(event, args[1], await Update.getChangeLog());
         break;
       }
     }
