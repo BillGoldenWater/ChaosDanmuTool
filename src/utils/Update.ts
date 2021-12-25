@@ -22,6 +22,8 @@ export class Update {
 
   static async updateReleaseInfo(ignoreException?: boolean): Promise<boolean> {
     let response = "";
+
+    //region 获取数据
     try {
       response = await httpsGet(this.releaseUrl);
     } catch (e) {
@@ -31,6 +33,9 @@ export class Update {
       this.getReleasesSuccess = false;
       return false;
     }
+    //endregion
+
+    //region 解析数据
     try {
       this.releasesInfo = JSON.parse(response);
       this.releasesInfo = this.releasesInfo.filter((value) => {
@@ -51,11 +56,14 @@ export class Update {
       this.getReleasesSuccess = false;
       return false;
     }
+    //endregion
+
     this.getReleasesSuccess = true;
     return true;
   }
 
   static async updateChangeLog(ignoreException?: boolean): Promise<boolean> {
+    //region 获取数据
     try {
       this.changeLog = await httpsGet(this.changeLogUrl);
     } catch (e) {
@@ -65,8 +73,19 @@ export class Update {
       this.getChangeLogSuccess = false;
       return false;
     }
+    //endregion
+
     this.getChangeLogSuccess = true;
     return true;
+  }
+
+  static async getReleasesInfo(): Promise<TGithubReleases> {
+    if (!this.getReleasesSuccess) {
+      if (!(await this.updateReleaseInfo())) {
+        return null;
+      }
+    }
+    return this.releasesInfo;
   }
 
   static async getChangeLog(): Promise<string> {
@@ -79,18 +98,18 @@ export class Update {
   }
 
   static async getLatestVersion(): Promise<string> {
-    if (!this.getReleasesSuccess) {
-      if (!(await this.updateReleaseInfo())) {
-        return "";
-      }
+    const info: TGithubReleases = await this.getReleasesInfo();
+    if (!info) {
+      return "";
     }
-    return this.releasesInfo[0].tag_name;
+    return info[0].tag_name;
   }
 
   /*
    * @return true if it has a newer version
    * */
   static async checkUpdate(): Promise<boolean> {
+    await this.updateReleaseInfo();
     const latestVer = await this.getLatestVersion();
     if (latestVer == "") {
       return false;

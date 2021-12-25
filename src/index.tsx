@@ -319,6 +319,28 @@ function init(): void {
   );
   GiftConfigGetter.init();
 
+  //region ipcMain
+  //region app
+  ipcMain.on("app", (event, ...args) => {
+    switch (args[0]) {
+      case "getPlatform": {
+        event.returnValue = process.platform;
+        break;
+      }
+      case "getVersion": {
+        event.returnValue = app.getVersion();
+        break;
+      }
+      case "getPath": {
+        event.returnValue = app.getPath(args[1]);
+        break;
+      }
+    }
+    event.returnValue = "";
+  });
+  //endregion
+
+  //region connection
   ipcMain.on("connection", (event, ...args) => {
     switch (args[0]) {
       case "connect": {
@@ -336,7 +358,9 @@ function init(): void {
     }
     event.returnValue = "";
   });
+  //endregion
 
+  //region config
   ipcMain.on("config", (event, ...args) => {
     let result = "";
     switch (args[0]) {
@@ -360,7 +384,9 @@ function init(): void {
     }
     event.returnValue = result;
   });
+  //endregion
 
+  //region koaServer
   ipcMain.on("koaServer", (event, ...args) => {
     switch (args[0]) {
       case "run": {
@@ -374,7 +400,9 @@ function init(): void {
     }
     event.returnValue = "";
   });
+  //endregion
 
+  //region websocketServer
   ipcMain.on("websocketServer", (event, ...args) => {
     switch (args[0]) {
       case "run": {
@@ -396,7 +424,9 @@ function init(): void {
     }
     event.returnValue = "";
   });
+  //endregion
 
+  //region windowControl
   ipcMain.on("windowControl", (event, ...args) => {
     switch (args[0]) {
       case "openViewer": {
@@ -410,6 +440,29 @@ function init(): void {
     }
     event.returnValue = "";
   });
+  //endregion
+
+  //region update
+  //incoming: name, callbackID
+  //reply: callbackID,...args
+  ipcMain.on("update", async (event, ...args) => {
+    switch (args[0]) {
+      case "checkUpdate": {
+        event.reply("callback", args[1], await Update.checkUpdate());
+        break;
+      }
+      case "getReleasesInfo": {
+        event.reply("callback", args[1], await Update.getReleasesInfo());
+        break;
+      }
+      case "getChangeLog": {
+        event.reply("callback", args[1], await Update.getChangeLog());
+        break;
+      }
+    }
+  });
+  //endregion
+  //endregion
 
   if (process.platform == "darwin") {
     const dockMenu = Menu.buildFromTemplate([

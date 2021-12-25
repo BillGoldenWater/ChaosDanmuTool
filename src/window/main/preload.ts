@@ -1,6 +1,12 @@
-import { clipboard, contextBridge, ipcRenderer } from "electron";
+import { contextBridge, ipcRenderer } from "electron";
+import { v4 as uuid4 } from "uuid";
+import { TGithubReleases } from "../../type/TGithubReleases";
 
 export interface ApiElectron {
+  getPlatform: () => string;
+  getVersion: () => string;
+  getPath: (name: string) => string;
+
   connect: (roomid: number) => void;
   disconnect: () => void;
 
@@ -19,10 +25,34 @@ export interface ApiElectron {
   openViewer: () => void;
   closeViewer: () => void;
 
-  writeClipboard: (text: string) => void;
+  checkUpdate: () => Promise<boolean>;
+  getReleasesInfo: () => Promise<TGithubReleases>;
+  getChangeLog: () => Promise<string>;
+}
+
+type Callbacks = {
+  [key: string]: (...args: unknown[]) => void;
+};
+
+const callbacks: Callbacks = {};
+
+function putCallback(callback: (...args: unknown[]) => void): string {
+  const id = uuid4();
+  callbacks[id] = callback;
+  return id;
 }
 
 const apiElectron: ApiElectron = {
+  getPlatform: (): string => {
+    return ipcRenderer.sendSync("app", "getPlatform");
+  },
+  getVersion: (): string => {
+    return ipcRenderer.sendSync("app", "getVersion");
+  },
+  getPath: (name: string): string => {
+    return ipcRenderer.sendSync("app", "getPath", name);
+  },
+
   connect: (roomid: number): void => {
     ipcRenderer.sendSync("connection", "connect", roomid);
   },
@@ -67,9 +97,30 @@ const apiElectron: ApiElectron = {
     ipcRenderer.sendSync("windowControl", "closeViewer");
   },
 
-  writeClipboard: (text: string): void => {
-    clipboard.writeText(text);
+  checkUpdate: (): Promise<boolean> => {
+    return new Promise((resolve) => {
+      ipcRenderer.send("update", "checkUpdate", putCallback(resolve));
+    });
+  },
+  getReleasesInfo: (): Promise<TGithubReleases> => {
+    return new Promise((resolve) => {
+      ipcRenderer.send("update", "getReleasesInfo", putCallback(resolve));
+    });
+  },
+  getChangeLog: (): Promise<string> => {
+    return new Promise((resolve) => {
+      ipcRenderer.send("update", "getChangeLog", putCallback(resolve));
+    });
   },
 };
 
 contextBridge.exposeInMainWorld("electron", apiElectron);
+
+ipcRenderer.on("callback", (event, ...args) => {
+  const callbackId = args[0];
+  const callback = callbacks[callbackId];
+  if (callback) {
+    callback(...args.slice(1));
+    delete callbacks[callbackId];
+  }
+});
