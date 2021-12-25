@@ -5,4 +5,7 @@ export const errorCode = {
   readException: "0x4",
   giftConfigGetException_1: "0x5_0x1",
   giftConfigGetException_2: "0x5_0x2",
+  githubReleasesGetFail: "0x6",
+  githubReleasesParseFail: "0x7",
+  githubChangeLogGetFail: "0x8",
 };
