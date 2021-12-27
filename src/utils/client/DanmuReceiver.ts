@@ -194,6 +194,8 @@ export class DanmuReceiver {
         }
       });
     });
+
+    this.broadcastMessage(getStatusUpdateMessage("connecting"));
   }
 
   static broadcastMessage(message: unknown): void {

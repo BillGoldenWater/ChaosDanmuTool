@@ -13,6 +13,10 @@ export class StatusUpdate extends React.Component<Props> {
     let statusMsg = "NULL";
 
     switch (rsu.data.status) {
+      case "connecting": {
+        statusMsg = "连接中";
+        break;
+      }
       case "open": {
         statusMsg = "已连接";
         break;

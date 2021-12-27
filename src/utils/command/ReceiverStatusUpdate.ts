@@ -1,4 +1,4 @@
-export type ReceiverStatus = "open" | "close" | "error";
+export type ReceiverStatus = "open" | "close" | "error" | "connecting";
 
 export type ReceiverStatusUpdateCmd = "receiverStatusUpdate";
 
