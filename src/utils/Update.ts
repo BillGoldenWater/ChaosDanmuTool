@@ -109,7 +109,9 @@ export class Update {
    * @return true if it has a newer version
    * */
   static async checkUpdate(): Promise<boolean> {
-    await this.updateReleaseInfo();
+    if (this.getReleasesSuccess) {
+      await this.updateReleaseInfo();
+    }
     const latestVer = await this.getLatestVersion();
     if (latestVer == "") {
       return false;
