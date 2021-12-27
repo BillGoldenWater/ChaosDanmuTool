@@ -1,7 +1,7 @@
-import React, {ReactNode} from "react";
-import {TGithubRelease} from "../../../../type/TGithubRelease";
-import {Button, Card, Collapse, Modal, Typography} from "antd";
-import {ConfigContext} from "../../utils/ConfigContext";
+import React, { ReactNode } from "react";
+import { TGithubRelease } from "../../../../type/TGithubRelease";
+import { Button, Card, Collapse, message, Modal, Typography } from "antd";
+import { ConfigContext } from "../../utils/ConfigContext";
 import MarkdownIt from "markdown-it";
 
 class Props {
@@ -39,19 +39,27 @@ export class UpdateInfo extends React.Component<Props, State> {
 
     return (
       <ConfigContext.Consumer>
-        {({config, setConfig}) => (
+        {({ config, setConfig }) => (
           <Modal
             title={"新的版本!"}
             visible={s.show}
             closable={false}
             footer={[
+              <Button // copy
+                type={"primary"}
+                onClick={() => {
+                  window.electron.writeClipboard(dlLink);
+                  message.success("复制成功").then();
+                }}
+              >
+                复制链接
+              </Button>,
               <Button // download
                 key={"link"}
                 href={dlLink}
-                type={"primary"}
                 loading={s.redirecting}
                 onClick={() => {
-                  this.setState({redirecting: true});
+                  this.setState({ redirecting: true });
                   setTimeout(() => {
                     this.setState({
                       show: false,
@@ -64,7 +72,7 @@ export class UpdateInfo extends React.Component<Props, State> {
               </Button>,
               <Button // skip
                 onClick={() => {
-                  this.setState({show: false});
+                  this.setState({ show: false });
                   setConfig({
                     ...config,
                     update: {
@@ -78,7 +86,7 @@ export class UpdateInfo extends React.Component<Props, State> {
               </Button>,
               <Button // close
                 onClick={() => {
-                  this.setState({show: false});
+                  this.setState({ show: false });
                 }}
               >
                 关闭
@@ -91,9 +99,7 @@ export class UpdateInfo extends React.Component<Props, State> {
             <Card>
               <div
                 dangerouslySetInnerHTML={{
-                  __html: this.markdownIt.render(
-                    p.githubRelease.body
-                  ),
+                  __html: this.markdownIt.render(p.githubRelease.body),
                 }}
               />
             </Card>

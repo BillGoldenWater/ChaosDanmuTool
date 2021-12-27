@@ -1,6 +1,6 @@
-import { contextBridge, ipcRenderer } from "electron";
-import { v4 as uuid4 } from "uuid";
-import { TGithubReleases } from "../../type/TGithubReleases";
+import {contextBridge, ipcRenderer, clipboard} from "electron";
+import {v4 as uuid4} from "uuid";
+import {TGithubReleases} from "../../type/TGithubReleases";
 
 export interface ApiElectron {
   getPlatform: () => string;
@@ -28,6 +28,8 @@ export interface ApiElectron {
   checkUpdate: () => Promise<boolean>;
   getReleasesInfo: () => Promise<TGithubReleases>;
   getChangeLog: () => Promise<string>;
+
+  writeClipboard: (str: string) => void;
 }
 
 type Callbacks = {
@@ -111,6 +113,10 @@ const apiElectron: ApiElectron = {
     return new Promise((resolve) => {
       ipcRenderer.send("update", "getChangeLog", putCallback(resolve));
     });
+  },
+
+  writeClipboard: (str: string): void => {
+    clipboard.writeText(str);
   },
 };
 
