@@ -19,6 +19,7 @@ import {
   DashboardOutlined,
   EyeOutlined,
   HistoryOutlined,
+  InfoCircleOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
 import SubMenu from "antd/lib/menu/SubMenu";
@@ -27,6 +28,7 @@ import { DanmuViewerControl } from "./danmuviewercontrol/DanmuViewerControl";
 import { Settings } from "./settings/Settings";
 import { UpdateChecker } from "../utils/UpdateChecker";
 import { Dashboard } from "./dashboard/Dashboard";
+import { About } from "./about/About";
 
 const { Sider, Content } = Layout;
 
@@ -36,8 +38,9 @@ type PageKey =
   | "dashboard"
   | "connectRoom"
   | "danmuViewerControl"
+  | "danmuHistory"
   | "settings"
-  | "danmuHistory";
+  | "about";
 
 class State {
   config: Config;
@@ -186,6 +189,21 @@ export class Main extends React.Component<Props, State> {
         currentPage = <Settings />;
         break;
       }
+      case "about": {
+        currentPage = (
+          <About
+            checkUpdate={(whenDone) => {
+              UpdateChecker.checkUpdate(this.state.config, true).then(
+                (updateInfo: ReactNode) => {
+                  this.setState({ updateInfo: updateInfo });
+                  whenDone();
+                }
+              );
+            }}
+          />
+        );
+        break;
+      }
     }
 
     return (
@@ -231,6 +249,9 @@ export class Main extends React.Component<Props, State> {
                 </Menu.Item>
                 <Menu.Item key={"settings"} icon={<SettingOutlined />}>
                   设置
+                </Menu.Item>
+                <Menu.Item key={"about"} icon={<InfoCircleOutlined />}>
+                  关于
                 </Menu.Item>
               </Menu>
             </Sider>
