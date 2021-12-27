@@ -100,32 +100,33 @@ export class Main extends React.Component<Props, State> {
         const msg: ReceiverStatusUpdate = msgObj;
 
         this.setState({ receiverStatus: msg.data.status });
+        let notify = null;
+        let statusMsg = "";
         switch (msg.data.status) {
           case "open": {
-            notification.success({
-              message: "直播间连接状态更新",
-              description: "当前状态为: 已连接",
-              placement: "bottomRight",
-            });
+            notify = notification.success;
+            statusMsg = "已连接";
             break;
           }
           case "close": {
-            notification.warn({
-              message: "直播间连接状态更新",
-              description: "当前状态为: 未连接",
-              placement: "bottomRight",
-            });
+            notify = notification.warn;
+            statusMsg = "未连接";
             break;
           }
           case "error": {
-            notification.error({
-              message: "直播间连接状态更新",
-              description: "当前状态为: 发生了错误",
-              placement: "bottomRight",
-            });
+            notify = notification.error;
+            statusMsg = "发生了错误";
             break;
           }
         }
+
+        notify
+          ? notify({
+              message: "直播间连接状态更新",
+              description: `当前状态为: ${statusMsg}`,
+              placement: "bottomRight",
+            })
+          : "";
         break;
       }
       case getConfigUpdateCmd(): {
