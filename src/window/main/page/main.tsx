@@ -16,6 +16,7 @@ import { ConfigProvider, Layout, Menu, notification } from "antd";
 import {
   ApiOutlined,
   AppstoreOutlined,
+  DashboardOutlined,
   EyeOutlined,
   HistoryOutlined,
   SettingOutlined,
@@ -25,12 +26,14 @@ import { ConnectRoom } from "./connectroom/ConnectRoom";
 import { DanmuViewerControl } from "./danmuviewercontrol/DanmuViewerControl";
 import { Settings } from "./settings/Settings";
 import { UpdateChecker } from "../utils/UpdateChecker";
+import { Dashboard } from "./dashboard/Dashboard";
 
 const { Sider, Content } = Layout;
 
 class Props {}
 
 type PageKey =
+  | "dashboard"
   | "connectRoom"
   | "danmuViewerControl"
   | "settings"
@@ -53,7 +56,7 @@ export class Main extends React.Component<Props, State> {
     this.state = {
       config: JSON.parse(window.electron.getConfig()),
       siderCollapsed: true,
-      pageKey: "connectRoom",
+      pageKey: "dashboard",
       receiverStatus: "close",
       updateInfo: null,
     };
@@ -165,6 +168,10 @@ export class Main extends React.Component<Props, State> {
     let currentPage = null;
 
     switch (state.pageKey) {
+      case "dashboard": {
+        currentPage = <Dashboard receiverStatus={this.state.receiverStatus} />;
+        break;
+      }
       case "connectRoom": {
         currentPage = (
           <ConnectRoom receiverStatus={this.state.receiverStatus} />
@@ -204,6 +211,9 @@ export class Main extends React.Component<Props, State> {
                 defaultSelectedKeys={["connectRoom"]}
                 theme={state.config.darkTheme ? "dark" : "light"}
               >
+                <Menu.Item key={"dashboard"} icon={<DashboardOutlined />}>
+                  总览
+                </Menu.Item>
                 <SubMenu
                   key={"functionList"}
                   icon={<AppstoreOutlined />}

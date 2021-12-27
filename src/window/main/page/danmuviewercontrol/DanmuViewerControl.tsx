@@ -12,6 +12,30 @@ class State {
   selectedStyle: string;
 }
 
+export class DanmuViewerSwitch extends React.Component {
+  render(): ReactNode {
+    return (
+      <Space>
+        <Typography.Text>悬浮窗开关:</Typography.Text>
+        <Button
+          onClick={() => {
+            window.electron.openViewer();
+          }}
+        >
+          打开
+        </Button>
+        <Button
+          onClick={() => {
+            window.electron.closeViewer();
+          }}
+        >
+          关闭
+        </Button>
+      </Space>
+    );
+  }
+}
+
 export class DanmuViewerControl extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
@@ -71,23 +95,7 @@ export class DanmuViewerControl extends React.Component<Props, State> {
             <div>
               <Divider orientation={"left"}>在悬浮窗中查看弹幕</Divider>
 
-              <Space>
-                <Typography.Text>悬浮窗开关:</Typography.Text>
-                <Button
-                  onClick={() => {
-                    window.electron.openViewer();
-                  }}
-                >
-                  打开
-                </Button>
-                <Button
-                  onClick={() => {
-                    window.electron.closeViewer();
-                  }}
-                >
-                  关闭
-                </Button>
-              </Space>
+              <DanmuViewerSwitch />
 
               <Divider orientation={"left"}>在其他应用中查看弹幕</Divider>
 
