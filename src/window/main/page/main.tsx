@@ -12,7 +12,7 @@ import {
   getConfigUpdateCmd,
 } from "../../../utils/command/ConfigUpdate";
 import { WebsocketClient } from "../../../utils/client/WebsocketClient";
-import { ConfigProvider, Layout, Menu, message, notification } from "antd";
+import { ConfigProvider, Layout, Menu, notification } from "antd";
 import {
   ApiOutlined,
   AppstoreOutlined,
@@ -24,8 +24,7 @@ import SubMenu from "antd/lib/menu/SubMenu";
 import { ConnectRoom } from "./connectroom/ConnectRoom";
 import { DanmuViewerControl } from "./danmuviewercontrol/DanmuViewerControl";
 import { Settings } from "./settings/Settings";
-import { TGithubReleases } from "../../../type/TGithubReleases";
-import { UpdateInfo } from "./updateinfo/UpdateInfo";
+import { UpdateChecker } from "../utils/UpdateChecker";
 
 const { Sider, Content } = Layout;
 
@@ -85,42 +84,12 @@ export class Main extends React.Component<Props, State> {
     );
 
     this.websocketClient.connect("localhost", this.state.config.httpServerPort);
-    this.checkUpdate();
-  }
 
-  checkUpdate(fromUser?: boolean): void {
-    window.electron.checkUpdate().then((hasUpdate: boolean) => {
-      if (hasUpdate) {
-        window.electron.getChangeLog().then((changeLog: string) => {
-          window.electron
-            .getReleasesInfo()
-            .then((releasesInfo: TGithubReleases) => {
-              const latestRelease = releasesInfo[0];
-
-              if (
-                latestRelease.tag_name == this.state.config.update.ignoreVersion
-              ) {
-                if (!fromUser) {
-                  return;
-                }
-              }
-
-              this.setState({
-                updateInfo: (
-                  <UpdateInfo
-                    githubRelease={latestRelease}
-                    changeLog={changeLog}
-                  />
-                ),
-              });
-            });
-        });
-      } else {
-        if (fromUser) {
-          message.success("当前已是最新版本").then();
-        }
+    UpdateChecker.checkUpdate(this.state.config).then(
+      (updateInfo: ReactNode) => {
+        this.setState({ updateInfo: updateInfo });
       }
-    });
+    );
   }
 
   onMessage(event: MessageEvent): void {
