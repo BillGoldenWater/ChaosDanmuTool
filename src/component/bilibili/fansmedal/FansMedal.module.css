@@ -3,9 +3,11 @@
   align-items: center;
   word-break: break-all;
   line-height: initial;
+  height: 1.3em;
 }
 
 .FansMedal > div {
+  height: 100%;
   display: flex;
   justify-content: space-around;
   align-items: center;
