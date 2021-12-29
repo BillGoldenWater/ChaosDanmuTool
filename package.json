@@ -91,6 +91,7 @@
     "antd": "^4.17.4",
     "css-loader": "^6.0.0",
     "dot-prop": "^6.0.1",
+    "echarts": "^5.2.2",
     "echarts-for-react": "^3.0.2",
     "electron": "^16.0.2",
     "eslint": "^7.6.0",
