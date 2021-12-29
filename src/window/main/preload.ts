@@ -1,7 +1,8 @@
-import { contextBridge, ipcRenderer, clipboard } from "electron";
-import { v4 as uuid4 } from "uuid";
-import { TGithubReleases } from "../../type/TGithubReleases";
-import { Config } from "../../utils/config/Config";
+import {contextBridge, ipcRenderer, clipboard} from "electron";
+import {v4 as uuid4} from "uuid";
+import {TGithubReleases} from "../../type/TGithubReleases";
+import {Config} from "../../utils/config/Config";
+import {MessageLog} from "../../utils/command/MessageLog";
 
 export interface ApiElectron {
   getPlatform: () => string;
@@ -29,6 +30,8 @@ export interface ApiElectron {
   checkUpdate: () => Promise<boolean>;
   getReleasesInfo: () => Promise<TGithubReleases>;
   getChangeLog: () => Promise<string>;
+
+  getDanmuHistory: () => MessageLog[];
 
   writeClipboard: (str: string) => void;
 }
@@ -114,6 +117,10 @@ const apiElectron: ApiElectron = {
     return new Promise((resolve) => {
       ipcRenderer.send("update", "getChangeLog", putCallback(resolve));
     });
+  },
+
+  getDanmuHistory: (): MessageLog[] => {
+    return ipcRenderer.sendSync("danmu", "getDanmuHistory");
   },
 
   writeClipboard: (str: string): void => {
