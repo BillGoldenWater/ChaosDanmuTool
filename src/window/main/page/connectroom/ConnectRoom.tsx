@@ -13,7 +13,7 @@ export class ConnectRoom extends React.Component<Props> {
 
     return (
       <ConfigContext.Consumer>
-        {({ config, setConfig }) => {
+        {({ get, set }) => {
           const open = props.receiverStatus == "open";
           const connecting = this.props.receiverStatus == "connecting" && {
             delay: 100,
@@ -25,16 +25,8 @@ export class ConnectRoom extends React.Component<Props> {
                 <Space>
                   <InputNumber
                     min={0}
-                    value={config.danmuReceiver.roomid}
-                    onChange={(value) => {
-                      setConfig({
-                        ...config,
-                        danmuReceiver: {
-                          ...config.danmuReceiver,
-                          roomid: value,
-                        },
-                      });
-                    }}
+                    value={get("danmuReceiver.roomid") as number}
+                    onChange={(value) => set("danmuReceiver.roomid", value)}
                   />
                   <Button
                     type={"primary"}
@@ -43,7 +35,9 @@ export class ConnectRoom extends React.Component<Props> {
                       if (open) {
                         window.electron.disconnect();
                       } else {
-                        window.electron.connect(config.danmuReceiver.roomid);
+                        window.electron.connect(
+                          get("danmuReceiver.roomid") as number
+                        );
                       }
                     }}
                   >

@@ -1,5 +1,6 @@
 import React, { ReactNode } from "react";
-import { ConfigContext } from "../../../../utils/ConfigContext";
+import { ConfigContext, TConfigContext } from "../../../../utils/ConfigContext";
+import dotProp from "dot-prop";
 import {
   Button,
   Collapse,
@@ -10,10 +11,11 @@ import {
   Typography,
 } from "antd";
 import {
+  BlackListMatchConfig,
   DanmuViewCustomConfig,
-  DanmuViewStyleConfig,
   defaultViewCustomInternalName,
   getDefaultDanmuViewCustomConfig,
+  TextReplacerConfig,
 } from "../../../../../../utils/config/Config";
 import { TextIconModifier } from "./texticonmodifier/TextIconModifier";
 import { ConfigItem } from "../../../../../../component/configitem/ConfigItem";
@@ -71,15 +73,15 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
   render(): ReactNode {
     return (
       <ConfigContext.Consumer>
-        {({ config, setConfig }) => {
+        {({ set, get }) => {
           const state = this.state;
 
-          const dvcs = config.danmuViewCustoms;
+          const dvcs = get("danmuViewCustoms") as DanmuViewCustomConfig[];
           const setDvcs = (danmuViewCustoms: DanmuViewCustomConfig[]) => {
-            setConfig({ ...config, danmuViewCustoms: danmuViewCustoms });
+            set("danmuViewCustoms", danmuViewCustoms);
           };
 
-          const styleOptionList = config.danmuViewCustoms.map((value) => {
+          const styleOptionList = dvcs.map((value) => {
             return (
               <Select.Option key={value.name} value={value.name}>
                 {value.name}
@@ -87,7 +89,7 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
             );
           });
 
-          const styleNameList = config.danmuViewCustoms.map((value) => {
+          const styleNameList = dvcs.map((value) => {
             return value.name;
           });
 
@@ -99,25 +101,47 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
             ? styleNameList[0]
             : "";
 
-          const cDvcL = dvcs.filter((value) => {
+          const dvcL = dvcs.filter((value) => {
             return value.name == verifiedSelectedStyle;
           });
 
-          const cDvc =
-            cDvcL.length > 0 ? cDvcL[0] : getDefaultDanmuViewCustomConfig();
+          const dvc =
+            dvcL.length > 0 ? dvcL[0] : getDefaultDanmuViewCustomConfig();
 
-          const setDvc = (viewCustomConfig: DanmuViewCustomConfig) => {
-            const tempList = config.danmuViewCustoms.filter((value) => {
-              return value.name != cDvc.name;
-            });
-            tempList.push(viewCustomConfig);
-            setConfig({ ...config, danmuViewCustoms: tempList });
-            this.setState({ selectedStyle: viewCustomConfig.name });
+          const dvcGet = (key: string, defaultValue?: unknown) => {
+            return dotProp.get(dvc, key, defaultValue);
           };
 
-          const dvcStyle = cDvc.style;
-          const setDvcStyle = (style: DanmuViewStyleConfig) => {
-            setDvc({ ...cDvc, style: style });
+          const dvcSet = (key: string, value: unknown) => {
+            // const tempList = dvcs.filter((value) => {
+            //   return value.name != cDvc.name;
+            // });
+            // tempList.push(viewCustomConfig);
+            // setConfig({...config, danmuViewCustoms: tempList});
+            // this.setState({selectedStyle: viewCustomConfig.name});
+
+            dotProp.set(dvc, key, value);
+            set("danmuViewCustoms", dvcs);
+          };
+
+          const dvcContext: TConfigContext = {
+            get: dvcGet,
+            set: dvcSet,
+            updateConfig: null,
+          };
+
+          const dvcStyleGet = (key: string, defaultValue?: unknown) => {
+            return dvcGet(`style.${key}`, defaultValue);
+          };
+
+          const dvcStyleSet = (key: string, value: unknown) => {
+            dvcSet(`style.${key}`, value);
+          };
+
+          const dvcStyleContext: TConfigContext = {
+            get: dvcStyleGet,
+            set: dvcStyleSet,
+            updateConfig: null,
           };
 
           return (
@@ -169,89 +193,69 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
               </Form.Item>
 
               <ConfigItem
+                configContext={dvcContext}
                 type={"string"}
                 disabled={state.selectedStyle == defaultViewCustomInternalName}
                 name={"配置名"}
-                value={cDvc.name}
+                valueKey={"name"}
                 setString={(value) => {
                   if (value == "") {
                     message.warning("名称不能为空").then();
                   } else if (styleNameList.includes(value)) {
                     message.warning("名称不能重复").then();
                   } else {
-                    setDvc({ ...cDvc, name: value });
+                    dvcSet("name", value);
                   }
                 }}
               />
 
               <ConfigItem
+                configContext={dvcContext}
                 type={"number"}
                 name={"最大弹幕数"}
                 description={<div>弹幕查看器中保留的最大弹幕数</div>}
-                value={cDvc.maxDanmuNumber}
+                valueKey={"maxDanmuNumber"}
                 min={1}
-                setNumber={(value) => {
-                  setDvc({ ...cDvc, maxDanmuNumber: value });
-                }}
               />
 
               <ConfigItem
+                configContext={dvcContext}
                 type={"boolean"}
                 name={"显示状态栏"}
                 description={<div>在弹幕查看器底部显示信息</div>}
-                value={cDvc.statusBarDisplay}
-                setBoolean={(value) => {
-                  setDvc({ ...cDvc, statusBarDisplay: value });
-                }}
+                valueKey={"statusBarDisplay"}
               />
 
               <ConfigItem
+                configContext={dvcContext}
                 type={"boolean"}
                 name={"置顶SC"}
                 description={<div>在SC持续时间内保持SC的显示</div>}
-                value={cDvc.superChatAlwaysOnTop}
-                setBoolean={(value) => {
-                  setDvc({ ...cDvc, superChatAlwaysOnTop: value });
-                }}
+                valueKey={"superChatAlwaysOnTop"}
               />
 
               <Collapse>
                 <Collapse.Panel key={"tts"} header={"语音播报"}>
                   <ConfigItem
+                    configContext={dvcContext}
                     type={"boolean"}
                     name={"启用"}
-                    value={cDvc.tts.enable}
-                    setBoolean={(value) => {
-                      setDvc({
-                        ...cDvc,
-                        tts: {
-                          ...cDvc.tts,
-                          enable: value,
-                        },
-                      });
-                    }}
+                    valueKey={"tts.enable"}
                   />
 
                   <ConfigItem
+                    configContext={dvcContext}
                     type={"number"}
                     name={"播放列表长度上限"}
                     description={
                       <div>当播放列表长度达到上限时会忽略新的弹幕</div>
                     }
-                    value={cDvc.tts.maxPlayListItemNum}
                     min={1}
-                    setNumber={(value) => {
-                      setDvc({
-                        ...cDvc,
-                        tts: {
-                          ...cDvc.tts,
-                          maxPlayListItemNum: value,
-                        },
-                      });
-                    }}
+                    valueKey={"tts.maxPlayListItemNum"}
                   />
 
                   <ConfigItem
+                    configContext={dvcContext}
                     type={"string"}
                     name={"速度"}
                     description={
@@ -260,19 +264,11 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
                         text: 播报内容
                       </div>
                     }
-                    value={cDvc.tts.rate}
-                    setString={(value) => {
-                      setDvc({
-                        ...cDvc,
-                        tts: {
-                          ...cDvc.tts,
-                          rate: value,
-                        },
-                      });
-                    }}
+                    valueKey={"tts.rate"}
                   />
 
                   <ConfigItem
+                    configContext={dvcContext}
                     type={"string"}
                     name={"音高"}
                     description={
@@ -281,19 +277,11 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
                         text: 播报内容
                       </div>
                     }
-                    value={cDvc.tts.pitch}
-                    setString={(value) => {
-                      setDvc({
-                        ...cDvc,
-                        tts: {
-                          ...cDvc.tts,
-                          pitch: value,
-                        },
-                      });
-                    }}
+                    valueKey={"tts.pitch"}
                   />
 
                   <ConfigItem
+                    configContext={dvcContext}
                     type={"string"}
                     name={"音量"}
                     description={
@@ -302,16 +290,7 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
                         text: 播报内容
                       </div>
                     }
-                    value={cDvc.tts.volume}
-                    setString={(value) => {
-                      setDvc({
-                        ...cDvc,
-                        tts: {
-                          ...cDvc.tts,
-                          volume: value,
-                        },
-                      });
-                    }}
+                    valueKey={"tts.volume"}
                   />
 
                   <Collapse>
@@ -321,12 +300,11 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
                       style={{ padding: "0" }}
                     >
                       <TextReplacerModifier
-                        list={cDvc.tts.textReplacer}
+                        list={
+                          dvcGet("tts.textReplacer") as TextReplacerConfig[]
+                        }
                         setList={(value) => {
-                          setDvc({
-                            ...cDvc,
-                            tts: { ...cDvc.tts, textReplacer: value },
-                          });
+                          dvcSet("tts.textReplacer", value);
                         }}
                       />
                     </Collapse.Panel>
@@ -335,37 +313,28 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
                       header={"黑名单匹配"}
                     >
                       <BlackListMatchModifier
-                        list={cDvc.tts.blackListMatch}
+                        list={
+                          dvcGet("tts.blackListMatch") as BlackListMatchConfig[]
+                        }
                         setList={(value) => {
-                          setDvc({
-                            ...cDvc,
-                            tts: { ...cDvc.tts, blackListMatch: value },
-                          });
+                          dvcSet("tts.blackListMatch", value);
                         }}
                       />
                     </Collapse.Panel>
                     <Collapse.Panel key={"danmuSetting"} header={"弹幕相关"}>
                       <ConfigItem
+                        configContext={dvcContext}
                         type={"boolean"}
+                        valueKey={"tts.danmu.speakUserName"}
                         name={"播报用户名"}
                         description={<div>在播报时带上 "xxx说"</div>}
-                        value={cDvc.tts.danmu.speakUserName}
-                        setBoolean={(value) => {
-                          setDvc({
-                            ...cDvc,
-                            tts: {
-                              ...cDvc.tts,
-                              danmu: {
-                                ...cDvc.tts.danmu,
-                                speakUserName: value,
-                              },
-                            },
-                          });
-                        }}
                       />
 
                       <ConfigItem
+                        configContext={dvcContext}
                         type={"number"}
+                        valueKey={"tts.danmu.filterDuplicateContentDelay"}
+                        min={1}
                         name={"过滤同内容弹幕的延迟"}
                         description={
                           <div>
@@ -374,20 +343,6 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
                             过滤指定时间内的重复弹幕 (即使不同用户)
                           </div>
                         }
-                        value={cDvc.tts.danmu.filterDuplicateContentDelay}
-                        min={1}
-                        setNumber={(value) => {
-                          setDvc({
-                            ...cDvc,
-                            tts: {
-                              ...cDvc.tts,
-                              danmu: {
-                                ...cDvc.tts.danmu,
-                                filterDuplicateContentDelay: value,
-                              },
-                            },
-                          });
-                        }}
                       />
                     </Collapse.Panel>
                   </Collapse>
@@ -397,33 +352,17 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
                     例: 10000 格式化后为 1万
                   </Typography.Paragraph>
                   <ConfigItem
+                    configContext={dvcContext}
                     type={"boolean"}
+                    valueKey={"numberFormat.formatActivity"}
                     name={"格式化人气"}
-                    value={cDvc.numberFormat.formatActivity}
-                    setBoolean={(value) => {
-                      setDvc({
-                        ...cDvc,
-                        numberFormat: {
-                          ...cDvc.numberFormat,
-                          formatActivity: value,
-                        },
-                      });
-                    }}
                   />
 
                   <ConfigItem
+                    configContext={dvcContext}
                     type={"boolean"}
+                    valueKey={"numberFormat.formatFansNum"}
                     name={"格式化粉丝数"}
-                    value={cDvc.numberFormat.formatFansNum}
-                    setBoolean={(value) => {
-                      setDvc({
-                        ...cDvc,
-                        numberFormat: {
-                          ...cDvc.numberFormat,
-                          formatFansNum: value,
-                        },
-                      });
-                    }}
                   />
                 </Collapse.Panel>
                 <Collapse.Panel key={"style"} header={"外观"}>
@@ -436,20 +375,17 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
                   </Typography.Paragraph>
 
                   <ConfigItem
+                    configContext={dvcStyleContext}
                     type={"string"}
+                    valueKey={"listMargin"}
                     name={"列表外边距"}
                     description={<div>弹幕列表的外边距</div>}
-                    value={dvcStyle.listMargin}
-                    setString={(value) => {
-                      setDvcStyle({
-                        ...dvcStyle,
-                        listMargin: value,
-                      });
-                    }}
                   />
 
                   <ConfigItem
+                    configContext={dvcStyleContext}
                     type={"string"}
+                    valueKey={"mainStyle.backgroundColor"}
                     name={"背景颜色"}
                     description={
                       <div>
@@ -470,173 +406,88 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
                         </Typography.Text>
                       </div>
                     }
-                    value={dvcStyle.mainStyle.backgroundColor}
-                    setString={(value) => {
-                      setDvcStyle({
-                        ...dvcStyle,
-                        mainStyle: {
-                          ...dvcStyle.mainStyle,
-                          backgroundColor: value,
-                        },
-                      });
-                    }}
                   />
 
                   <ConfigItem
+                    configContext={dvcStyleContext}
                     type={"number"}
-                    name={"缩放"}
-                    value={dvcStyle.mainStyle.zoom}
+                    valueKey={"mainStyle.zoom"}
                     min={0.1}
                     step={0.1}
-                    setNumber={(value) => {
-                      setDvcStyle({
-                        ...dvcStyle,
-                        mainStyle: { ...dvcStyle.mainStyle, zoom: value },
-                      });
-                    }}
+                    name={"缩放"}
                   />
 
                   <ConfigItem
+                    configContext={dvcStyleContext}
                     type={"string"}
+                    valueKey={"mainStyle.lineHeight"}
                     name={"行高"}
-                    value={dvcStyle.mainStyle.lineHeight}
-                    setString={(value) => {
-                      setDvcStyle({
-                        ...dvcStyle,
-                        mainStyle: {
-                          ...dvcStyle.mainStyle,
-                          lineHeight: value,
-                        },
-                      });
-                    }}
                   />
 
                   <ConfigItem
+                    configContext={dvcStyleContext}
                     type={"string"}
+                    valueKey={"giftIcon.height"}
                     name={"礼物图标高度"}
-                    value={dvcStyle.giftIcon.height}
-                    setString={(value) => {
-                      setDvcStyle({
-                        ...dvcStyle,
-                        giftIcon: {
-                          ...dvcStyle.giftIcon,
-                          height: value,
-                        },
-                      });
-                    }}
                   />
 
                   <ConfigItem
+                    configContext={dvcStyleContext}
                     type={"color"}
+                    valueKey={"mainStyle.color"}
                     name={"文字颜色"}
-                    value={dvcStyle.mainStyle.color}
-                    setString={(value) => {
-                      setDvcStyle({
-                        ...dvcStyle,
-                        mainStyle: {
-                          ...dvcStyle.mainStyle,
-                          color: value,
-                        },
-                      });
-                    }}
                   />
 
                   <ConfigItem
+                    configContext={dvcStyleContext}
                     type={"color"}
+                    valueKey={"userName.color"}
                     name={"用户名颜色"}
-                    value={dvcStyle.userName.color}
-                    setString={(value) => {
-                      setDvcStyle({
-                        ...dvcStyle,
-                        userName: {
-                          ...dvcStyle.userName,
-                          color: value,
-                        },
-                      });
-                    }}
                   />
 
                   <ConfigItem
+                    configContext={dvcStyleContext}
                     type={"color"}
+                    valueKey={"danmuContent.color"}
                     name={"弹幕文字颜色"}
-                    value={dvcStyle.danmuContent.color}
-                    setString={(value) => {
-                      setDvcStyle({
-                        ...dvcStyle,
-                        danmuContent: {
-                          ...dvcStyle.danmuContent,
-                          color: value,
-                        },
-                      });
-                    }}
                   />
                   <Collapse>
                     <Collapse.Panel key={"fontSettings"} header={"字体设置"}>
                       <ConfigItem
+                        configContext={dvcStyleContext}
                         type={"string"}
+                        valueKey={"mainStyle.fontFamily"}
                         name={"字体"}
-                        value={dvcStyle.mainStyle.fontFamily}
-                        setString={(value) => {
-                          setDvcStyle({
-                            ...dvcStyle,
-                            mainStyle: {
-                              ...dvcStyle.mainStyle,
-                              fontFamily: value,
-                            },
-                          });
-                        }}
                       />
                       <ConfigItem
+                        configContext={dvcStyleContext}
                         type={"string"}
+                        valueKey={"mainStyle.fontSize"}
                         name={"字体大小"}
-                        value={dvcStyle.mainStyle.fontSize}
-                        setString={(value) => {
-                          setDvcStyle({
-                            ...dvcStyle,
-                            mainStyle: {
-                              ...dvcStyle.mainStyle,
-                              fontSize: value,
-                            },
-                          });
-                        }}
                       />
                       <ConfigItem
+                        configContext={dvcStyleContext}
                         type={"number"}
-                        name={"字重"}
-                        value={dvcStyle.mainStyle.fontWeight}
+                        valueKey={"mainStyle.fontWeight"}
                         min={0}
-                        setNumber={(value) => {
-                          setDvcStyle({
-                            ...dvcStyle,
-                            mainStyle: {
-                              ...dvcStyle.mainStyle,
-                              fontWeight: value,
-                            },
-                          });
-                        }}
+                        name={"字重"}
                       />
                     </Collapse.Panel>
                     <Collapse.Panel key={"iconSettings"} header={"图标设置"}>
                       <TextIconModifier
+                        styleContext={dvcStyleContext}
+                        valueKey={"vipIcon"}
                         name={"VIP图标"}
-                        style={dvcStyle.vipIcon}
-                        setStyle={(iconStyle) => {
-                          setDvcStyle({ ...dvcStyle, vipIcon: iconStyle });
-                        }}
                       />
                       <TextIconModifier
+                        styleContext={dvcStyleContext}
+                        valueKey={"svipIcon"}
                         name={"SVIP图标"}
-                        style={dvcStyle.svipIcon}
-                        setStyle={(iconStyle) => {
-                          setDvcStyle({ ...dvcStyle, svipIcon: iconStyle });
-                        }}
                       />
                       <TextIconModifier
+                        styleContext={dvcStyleContext}
+                        valueKey={"adminIcon"}
                         name={"房管图标"}
-                        style={dvcStyle.adminIcon}
-                        setStyle={(iconStyle) => {
-                          setDvcStyle({ ...dvcStyle, adminIcon: iconStyle });
-                        }}
                       />
                     </Collapse.Panel>
                   </Collapse>

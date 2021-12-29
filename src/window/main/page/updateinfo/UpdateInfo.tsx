@@ -39,7 +39,7 @@ export class UpdateInfo extends React.Component<Props, State> {
 
     return (
       <ConfigContext.Consumer>
-        {({ config, setConfig }) => (
+        {({ set }) => (
           <Modal
             title={"新的版本!"}
             visible={s.show}
@@ -73,13 +73,7 @@ export class UpdateInfo extends React.Component<Props, State> {
               <Button // skip
                 onClick={() => {
                   this.setState({ show: false });
-                  setConfig({
-                    ...config,
-                    update: {
-                      ...config.update,
-                      ignoreVersion: p.githubRelease.tag_name,
-                    },
-                  });
+                  set("update.ignoreVersion", p.githubRelease.tag_name);
                 }}
               >
                 跳过此版本

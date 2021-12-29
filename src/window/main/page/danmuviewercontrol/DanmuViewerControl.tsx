@@ -4,6 +4,7 @@ import { ConfigContext } from "../../utils/ConfigContext";
 import {
   getDefaultConfig,
   defaultViewCustomInternalName,
+  DanmuViewCustomConfig,
 } from "../../../../utils/config/Config";
 
 class Props {}
@@ -48,13 +49,15 @@ export class DanmuViewerControl extends React.Component<Props, State> {
   render(): ReactNode {
     return (
       <ConfigContext.Consumer>
-        {({ config }) => {
+        {({ get }) => {
           const state = this.state;
 
-          const styleNameList = config.danmuViewCustoms.map((value) => {
+          const dvcs = get("danmuViewCustoms") as DanmuViewCustomConfig[];
+
+          const styleNameList = dvcs.map((value) => {
             return value.name;
           });
-          const styleOptionList = config.danmuViewCustoms.map((value) => {
+          const styleOptionList = dvcs.map((value) => {
             return (
               <Select.Option key={value.name} value={value.name}>
                 {value.name}
@@ -70,16 +73,18 @@ export class DanmuViewerControl extends React.Component<Props, State> {
             ? styleNameList[0]
             : "";
 
-          let link = `http://localhost:${config.httpServerPort}/viewer`;
+          let link = `http://localhost:${get("httpServerPort")}/viewer`;
           const param = new URLSearchParams();
 
           if (
-            config.danmuViewConfig.maxReconnectAttemptNumber !=
+            get("danmuViewConfig.maxReconnectAttemptNumber") !=
             getDefaultConfig().danmuViewConfig.maxReconnectAttemptNumber
           ) {
             param.append(
               "maxReconnectAttemptNum",
-              config.danmuViewConfig.maxReconnectAttemptNumber.toString(10)
+              (
+                get("danmuViewConfig.maxReconnectAttemptNumber") as number
+              ).toString(10)
             );
           }
           if (state.selectedStyle != defaultViewCustomInternalName) {
@@ -114,7 +119,7 @@ export class DanmuViewerControl extends React.Component<Props, State> {
               </Typography.Paragraph>
               <Typography.Paragraph type={"secondary"}>
                 其他设备: 需要将链接中的 localhost 替换为本机的ip地址,
-                确保防火墙中放行端口 {config.httpServerPort}
+                确保防火墙中放行端口 {get("httpServerPort")}
               </Typography.Paragraph>
 
               <Form.Item label={"要使用的配置"}>

@@ -1,6 +1,7 @@
 import React, { ReactNode } from "react";
 import style from "./main.module.css";
 import { Config } from "../../../utils/config/Config";
+import dotProp from "dot-prop";
 import {
   getStatusUpdateMessageCmd,
   ReceiverStatus,
@@ -159,8 +160,17 @@ export class Main extends React.Component<Props, State> {
     }
 
     const configContext = {
-      config: state.config,
-      setConfig: (config: Config) => {
+      get: (key: string, defaultValue?: unknown) => {
+        return dotProp.get(state.config, key, defaultValue);
+      },
+      set: (key: string, value: unknown) => {
+        this.setState((prevState) => {
+          dotProp.set(prevState.config, key, value);
+          window.electron.updateConfig(JSON.stringify(prevState.config));
+          return prevState;
+        });
+      },
+      updateConfig: (config: Config) => {
         this.setState({
           config: config,
         });

@@ -11,13 +11,13 @@ export class Settings extends React.Component {
     return (
       <div>
         <ConfigContext.Consumer>
-          {({ setConfig }) => {
+          {({ updateConfig }) => {
             return (
               <Space>
                 <Button
                   onClick={() => {
                     window.electron.loadConfig();
-                    setConfig(JSON.parse(window.electron.getConfig()));
+                    updateConfig(JSON.parse(window.electron.getConfig()));
                   }}
                 >
                   读取
@@ -31,7 +31,7 @@ export class Settings extends React.Component {
                 </Button>
                 <Button
                   onClick={() => {
-                    setConfig(getDefaultConfig());
+                    updateConfig(getDefaultConfig());
                     message.success("重置成功").then();
                   }}
                 >

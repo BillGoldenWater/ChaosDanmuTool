@@ -7,22 +7,19 @@ export class MainConfigModifier extends React.Component {
   render(): ReactNode {
     return (
       <ConfigContext.Consumer>
-        {({ config, setConfig }) => {
-          const cfg = config;
+        {(configContext) => {
           return (
             <div>
               <ConfigItem
+                configContext={configContext}
                 type={"boolean"}
+                valueKey={"darkTheme"}
                 name={"黑暗主题"}
                 description={
                   <div>
                     主题切换出现问题时请按下 Ctrl+R (macOS 为 ⌘ +R) 重新加载
                   </div>
                 }
-                value={cfg.darkTheme}
-                setBoolean={(value) => {
-                  setConfig({ ...cfg, darkTheme: value });
-                }}
               />
 
               <Collapse>
@@ -31,27 +28,24 @@ export class MainConfigModifier extends React.Component {
                   header={"配置文件自动保存设置"}
                 >
                   <ConfigItem
+                    configContext={configContext}
                     type={"boolean"}
                     name={"退出时"}
                     description={<div>退出应用时自动保存配置文件</div>}
-                    value={cfg.autoSaveOnQuit}
-                    setBoolean={(value) => {
-                      setConfig({ ...cfg, autoSaveOnQuit: value });
-                    }}
+                    valueKey={"autoSaveOnQuit"}
                   />
 
                   <ConfigItem
+                    configContext={configContext}
                     type={"boolean"}
                     name={"更改时"}
                     description={<div>每次更改设置时自动保存配置文件</div>}
-                    value={cfg.autoSaveOnChange}
-                    setBoolean={(value) => {
-                      setConfig({ ...cfg, autoSaveOnChange: value });
-                    }}
+                    valueKey={"autoSaveOnChange"}
                   />
                 </Collapse.Panel>
                 <Collapse.Panel key={"advanced"} header={"高级"}>
                   <ConfigItem
+                    configContext={configContext}
                     type={"number"}
                     name={"HTTP服务器监听端口"}
                     description={
@@ -63,11 +57,8 @@ export class MainConfigModifier extends React.Component {
                         服务器连接发生错误)
                       </div>
                     }
-                    value={cfg.httpServerPort}
+                    valueKey={"httpServerPort"}
                     min={0}
-                    setNumber={(value) => {
-                      setConfig({ ...cfg, httpServerPort: value });
-                    }}
                   />
 
                   <Alert
