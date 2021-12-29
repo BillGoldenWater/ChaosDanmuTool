@@ -1,6 +1,7 @@
-import {contextBridge, ipcRenderer, clipboard} from "electron";
-import {v4 as uuid4} from "uuid";
-import {TGithubReleases} from "../../type/TGithubReleases";
+import { contextBridge, ipcRenderer, clipboard } from "electron";
+import { v4 as uuid4 } from "uuid";
+import { TGithubReleases } from "../../type/TGithubReleases";
+import { Config } from "../../utils/config/Config";
 
 export interface ApiElectron {
   getPlatform: () => string;
@@ -12,8 +13,8 @@ export interface ApiElectron {
 
   loadConfig: () => void;
   saveConfig: () => void;
-  getConfig: () => string;
-  updateConfig: (config: string) => void;
+  getConfig: () => Config;
+  updateConfig: (config: Config) => void;
 
   runKoaServer: (port: number) => void;
   closeKoaServer: () => void;
@@ -68,10 +69,10 @@ const apiElectron: ApiElectron = {
   saveConfig: (): void => {
     ipcRenderer.sendSync("config", "save");
   },
-  getConfig: (): string => {
+  getConfig: (): Config => {
     return ipcRenderer.sendSync("config", "get");
   },
-  updateConfig: (config: string): void => {
+  updateConfig: (config: Config): void => {
     ipcRenderer.sendSync("config", "update", config);
   },
 

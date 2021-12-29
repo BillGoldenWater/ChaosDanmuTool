@@ -58,7 +58,7 @@ export class Main extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      config: JSON.parse(window.electron.getConfig()),
+      config: window.electron.getConfig(),
       siderCollapsed: true,
       pageKey: "dashboard",
       receiverStatus: "close",
@@ -166,7 +166,7 @@ export class Main extends React.Component<Props, State> {
       set: (key: string, value: unknown) => {
         this.setState((prevState) => {
           dotProp.set(prevState.config, key, value);
-          window.electron.updateConfig(JSON.stringify(prevState.config));
+          window.electron.updateConfig(prevState.config);
           return prevState;
         });
       },
@@ -174,7 +174,7 @@ export class Main extends React.Component<Props, State> {
         this.setState({
           config: config,
         });
-        window.electron.updateConfig(JSON.stringify(config));
+        window.electron.updateConfig(config);
       },
     };
 

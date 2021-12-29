@@ -12,6 +12,8 @@ import { dialog } from "electron";
 import { ConfigManager } from "../config/ConfigManager";
 import { createViewerWindow, showWindow, viewerWindow } from "../../index";
 
+const get = ConfigManager.get.bind(ConfigManager);
+
 const DataOffset = {
   packetLength: 0,
   headerLength: 4,
@@ -136,7 +138,7 @@ export class DanmuReceiver {
 
       this.broadcastMessage(getStatusUpdateMessage("open"));
 
-      if (ConfigManager.config.danmuViewConfig.autoOpenWhenConnect) {
+      if (get("danmuViewConfig.autoOpenWhenConnect")) {
         showWindow(viewerWindow, createViewerWindow);
       }
     });

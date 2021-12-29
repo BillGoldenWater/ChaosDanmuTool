@@ -4,12 +4,13 @@ import { errorCode } from "../ErrorCode";
 import { dialog } from "electron";
 import { WebsocketServer } from "../server/WebsocketServer";
 import { getConfigUpdateMessage } from "../command/ConfigUpdate";
+import dotProp from "dot-prop";
 
 export class ConfigManager {
-  static config: Config;
-  static filePath: string;
-  static inited: boolean;
-  static loaded: boolean;
+  private static config: Config;
+  private static filePath: string;
+  private static inited: boolean;
+  private static loaded: boolean;
 
   static init(filePath: string): void {
     this.config = getDefaultConfig();
@@ -89,10 +90,28 @@ export class ConfigManager {
     return this.inited && this.loaded;
   }
 
+  static get(key: string, defaultValue?: unknown): unknown {
+    return dotProp.get(this.config, key, defaultValue);
+  }
+
+  static set(key: string, value: unknown): void {
+    dotProp.set(this.config, key, value);
+    this.onChange();
+  }
+
+  static getConfig(): Config {
+    return this.config;
+  }
+
+  static updateConfig(config: Config): void {
+    this.config = config;
+    this.onChange();
+  }
+
   static onChange(): void {
     WebsocketServer.broadcast(
       JSON.stringify(getConfigUpdateMessage(this.config))
     );
-    this.config.autoSaveOnChange ? this.save() : "";
+    this.get("autoSaveOnChange") ? this.save() : "";
   }
 }

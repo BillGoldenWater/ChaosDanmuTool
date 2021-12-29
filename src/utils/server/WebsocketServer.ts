@@ -9,6 +9,9 @@ import { DanmuReceiver } from "../client/DanmuReceiver";
 import { DanmuHistoryGetter } from "../data/DanmuHistoryGetter";
 import { getMessageCommand } from "../command/MessageCommand";
 
+const get = ConfigManager.get.bind(ConfigManager);
+const getConfig = ConfigManager.getConfig.bind(ConfigManager);
+
 export class WebsocketServer {
   static server: Server;
 
@@ -16,7 +19,7 @@ export class WebsocketServer {
     this.close();
     this.server = new Server({ server });
     this.server.on("connection", (socket) => {
-      socket.send(JSON.stringify(getConfigUpdateMessage(ConfigManager.config)));
+      socket.send(JSON.stringify(getConfigUpdateMessage(getConfig())));
       socket.send(
         JSON.stringify(
           getGiftConfigUpdateMessage(GiftConfigGetter.giftConfigRes)
@@ -34,7 +37,7 @@ export class WebsocketServer {
         )
       );
       new DanmuHistoryGetter().get(
-        ConfigManager.config.danmuReceiver.roomid,
+        get("danmuReceiver.roomid") as number,
         (history) => {
           history.forEach((value) => {
             socket.send(

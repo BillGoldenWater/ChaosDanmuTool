@@ -17,7 +17,7 @@ export class Settings extends React.Component {
                 <Button
                   onClick={() => {
                     window.electron.loadConfig();
-                    updateConfig(JSON.parse(window.electron.getConfig()));
+                    updateConfig(window.electron.getConfig());
                   }}
                 >
                   读取
