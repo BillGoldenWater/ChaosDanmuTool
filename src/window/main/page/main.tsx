@@ -159,7 +159,7 @@ export class Main extends React.Component<Props, State> {
     }
 
     const configContext = {
-      config: this.state.config,
+      config: state.config,
       setConfig: (config: Config) => {
         this.setState({
           config: config,
@@ -168,17 +168,15 @@ export class Main extends React.Component<Props, State> {
       },
     };
 
-    let currentPage = null;
+    let currentPage: ReactNode;
 
     switch (state.pageKey) {
       case "dashboard": {
-        currentPage = <Dashboard receiverStatus={this.state.receiverStatus} />;
+        currentPage = <Dashboard receiverStatus={state.receiverStatus} />;
         break;
       }
       case "connectRoom": {
-        currentPage = (
-          <ConnectRoom receiverStatus={this.state.receiverStatus} />
-        );
+        currentPage = <ConnectRoom receiverStatus={state.receiverStatus} />;
         break;
       }
       case "danmuViewerControl": {
@@ -193,7 +191,7 @@ export class Main extends React.Component<Props, State> {
         currentPage = (
           <About
             checkUpdate={(whenDone) => {
-              UpdateChecker.checkUpdate(this.state.config, true).then(
+              UpdateChecker.checkUpdate(state.config, true).then(
                 (updateInfo: ReactNode) => {
                   this.setState({ updateInfo: updateInfo });
                   whenDone();
@@ -203,6 +201,9 @@ export class Main extends React.Component<Props, State> {
           />
         );
         break;
+      }
+      default: {
+        currentPage = <h3>未完成</h3>;
       }
     }
 
