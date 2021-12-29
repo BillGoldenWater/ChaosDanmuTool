@@ -573,6 +573,13 @@
     "@types/keygrip" "*"
     "@types/node" "*"
 
+"@types/dot-prop@^5.0.1":
+  version "5.0.1"
+  resolved "https://registry.npmmirror.com/@types/dot-prop/download/@types/dot-prop-5.0.1.tgz#7dffa5877b19161287a37d3b2bfa06b63724ec22"
+  integrity sha1-ff+lh3sZFhKHo307K/oGtjck7CI=
+  dependencies:
+    dot-prop "*"
+
 "@types/eslint-scope@^3.7.0":
   version "3.7.2"
   resolved "https://registry.npmmirror.com/@types/eslint-scope/download/@types/eslint-scope-3.7.2.tgz#11e96a868c67acf65bf6f11d10bb89ea71d5e473"
@@ -2420,6 +2427,13 @@ dot-case@^3.0.4:
     no-case "^3.0.4"
     tslib "^2.0.3"
 
+dot-prop@*, dot-prop@^6.0.1:
+  version "6.0.1"
+  resolved "https://registry.npmmirror.com/dot-prop/download/dot-prop-6.0.1.tgz#fc26b3cf142b9e59b74dbd39ed66ce620c681083"
+  integrity sha1-/CazzxQrnlm3Tb057WbOYgxoEIM=
+  dependencies:
+    is-obj "^2.0.0"
+
 dotenv@^10.0.0:
   version "10.0.0"
   resolved "https://registry.npmmirror.com/dotenv/download/dotenv-10.0.0.tgz#3d4227b8fb95f81096cdd2b66653fb2c7085ba81"
@@ -4073,6 +4087,11 @@ is-number@^7.0.0:
   version "7.0.0"
   resolved "https://registry.npmmirror.com/is-number/download/is-number-7.0.0.tgz#7535345b896734d5f80c4d06c50955527a14f12b"
   integrity sha1-dTU0W4lnNNX4DE0GxQlVUnoU8Ss=
+
+is-obj@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.npmmirror.com/is-obj/download/is-obj-2.0.0.tgz#473fb05d973705e3fd9620545018ca8e22ef4982"
+  integrity sha1-Rz+wXZc3BeP9liBUUBjKjiLvSYI=
 
 is-path-cwd@^2.2.0:
   version "2.2.0"
