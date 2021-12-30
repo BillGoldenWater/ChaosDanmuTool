@@ -410,15 +410,6 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
 
                   <ConfigItem
                     configContext={dvcStyleContext}
-                    type={"number"}
-                    valueKey={"mainStyle.zoom"}
-                    min={0.1}
-                    step={0.1}
-                    name={"缩放"}
-                  />
-
-                  <ConfigItem
-                    configContext={dvcStyleContext}
                     type={"string"}
                     valueKey={"mainStyle.lineHeight"}
                     name={"行高"}

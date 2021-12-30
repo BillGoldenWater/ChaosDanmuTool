@@ -134,7 +134,6 @@ const defaultDanmuViewCustom: DanmuViewCustomConfig = {
     listMargin: "0.25em",
     mainStyle: {
       backgroundColor: "#3B3B3B44",
-      zoom: 1.0,
       fontSize: "3.5vw",
       fontFamily: "",
       fontWeight: 400,
