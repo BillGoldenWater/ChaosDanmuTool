@@ -67,13 +67,7 @@ export class Main extends React.Component<Props, State> {
 
     this.websocketClient = new WebsocketClient(
       this.onMessage.bind(this),
-      () => {
-        notification.success({
-          message: "连接服务器成功",
-          description: "已连接到指令转发服务器",
-          placement: "bottomRight",
-        });
-      },
+      () => null,
       () => {
         notification.warn({
           message: "已断开服务器连接",
