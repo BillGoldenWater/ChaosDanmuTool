@@ -21,6 +21,14 @@ export class SendGift extends React.Component<Props> {
         {({ giftConfig }) => {
           const gc: TGiftConfig = giftConfig;
           const gi: TGiftInfo = gc ? gc.data.get(data.giftId) : undefined;
+
+          let priceTag = "";
+          if (gi && gi.coin_type == "gold") {
+            const price = (gi.price / 1000) * data.num;
+
+            priceTag = `￥${price.toFixed(2)}`;
+          }
+
           return (
             <div className={style.SendGift}>
               <UserInfo
@@ -36,14 +44,7 @@ export class SendGift extends React.Component<Props> {
                 name={data.giftName}
                 iconUrl={gi ? gi.webp || gi.img_basic : ""}
                 num={data.num}
-                price={
-                  gi
-                    ? gi.coin_type == "gold"
-                      ? ((gi.price / 1000) * data.num).toFixed(2).toString() +
-                        "￥"
-                      : ""
-                    : ""
-                }
+                price={priceTag}
               />
             </div>
           );
