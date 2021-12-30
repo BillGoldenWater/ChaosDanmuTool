@@ -2,6 +2,12 @@ import React, { ReactNode } from "react";
 import { Button, Form, InputNumber, Space } from "antd";
 import { ConfigContext } from "../../utils/ConfigContext";
 import { ReceiverStatus } from "../../../../utils/command/ReceiverStatusUpdate";
+import {
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+  LoadingOutlined,
+  WarningOutlined,
+} from "@ant-design/icons";
 
 class Props {
   receiverStatus: ReceiverStatus;
@@ -9,15 +15,31 @@ class Props {
 
 export class ConnectRoom extends React.Component<Props> {
   render(): ReactNode {
-    const props = this.props;
-
     return (
       <ConfigContext.Consumer>
         {({ get, set }) => {
-          const open = props.receiverStatus == "open";
-          const connecting = this.props.receiverStatus == "connecting" && {
-            delay: 100,
-          };
+          const p = this.props;
+
+          const open = p.receiverStatus == "open";
+          let icon = <></>;
+          switch (p.receiverStatus) {
+            case "connecting": {
+              icon = <LoadingOutlined />;
+              break;
+            }
+            case "open": {
+              icon = <CheckCircleOutlined style={{ color: "#0f0" }} />;
+              break;
+            }
+            case "close": {
+              icon = <CloseCircleOutlined style={{ color: "#ff0" }} />;
+              break;
+            }
+            case "error": {
+              icon = <WarningOutlined style={{ color: "#f00" }} />;
+              break;
+            }
+          }
 
           return (
             <div>
@@ -30,7 +52,6 @@ export class ConnectRoom extends React.Component<Props> {
                   />
                   <Button
                     type={"primary"}
-                    loading={connecting}
                     onClick={() => {
                       if (open) {
                         window.electron.disconnect();
@@ -43,6 +64,7 @@ export class ConnectRoom extends React.Component<Props> {
                   >
                     {!open ? "连接" : "断开"}
                   </Button>
+                  {icon}
                 </Space>
               </Form.Item>
             </div>
