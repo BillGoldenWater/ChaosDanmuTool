@@ -205,7 +205,7 @@ export class Main extends React.Component<Props, State> {
                 onClick={(event) => {
                   this.setState({ pageKey: event.key as PageKey });
                 }}
-                defaultSelectedKeys={["connectRoom"]}
+                defaultSelectedKeys={["dashboard"]}
                 theme={state.config.darkTheme ? "dark" : "light"}
               >
                 <Menu.Item key={"dashboard"} icon={<DashboardOutlined />}>
