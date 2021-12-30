@@ -4,9 +4,10 @@ import { QuestionCircleOutlined } from "@ant-design/icons";
 import { TConfigContext } from "../../window/main/utils/ConfigContext";
 
 class Props {
-  configContext: TConfigContext;
+  configContext?: TConfigContext;
   type: "number" | "string" | "boolean" | "color";
-  valueKey: string;
+  value?: unknown;
+  valueKey?: string;
   disabled?: boolean;
   setNumber?: (value: number) => void;
   setString?: (value: string) => void;
@@ -20,8 +21,39 @@ class Props {
 
 export class ConfigItem extends React.Component<Props> {
   render(): ReactNode {
-    const props = this.props;
-    const { get, set } = props.configContext;
+    const p = this.props;
+    let { get, set }: TConfigContext = {
+      get: null,
+      set: null,
+      updateConfig: null,
+    };
+    if (p.configContext) {
+      get = p.configContext.get;
+      set = p.configContext.set;
+    } else {
+      get = () => {
+        return p.value;
+      };
+      set = (key, value) => {
+        switch (p.type) {
+          case "number":
+            if (p.setNumber) {
+              p.setNumber(value as number);
+            }
+            break;
+          case "string":
+            if (p.setString) {
+              p.setString(value as string);
+            }
+            break;
+          case "boolean":
+            if (p.setBoolean) {
+              p.setBoolean(value as boolean);
+            }
+            break;
+        }
+      };
+    }
 
     let item = <></>;
 
@@ -29,16 +61,16 @@ export class ConfigItem extends React.Component<Props> {
       case "number": {
         item = (
           <InputNumber
-            disabled={props.disabled}
-            value={get(props.valueKey) as number}
-            min={props.min}
-            max={props.max}
-            step={props.step}
+            disabled={p.disabled}
+            value={get(p.valueKey) as number}
+            min={p.min}
+            max={p.max}
+            step={p.step}
             onChange={(value) => {
-              if (props.setNumber) {
-                props.setNumber(value as number);
+              if (p.setNumber) {
+                p.setNumber(value as number);
               } else {
-                set(props.valueKey, value);
+                set(p.valueKey, value);
               }
             }}
           />
@@ -48,13 +80,13 @@ export class ConfigItem extends React.Component<Props> {
       case "string": {
         item = (
           <Input
-            disabled={props.disabled}
-            value={get(props.valueKey) as string}
+            disabled={p.disabled}
+            value={get(p.valueKey) as string}
             onChange={(value) => {
-              if (props.setString) {
-                props.setString(value.target.value);
+              if (p.setString) {
+                p.setString(value.target.value);
               } else {
-                set(props.valueKey, value.target.value);
+                set(p.valueKey, value.target.value);
               }
             }}
           />
@@ -64,14 +96,14 @@ export class ConfigItem extends React.Component<Props> {
       case "boolean": {
         item = (
           <Switch
-            disabled={props.disabled}
-            checked={get(props.valueKey) as boolean}
+            disabled={p.disabled}
+            checked={get(p.valueKey) as boolean}
             onChange={(value) => {
-              if (props.setBoolean) {
-                props.setBoolean(value as boolean);
+              if (p.setBoolean) {
+                p.setBoolean(value as boolean);
                 console.log("1");
               } else {
-                set(props.valueKey, value);
+                set(p.valueKey, value);
               }
             }}
           />
@@ -81,15 +113,15 @@ export class ConfigItem extends React.Component<Props> {
       case "color": {
         item = (
           <Input
-            disabled={props.disabled}
+            disabled={p.disabled}
             type={"color"}
             style={{ minWidth: "5em" }}
-            value={get(props.valueKey) as string}
+            value={get(p.valueKey) as string}
             onChange={(value) => {
-              if (props.setString) {
-                props.setString(value.target.value);
+              if (p.setString) {
+                p.setString(value.target.value);
               } else {
-                set(props.valueKey, value.target.value);
+                set(p.valueKey, value.target.value);
               }
             }}
           />
@@ -99,11 +131,11 @@ export class ConfigItem extends React.Component<Props> {
     }
 
     return (
-      <Form.Item label={props.name}>
+      <Form.Item label={p.name}>
         <Space>
           {item}
-          {props.description && (
-            <Popover content={props.description}>
+          {p.description && (
+            <Popover content={p.description}>
               <QuestionCircleOutlined />
             </Popover>
           )}

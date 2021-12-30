@@ -143,10 +143,6 @@ export class Main extends React.Component<Props, State> {
         });
         break;
       }
-      default: {
-        console.log(msgObj);
-        break;
-      }
     }
   }
 
@@ -182,7 +178,12 @@ export class Main extends React.Component<Props, State> {
 
     switch (state.pageKey) {
       case "dashboard": {
-        currentPage = <Dashboard receiverStatus={state.receiverStatus} />;
+        currentPage = (
+          <Dashboard
+            receiverStatus={state.receiverStatus}
+            httpServerPort={this.state.config.httpServerPort}
+          />
+        );
         break;
       }
       case "connectRoom": {
