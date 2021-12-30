@@ -57,21 +57,26 @@ export class DanmuAnalysis extends React.Component<Props, State> {
     this.setState((prevState) => {
       const done = message.info("正在加载历史弹幕中");
       this.history = window.electron.getDanmuHistory();
-      prevState.danmuPerSecond.clear();
+      const danmuPerSecond = new Map<string, number>();
+      const state = { ...prevState, danmuPerSecond: danmuPerSecond };
 
-      if (this.history == null) {
+      // 如果历史弹幕为空
+      if (this.history == null || this.history.length == 0) {
         done();
         message.success(`加载了 0 条弹幕`).then();
         this.doneLoad();
-        return prevState;
+        return state;
       }
 
+      // 初始化中间所有的时间
       const startTs = Math.round(this.history[0].data.timestamp / 1000);
       const endTs = Math.round(this.history.at(-1).data.timestamp / 1000);
       for (let i = startTs; i <= endTs; i++) {
-        this.updateNumber(prevState, this.formatDate(new Date(i * 1000)));
+        this.updateNumber(state, this.formatDate(new Date(i * 1000)));
       }
 
+      // 统计历史弹幕
+      let danmuCount = 0;
       this.history.forEach((value) => {
         const cmd = value.data.message as MessageCommand;
         if (cmd.cmd != getMessageCommandCmd()) return;
@@ -80,13 +85,14 @@ export class DanmuAnalysis extends React.Component<Props, State> {
         if (danmuMsg.cmd == "DANMU_MSG") return;
 
         const ts = new Date(value.data.timestamp);
-        this.updateNumber(prevState, this.formatDate(ts), 1);
+        this.updateNumber(state, this.formatDate(ts), 1);
+        danmuCount++;
       });
 
       done();
-      message.success(`加载了 ${this.history.length} 条弹幕`).then();
+      message.success(`加载了 ${danmuCount} 条弹幕`).then();
       this.doneLoad();
-      return prevState;
+      return state;
     });
   }
 
@@ -145,8 +151,7 @@ export class DanmuAnalysis extends React.Component<Props, State> {
       series: [
         {
           data: Array.from(s.danmuPerSecond.values()),
-          type: "line",
-          smooth: true,
+          type: "bar",
         },
       ],
       tooltip: {
@@ -177,6 +182,12 @@ export class DanmuAnalysis extends React.Component<Props, State> {
     const minutes = date.getMinutes();
     const seconds = Math.floor(date.getSeconds() / updatePer) * updatePer;
 
-    return `${month}-${date_} ${hours}-${minutes}-${seconds}`;
+    const monthStr = month.toString(10).padStart(2, "0");
+    const dateStr = date_.toString(10).padStart(2, "0");
+    const hoursStr = hours.toString(10).padStart(2, "0");
+    const minutesStr = minutes.toString(10).padStart(2, "0");
+    const secondsStr = seconds.toString(10).padStart(2, "0");
+
+    return `${monthStr}-${dateStr} ${hoursStr}:${minutesStr}:${secondsStr}`;
   }
 }
