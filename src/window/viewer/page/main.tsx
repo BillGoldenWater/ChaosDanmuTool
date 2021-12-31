@@ -168,8 +168,12 @@ export class Main extends React.Component<Props, State> {
           }
         });
 
-        if (viewConfig === null) {
+        if (viewConfig == null) {
           viewConfig = defaultViewConfig;
+        }
+
+        if (viewConfig == null) {
+          viewConfig = getDefaultDanmuViewCustomConfig();
         }
 
         this.setState({
