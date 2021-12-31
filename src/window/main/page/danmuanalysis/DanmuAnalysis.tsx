@@ -151,7 +151,7 @@ export class DanmuAnalysis extends React.Component<Props, State> {
       series: [
         {
           data: Array.from(s.danmuPerSecond.values()),
-          type: "bar",
+          type: "line",
         },
       ],
       tooltip: {
@@ -184,6 +184,7 @@ export class DanmuAnalysis extends React.Component<Props, State> {
     const hours = mergedDate.getHours();
     const minutes = mergedDate.getMinutes();
     const seconds = mergedDate.getSeconds();
+
     const monthStr = month.toString(10).padStart(2, "0");
     const dateStr = date_.toString(10).padStart(2, "0");
     const hoursStr = hours.toString(10).padStart(2, "0");
