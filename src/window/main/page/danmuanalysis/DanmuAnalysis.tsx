@@ -82,7 +82,7 @@ export class DanmuAnalysis extends React.Component<Props, State> {
         if (cmd.cmd != getMessageCommandCmd()) return;
 
         const danmuMsg: DanmuMessage = JSON.parse(cmd.data);
-        if (danmuMsg.cmd == "DANMU_MSG") return;
+        if (danmuMsg.cmd != "DANMU_MSG") return;
 
         const ts = new Date(value.data.timestamp);
         this.updateNumber(state, this.formatDate(ts), 1);
