@@ -10,7 +10,7 @@ export type TSendGift = {
     biz_source: string;
     blind_gift: unknown;
     broadcast_id: number;
-    coin_type: string;
+    coin_type: "gold" | "silver";
     combo_resources_id: number;
     combo_send: unknown;
     combo_stay_time: number; // second

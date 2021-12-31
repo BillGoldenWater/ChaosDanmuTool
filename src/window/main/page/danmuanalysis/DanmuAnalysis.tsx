@@ -8,14 +8,22 @@ import {
   MessageCommand,
 } from "../../../../utils/command/MessageCommand";
 import { DanmuMessage } from "../../../../utils/command/DanmuMessage";
+import { TSendGift } from "../../../../type/TSendGift";
 
 class Props {
   httpServerPort: number;
   updatePer: number; //second(s)
 }
 
+type MessageCount = {
+  danmu: number;
+  gift: number;
+  freeGift: number;
+  paidGift: number;
+};
+
 class State {
-  danmuPerSecond: Map<string, number>;
+  danmuMsgCount: Map<string, MessageCount>;
 }
 
 export class DanmuAnalysis extends React.Component<Props, State> {
@@ -27,7 +35,7 @@ export class DanmuAnalysis extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      danmuPerSecond: new Map<string, number>(),
+      danmuMsgCount: new Map<string, MessageCount>(),
     };
 
     this.websocketClient = new WebsocketClient(
@@ -37,120 +45,180 @@ export class DanmuAnalysis extends React.Component<Props, State> {
       () => message.error("无法接收弹幕信息, 数据可能不会实时更新").then()
     );
 
-    window.setTimeout(this.loadHistory.bind(this), 500);
+    window.setTimeout(this.load.bind(this), 500);
   }
 
   componentDidUpdate(prevProps: Readonly<Props>): void {
     if (prevProps.updatePer != this.props.updatePer) {
-      this.websocketClient.close();
-      window.clearInterval(this.updateTimer);
-
-      this.loadHistory();
+      this.reload();
     }
   }
 
   componentWillUnmount(): void {
-    window.clearInterval(this.updateTimer);
+    this.unload();
   }
 
-  loadHistory(): void {
-    this.setState((prevState) => {
-      const done = message.info("正在加载历史弹幕中");
-      this.history = window.electron.getDanmuHistory();
-      const danmuPerSecond = new Map<string, number>();
-      const state = { ...prevState, danmuPerSecond: danmuPerSecond };
+  async load(): Promise<void> {
+    const done = message.info("正在加载历史弹幕中");
+    const dc = new Map<string, MessageCount>();
+    const state: State = { ...this.state, danmuMsgCount: dc };
+    this.history = window.electron.getDanmuHistory();
 
-      // 如果历史弹幕为空
-      if (this.history == null || this.history.length == 0) {
-        done();
-        message.success(`加载了 0 条弹幕`).then();
-        this.doneLoad();
-        return state;
-      }
-
-      // 初始化中间所有的时间
-      const startTs = Math.round(this.history[0].data.timestamp / 1000);
-      const endTs = Math.round(this.history.at(-1).data.timestamp / 1000);
-      for (let i = startTs; i <= endTs; i++) {
-        this.updateNumber(state, this.formatDate(new Date(i * 1000)));
-      }
-
-      // 统计历史弹幕
-      let danmuCount = 0;
-      this.history.forEach((value) => {
-        const cmd = value.data.message as MessageCommand;
-        if (cmd.cmd != getMessageCommandCmd()) return;
-
-        const danmuMsg: DanmuMessage = JSON.parse(cmd.data);
-        if (danmuMsg.cmd != "DANMU_MSG") return;
-
-        const ts = new Date(value.data.timestamp);
-        this.updateNumber(state, this.formatDate(ts), 1);
-        danmuCount++;
-      });
-
+    console.log(state);
+    // 如果历史弹幕为空
+    if (this.history == null || this.history.length == 0) {
       done();
-      message.success(`加载了 ${danmuCount} 条弹幕`).then();
-      this.doneLoad();
-      return state;
+      message.success(`加载了 0 条记录`).then();
+      this.doneLoad(state);
+      return;
+    }
+
+    // 初始化中间所有的时间
+    const startTs = Math.round(this.history[0].data.timestamp / 1000);
+    const endTs = Math.round(this.history.at(-1).data.timestamp / 1000);
+    for (let i = startTs; i <= endTs; i++) {
+      this.newItem(state, this.formatDate(new Date(i * 1000)));
+    }
+
+    // 统计历史弹幕
+    this.history.forEach((value) => {
+      const cmd = value.data.message as MessageCommand;
+      this.newMessage(state, cmd, new Date(value.data.timestamp));
     });
+
+    done();
+    message.success(`加载了 ${this.history.length} 条记录`).then();
+    this.doneLoad(state);
   }
 
-  doneLoad(): void {
+  doneLoad(state: State): void {
+    this.setState(state);
     this.websocketClient.connect("localhost", this.props.httpServerPort);
     this.updateTimer = window.setInterval(this.update.bind(this), 500);
   }
 
   update(): void {
     const date = this.formatDate(new Date());
-    if (!this.state.danmuPerSecond.get(date)) {
+    if (!this.state.danmuMsgCount.get(date)) {
       this.setState((prevState) => {
-        return this.updateNumber(prevState, date);
+        return this.newItem(prevState, date);
       });
     }
   }
 
-  updateNumber(state: State, date: string, num?: number): State {
-    const s = state;
-    const value = s.danmuPerSecond.get(date);
-    if (value != null && num != null) {
-      s.danmuPerSecond.set(date, value + num);
-    } else if (num != null) {
-      s.danmuPerSecond.set(date, num);
-    } else {
-      s.danmuPerSecond.set(date, 0);
+  unload(): void {
+    this.websocketClient.close();
+    window.clearInterval(this.updateTimer);
+  }
+
+  reload(): void {
+    this.unload();
+    this.load().then();
+    return;
+  }
+
+  newItem(
+    state: State,
+    date: string,
+    name?: keyof MessageCount,
+    num?: number
+  ): State {
+    const msgCount = state.danmuMsgCount;
+    let count = msgCount.get(date);
+
+    if (count == null) {
+      msgCount.set(date, {
+        danmu: 0,
+        gift: 0,
+        freeGift: 0,
+        paidGift: 0,
+      });
+      count = msgCount.get(date);
     }
-    return state;
+
+    if (name != null && num != null) {
+      count[name] += num;
+    }
+
+    return { ...state, danmuMsgCount: msgCount };
+  }
+
+  newMessage(state: State, cmd: MessageCommand, date: Date): State {
+    if (cmd.cmd != getMessageCommandCmd()) return;
+
+    const danmuMessage: DanmuMessage = JSON.parse(cmd.data);
+    const dateStr = this.formatDate(date);
+
+    switch (danmuMessage.cmd) {
+      case "DANMU_MSG": {
+        if (danmuMessage.info == null) return;
+        return this.newItem(state, dateStr, "danmu", 1);
+      }
+      case "SEND_GIFT": {
+        const gift = danmuMessage as TSendGift;
+        this.newItem(state, dateStr, "gift", gift.data.num);
+
+        switch (gift.data.coin_type) {
+          case "silver": {
+            return this.newItem(state, dateStr, "freeGift", gift.data.num);
+          }
+          case "gold": {
+            return this.newItem(state, dateStr, "paidGift", gift.data.num);
+          }
+        }
+      }
+    }
   }
 
   onMessage(data: string): void {
-    const cmd: MessageCommand = JSON.parse(data);
-    if (cmd.cmd != getMessageCommandCmd()) return;
-
-    const danmuMsg: DanmuMessage = JSON.parse(cmd.data);
-    if (danmuMsg.cmd != "DANMU_MSG") return;
-    if (danmuMsg.info == null) return;
-
     this.setState((prevState) => {
-      const date = this.formatDate(new Date());
-      return this.updateNumber(prevState, date, 1);
+      return this.newMessage(prevState, JSON.parse(data), new Date());
     });
   }
 
   render(): ReactNode {
     const s = this.state;
 
-    const option = {
+    const danmuMsgCountValues = Array.from(s.danmuMsgCount.values());
+    const danmuMsgCountDanmu: number[] = [];
+    const danmuMsgCountGift: number[] = [];
+    const danmuMsgCountFreeGift: number[] = [];
+    const danmuMsgCountPaidGift: number[] = [];
+
+    danmuMsgCountValues.forEach((value) => {
+      danmuMsgCountDanmu.push(value.danmu);
+      danmuMsgCountGift.push(value.gift);
+      danmuMsgCountFreeGift.push(value.freeGift);
+      danmuMsgCountPaidGift.push(value.paidGift);
+    });
+
+    const danmuCountOption = {
       xAxis: {
         type: "category",
-        data: Array.from(s.danmuPerSecond.keys()),
+        data: Array.from(s.danmuMsgCount.keys()),
       },
       yAxis: {
         type: "value",
       },
       series: [
         {
-          data: Array.from(s.danmuPerSecond.values()),
+          name: "弹幕",
+          data: danmuMsgCountDanmu,
+          type: "line",
+        },
+        {
+          name: "礼物",
+          data: danmuMsgCountGift,
+          type: "line",
+        },
+        {
+          name: "免费礼物",
+          data: danmuMsgCountFreeGift,
+          type: "line",
+        },
+        {
+          name: "付费礼物",
+          data: danmuMsgCountPaidGift,
           type: "line",
         },
       ],
@@ -170,7 +238,7 @@ export class DanmuAnalysis extends React.Component<Props, State> {
         },
       ],
     };
-    return <EChartsReact option={option} style={{ width: "99%" }} />;
+    return <EChartsReact option={danmuCountOption} style={{ width: "99%" }} />;
   }
 
   formatDate(date: Date): string {
