@@ -175,13 +175,15 @@ export class DanmuAnalysis extends React.Component<Props, State> {
 
   formatDate(date: Date): string {
     const updatePer = Math.max(this.props.updatePer, 1);
+    const mergedTime =
+      Math.floor(date.getTime() / 1000 / updatePer) * updatePer * 1000;
+    const mergedDate = new Date(mergedTime);
 
-    const month = date.getMonth();
-    const date_ = date.getDate();
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
-    const seconds = Math.floor(date.getSeconds() / updatePer) * updatePer;
-
+    const month = mergedDate.getMonth();
+    const date_ = mergedDate.getDate();
+    const hours = mergedDate.getHours();
+    const minutes = mergedDate.getMinutes();
+    const seconds = mergedDate.getSeconds();
     const monthStr = month.toString(10).padStart(2, "0");
     const dateStr = date_.toString(10).padStart(2, "0");
     const hoursStr = hours.toString(10).padStart(2, "0");
