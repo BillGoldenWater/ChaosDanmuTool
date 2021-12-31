@@ -33,7 +33,7 @@ export class Dashboard extends React.Component<Props, State> {
         <ConnectRoom receiverStatus={p.receiverStatus} />
         <Divider />
         <DanmuViewerSwitch />
-        <Divider orientation={"left"}>弹幕数量统计</Divider>
+        <Divider orientation={"left"}>统计</Divider>
         <ConfigItem
           type={"number"}
           value={s.updatePer}
