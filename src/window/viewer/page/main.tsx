@@ -156,7 +156,7 @@ export class Main extends React.Component<Props, State> {
     switch (command.cmd) {
       case getConfigUpdateCmd(): {
         const config: Config = command.data;
-        const name = decodeURI(getParam("name"));
+        const name = getParam("name");
         let viewConfig: DanmuViewCustomConfig = null;
         let defaultViewConfig: DanmuViewCustomConfig = null;
 
