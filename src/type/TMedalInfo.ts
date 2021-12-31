@@ -1,5 +1,5 @@
-import {TFansMedal} from "./TFansMedal";
-import {TMedal} from "./TMedal";
+import { TFansMedal } from "./TFansMedal";
+import { TMedal } from "./TMedal";
 
 export type TMedalInfo = TFansMedal & {
   anchor_uname: string;
@@ -23,5 +23,5 @@ export function parseMedalInfo(medal: TMedal): TMedalInfo {
     medalInfo.is_lighted = 0;
   }
 
-  return medalInfo
+  return medalInfo;
 }

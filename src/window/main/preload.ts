@@ -1,8 +1,8 @@
-import {contextBridge, ipcRenderer, clipboard} from "electron";
-import {v4 as uuid4} from "uuid";
-import {TGithubReleases} from "../../type/TGithubReleases";
-import {Config} from "../../utils/config/Config";
-import {MessageLog} from "../../utils/command/MessageLog";
+import { contextBridge, ipcRenderer, clipboard } from "electron";
+import { v4 as uuid4 } from "uuid";
+import { TGithubReleases } from "../../type/TGithubReleases";
+import { Config } from "../../utils/config/Config";
+import { MessageLog } from "../../utils/command/MessageLog";
 
 export interface ApiElectron {
   getPlatform: () => string;

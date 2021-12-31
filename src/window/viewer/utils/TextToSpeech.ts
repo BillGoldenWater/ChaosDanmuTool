@@ -1,4 +1,4 @@
-import {TDanmuMsg} from "../../../type/TDanmuMsg";
+import { TDanmuMsg } from "../../../type/TDanmuMsg";
 import {
   getDefaultDanmuViewCustomConfig,
   TextToSpeechConfig,

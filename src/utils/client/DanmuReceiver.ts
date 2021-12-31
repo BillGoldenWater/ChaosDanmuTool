@@ -1,16 +1,16 @@
 import Zlib from "zlib";
 import WebSocket from "ws";
-import {WebsocketServer} from "../server/WebsocketServer";
-import {getStatusUpdateMessage} from "../command/ReceiverStatusUpdate";
-import {getActivityUpdateMessage} from "../command/ActivityUpdate";
-import {errorCode} from "../ErrorCode";
-import {getJoinResponseMessage} from "../command/JoinResponse";
-import {ErrorMessage, getErrorMessageMessage} from "../command/ErrorMessage";
-import {getMessageLogMessage, MessageLog} from "../command/MessageLog";
-import {getMessageCommand} from "../command/MessageCommand";
-import {dialog} from "electron";
-import {ConfigManager} from "../config/ConfigManager";
-import {createViewerWindow, showWindow, viewerWindow} from "../../index";
+import { WebsocketServer } from "../server/WebsocketServer";
+import { getStatusUpdateMessage } from "../command/ReceiverStatusUpdate";
+import { getActivityUpdateMessage } from "../command/ActivityUpdate";
+import { errorCode } from "../ErrorCode";
+import { getJoinResponseMessage } from "../command/JoinResponse";
+import { ErrorMessage, getErrorMessageMessage } from "../command/ErrorMessage";
+import { getMessageLogMessage, MessageLog } from "../command/MessageLog";
+import { getMessageCommand } from "../command/MessageCommand";
+import { dialog } from "electron";
+import { ConfigManager } from "../config/ConfigManager";
+import { createViewerWindow, showWindow, viewerWindow } from "../../index";
 
 const get = ConfigManager.get.bind(ConfigManager);
 
