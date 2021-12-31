@@ -156,21 +156,27 @@ export class Main extends React.Component<Props, State> {
     switch (command.cmd) {
       case getConfigUpdateCmd(): {
         const config: Config = command.data;
+        const name = decodeURI(getParam("name"));
+        let viewConfig: DanmuViewCustomConfig = null;
+        let defaultViewConfig: DanmuViewCustomConfig = null;
 
-        for (const i in config.danmuViewCustoms) {
-          const viewConfig = config.danmuViewCustoms[i];
-          if (
-            viewConfig.name == decodeURI(getParam("name")) ||
-            viewConfig.name == defaultViewCustomInternalName
-          ) {
-            this.setState({
-              config: viewConfig,
-            });
-
-            this.tts.updateConfig(viewConfig.tts);
-            break;
+        config.danmuViewCustoms.forEach((value) => {
+          if (value.name === name) {
+            viewConfig = value;
+          } else if (value.name === defaultViewCustomInternalName) {
+            defaultViewConfig = value;
           }
+        });
+
+        if (viewConfig === null) {
+          viewConfig = defaultViewConfig;
         }
+
+        this.setState({
+          config: viewConfig,
+        });
+
+        this.tts.updateConfig(viewConfig.tts);
         break;
       }
       case getGiftConfigUpdateCmd(): {
