@@ -9,6 +9,7 @@ import {
 } from "../../../../utils/command/MessageCommand";
 import { DanmuMessage } from "../../../../utils/command/DanmuMessage";
 import { TSendGift } from "../../../../type/TSendGift";
+import { ConfigContext } from "../../utils/ConfigContext";
 
 class Props {
   httpServerPort: number;
@@ -176,7 +177,7 @@ export class DanmuAnalysis extends React.Component<Props, State> {
     });
   }
 
-  render(): ReactNode {
+  getDanmuCountOption(darkTheme: boolean): unknown {
     const s = this.state;
 
     const danmuMsgCountValues = Array.from(s.danmuMsgCount.values());
@@ -192,7 +193,7 @@ export class DanmuAnalysis extends React.Component<Props, State> {
       danmuMsgCountPaidGift.push(value.paidGift);
     });
 
-    const danmuCountOption = {
+    return {
       xAxis: {
         type: "category",
         data: Array.from(s.danmuMsgCount.keys()),
@@ -237,8 +238,23 @@ export class DanmuAnalysis extends React.Component<Props, State> {
           filterMode: "none",
         },
       ],
+      textStyle: {
+        color: darkTheme ? "rgba(255,255,255,0.85)" : "rgba(0,0,0,0.85)",
+      },
     };
-    return <EChartsReact option={danmuCountOption} style={{ width: "99%" }} />;
+  }
+
+  render(): ReactNode {
+    return (
+      <ConfigContext.Consumer>
+        {({ get }) => (
+          <EChartsReact
+            option={this.getDanmuCountOption(get("darkTheme") as boolean)}
+            style={{ width: "99%" }}
+          />
+        )}
+      </ConfigContext.Consumer>
+    );
   }
 
   formatDate(date: Date): string {
