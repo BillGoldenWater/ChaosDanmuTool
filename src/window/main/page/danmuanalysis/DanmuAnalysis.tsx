@@ -170,7 +170,7 @@ export class DanmuAnalysis extends React.Component<Props, State> {
         },
       ],
     };
-    return <EChartsReact option={option} />;
+    return <EChartsReact option={option} style={{ width: "99%" }} />;
   }
 
   formatDate(date: Date): string {
