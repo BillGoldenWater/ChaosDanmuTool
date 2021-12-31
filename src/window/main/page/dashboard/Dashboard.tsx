@@ -43,6 +43,7 @@ export class Dashboard extends React.Component<Props, State> {
             });
           }}
           name={"统计间隔"}
+          min={1}
           description={
             <div>
               单位:秒
@@ -51,12 +52,10 @@ export class Dashboard extends React.Component<Props, State> {
             </div>
           }
         />
-        <div>
-          <DanmuAnalysis
-            httpServerPort={p.httpServerPort}
-            updatePer={s.updatePer}
-          />
-        </div>
+        <DanmuAnalysis
+          httpServerPort={p.httpServerPort}
+          updatePer={s.updatePer}
+        />
       </div>
     );
   }
