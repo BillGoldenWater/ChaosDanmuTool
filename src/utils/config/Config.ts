@@ -205,21 +205,10 @@ const defaultConfig: Config = {
     {
       ...defaultDanmuViewCustom,
       name: defaultViewCustomInternalName,
-      tts: {
-        ...defaultDanmuViewCustom.tts,
-        enable: true,
-      },
     },
     {
       ...defaultDanmuViewCustom,
       name: defaultViewCustomOtherName,
-      style: {
-        ...defaultDanmuViewCustom.style,
-      },
-      numberFormat: {
-        formatActivity: false,
-        formatFansNum: false,
-      },
     },
   ],
 };
