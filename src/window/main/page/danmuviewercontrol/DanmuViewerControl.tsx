@@ -73,27 +73,25 @@ export class DanmuViewerControl extends React.Component<Props, State> {
             ? styleNameList[0]
             : "";
 
-          let link = `http://localhost:${get("httpServerPort")}/viewer`;
-          const param = new URLSearchParams();
+          const url = new URL(`http://localhost/viewer`);
 
+          url.port = get("httpServerPort").toString();
+
+          const maxReconnectAttemptNum = get(
+            "danmuViewConfig.maxReconnectAttemptNumber"
+          ) as number;
           if (
-            get("danmuViewConfig.maxReconnectAttemptNumber") !=
+            maxReconnectAttemptNum !=
             getDefaultConfig().danmuViewConfig.maxReconnectAttemptNumber
           ) {
-            param.append(
+            url.searchParams.append(
               "maxReconnectAttemptNum",
-              (
-                get("danmuViewConfig.maxReconnectAttemptNumber") as number
-              ).toString(10)
+              maxReconnectAttemptNum.toString(10)
             );
           }
-          if (state.selectedStyle != defaultViewCustomInternalName) {
-            param.append("name", this.state.selectedStyle);
-          }
 
-          if (param.toString().length > 0) {
-            link += "?";
-            link += param.toString();
+          if (state.selectedStyle != defaultViewCustomInternalName) {
+            url.searchParams.append("name", this.state.selectedStyle);
           }
 
           return (
@@ -139,7 +137,9 @@ export class DanmuViewerControl extends React.Component<Props, State> {
 
               <Typography.Paragraph>
                 <Typography.Text>链接: </Typography.Text>
-                <Typography.Text copyable>{link}</Typography.Text>
+                <Typography.Text copyable={{ text: url.toString() }}>
+                  {decodeURIComponent(url.toString())}
+                </Typography.Text>
               </Typography.Paragraph>
             </div>
           );
