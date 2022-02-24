@@ -1,5 +1,5 @@
 import { httpsGet } from "./HttpsGet";
-import { TGithubReleases } from "../type/TGithubReleases";
+import { TGithubReleases } from "../type/github/TGithubReleases";
 import { app, dialog } from "electron";
 import { errorCode } from "./ErrorCode";
 

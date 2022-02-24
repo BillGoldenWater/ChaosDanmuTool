@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer, clipboard } from "electron";
 import { v4 as uuid4 } from "uuid";
-import { TGithubReleases } from "../../type/TGithubReleases";
+import { TGithubReleases } from "../../type/github/TGithubReleases";
 import { Config } from "../../utils/config/Config";
 import { MessageLog } from "../../utils/command/MessageLog";
 

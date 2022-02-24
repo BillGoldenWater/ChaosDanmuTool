@@ -1,6 +1,8 @@
+
 ChaosDanmuTool
 
 - 仅存储修改过的配置
+- 查看器接收状态更新时 不同状态以不同颜色显示
 - 统计-在有第一条有效命令前不实时添加间隔
 - 进入统计
 - 关注统计
@@ -13,6 +15,7 @@ ChaosDanmuTool
     - number string boolean custom etc.
     - custom: (value, setValue)=>{...}
 - 语音播报 Anti复读的间隔的min设为0
+- 语音播报 语音选择
 - 语音播报 文本替换/黑名单 的 配置复制和粘贴
 - 配置的导入和导出
 - 投票

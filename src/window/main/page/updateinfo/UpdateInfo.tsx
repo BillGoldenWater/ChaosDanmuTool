@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { TGithubRelease } from "../../../../type/TGithubRelease";
+import { TGithubRelease } from "../../../../type/github/TGithubRelease";
 import { Button, Card, Collapse, message, Modal, Typography } from "antd";
 import { ConfigContext } from "../../utils/ConfigContext";
 import MarkdownIt from "markdown-it";
