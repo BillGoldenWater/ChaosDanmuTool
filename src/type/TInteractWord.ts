@@ -1,22 +1,25 @@
 import { TFansMedal } from "./TFansMedal";
 
 export type TInteractWord = {
-  contribution: unknown;
-  dmscore: number;
-  fans_medal: TFansMedal;
-  identities: unknown;
-  is_spread: number;
-  msg_type: number;
-  roomid: number;
-  score: number;
-  spread_desc: string;
-  spread_info: string;
-  tail_icon: number;
-  timestamp: number;
-  trigger_time: number;
-  uid: number;
-  uname: string;
-  uname_color: string;
+  cmd: "INTERACT_WORD";
+  data: {
+    contribution: unknown;
+    dmscore: number;
+    fans_medal: TFansMedal;
+    identities: unknown;
+    is_spread: number;
+    msg_type: number;
+    roomid: number;
+    score: number;
+    spread_desc: string;
+    spread_info: string;
+    tail_icon: number;
+    timestamp: number;
+    trigger_time: number;
+    uid: number;
+    uname: string;
+    uname_color: string;
+  };
 };
 
 export const InteractWordType = {

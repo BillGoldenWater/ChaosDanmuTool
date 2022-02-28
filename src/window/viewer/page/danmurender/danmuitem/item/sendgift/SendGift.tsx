@@ -6,16 +6,15 @@ import { emptyUserInfo } from "../../../../../../../type/TUserInfo";
 import { ConfigContext } from "../../../../../utils/ConfigContext";
 import { TGiftConfig } from "../../../../../../../type/giftconfig/TGiftConfig";
 import { TGiftInfo } from "../../../../../../../type/giftconfig/TGiftInfo";
-import { DanmuMessage } from "../../../../../../../utils/command/DanmuMessage";
 import { GiftContent } from "../../../../../../../component/bilibili/giftcontent/GiftContent";
 
 class Props {
-  msg: DanmuMessage;
+  sendGift: TSendGift;
 }
 
 export class SendGift extends React.Component<Props> {
   render(): ReactNode {
-    const data = (this.props.msg as TSendGift).data;
+    const data = this.props.sendGift.data;
     return (
       <ConfigContext.Consumer>
         {({ giftConfig }) => {

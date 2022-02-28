@@ -1,16 +1,17 @@
 import React, { ReactNode } from "react";
 import style from "./RoomStatusChange.module.css";
-import { DanmuMessage } from "../../../../../../../utils/command/DanmuMessage";
 import { ConfigContext } from "../../../../../utils/ConfigContext";
+import { TPreparing } from "../../../../../../../type/TPreparing";
+import { TLive } from "../../../../../../../type/TLive";
 
 class Props {
-  msg: DanmuMessage;
+  changeMsg: TLive | TPreparing;
 }
 
 export class RoomStatusChange extends React.Component<Props> {
   render(): ReactNode {
     let status = "";
-    switch (this.props.msg.cmd) {
+    switch (this.props.changeMsg.cmd) {
       case "LIVE": {
         status = "直播中";
         break;
@@ -25,7 +26,9 @@ export class RoomStatusChange extends React.Component<Props> {
         直播间
         <ConfigContext.Consumer>
           {({ config }) => (
-            <div style={config.style.userName}>{this.props.msg.roomid}</div>
+            <div style={config.style.userName}>
+              {this.props.changeMsg.roomid}
+            </div>
           )}
         </ConfigContext.Consumer>
         状态更改为{status}

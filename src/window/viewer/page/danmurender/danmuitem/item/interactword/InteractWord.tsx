@@ -7,19 +7,18 @@ import { UserInfo } from "../../../../../../../component/bilibili/userinfo/UserI
 import { emptyUserInfo } from "../../../../../../../type/TUserInfo";
 import { DanmuContent } from "../../../../../../../component/bilibili/danmucontent/DanmuContent";
 import { TMedalInfo } from "../../../../../../../type/TMedalInfo";
-import { DanmuMessage } from "../../../../../../../utils/command/DanmuMessage";
 
 class Props {
-  msg: DanmuMessage;
+  interactWord: TInteractWord;
 }
 
 export class InteractWord extends React.Component<Props> {
   render(): ReactNode {
-    const iw: TInteractWord = this.props.msg as unknown as TInteractWord;
+    const iw: TInteractWord = this.props.interactWord;
 
     let action: string;
 
-    switch (iw.msg_type) {
+    switch (iw.data.msg_type) {
       case InteractWordType.join: {
         action = "进入了直播间";
         break;
@@ -33,7 +32,7 @@ export class InteractWord extends React.Component<Props> {
         break;
       }
       default: {
-        action = "msg_type:" + iw.msg_type;
+        action = "msg_type:" + iw.data.msg_type;
       }
     }
 
@@ -42,10 +41,10 @@ export class InteractWord extends React.Component<Props> {
         <UserInfo
           userInfo={{
             ...emptyUserInfo,
-            uname: iw.uname,
-            name_color: iw.uname_color,
+            uname: iw.data.uname,
+            name_color: iw.data.uname_color,
           }}
-          medalInfo={iw.fans_medal as TMedalInfo}
+          medalInfo={iw.data.fans_medal as TMedalInfo}
         />
         <DanmuContent content={action} color={"#F7B500"} />
       </div>

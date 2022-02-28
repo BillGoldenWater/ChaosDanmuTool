@@ -1,7 +1,7 @@
 import { TMedalInfo } from "./TMedalInfo";
 
 export type TSendGift = {
-  cmd: string;
+  cmd: "SEND_GIFT";
   data: {
     action: string;
     batch_combo_id: string;

@@ -10,6 +10,12 @@ import { RoomStatusChange } from "./item/roomstatuschange/RoomStatusChange";
 import { getStatusUpdateMessageCmd } from "../../../../../utils/command/ReceiverStatusUpdate";
 import { StatusUpdate } from "./item/statusupdate/StatusUpdate";
 import { GuardBuy } from "./item/guardbuy/GuardBuy";
+import { TInteractWord } from "../../../../../type/TInteractWord";
+import { TSendGift } from "../../../../../type/TSendGift";
+import { TSuperChatMessage } from "../../../../../type/TSuperChatMessage";
+import { TPreparing } from "../../../../../type/TPreparing";
+import { TLive } from "../../../../../type/TLive";
+import { TGuardBuy } from "../../../../../type/TGuardBuy";
 
 class Props {
   message: DanmuMessage;
@@ -23,26 +29,26 @@ export class DanmuItem extends React.Component<Props> {
         return <StatusUpdate msg={msg} />;
       }
       case "INTERACT_WORD": {
-        return <InteractWord msg={msg} />;
+        return <InteractWord interactWord={msg as TInteractWord} />;
       }
       case "SEND_GIFT": {
-        return <SendGift msg={msg} />;
+        return <SendGift sendGift={msg as TSendGift} />;
       }
       case "DANMU_MSG": {
         return <DanmuMsg data={parseDanmuMsg(msg)} />;
       }
       case "SUPER_CHAT_MESSAGE": {
-        return <SuperChatMessage msg={msg} />;
+        return <SuperChatMessage superChatMessage={msg as TSuperChatMessage} />;
       }
       case "ROOM_BLOCK_MSG": {
         return <RoomBlockMsg msg={msg} />;
       }
       case "PREPARING":
       case "LIVE": {
-        return <RoomStatusChange msg={msg} />;
+        return <RoomStatusChange changeMsg={msg as TPreparing | TLive} />;
       }
       case "GUARD_BUY": {
-        return <GuardBuy msg={msg} />;
+        return <GuardBuy guardBuy={msg as TGuardBuy} />;
       }
     }
     console.log("unknown: ");

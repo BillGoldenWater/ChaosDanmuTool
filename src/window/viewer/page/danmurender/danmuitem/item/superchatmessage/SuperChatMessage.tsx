@@ -1,13 +1,12 @@
 import React from "react";
 import style from "./SuperChatMessage.module.css";
-import { DanmuMessage } from "../../../../../../../utils/command/DanmuMessage";
 import { UserInfo } from "../../../../../../../component/bilibili/userinfo/UserInfo";
 import { TSuperChatMessage } from "../../../../../../../type/TSuperChatMessage";
 import { DanmuContent } from "../../../../../../../component/bilibili/danmucontent/DanmuContent";
 import { ConfigContext } from "../../../../../utils/ConfigContext";
 
 class Props {
-  msg: DanmuMessage;
+  superChatMessage: TSuperChatMessage;
 }
 
 class State {
@@ -25,7 +24,7 @@ export class SuperChatMessage extends React.Component<Props, State> {
 
     this.updateIntervalId = window.setInterval(() => {
       this.setState({ ts: new Date().getTime() / 1000 });
-      const scm: TSuperChatMessage = this.props.msg as TSuperChatMessage;
+      const scm: TSuperChatMessage = this.props.superChatMessage;
       if (this.state.ts > scm.data.end_time) {
         window.clearInterval(this.updateIntervalId);
       }
@@ -33,7 +32,7 @@ export class SuperChatMessage extends React.Component<Props, State> {
   }
 
   render(): JSX.Element {
-    const scm: TSuperChatMessage = this.props.msg as TSuperChatMessage;
+    const scm: TSuperChatMessage = this.props.superChatMessage;
     return (
       <ConfigContext.Consumer>
         {({ config }) => (

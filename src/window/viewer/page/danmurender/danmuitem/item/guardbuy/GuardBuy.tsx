@@ -1,5 +1,4 @@
 import React, { ReactNode } from "react";
-import { DanmuMessage } from "../../../../../../../utils/command/DanmuMessage";
 import {
   getGuardIconUrl,
   TGuardBuy,
@@ -9,12 +8,12 @@ import { emptyUserInfo } from "../../../../../../../type/TUserInfo";
 import { GiftContent } from "../../../../../../../component/bilibili/giftcontent/GiftContent";
 
 class Props {
-  msg: DanmuMessage;
+  guardBuy: TGuardBuy;
 }
 
 export class GuardBuy extends React.Component<Props> {
   render(): ReactNode {
-    const data = (this.props.msg as TGuardBuy).data;
+    const data = this.props.guardBuy.data;
     return (
       <div>
         <UserInfo userInfo={{ ...emptyUserInfo, uname: data.username }} />

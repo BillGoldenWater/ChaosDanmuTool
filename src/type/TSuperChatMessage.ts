@@ -2,7 +2,7 @@ import { TUserInfo } from "./TUserInfo";
 import { TMedalInfo } from "./TMedalInfo";
 
 export type TSuperChatMessage = {
-  cmd: string;
+  cmd: "SUPER_CHAT_MESSAGE";
   data: {
     background_bottom_color: string;
     background_color: string;

@@ -203,7 +203,7 @@ export class Main extends React.Component<Props, State> {
         const msg: DanmuMessage = JSON.parse(command.data);
         switch (msg.cmd) {
           case "INTERACT_WORD": {
-            this.processInteractWord(msg.data as TInteractWord);
+            this.processInteractWord(msg as TInteractWord);
             break;
           }
           case "SEND_GIFT": {
@@ -310,12 +310,10 @@ export class Main extends React.Component<Props, State> {
   }
 
   processInteractWord(interactWord: TInteractWord): void {
-    switch (interactWord.msg_type) {
+    switch (interactWord.data.msg_type) {
       case InteractWordType.join: {
         this.setState({
-          statusMessage: (
-            <InteractWord msg={{ ...interactWord, cmd: "INTERACT_WORD" }} />
-          ),
+          statusMessage: <InteractWord interactWord={interactWord} />,
         });
         break;
       }
