@@ -3,7 +3,7 @@ import WebSocket from "ws";
 import { WebsocketServer } from "../server/WebsocketServer";
 import { getStatusUpdateMessage } from "../command/ReceiverStatusUpdate";
 import { getActivityUpdateMessage } from "../command/ActivityUpdate";
-import { errorCode } from "../ErrorCode";
+import { ErrorCode } from "../ErrorCode";
 import { getJoinResponseMessage } from "../command/JoinResponse";
 import { ErrorMessage, getErrorMessageMessage } from "../command/ErrorMessage";
 import { getMessageLogMessage, MessageLog } from "../command/MessageLog";
@@ -158,7 +158,7 @@ export class DanmuReceiver {
         if (value.getDataType() != DataType.json) {
           const message =
             "出现了错误: " +
-            errorCode.dataTypeIncorrect +
+            ErrorCode.dataTypeIncorrect +
             " " +
             value.getDataType();
           this.alertMessage(getErrorMessageMessage(message, value));
@@ -187,7 +187,7 @@ export class DanmuReceiver {
           default: {
             const message =
               "出现了错误: " +
-              errorCode.unknownOpCode +
+              ErrorCode.unknownOpCode +
               " " +
               value.getOpCode();
             this.alertMessage(getErrorMessageMessage(message, value));

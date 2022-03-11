@@ -1,6 +1,6 @@
 import { Config, getDefaultConfig } from "./Config";
 import * as fs from "fs";
-import { errorCode } from "../ErrorCode";
+import { ErrorCode } from "../ErrorCode";
 import { dialog } from "electron";
 import { WebsocketServer } from "../server/WebsocketServer";
 import { getConfigUpdateMessage } from "../command/ConfigUpdate";
@@ -22,8 +22,8 @@ export class ConfigManager {
     this.config = getDefaultConfig(config);
   }
 
-  static load(): void {
-    if (!this.inited) return;
+  static load(): boolean {
+    if (!this.inited) return false;
 
     try {
       const configStr = fs.readFileSync(this.filePath, {
@@ -42,17 +42,19 @@ export class ConfigManager {
       if (fs.existsSync(this.filePath)) {
         dialog.showErrorBox(
           "读取失败",
-          `${errorCode.readException}\n配置文件存在但无法读取\n可能的原因: 被其他应用程序占用, 无读取权限`
+          `${ErrorCode.configReadException}\n配置文件存在但无法读取\n可能的原因: 被其他应用程序占用, 无读取权限`
         );
+        return false;
       }
 
       this.loadDefault();
     }
     this.loaded = true;
+    return true;
   }
 
-  static save(): void {
-    if (!this.isSafeToSave()) return;
+  static save(): boolean {
+    if (!this.isSafeToSave()) return false;
 
     if (fs.existsSync(this.filePath)) {
       try {
@@ -68,22 +70,32 @@ export class ConfigManager {
         } else {
           dialog.showErrorBox(
             "保存失败",
-            `${errorCode.unknownExistsFile}\n存在未知的同名文件`
+            `${ErrorCode.unknownExistsFile}\n存在未知的同名文件`
           );
+          return false;
         }
       } catch (e) {
         dialog.showErrorBox(
           "保存失败",
-          `${errorCode.unknownExistsFile}\n存在未知的同名文件`
+          `${ErrorCode.unknownExistsFile}\n存在未知的同名文件`
         );
+        return false;
       }
     } else {
       this.writeToFile();
     }
+    return true;
   }
 
   static writeToFile(): void {
-    fs.writeFileSync(this.filePath, JSON.stringify(this.config, null, 2));
+    try {
+      fs.writeFileSync(this.filePath, JSON.stringify(this.config, null, 2));
+    } catch (e) {
+      dialog.showErrorBox(
+        "保存失败",
+        `${ErrorCode.configWriteException}\n无法写入`
+      );
+    }
   }
 
   static isSafeToSave(): boolean {

@@ -1,7 +1,7 @@
 import { TGiftConfigResponse } from "../../type/giftconfig/TGiftConfig";
 import * as https from "https";
 import { dialog } from "electron";
-import { errorCode } from "../ErrorCode";
+import { ErrorCode } from "../ErrorCode";
 
 export class GiftConfigGetter {
   static giftConfigRes: TGiftConfigResponse;
@@ -20,21 +20,21 @@ export class GiftConfigGetter {
           res.on("end", () => {
             this.giftConfigRes = JSON.parse(this.giftConfigResStr);
             if (this.giftConfigRes["code"] != 0) {
-              this.onGiftConfigGetException(errorCode.giftConfigGetException_1);
+              this.onGiftConfigGetException(ErrorCode.giftConfigGetException_1);
             }
           });
         }
       )
       .on("error", (e) => {
         this.onGiftConfigGetException(
-          errorCode.giftConfigGetException_2,
+          ErrorCode.giftConfigGetException_2,
           e.message
         );
       });
   }
 
   private static onGiftConfigGetException(
-    code: string,
+    code: ErrorCode,
     message?: string
   ): void {
     this.giftConfigRes = <TGiftConfigResponse>{};

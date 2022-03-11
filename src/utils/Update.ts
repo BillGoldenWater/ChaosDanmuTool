@@ -1,7 +1,7 @@
 import { httpsGet } from "./HttpsGet";
 import { TGithubReleases } from "../type/github/TGithubReleases";
 import { app, dialog } from "electron";
-import { errorCode } from "./ErrorCode";
+import { ErrorCode } from "./ErrorCode";
 
 export class Update {
   static releaseUrl: string;
@@ -122,7 +122,7 @@ export class Update {
   static onChangeLogGetException(e: unknown): void {
     this.onException(
       "无法获取更新记录, 请检查网络连接或忽略",
-      errorCode.githubChangeLogGetFail,
+      ErrorCode.githubChangeLogGetFail,
       e.toString()
     );
   }
@@ -130,7 +130,7 @@ export class Update {
   static onReleasesGetException(e: unknown): void {
     this.onException(
       "无法获取更新信息, 请检查网络连接或忽略",
-      errorCode.githubReleasesGetFail,
+      ErrorCode.githubReleasesGetFail,
       e.toString()
     );
   }
@@ -138,12 +138,16 @@ export class Update {
   static onReleasesParseException(e: unknown): void {
     this.onException(
       "无法解析更新信息",
-      errorCode.githubReleasesParseFail,
+      ErrorCode.githubReleasesParseFail,
       e.toString()
     );
   }
 
-  static onException(message: string, code: string, devMessage?: string): void {
+  static onException(
+    message: string,
+    code: ErrorCode,
+    devMessage?: string
+  ): void {
     dialog.showErrorBox("错误", `${message}\n${code}\n${devMessage}`);
   }
 }
