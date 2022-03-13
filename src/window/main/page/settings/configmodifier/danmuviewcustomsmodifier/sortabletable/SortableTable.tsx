@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 import React, { ReactNode } from "react";
 import { v4 as uuid4 } from "uuid";
 import { Button, Input, Space, Switch, Table } from "antd";

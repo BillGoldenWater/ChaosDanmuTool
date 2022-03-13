@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 import React, { ReactNode } from "react";
 import { Button, Collapse, Divider, message, Space } from "antd";
 import { MainConfigModifier } from "./configmodifier/mainconfigmodifier/MainConfigModifier";

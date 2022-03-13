@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 import React, { ReactNode } from "react";
 import { ConfigContext } from "../../../window/viewer/utils/ConfigContext";
 import style from "./GiftIcon.module.css";

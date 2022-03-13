@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 export class WebsocketClient {
   client: WebSocket;
   onmessage: (event: MessageEvent) => void;

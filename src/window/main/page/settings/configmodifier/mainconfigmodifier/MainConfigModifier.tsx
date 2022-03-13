@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 import React, { ReactNode } from "react";
 import { ConfigContext } from "../../../../utils/ConfigContext";
 import { Alert, Collapse } from "antd";

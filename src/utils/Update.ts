@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 import { httpsGet } from "./HttpsGet";
 import { TGithubReleases } from "../type/github/TGithubReleases";
 import { app, dialog } from "electron";

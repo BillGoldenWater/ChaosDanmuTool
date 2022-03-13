@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 export function formatNumber(num: number): string {
   if (num <= 999) {
     return num.toString();

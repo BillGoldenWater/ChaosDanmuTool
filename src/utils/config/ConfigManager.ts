@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 import { Config, getDefaultConfig } from "./Config";
 import * as fs from "fs";
 import { ErrorCode } from "../ErrorCode";

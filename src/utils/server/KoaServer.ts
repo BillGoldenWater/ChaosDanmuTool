@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 import Koa from "koa";
 import KoaStatic from "koa-static";
 import { Server } from "http";

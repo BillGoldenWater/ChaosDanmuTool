@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 /**
  * This file will automatically be loaded by webpack and run in the "renderer" context.
  * To learn more about the differences between the "main" and the "renderer" context in

@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 import React, { ReactNode } from "react";
 import { Card, Divider, message, Skeleton, Tooltip, Typography } from "antd";
 import MarkdownIt from "markdown-it";

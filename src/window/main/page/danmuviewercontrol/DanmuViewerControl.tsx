@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 import React, { ReactNode } from "react";
 import { Button, Divider, Form, Select, Space, Typography } from "antd";
 import { ConfigContext } from "../../utils/ConfigContext";

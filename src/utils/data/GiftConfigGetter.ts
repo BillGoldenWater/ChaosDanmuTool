@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 import { TGiftConfigResponse } from "../../type/giftconfig/TGiftConfig";
 import * as https from "https";
 import { dialog } from "electron";

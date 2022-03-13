@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 import React, { ReactNode } from "react";
 import { Form, Popover, Space } from "antd";
 import { TextIcon } from "../../../../../../../component/bilibili/texticon/TextIcon";

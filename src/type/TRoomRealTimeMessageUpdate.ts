@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 export type TRoomRealTimeMessageUpdate = {
   cmd: "ROOM_REAL_TIME_MESSAGE_UPDATE";
   data: {

@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 import React from "react";
 import style from "./SuperChatMessage.module.css";
 import { UserInfo } from "../../../../../../../component/bilibili/userinfo/UserInfo";

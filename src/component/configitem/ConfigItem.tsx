@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 import { Form, Input, InputNumber, Popover, Space, Switch } from "antd";
 import React, { ReactNode } from "react";
 import { QuestionCircleOutlined } from "@ant-design/icons";

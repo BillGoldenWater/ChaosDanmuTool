@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 import { contextBridge, ipcRenderer, clipboard } from "electron";
 import { v4 as uuid4 } from "uuid";
 import { TGithubReleases } from "../../type/github/TGithubReleases";

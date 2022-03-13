@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 const rules = require("./webpack.rules");
 const plugins = require("./webpack.plugins");
 

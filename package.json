@@ -16,57 +16,9 @@
     "name": "BiliGoldenWater",
     "email": "2439577268@qq.com"
   },
-  "license": "",
+  "license": "AGPL-3.0-only",
   "config": {
-    "forge": {
-      "packagerConfig": {},
-      "makers": [
-        {
-          "name": "@electron-forge/maker-squirrel",
-          "config": {
-            "name": "ChaosDanmuTool"
-          }
-        },
-        {
-          "name": "@electron-forge/maker-zip",
-          "platforms": [
-            "darwin",
-            "win32",
-            "linux"
-          ]
-        },
-        {
-          "name": "@electron-forge/maker-deb"
-        }
-      ],
-      "plugins": [
-        [
-          "@electron-forge/plugin-webpack",
-          {
-            "mainConfig": "./webpack.main.config.js",
-            "renderer": {
-              "config": "./webpack.renderer.config.js",
-              "entryPoints": [
-                {
-                  "html": "./src/window/main/index.html",
-                  "js": "./src/window/main/renderer.tsx",
-                  "name": "main_window",
-                  "preload": {
-                    "js": "./src/window/main/preload.ts"
-                  }
-                },
-                {
-                  "html": "./src/window/viewer/index.html",
-                  "js": "./src/window/viewer/renderer.tsx",
-                  "name": "viewer"
-                }
-              ]
-            },
-            "devContentSecurityPolicy": "connect-src *;"
-          }
-        ]
-      ]
-    }
+    "forge": "./config.forge.js"
   },
   "devDependencies": {
     "@ant-design/icons": "^4.7.0",

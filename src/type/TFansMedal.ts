@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 export type TFansMedal = {
   anchor_roomid: number;
   guard_level: number;

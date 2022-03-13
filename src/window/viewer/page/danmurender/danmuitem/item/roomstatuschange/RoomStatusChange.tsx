@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 import React, { ReactNode } from "react";
 import style from "./RoomStatusChange.module.css";
 import { ConfigContext } from "../../../../../utils/ConfigContext";

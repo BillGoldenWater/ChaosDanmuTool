@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 import Zlib from "zlib";
 import WebSocket from "ws";
 import { WebsocketServer } from "../server/WebsocketServer";

@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 import { DanmuMessage } from "../utils/command/DanmuMessage";
 import { TEmojiData } from "./TEmojiData";
 import { parseMedalInfo, TMedalInfo } from "./TMedalInfo";

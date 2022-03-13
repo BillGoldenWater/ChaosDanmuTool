@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 import React from "react";
 import { ConfigContext } from "../../../window/viewer/utils/ConfigContext";
 import { TextIcon } from "../texticon/TextIcon";

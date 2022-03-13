@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 import React, { ReactNode } from "react";
 import { TGithubRelease } from "../../../../type/github/TGithubRelease";
 import { Button, Card, Collapse, message, Modal, Typography } from "antd";

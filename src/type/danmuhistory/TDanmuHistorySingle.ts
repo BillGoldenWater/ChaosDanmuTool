@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 import { TMedal } from "../TMedal";
 import { TUserLevel } from "../TUserLevel";
 import { TEmojiData } from "../TEmojiData";

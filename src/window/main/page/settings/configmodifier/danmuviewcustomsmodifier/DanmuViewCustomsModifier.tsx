@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 import React, { ReactNode } from "react";
 import { ConfigContext, TConfigContext } from "../../../../utils/ConfigContext";
 import dotProp from "dot-prop";

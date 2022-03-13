@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 import https from "https";
 import { TDanmuHistoryResponse } from "../../type/danmuhistory/TDanmuHistoryResponse";
 import { DanmuMessage } from "../command/DanmuMessage";

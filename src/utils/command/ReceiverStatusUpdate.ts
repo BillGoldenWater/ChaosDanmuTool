@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 export type ReceiverStatus = "open" | "close" | "error" | "connecting";
 
 export type ReceiverStatusUpdateCmd = "receiverStatusUpdate";
