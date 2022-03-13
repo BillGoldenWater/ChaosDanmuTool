@@ -8,7 +8,7 @@ import { ErrorCode } from "../ErrorCode";
 import { dialog } from "electron";
 import { WebsocketServer } from "../server/WebsocketServer";
 import { getConfigUpdateMessage } from "../command/ConfigUpdate";
-import dotProp from "dot-prop";
+import { getProperty, setProperty } from "dot-prop";
 
 export class ConfigManager {
   private static config: Config;
@@ -107,11 +107,11 @@ export class ConfigManager {
   }
 
   static get(key: string, defaultValue?: unknown): unknown {
-    return dotProp.get(this.config, key, defaultValue);
+    return getProperty(this.config, key, defaultValue);
   }
 
   static set(key: string, value: unknown): void {
-    dotProp.set(this.config, key, value);
+    setProperty(this.config, key, value);
     this.onChange();
   }
 

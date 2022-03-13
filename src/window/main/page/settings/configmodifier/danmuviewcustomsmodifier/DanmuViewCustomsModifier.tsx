@@ -4,7 +4,7 @@
 
 import React, { ReactNode } from "react";
 import { ConfigContext, TConfigContext } from "../../../../utils/ConfigContext";
-import dotProp from "dot-prop";
+import { getProperty, setProperty } from "dot-prop";
 import {
   Button,
   Collapse,
@@ -113,7 +113,7 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
             dvcL.length > 0 ? dvcL[0] : getDefaultDanmuViewCustomConfig();
 
           const dvcGet = (key: string, defaultValue?: unknown) => {
-            return dotProp.get(dvc, key, defaultValue);
+            return getProperty(dvc, key, defaultValue);
           };
 
           const dvcSet = (key: string, value: unknown) => {
@@ -124,7 +124,7 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
             // setConfig({...config, danmuViewCustoms: tempList});
             // this.setState({selectedStyle: viewCustomConfig.name});
 
-            dotProp.set(dvc, key, value);
+            setProperty(dvc, key, value);
             set("danmuViewCustoms", dvcs);
           };
 
