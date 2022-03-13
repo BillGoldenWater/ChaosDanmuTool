@@ -152,9 +152,9 @@ export class Update {
   }
 }
 
-/*
+/**
  * @return true if varA > verB
- * */
+ */
 export function versionCompare(verA: string, verB: string): boolean {
   const a: number[] = verA.split(".").map((val) => parseInt(val, 10));
   const b: number[] = verB.split(".").map((val) => parseInt(val, 10));
