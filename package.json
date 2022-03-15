@@ -1,7 +1,7 @@
 {
   "name": "chaosdanmutool",
   "productName": "ChaosDanmuTool",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "A tool for process/view Danmu on bilibili",
   "main": ".webpack/main",
   "scripts": {
@@ -39,7 +39,9 @@
     "@typescript-eslint/eslint-plugin": "^5.14.0",
     "@typescript-eslint/parser": "^5.14.0",
     "@vercel/webpack-asset-relocator-loader": "1.7.0",
+    "adm-zip": "^0.5.9",
     "antd": "^4.17.4",
+    "cross-zip": "^4.0.0",
     "css-loader": "^6.0.0",
     "dot-prop": "^7.2.0",
     "echarts": "^5.2.2",

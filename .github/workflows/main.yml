@@ -34,7 +34,7 @@ jobs:
 
       - name: Get change log
         id: get_change_log
-        run: node getLastChangeLog.js
+        run: node scripts/getLastChangeLog.js
 
       - name: Cache node modules
         uses: actions/cache@v2
@@ -72,20 +72,10 @@ jobs:
         run: |
           yarn
 
-      - name: Make for linux
+      - name: Build all
         if: success()
         run: |
-          yarn make -p linux --targets @electron-forge/maker-zip
-
-      - name: Make for win32
-        if: success()
-        run: |
-          yarn make -p win32 --targets @electron-forge/maker-zip
-
-      - name: Make for darwin
-        if: success()
-        run: |
-          yarn make -p darwin --targets @electron-forge/maker-zip
+          node scripts/buildAll.mjs
 
       - name: Get current date
         if: success()
@@ -105,38 +95,74 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload Release Asset - linux
+      - name: Upload Release Asset - linux - x64
         if: success()
-        id: upload-release-asset-linux
+        id: upload-release-asset-linux-x64
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: ./out/make/zip/linux/x64/ChaosDanmuTool-linux-x64-${{ env.TAG }}.zip
+          asset_path: ./out/ChaosDanmuTool-linux-x64-${{ env.TAG }}.zip
           asset_name: ChaosDanmuTool-linux-x64-${{ env.TAG }}.zip
           asset_content_type: application/zip
 
-      - name: Upload Release Asset - win32
+      - name: Upload Release Asset - linux - arm64
         if: success()
-        id: upload-release-asset-win32
+        id: upload-release-asset-linux-arm64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./out/ChaosDanmuTool-linux-arm64-${{ env.TAG }}.zip
+          asset_name: ChaosDanmuTool-linux-arm64-${{ env.TAG }}.zip
+          asset_content_type: application/zip
+
+      - name: Upload Release Asset - win32 - x64
+        if: success()
+        id: upload-release-asset-win32-x64
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ./out/make/zip/win32/x64/ChaosDanmuTool-win32-x64-${{ env.TAG }}.zip
+          asset_path: ./out/ChaosDanmuTool-win32-x64-${{ env.TAG }}.zip
           asset_name: ChaosDanmuTool-win32-x64-${{ env.TAG }}.zip
           asset_content_type: application/zip
 
-      - name: Upload Release Asset - darwin
+      - name: Upload Release Asset - win32 - arm64
         if: success()
-        id: upload-release-asset-darwin
+        id: upload-release-asset-win32-arm64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./out/ChaosDanmuTool-win32-arm64-${{ env.TAG }}.zip
+          asset_name: ChaosDanmuTool-win32-arm64-${{ env.TAG }}.zip
+          asset_content_type: application/zip
+
+      - name: Upload Release Asset - darwin - x64
+        if: success()
+        id: upload-release-asset-darwin-x64
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ./out/make/zip/darwin/x64/ChaosDanmuTool-darwin-x64-${{ env.TAG }}.zip
+          asset_path: ./out/ChaosDanmuTool-darwin-x64-${{ env.TAG }}.zip
           asset_name: ChaosDanmuTool-darwin-x64-${{ env.TAG }}.zip
+          asset_content_type: application/zip
+
+      - name: Upload Release Asset - darwin - arm64
+        if: success()
+        id: upload-release-asset-darwin-arm64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./out/ChaosDanmuTool-darwin-arm64-${{ env.TAG }}.zip
+          asset_name: ChaosDanmuTool-darwin-arm64-${{ env.TAG }}.zip
           asset_content_type: application/zip

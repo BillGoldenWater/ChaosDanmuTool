@@ -69,7 +69,6 @@ export class DanmuAnalysis extends React.Component<Props, State> {
     const state: State = { ...this.state, danmuMsgCount: dc };
     this.history = window.electron.getDanmuHistory();
 
-    console.log(state);
     // 如果历史弹幕为空
     if (this.history == null || this.history.length == 0) {
       done();
