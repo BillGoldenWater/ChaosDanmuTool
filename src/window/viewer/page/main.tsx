@@ -7,7 +7,7 @@ import style from "./main.module.css";
 import {
   Config,
   DanmuViewCustomConfig,
-  defaultViewCustomInternalName,
+  defaultViewCustomInternalUUID,
   getDefaultConfig,
   getDefaultDanmuViewCustomConfig,
 } from "../../../utils/config/Config";
@@ -160,14 +160,14 @@ export class Main extends React.Component<Props, State> {
     switch (command.cmd) {
       case getConfigUpdateCmd(): {
         const config: Config = command.data;
-        const name = getParam("name");
+        const uuid = getParam("uuid");
         let viewConfig: DanmuViewCustomConfig = null;
         let defaultViewConfig: DanmuViewCustomConfig = null;
 
         config.danmuViewCustoms.forEach((value) => {
-          if (value.name === name) {
+          if (value.uuid === uuid) {
             viewConfig = value;
-          } else if (value.name === defaultViewCustomInternalName) {
+          } else if (value.uuid === defaultViewCustomInternalUUID) {
             defaultViewConfig = value;
           }
         });

@@ -4,6 +4,8 @@
 
 import { CSSProperties } from "react";
 import { cloneDeep, defaultsDeep } from "lodash-es";
+import { arrayTag, getArrayDiff, getDiff, getTag } from "../ObjectUtils";
+import { v4 as uuidv4 } from "uuid";
 
 export type UpdateConfig = {
   ignoreVersion: string;
@@ -46,12 +48,14 @@ export type DanmuViewStyleConfig = {
 };
 
 export type TextReplacerConfig = {
+  uuid: string;
   searchValue: string;
   replaceValue: string;
   isRegExp: boolean;
 };
 
 export type BlackListMatchConfig = {
+  uuid: string;
   searchValue: string;
   isRegExp: boolean;
 };
@@ -75,6 +79,7 @@ export type TextToSpeechConfig = {
 
 export type DanmuViewCustomConfig = {
   name: string;
+  uuid: string;
   maxDanmuNumber: number;
   statusBarDisplay: boolean;
   superChatAlwaysOnTop: boolean;
@@ -96,18 +101,21 @@ export type Config = {
 };
 
 const defaultTextReplacer: TextReplacerConfig = {
+  uuid: "00000000-0000-0000-0000-000000000000",
   searchValue: "",
   replaceValue: "",
   isRegExp: false,
 };
 
 const defaultBlackListMatch: BlackListMatchConfig = {
+  uuid: "00000000-0000-0000-0000-000000000000",
   searchValue: "",
   isRegExp: false,
 };
 
 const defaultDanmuViewCustom: DanmuViewCustomConfig = {
   name: "default",
+  uuid: "00000000-0000-0000-0000-000000000000",
   maxDanmuNumber: 100,
   statusBarDisplay: true,
   superChatAlwaysOnTop: true,
@@ -122,12 +130,31 @@ const defaultDanmuViewCustom: DanmuViewCustomConfig = {
     pitch: 1,
     volume: 1,
     textReplacer: [
-      { searchValue: "233+", replaceValue: "二三三", isRegExp: true },
-      { searchValue: "666+", replaceValue: "六六六", isRegExp: true },
-      { searchValue: "77", replaceValue: "七七", isRegExp: true },
+      {
+        uuid: "0f0b6682-d6c0-47aa-8db3-1944d5e6a3cd",
+        searchValue: "233+",
+        replaceValue: "二三三",
+        isRegExp: true,
+      },
+      {
+        uuid: "658252d0-321c-45a2-b610-0d878d3cd0a0",
+        searchValue: "666+",
+        replaceValue: "六六六",
+        isRegExp: true,
+      },
+      {
+        uuid: "361687e3-a232-42fc-b0e0-cadd6a4d5600",
+        searchValue: "77",
+        replaceValue: "七七",
+        isRegExp: true,
+      },
     ],
     blackListMatch: [
-      { searchValue: ".*(:|：|冒号).*(\\.|点|·|丶|_).*", isRegExp: true },
+      {
+        uuid: "72efd7d7-3430-47a9-8470-f7259a45ad9d",
+        searchValue: ".*(:|：|冒号).*(\\.|点|·|丶|_).*",
+        isRegExp: true,
+      },
     ],
     danmu: {
       speakUserName: false,
@@ -180,8 +207,10 @@ const defaultDanmuViewCustom: DanmuViewCustomConfig = {
   },
 };
 
-export const defaultViewCustomInternalName = "内置弹幕查看器";
-export const defaultViewCustomOtherName = "其他";
+export const defaultViewCustomInternalUUID =
+  "93113675-999d-469c-a280-47ed2c5a09e4";
+export const defaultViewCustomOtherUUID =
+  "8ec89836-5ba4-43e6-805c-7fc8f96eaf1f";
 
 const defaultConfig: Config = {
   forChaosDanmuTool: true,
@@ -208,20 +237,16 @@ const defaultConfig: Config = {
   danmuViewCustoms: [
     {
       ...defaultDanmuViewCustom,
-      name: defaultViewCustomInternalName,
+      name: "内置弹幕查看器",
+      uuid: defaultViewCustomInternalUUID,
     },
     {
       ...defaultDanmuViewCustom,
-      name: defaultViewCustomOtherName,
+      name: "其他",
+      uuid: defaultViewCustomOtherUUID,
     },
   ],
 };
-
-function getTag(obj: unknown): string {
-  return Object.prototype.toString.call(obj);
-}
-
-const arrayTag = getTag([]);
 
 export function getDefaultConfig(config?: Config): Config {
   if (!config) return cloneDeep(defaultConfig);
@@ -245,7 +270,11 @@ export function getDefaultConfig(config?: Config): Config {
 export function getDefaultDanmuViewCustomConfig(
   config?: DanmuViewCustomConfig
 ): DanmuViewCustomConfig {
-  if (!config) return cloneDeep(defaultDanmuViewCustom);
+  if (!config)
+    return ((config: DanmuViewCustomConfig) => {
+      config.uuid = uuidv4();
+      return config;
+    })(cloneDeep(defaultDanmuViewCustom));
 
   const result: DanmuViewCustomConfig = cloneDeep(config);
   defaultsDeep(result, defaultDanmuViewCustom);
@@ -269,6 +298,13 @@ export function getDefaultDanmuViewCustomConfig(
     }
   }
 
+  if (!config.uuid || config.uuid === "00000000-0000-0000-0000-000000000000") {
+    config.uuid = uuidv4();
+    if (config.name === defaultConfig.danmuViewCustoms[0].name) {
+      config.uuid = defaultViewCustomInternalUUID;
+    }
+  }
+
   return result;
 }
 
@@ -279,6 +315,9 @@ export function getDefaultTextReplacerConfig(
 
   const result: TextReplacerConfig = cloneDeep(config);
   defaultsDeep(result, defaultTextReplacer);
+
+  if (config.uuid === "00000000-0000-0000-0000-000000000000")
+    config.uuid = uuidv4();
 
   return result;
 }
@@ -291,5 +330,49 @@ export function getDefaultBlackListMatchConfig(
   const result: BlackListMatchConfig = cloneDeep(config);
   defaultsDeep(result, defaultBlackListMatch);
 
+  if (config.uuid === "00000000-0000-0000-0000-000000000000")
+    config.uuid = uuidv4();
+
   return result;
+}
+
+export function getDiffConfig(config: Config): Config {
+  return ((diff: Config) => {
+    if (!diff) {
+      diff = {} as Config;
+    }
+    diff.forChaosDanmuTool = true;
+
+    diff.danmuViewCustoms = getArrayDiff(
+      config.danmuViewCustoms,
+      defaultDanmuViewCustom,
+      defaultConfig.danmuViewCustoms,
+      (diff, origin) => {
+        let obj: DanmuViewCustomConfig = diff;
+
+        const diffTextReplacer = getArrayDiff(
+          origin.tts.textReplacer,
+          defaultTextReplacer,
+          defaultDanmuViewCustom.tts.textReplacer
+        );
+        const diffBlackListMatch = getArrayDiff(
+          origin.tts.blackListMatch,
+          defaultBlackListMatch,
+          defaultDanmuViewCustom.tts.blackListMatch
+        );
+
+        if (diffTextReplacer || diffBlackListMatch) {
+          if (!obj) obj = {} as DanmuViewCustomConfig;
+          if (!obj.tts) obj.tts = {} as TextToSpeechConfig;
+
+          obj.tts.textReplacer = diffTextReplacer;
+          obj.tts.blackListMatch = diffBlackListMatch;
+        }
+
+        return obj;
+      }
+    );
+
+    return diff;
+  })(getDiff(config, defaultConfig));
 }

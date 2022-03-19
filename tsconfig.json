@@ -11,19 +11,10 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "paths": {
-      "*": [
-        "node_modules/*"
-      ]
+      "*": ["node_modules/*"]
     },
     "jsx": "react",
-    "lib": [
-      "dom",
-      "es5",
-      "scripthost",
-      "es2021"
-    ]
+    "lib": ["dom", "es5", "scripthost", "es2021"]
   },
-  "include": [
-    "src/**/*"
-  ]
+  "include": ["src/**/*"]
 }

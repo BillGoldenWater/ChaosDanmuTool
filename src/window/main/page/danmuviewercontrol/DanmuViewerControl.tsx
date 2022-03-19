@@ -7,7 +7,7 @@ import { Button, Divider, Form, Select, Space, Typography } from "antd";
 import { ConfigContext } from "../../utils/ConfigContext";
 import {
   getDefaultConfig,
-  defaultViewCustomInternalName,
+  defaultViewCustomInternalUUID,
   DanmuViewCustomConfig,
 } from "../../../../utils/config/Config";
 
@@ -46,7 +46,7 @@ export class DanmuViewerControl extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      selectedStyle: defaultViewCustomInternalName,
+      selectedStyle: defaultViewCustomInternalUUID,
     };
   }
 
@@ -58,24 +58,13 @@ export class DanmuViewerControl extends React.Component<Props, State> {
 
           const dvcs = get("danmuViewCustoms") as DanmuViewCustomConfig[];
 
-          const styleNameList = dvcs.map((value) => {
-            return value.name;
-          });
           const styleOptionList = dvcs.map((value) => {
             return (
-              <Select.Option key={value.name} value={value.name}>
+              <Select.Option key={value.uuid} value={value.uuid}>
                 {value.name}
               </Select.Option>
             );
           });
-
-          const verifiedSelectedStyle = styleNameList.includes(
-            state.selectedStyle
-          )
-            ? state.selectedStyle
-            : styleNameList.length > 0
-            ? styleNameList[0]
-            : "";
 
           const url = new URL(`http://localhost/viewer`);
 
@@ -94,8 +83,8 @@ export class DanmuViewerControl extends React.Component<Props, State> {
             );
           }
 
-          if (state.selectedStyle != defaultViewCustomInternalName) {
-            url.searchParams.append("name", this.state.selectedStyle);
+          if (state.selectedStyle != defaultViewCustomInternalUUID) {
+            url.searchParams.append("uuid", state.selectedStyle);
           }
 
           return (
@@ -129,7 +118,7 @@ export class DanmuViewerControl extends React.Component<Props, State> {
                   <Select
                     showSearch
                     style={{ minWidth: "7em" }}
-                    value={verifiedSelectedStyle}
+                    value={state.selectedStyle}
                     onChange={(value) => {
                       this.setState({ selectedStyle: value });
                     }}

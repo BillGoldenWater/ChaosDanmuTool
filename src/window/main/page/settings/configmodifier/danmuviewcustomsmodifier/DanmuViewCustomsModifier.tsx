@@ -17,7 +17,7 @@ import {
 import {
   BlackListMatchConfig,
   DanmuViewCustomConfig,
-  defaultViewCustomInternalName,
+  defaultViewCustomInternalUUID,
   getDefaultDanmuViewCustomConfig,
   TextReplacerConfig,
 } from "../../../../../../utils/config/Config";
@@ -37,39 +37,31 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      selectedStyle: defaultViewCustomInternalName,
+      selectedStyle: defaultViewCustomInternalUUID,
     };
   }
 
   createCustomItem(
     dvc: DanmuViewCustomConfig[],
-    setDvc: (dvc: DanmuViewCustomConfig[]) => void,
-    name: string
+    setDvc: (dvc: DanmuViewCustomConfig[]) => void
   ): string {
-    const hasSameName =
-      dvc.filter((value) => {
-        return value.name == name;
-      }).length > 0;
+    const newConfig = { ...getDefaultDanmuViewCustomConfig(), name: "未命名" };
 
-    if (hasSameName) {
-      return "已有同名配置";
-    }
-
-    dvc.push({ ...getDefaultDanmuViewCustomConfig(), name: name });
+    dvc.push(newConfig);
 
     setDvc(dvc);
 
-    return "";
+    return newConfig.uuid;
   }
 
   deleteCustomItem(
     dvc: DanmuViewCustomConfig[],
     setDvc: (dvc: DanmuViewCustomConfig[]) => void,
-    name: string
+    uuid: string
   ): void {
     setDvc(
       dvc.filter((value) => {
-        return value.name != name;
+        return value.uuid != uuid;
       })
     );
   }
@@ -87,26 +79,14 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
 
           const styleOptionList = dvcs.map((value) => {
             return (
-              <Select.Option key={value.name} value={value.name}>
+              <Select.Option key={value.uuid} value={value.uuid}>
                 {value.name}
               </Select.Option>
             );
           });
 
-          const styleNameList = dvcs.map((value) => {
-            return value.name;
-          });
-
-          const verifiedSelectedStyle = styleNameList.includes(
-            state.selectedStyle
-          )
-            ? state.selectedStyle
-            : styleNameList.length > 0
-            ? styleNameList[0]
-            : "";
-
           const dvcL = dvcs.filter((value) => {
-            return value.name == verifiedSelectedStyle;
+            return value.uuid == this.state.selectedStyle;
           });
 
           const dvc =
@@ -117,13 +97,6 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
           };
 
           const dvcSet = (key: string, value: unknown) => {
-            // const tempList = dvcs.filter((value) => {
-            //   return value.name != cDvc.name;
-            // });
-            // tempList.push(viewCustomConfig);
-            // setConfig({...config, danmuViewCustoms: tempList});
-            // this.setState({selectedStyle: viewCustomConfig.name});
-
             setProperty(dvc, key, value);
             set("danmuViewCustoms", dvcs);
           };
@@ -155,7 +128,7 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
                   <Select
                     showSearch
                     style={{ minWidth: "7em" }}
-                    value={verifiedSelectedStyle}
+                    value={this.state.selectedStyle}
                     onChange={(value) => {
                       this.setState({ selectedStyle: value });
                     }}
@@ -164,30 +137,25 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
                   </Select>
                   <Button
                     onClick={() => {
-                      const name = "new";
-                      const result = this.createCustomItem(dvcs, setDvcs, name);
-                      if (result) {
-                        message.error(result).then();
-                      } else {
-                        message.success("创建成功").then();
-                        this.setState({ selectedStyle: name });
-                      }
+                      const uuid = this.createCustomItem(dvcs, setDvcs);
+                      message.success("创建成功").then();
+                      this.setState({ selectedStyle: uuid });
                     }}
                   >
                     新建
                   </Button>
                   <Button
                     disabled={
-                      state.selectedStyle == defaultViewCustomInternalName ||
-                      state.selectedStyle == ""
+                      state.selectedStyle == defaultViewCustomInternalUUID
                     }
                     onClick={() => {
                       this.deleteCustomItem(dvcs, setDvcs, state.selectedStyle);
-                      message
-                        .success(`成功的删除了配置 "${state.selectedStyle}"`)
-                        .then();
+                      message.success(`成功的删除了配置 "${dvc.name}"`).then();
+
+                      const previousIndex =
+                        dvcs.findIndex((value) => value.uuid == dvc.uuid) - 1;
                       this.setState({
-                        selectedStyle: defaultViewCustomInternalName,
+                        selectedStyle: dvcs[previousIndex].uuid,
                       });
                     }}
                   >
@@ -196,20 +164,18 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
                 </Space>
               </Form.Item>
 
+              <Typography.Paragraph type={"secondary"}>
+                id: {dvc.uuid}
+              </Typography.Paragraph>
+
               <ConfigItem
                 configContext={dvcContext}
                 type={"string"}
-                disabled={state.selectedStyle == defaultViewCustomInternalName}
+                disabled={state.selectedStyle == defaultViewCustomInternalUUID}
                 name={"配置名"}
                 valueKey={"name"}
                 setString={(value) => {
-                  if (value == "") {
-                    message.warning("名称不能为空").then();
-                  } else if (styleNameList.includes(value)) {
-                    message.warning("名称不能重复").then();
-                  } else {
-                    dvcSet("name", value);
-                  }
+                  dvcSet("name", value);
                 }}
               />
 

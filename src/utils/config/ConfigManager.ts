@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Config, getDefaultConfig } from "./Config";
+import { Config, getDefaultConfig, getDiffConfig } from "./Config";
 import * as fs from "fs";
 import { ErrorCode } from "../ErrorCode";
 import { dialog } from "electron";
@@ -93,11 +93,14 @@ export class ConfigManager {
 
   static writeToFile(): void {
     try {
-      fs.writeFileSync(this.filePath, JSON.stringify(this.config, null, 2));
+      fs.writeFileSync(
+        this.filePath,
+        JSON.stringify(getDiffConfig(this.config), null, 2)
+      );
     } catch (e) {
       dialog.showErrorBox(
         "保存失败",
-        `${ErrorCode.configWriteException}\n无法写入`
+        `${ErrorCode.configWriteException}\n无法写入\n${e}`
       );
     }
   }
