@@ -298,10 +298,10 @@ export function getDefaultDanmuViewCustomConfig(
     }
   }
 
-  if (!config.uuid || config.uuid === "00000000-0000-0000-0000-000000000000") {
-    config.uuid = uuidv4();
-    if (config.name === defaultConfig.danmuViewCustoms[0].name) {
-      config.uuid = defaultViewCustomInternalUUID;
+  if (!result.uuid || result.uuid === "00000000-0000-0000-0000-000000000000") {
+    result.uuid = uuidv4();
+    if (result.name === defaultConfig.danmuViewCustoms[0].name) {
+      result.uuid = defaultViewCustomInternalUUID;
     }
   }
 
