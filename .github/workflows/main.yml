@@ -58,15 +58,15 @@ jobs:
         run: |
           npm install -g yarn
 
-      - name: apt update
+      - name: brew update
         if: success()
         run: |
-          sudo apt update
+          brew update
 
       - name: Install Wine
         if: success()
         run: |
-          sudo apt install -y wine
+          brew install --cask wine-stable
 
       - name: Preparing Yarn
         if: success()
