@@ -48,6 +48,21 @@ for (let buildOption of buildOptions) {
 
 const pkg = JSON.parse(fs.readFileSync("package.json", {encoding: "utf8"}));
 
+//region use script for launch and sign
+const darwin_arm64_app_path =
+    path.join("out", "ChaosDanmuTool-darwin-arm64", "ChaosDanmuTool.app")
+const darwin_arm64_exec_path =
+    path.join(darwin_arm64_app_path, "Contents", "MacOS", "ChaosDanmuTool")
+const darwin_arm64_exec_origin_suffix_path = ".origin"
+const darwin_arm64_exec_origin_path =
+    path.join(darwin_arm64_app_path, "Contents", "MacOS", `ChaosDanmuTool${darwin_arm64_exec_origin_suffix_path}`)
+
+fs.renameSync(darwin_arm64_exec_path, darwin_arm64_exec_origin_path)
+fs.writeFileSync(darwin_arm64_exec_path, "#!/bin/sh\n" +
+    `exec "\${0}${darwin_arm64_exec_origin_suffix_path}"`, {encoding: "utf-8"})
+execSync(`chmod +x ${darwin_arm64_exec_path}`)
+//endregion
+
 fs.readdirSync("out", {withFileTypes: true}).forEach(info => {
     const dir = info.name;
 
