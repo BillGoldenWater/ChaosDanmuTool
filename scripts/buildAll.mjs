@@ -39,8 +39,9 @@ const buildOptions = [
     },
 ];
 
+let num = 1
 for (let buildOption of buildOptions) {
-    console.log(`Building for ${buildOption.platform} ${buildOption.arch}`);
+    console.log(`Building for ${buildOption.platform} ${buildOption.arch} (${num++}/${buildOptions.length})`);
     execSync(`yarn package -a ${buildOption.arch} -p ${buildOption.platform}`, {
         stdio: "inherit",
     });
@@ -92,6 +93,7 @@ fs.readdirSync("out", {withFileTypes: true}).forEach(info => {
 
         const zipName = `${dir}-${pkg.version}.zip`;
 
+        console.log(`${zipName} compressing`);
         crossZip.zipSync(appDir, zipName);
         console.log(`${zipName} done`);
     }
