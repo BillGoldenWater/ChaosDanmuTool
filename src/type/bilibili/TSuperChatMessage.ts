@@ -2,8 +2,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { TUserInfo } from "./TUserInfo";
-import { TMedalInfo } from "./TMedalInfo";
+import { TUserInfo } from "./userinfo/TUserInfo";
+import { TMedalInfo } from "./userinfo/TMedalInfo";
 
 export type TSuperChatMessage = {
   cmd: "SUPER_CHAT_MESSAGE";

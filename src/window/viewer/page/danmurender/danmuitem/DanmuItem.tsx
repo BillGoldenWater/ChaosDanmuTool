@@ -5,7 +5,7 @@
 import React from "react";
 import { DanmuMessage } from "../../../../../utils/command/DanmuMessage";
 import { DanmuMsg } from "./item/danmumsg/DanmuMsg";
-import { parseDanmuMsg } from "../../../../../type/TDanmuMsg";
+import { parseDanmuMsg } from "../../../../../type/bilibili/TDanmuMsg";
 import { SuperChatMessage } from "./item/superchatmessage/SuperChatMessage";
 import { InteractWord } from "./item/interactword/InteractWord";
 import { SendGift } from "./item/sendgift/SendGift";
@@ -14,12 +14,12 @@ import { RoomStatusChange } from "./item/roomstatuschange/RoomStatusChange";
 import { getStatusUpdateMessageCmd } from "../../../../../utils/command/ReceiverStatusUpdate";
 import { StatusUpdate } from "./item/statusupdate/StatusUpdate";
 import { GuardBuy } from "./item/guardbuy/GuardBuy";
-import { TInteractWord } from "../../../../../type/TInteractWord";
-import { TSendGift } from "../../../../../type/TSendGift";
-import { TSuperChatMessage } from "../../../../../type/TSuperChatMessage";
-import { TPreparing } from "../../../../../type/TPreparing";
-import { TLive } from "../../../../../type/TLive";
-import { TGuardBuy } from "../../../../../type/TGuardBuy";
+import { TInteractWord } from "../../../../../type/bilibili/TInteractWord";
+import { TSendGift } from "../../../../../type/bilibili/TSendGift";
+import { TSuperChatMessage } from "../../../../../type/bilibili/TSuperChatMessage";
+import { TPreparing } from "../../../../../type/bilibili/TPreparing";
+import { TLive } from "../../../../../type/bilibili/TLive";
+import { TGuardBuy } from "../../../../../type/bilibili/TGuardBuy";
 
 class Props {
   message: DanmuMessage;

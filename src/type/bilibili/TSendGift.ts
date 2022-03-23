@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { TMedalInfo } from "./TMedalInfo";
+import { TMedalInfo } from "./userinfo/TMedalInfo";
 
 export type TSendGift = {
   cmd: "SEND_GIFT";

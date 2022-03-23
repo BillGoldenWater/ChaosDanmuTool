@@ -4,7 +4,7 @@
 
 import React from "react";
 import style from "./DanmuContent.module.css";
-import { TEmojiData } from "../../../type/TEmojiData";
+import { TEmojiData } from "../../../type/bilibili/TEmojiData";
 import { ConfigContext } from "../../../window/viewer/utils/ConfigContext";
 
 class Props {

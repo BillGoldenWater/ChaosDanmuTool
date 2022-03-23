@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { TGiftConfigResponse } from "../../type/giftconfig/TGiftConfig";
+import { TGiftConfigResponse } from "../../type/bilibili/giftconfig/TGiftConfig";
 
 export type GiftConfigUpdateCmd = "updateGiftConfig";
 

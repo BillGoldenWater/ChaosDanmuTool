@@ -12,7 +12,7 @@ import {
   MessageCommand,
 } from "../../../../utils/command/MessageCommand";
 import { DanmuMessage } from "../../../../utils/command/DanmuMessage";
-import { TSendGift } from "../../../../type/TSendGift";
+import { TSendGift } from "../../../../type/bilibili/TSendGift";
 import { ConfigContext } from "../../utils/ConfigContext";
 
 class Props {

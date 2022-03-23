@@ -5,12 +5,12 @@
 import {
   InteractWordType,
   TInteractWord,
-} from "../../../../../../../type/TInteractWord";
+} from "../../../../../../../type/bilibili/TInteractWord";
 import React, { ReactNode } from "react";
 import { UserInfo } from "../../../../../../../component/bilibili/userinfo/UserInfo";
-import { emptyUserInfo } from "../../../../../../../type/TUserInfo";
+import { emptyUserInfo } from "../../../../../../../type/bilibili/userinfo/TUserInfo";
 import { DanmuContent } from "../../../../../../../component/bilibili/danmucontent/DanmuContent";
-import { TMedalInfo } from "../../../../../../../type/TMedalInfo";
+import { TMedalInfo } from "../../../../../../../type/bilibili/userinfo/TMedalInfo";
 
 class Props {
   interactWord: TInteractWord;

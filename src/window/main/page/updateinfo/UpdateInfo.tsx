@@ -37,9 +37,16 @@ export class UpdateInfo extends React.Component<Props, State> {
     const s = this.state;
 
     const platform = window.electron.getPlatform();
-    const dlLink = p.githubRelease.assets.find((value) => {
-      return value.name.includes(platform);
-    }).browser_download_url;
+    const arch = window.electron.getArch();
+    let dlLink = p.githubRelease.assets.find(
+      (value) => value.name.includes(platform) && value.name.includes(arch)
+    )?.browser_download_url;
+
+    let downloadAvailable = true;
+    if (!dlLink) {
+      dlLink = "";
+      downloadAvailable = false;
+    }
 
     return (
       <ConfigContext.Consumer>
@@ -50,6 +57,7 @@ export class UpdateInfo extends React.Component<Props, State> {
             closable={false}
             footer={[
               <Button // copy
+                disabled={!downloadAvailable}
                 type={"primary"}
                 onClick={() => {
                   window.electron.writeClipboard(dlLink);
@@ -59,6 +67,7 @@ export class UpdateInfo extends React.Component<Props, State> {
                 复制链接
               </Button>,
               <Button // download
+                disabled={true}
                 key={"link"}
                 href={dlLink}
                 loading={s.redirecting}

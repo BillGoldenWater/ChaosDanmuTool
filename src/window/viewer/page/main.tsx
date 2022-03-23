@@ -28,23 +28,23 @@ import {
 import {
   InteractWordType,
   TInteractWord as TInteractWord,
-} from "../../../type/TInteractWord";
+} from "../../../type/bilibili/TInteractWord";
 import { ConfigContext } from "../utils/ConfigContext";
 import { StatusBar } from "../../../component/statusbar/StatusBar";
 import { DanmuRender } from "./danmurender/DanmuRender";
 import { InteractWord } from "./danmurender/danmuitem/item/interactword/InteractWord";
 import { formatNumber } from "../../../utils/FormatConverters";
-import { TRoomRealTimeMessageUpdate } from "../../../type/TRoomRealTimeMessageUpdate";
+import { TRoomRealTimeMessageUpdate } from "../../../type/bilibili/TRoomRealTimeMessageUpdate";
 import {
   parseGiftConfig,
   TGiftConfig,
   TGiftConfigResponse,
-} from "../../../type/giftconfig/TGiftConfig";
+} from "../../../type/bilibili/giftconfig/TGiftConfig";
 import { getGiftConfigUpdateCmd } from "../../../utils/command/GiftConfigUpdate";
-import { TSendGift } from "../../../type/TSendGift";
+import { TSendGift } from "../../../type/bilibili/TSendGift";
 import { getStatusUpdateMessageCmd } from "../../../utils/command/ReceiverStatusUpdate";
-import { TSuperChatMessage } from "../../../type/TSuperChatMessage";
-import { parseDanmuMsg } from "../../../type/TDanmuMsg";
+import { TSuperChatMessage } from "../../../type/bilibili/TSuperChatMessage";
+import { parseDanmuMsg } from "../../../type/bilibili/TDanmuMsg";
 import { TextToSpeech } from "../utils/TextToSpeech";
 
 class Props {}

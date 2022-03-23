@@ -3,11 +3,11 @@
  */
 
 import https from "https";
-import { TDanmuHistoryResponse } from "../../type/danmuhistory/TDanmuHistoryResponse";
+import { TDanmuHistoryResponse } from "../../type/bilibili/danmuhistory/TDanmuHistoryResponse";
 import { DanmuMessage } from "../command/DanmuMessage";
-import { TDanmuMsg } from "../../type/TDanmuMsg";
-import { parseMedalInfo } from "../../type/TMedalInfo";
-import { getUserUL } from "../../type/TUserLevel";
+import { TDanmuMsg } from "../../type/bilibili/TDanmuMsg";
+import { parseMedalInfo } from "../../type/bilibili/userinfo/TMedalInfo";
+import { getUserUL } from "../../type/bilibili/userinfo/TUserLevel";
 
 export class DanmuHistoryGetter {
   historyRes: TDanmuHistoryResponse;

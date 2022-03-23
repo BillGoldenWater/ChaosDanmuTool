@@ -5,8 +5,8 @@
 import React, { ReactNode } from "react";
 import style from "./RoomStatusChange.module.css";
 import { ConfigContext } from "../../../../../utils/ConfigContext";
-import { TPreparing } from "../../../../../../../type/TPreparing";
-import { TLive } from "../../../../../../../type/TLive";
+import { TPreparing } from "../../../../../../../type/bilibili/TPreparing";
+import { TLive } from "../../../../../../../type/bilibili/TLive";
 
 class Props {
   changeMsg: TLive | TPreparing;

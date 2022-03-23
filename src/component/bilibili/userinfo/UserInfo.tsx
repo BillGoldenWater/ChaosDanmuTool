@@ -4,9 +4,9 @@
 
 import React from "react";
 import style from "./UserInfo.module.css";
-import { TUserInfo as TUserInfo } from "../../../type/TUserInfo";
+import { TUserInfo as TUserInfo } from "../../../type/bilibili/userinfo/TUserInfo";
 import { FansMedal } from "../fansmedal/FansMedal";
-import { TMedalInfo } from "../../../type/TMedalInfo";
+import { TMedalInfo } from "../../../type/bilibili/userinfo/TMedalInfo";
 import { UserName } from "../username/UserName";
 import { AdminIcon } from "../adminicon/AdminIcon";
 import { VipIcon } from "../vipicon/VipIcon";

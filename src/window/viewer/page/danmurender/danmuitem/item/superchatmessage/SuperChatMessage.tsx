@@ -5,7 +5,7 @@
 import React from "react";
 import style from "./SuperChatMessage.module.css";
 import { UserInfo } from "../../../../../../../component/bilibili/userinfo/UserInfo";
-import { TSuperChatMessage } from "../../../../../../../type/TSuperChatMessage";
+import { TSuperChatMessage } from "../../../../../../../type/bilibili/TSuperChatMessage";
 import { DanmuContent } from "../../../../../../../component/bilibili/danmucontent/DanmuContent";
 import { ConfigContext } from "../../../../../utils/ConfigContext";
 

@@ -4,9 +4,9 @@
 
 import React from "react";
 import style from "./FansMedal.module.css";
-import { TMedalInfo } from "../../../type/TMedalInfo";
+import { TMedalInfo } from "../../../type/bilibili/userinfo/TMedalInfo";
 import { rgbI2S } from "../../../utils/FormatConverters";
-import { getGuardIconUrl } from "../../../type/TGuardBuy";
+import { getGuardIconUrl } from "../../../type/bilibili/TGuardBuy";
 
 class Props {
   medalInfo: TMedalInfo;

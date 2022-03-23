@@ -6,9 +6,9 @@ import React, { ReactNode } from "react";
 import {
   getGuardIconUrl,
   TGuardBuy,
-} from "../../../../../../../type/TGuardBuy";
+} from "../../../../../../../type/bilibili/TGuardBuy";
 import { UserInfo } from "../../../../../../../component/bilibili/userinfo/UserInfo";
-import { emptyUserInfo } from "../../../../../../../type/TUserInfo";
+import { emptyUserInfo } from "../../../../../../../type/bilibili/userinfo/TUserInfo";
 import { GiftContent } from "../../../../../../../component/bilibili/giftcontent/GiftContent";
 
 class Props {

@@ -2,14 +2,17 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { contextBridge, ipcRenderer, clipboard } from "electron";
+import { clipboard, contextBridge, ipcRenderer } from "electron";
 import { v4 as uuid4 } from "uuid";
-import { TGithubReleases } from "../../type/github/TGithubReleases";
 import { Config } from "../../utils/config/Config";
 import { MessageLog } from "../../utils/command/MessageLog";
+import { TGithubRelease } from "../../type/github/TGithubRelease";
+import { UpdateUtilsResult } from "../../type/TUpdateUtilsResult";
 
 export interface ApiElectron {
   getPlatform: () => string;
+  getArch: () => string;
+  isUnderARM64Translation: () => boolean;
   getVersion: () => string;
   getPath: (name: string) => string;
 
@@ -31,9 +34,9 @@ export interface ApiElectron {
   openViewer: () => void;
   closeViewer: () => void;
 
-  checkUpdate: () => Promise<boolean>;
-  getReleasesInfo: () => Promise<TGithubReleases>;
-  getChangeLog: () => Promise<string>;
+  checkUpdate: () => Promise<UpdateUtilsResult<boolean>>;
+  getLatestRelease: () => Promise<UpdateUtilsResult<TGithubRelease>>;
+  getChangeLog: () => Promise<UpdateUtilsResult<string>>;
 
   getDanmuHistory: () => MessageLog[];
 
@@ -55,6 +58,12 @@ function putCallback(callback: (...args: unknown[]) => void): string {
 const apiElectron: ApiElectron = {
   getPlatform: (): string => {
     return ipcRenderer.sendSync("app", "getPlatform");
+  },
+  getArch: (): string => {
+    return ipcRenderer.sendSync("app", "getArch");
+  },
+  isUnderARM64Translation: (): boolean => {
+    return ipcRenderer.sendSync("app", "isUnderARM64Translation");
   },
   getVersion: (): string => {
     return ipcRenderer.sendSync("app", "getVersion");
@@ -107,17 +116,17 @@ const apiElectron: ApiElectron = {
     ipcRenderer.sendSync("windowControl", "closeViewer");
   },
 
-  checkUpdate: (): Promise<boolean> => {
+  checkUpdate: (): Promise<UpdateUtilsResult<boolean>> => {
     return new Promise((resolve) => {
       ipcRenderer.send("update", "checkUpdate", putCallback(resolve));
     });
   },
-  getReleasesInfo: (): Promise<TGithubReleases> => {
+  getLatestRelease: (): Promise<UpdateUtilsResult<TGithubRelease>> => {
     return new Promise((resolve) => {
-      ipcRenderer.send("update", "getReleasesInfo", putCallback(resolve));
+      ipcRenderer.send("update", "getLatestRelease", putCallback(resolve));
     });
   },
-  getChangeLog: (): Promise<string> => {
+  getChangeLog: (): Promise<UpdateUtilsResult<string>> => {
     return new Promise((resolve) => {
       ipcRenderer.send("update", "getChangeLog", putCallback(resolve));
     });

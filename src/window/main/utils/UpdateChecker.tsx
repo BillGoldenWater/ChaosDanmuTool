@@ -5,7 +5,8 @@
 import React, { ReactNode } from "react";
 import { UpdateInfo } from "../page/updateinfo/UpdateInfo";
 import { Config } from "../../../utils/config/Config";
-import { message } from "antd";
+import { message, notification } from "antd";
+import { ResultStatus } from "../../../type/TResultStatus";
 
 export class UpdateChecker {
   static async checkUpdate(
@@ -14,13 +15,39 @@ export class UpdateChecker {
   ): Promise<ReactNode> {
     let updateInfo = null;
 
-    const hasUpdate = await window.electron.checkUpdate();
+    const hasUpdateRes = await window.electron.checkUpdate();
+
+    if (hasUpdateRes.status != ResultStatus.Success) {
+      if (fromUser) {
+        notification.error({
+          message: "检查更新失败",
+          description: hasUpdateRes.message || hasUpdateRes.message,
+        });
+      } else {
+        return;
+      }
+    }
+
+    const hasUpdate = hasUpdateRes.result;
 
     if (hasUpdate) {
-      const changeLog = await window.electron.getChangeLog();
-      const releasesInfo = await window.electron.getReleasesInfo();
+      const changeLogRes = await window.electron.getChangeLog();
+      const latestReleaseRes = await window.electron.getLatestRelease();
+      if (
+        changeLogRes.status != ResultStatus.Success ||
+        latestReleaseRes.status != ResultStatus.Success
+      ) {
+        if (fromUser) {
+          notification.error({
+            message: "检查更新失败",
+            description: changeLogRes.message || latestReleaseRes.message,
+          });
+        }
+        return;
+      }
 
-      const latestRelease = releasesInfo[0];
+      const changeLog = changeLogRes.result;
+      const latestRelease = latestReleaseRes.result;
 
       if (latestRelease.tag_name == config.update.ignoreVersion) {
         if (!fromUser) {

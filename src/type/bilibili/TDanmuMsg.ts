@@ -2,11 +2,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { DanmuMessage } from "../utils/command/DanmuMessage";
+import { DanmuMessage } from "../../utils/command/DanmuMessage";
 import { TEmojiData } from "./TEmojiData";
-import { parseMedalInfo, TMedalInfo } from "./TMedalInfo";
-import { TMedal } from "./TMedal";
-import { getUserUL, TUserLevel } from "./TUserLevel";
+import { parseMedalInfo, TMedalInfo } from "./userinfo/TMedalInfo";
+import { TMedal } from "./userinfo/TMedal";
+import { getUserUL, TUserLevel } from "./userinfo/TUserLevel";
 
 export type TDanmuMsg = {
   fontsize: number;

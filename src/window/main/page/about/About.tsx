@@ -3,11 +3,25 @@
  */
 
 import React, { ReactNode } from "react";
-import { Card, Divider, message, Skeleton, Tooltip, Typography } from "antd";
+import {
+  Button,
+  Card,
+  Divider,
+  message,
+  notification,
+  Skeleton,
+  Tooltip,
+  Typography,
+} from "antd";
 import MarkdownIt from "markdown-it";
 import Link from "antd/lib/typography/Link";
+import { ResultStatus } from "../../../../type/TResultStatus";
 
 const { Title, Paragraph } = Typography;
+
+enum Status {
+  FailedToLoad = "&{FailedToLoad}&",
+}
 
 class Props {
   checkUpdate: (whenDone: () => void) => void;
@@ -15,6 +29,7 @@ class Props {
 
 class State {
   changeLog: string;
+  gettingChangeLog: boolean;
 }
 
 export class About extends React.Component<Props, State> {
@@ -25,13 +40,31 @@ export class About extends React.Component<Props, State> {
 
     this.state = {
       changeLog: "",
+      gettingChangeLog: false,
     };
 
     this.markdownIt = new MarkdownIt();
 
-    window.electron.getChangeLog().then((changeLog) => {
+    this.updateChangeLog();
+  }
+
+  updateChangeLog(fromUser?: boolean) {
+    window.electron.getChangeLog().then((changeLogRes) => {
+      if (changeLogRes.status != ResultStatus.Success) {
+        if (fromUser) {
+          notification.error({
+            message: "获取更新日志失败",
+            description: changeLogRes.message,
+          });
+        }
+        this.setState({
+          changeLog: Status.FailedToLoad,
+        });
+        return;
+      }
+
       this.setState({
-        changeLog,
+        changeLog: changeLogRes.result,
       });
     });
   }
@@ -52,9 +85,11 @@ export class About extends React.Component<Props, State> {
       </Tooltip>
     );
     const platform = window.electron.getPlatform();
+    const arch = window.electron.getArch();
 
     let changelog: ReactNode;
-    if (s.changeLog != "") {
+
+    if (s.changeLog != "" && s.changeLog != Status.FailedToLoad) {
       changelog = (
         <Card>
           <div
@@ -63,6 +98,20 @@ export class About extends React.Component<Props, State> {
             }}
           />
         </Card>
+      );
+    } else if (s.changeLog == Status.FailedToLoad) {
+      changelog = (
+        <Button
+          loading={s.gettingChangeLog}
+          onClick={() => {
+            this.setState({
+              gettingChangeLog: true,
+            });
+            this.updateChangeLog(true);
+          }}
+        >
+          重新加载
+        </Button>
       );
     } else {
       changelog = [
@@ -76,7 +125,7 @@ export class About extends React.Component<Props, State> {
       <div>
         <Typography>
           <Title level={3}>
-            Chaos Danmu Tool {version}-{platform}
+            Chaos Danmu Tool {version}-{platform}-{arch}
           </Title>
           <Divider />
           <Paragraph
