@@ -35,6 +35,10 @@ export class SuperChatMessage extends React.Component<Props, State> {
     }, 100);
   }
 
+  componentWillUnmount() {
+    window.clearInterval(this.updateIntervalId);
+  }
+
   render(): JSX.Element {
     const scm: TSuperChatMessage = this.props.superChatMessage;
     return (
