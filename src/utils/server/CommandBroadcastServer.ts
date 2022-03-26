@@ -4,14 +4,14 @@
 
 import { WebSocketServer } from "ws";
 import { Server as HttpServer } from "http";
-import { getConfigUpdateMessage } from "../command/ConfigUpdate";
+import { getConfigUpdateMessage } from "../../command/ConfigUpdate";
 import { ConfigManager } from "../config/ConfigManager";
-import { getGiftConfigUpdateMessage } from "../command/GiftConfigUpdate";
+import { getGiftConfigUpdateMessage } from "../../command/GiftConfigUpdate";
 import { GiftConfigGetter } from "../data/GiftConfigGetter";
-import { getStatusUpdateMessage } from "../command/ReceiverStatusUpdate";
+import { getStatusUpdateMessage } from "../../command/ReceiverStatusUpdate";
 import { DanmuReceiver } from "../client/DanmuReceiver";
 import { DanmuHistoryGetter } from "../data/DanmuHistoryGetter";
-import { getMessageCommand } from "../command/MessageCommand";
+import { getMessageCommand } from "../../command/MessageCommand";
 
 const get = ConfigManager.get.bind(ConfigManager);
 const getConfig = ConfigManager.getConfig.bind(ConfigManager);
@@ -44,9 +44,7 @@ export class CommandBroadcastServer {
         get("danmuReceiver.roomid") as number,
         (history) => {
           history.forEach((value) => {
-            socket.send(
-              JSON.stringify(getMessageCommand(JSON.stringify(value)))
-            );
+            socket.send(JSON.stringify(getMessageCommand(value)));
           });
         }
       );

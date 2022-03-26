@@ -6,19 +6,15 @@ export type MessageLogCmd = "messageLog";
 
 export type MessageLog = {
   cmd: MessageLogCmd;
-  data: {
-    timestamp: number;
-    message: unknown;
-  };
+  timestamp: number;
+  message: unknown;
 };
 
 export function getMessageLogMessage(message: unknown): MessageLog {
   return {
     cmd: "messageLog",
-    data: {
-      timestamp: new Date().getTime(),
-      message: message,
-    },
+    timestamp: new Date().getTime(),
+    message: message,
   };
 }
 

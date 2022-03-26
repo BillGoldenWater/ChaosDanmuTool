@@ -15,16 +15,16 @@ import { WebsocketClient } from "../../../utils/client/WebsocketClient";
 import { getParam } from "../utils/UrlParamGeter";
 import { LoadingPage } from "./loadingpage/LoadingPage";
 import { ConnectFail } from "./connectfail/ConnectFail";
-import { getConfigUpdateCmd } from "../../../utils/command/ConfigUpdate";
-import { getMessageCommandCmd } from "../../../utils/command/MessageCommand";
+import { getConfigUpdateCmd } from "../../../command/ConfigUpdate";
+import { getMessageCommandCmd } from "../../../command/MessageCommand";
 import {
   ActivityUpdate,
   getActivityUpdateMessageCmd,
-} from "../../../utils/command/ActivityUpdate";
+} from "../../../command/ActivityUpdate";
 import {
-  DanmuMessage,
+  TBiliBiliDanmuContent,
   DanmuMessageWithKey,
-} from "../../../utils/command/DanmuMessage";
+} from "../../../type/bilibili/TBiliBiliDanmuContent";
 import {
   InteractWordType,
   TInteractWord as TInteractWord,
@@ -40,9 +40,9 @@ import {
   TGiftConfig,
   TGiftConfigResponse,
 } from "../../../type/bilibili/giftconfig/TGiftConfig";
-import { getGiftConfigUpdateCmd } from "../../../utils/command/GiftConfigUpdate";
+import { getGiftConfigUpdateCmd } from "../../../command/GiftConfigUpdate";
 import { TSendGift } from "../../../type/bilibili/TSendGift";
-import { getStatusUpdateMessageCmd } from "../../../utils/command/ReceiverStatusUpdate";
+import { getStatusUpdateMessageCmd } from "../../../command/ReceiverStatusUpdate";
 import { TSuperChatMessage } from "../../../type/bilibili/TSuperChatMessage";
 import { parseDanmuMsg } from "../../../type/bilibili/TDanmuMsg";
 import { TextToSpeech } from "../utils/TextToSpeech";
@@ -204,7 +204,7 @@ export class Main extends React.Component<Props, State> {
         break;
       }
       case getMessageCommandCmd(): {
-        const msg: DanmuMessage = JSON.parse(command.data);
+        const msg: TBiliBiliDanmuContent = command.data;
         switch (msg.cmd) {
           case "INTERACT_WORD": {
             this.processInteractWord(msg as TInteractWord);
@@ -255,13 +255,15 @@ export class Main extends React.Component<Props, State> {
           case "ONLINE_RANK_COUNT":
           case "ONLINE_RANK_TOP3":
           case "ONLINE_RANK_V2":
-          case "ENTRY_EFFECT": // planToDo
+          case "ENTRY_EFFECT":
           case "ANCHOR_LOT_AWARD":
           case "ANCHOR_LOT_CHECKSTATUS":
           case "ANCHOR_LOT_END":
           case "ANCHOR_LOT_START":
           case "HOT_RANK_CHANGED":
-          case "HOT_RANK_SETTLEMENT": {
+          case "HOT_RANK_SETTLEMENT":
+          case "WATCHED_CHANGE": {
+            // planToDo
             break;
           }
           default: {
@@ -280,7 +282,7 @@ export class Main extends React.Component<Props, State> {
     let totalNum = 0;
 
     for (const i in this.state.danmuList) {
-      const msg: DanmuMessage = this.state.danmuList[i].msg;
+      const msg: TBiliBiliDanmuContent = this.state.danmuList[i].msg;
       const key: number = this.state.danmuList[i].key;
       if (msg.cmd == "SEND_GIFT") {
         const sgData = (msg as TSendGift).data;
@@ -325,13 +327,13 @@ export class Main extends React.Component<Props, State> {
         this.addToList({
           ...interactWord,
           cmd: "INTERACT_WORD",
-        } as DanmuMessage);
+        } as TBiliBiliDanmuContent);
         break;
       }
     }
   }
 
-  addToList(msg: DanmuMessage, removeKeys?: number[]): void {
+  addToList(msg: TBiliBiliDanmuContent, removeKeys?: number[]): void {
     this.setState((prevState) => {
       let list: DanmuMessageWithKey[] = prevState.danmuList;
       list.push({

@@ -3,7 +3,7 @@
  */
 
 import React from "react";
-import { DanmuMessage } from "../../../../../utils/command/DanmuMessage";
+import { TBiliBiliDanmuContent } from "../../../../../type/bilibili/TBiliBiliDanmuContent";
 import { DanmuMsg } from "./item/danmumsg/DanmuMsg";
 import { parseDanmuMsg } from "../../../../../type/bilibili/TDanmuMsg";
 import { SuperChatMessage } from "./item/superchatmessage/SuperChatMessage";
@@ -11,7 +11,7 @@ import { InteractWord } from "./item/interactword/InteractWord";
 import { SendGift } from "./item/sendgift/SendGift";
 import { RoomBlockMsg } from "./item/roomblockmsg/RoomBlockMsg";
 import { RoomStatusChange } from "./item/roomstatuschange/RoomStatusChange";
-import { getStatusUpdateMessageCmd } from "../../../../../utils/command/ReceiverStatusUpdate";
+import { getStatusUpdateMessageCmd } from "../../../../../command/ReceiverStatusUpdate";
 import { StatusUpdate } from "./item/statusupdate/StatusUpdate";
 import { GuardBuy } from "./item/guardbuy/GuardBuy";
 import { TInteractWord } from "../../../../../type/bilibili/TInteractWord";
@@ -22,12 +22,12 @@ import { TLive } from "../../../../../type/bilibili/TLive";
 import { TGuardBuy } from "../../../../../type/bilibili/TGuardBuy";
 
 class Props {
-  message: DanmuMessage;
+  message: TBiliBiliDanmuContent;
 }
 
 export class DanmuItem extends React.Component<Props> {
   render(): JSX.Element {
-    const msg: DanmuMessage = this.props.message;
+    const msg: TBiliBiliDanmuContent = this.props.message;
     switch (msg.cmd) {
       case getStatusUpdateMessageCmd(): {
         return <StatusUpdate msg={msg} />;

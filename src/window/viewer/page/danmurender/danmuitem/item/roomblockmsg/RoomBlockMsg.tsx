@@ -4,13 +4,13 @@
 
 import React, { ReactNode } from "react";
 import style from "./RoomBlockMsg.module.css";
-import { DanmuMessage } from "../../../../../../../utils/command/DanmuMessage";
+import { TBiliBiliDanmuContent } from "../../../../../../../type/bilibili/TBiliBiliDanmuContent";
 import { TRoomBlockMsg } from "../../../../../../../type/bilibili/TRoomBlockMsg";
 import { UserInfo } from "../../../../../../../component/bilibili/userinfo/UserInfo";
 import { emptyUserInfo } from "../../../../../../../type/bilibili/userinfo/TUserInfo";
 
 class Props {
-  msg: DanmuMessage;
+  msg: TBiliBiliDanmuContent;
 }
 
 export class RoomBlockMsg extends React.Component<Props> {

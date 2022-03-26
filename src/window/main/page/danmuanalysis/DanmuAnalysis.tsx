@@ -4,14 +4,14 @@
 
 import React, { ReactNode } from "react";
 import EChartsReact from "echarts-for-react";
-import { MessageLog } from "../../../../utils/command/MessageLog";
+import { MessageLog } from "../../../../command/messagelog/MessageLog";
 import { WebsocketClient } from "../../../../utils/client/WebsocketClient";
 import { message } from "antd";
 import {
   getMessageCommandCmd,
   MessageCommand,
-} from "../../../../utils/command/MessageCommand";
-import { DanmuMessage } from "../../../../utils/command/DanmuMessage";
+} from "../../../../command/MessageCommand";
+import { TBiliBiliDanmuContent } from "../../../../type/bilibili/TBiliBiliDanmuContent";
 import { TSendGift } from "../../../../type/bilibili/TSendGift";
 import { ConfigContext } from "../../utils/ConfigContext";
 
@@ -78,16 +78,16 @@ export class DanmuAnalysis extends React.Component<Props, State> {
     }
 
     // 初始化中间所有的时间
-    const startTs = Math.round(this.history[0].data.timestamp / 1000);
-    const endTs = Math.round(this.history.at(-1).data.timestamp / 1000);
+    const startTs = Math.round(this.history[0].timestamp / 1000);
+    const endTs = Math.round(this.history.at(-1).timestamp / 1000);
     for (let i = startTs; i <= endTs; i++) {
       this.newItem(state, this.formatDate(new Date(i * 1000)));
     }
 
     // 统计历史弹幕
     this.history.forEach((value) => {
-      const cmd = value.data.message as MessageCommand;
-      this.newMessage(state, cmd, new Date(value.data.timestamp));
+      const cmd = value.message as MessageCommand;
+      this.newMessage(state, cmd, new Date(value.timestamp));
     });
 
     done();
@@ -150,7 +150,7 @@ export class DanmuAnalysis extends React.Component<Props, State> {
   newMessage(state: State, cmd: MessageCommand, date: Date): State {
     if (cmd.cmd != getMessageCommandCmd()) return;
 
-    const danmuMessage: DanmuMessage = JSON.parse(cmd.data);
+    const danmuMessage: TBiliBiliDanmuContent = cmd.data;
     const dateStr = this.formatDate(date);
 
     switch (danmuMessage.cmd) {

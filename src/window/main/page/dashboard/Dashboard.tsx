@@ -4,7 +4,7 @@
 
 import React, { ReactNode } from "react";
 import { ConnectRoom } from "../connectroom/ConnectRoom";
-import { ReceiverStatus } from "../../../../utils/command/ReceiverStatusUpdate";
+import { ReceiverStatus } from "../../../../command/ReceiverStatusUpdate";
 import { Divider } from "antd";
 import { DanmuViewerSwitch } from "../danmuviewercontrol/DanmuViewerControl";
 import { DanmuAnalysis } from "../danmuanalysis/DanmuAnalysis";

@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Data } from "../client/DanmuReceiver";
+import { Data } from "../../utils/client/DanmuReceiver";
 
 export type ErrorMessageCmd = "errorMessage";
 

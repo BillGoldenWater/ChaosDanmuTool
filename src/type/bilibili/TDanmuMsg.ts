@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { DanmuMessage } from "../../utils/command/DanmuMessage";
+import { TBiliBiliDanmuContent } from "./TBiliBiliDanmuContent";
 import { TEmojiData } from "./TEmojiData";
 import { parseMedalInfo, TMedalInfo } from "./userinfo/TMedalInfo";
 import { TMedal } from "./userinfo/TMedal";
@@ -30,7 +30,7 @@ export type TDanmuMsg = {
   userTitle1: string;
 };
 
-export function parseDanmuMsg(data: DanmuMessage): TDanmuMsg {
+export function parseDanmuMsg(data: TBiliBiliDanmuContent): TDanmuMsg {
   if (data.data) {
     return <TDanmuMsg>data.data;
   }

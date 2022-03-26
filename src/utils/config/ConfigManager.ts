@@ -7,7 +7,7 @@ import * as fs from "fs";
 import { ErrorCode } from "../ErrorCode";
 import { dialog } from "electron";
 import { CommandBroadcastServer } from "../server/CommandBroadcastServer";
-import { getConfigUpdateMessage } from "../command/ConfigUpdate";
+import { getConfigUpdateMessage } from "../../command/ConfigUpdate";
 import { getProperty, setProperty } from "dot-prop";
 
 export class ConfigManager {

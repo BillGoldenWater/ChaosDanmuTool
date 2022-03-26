@@ -5,13 +5,16 @@
 import React, { ReactNode } from "react";
 import { Button, Form, InputNumber, Space } from "antd";
 import { ConfigContext } from "../../utils/ConfigContext";
-import { ReceiverStatus } from "../../../../utils/command/ReceiverStatusUpdate";
+import { ReceiverStatus } from "../../../../command/ReceiverStatusUpdate";
 import {
   CheckCircleOutlined,
   CloseCircleOutlined,
   LoadingOutlined,
   WarningOutlined,
 } from "@ant-design/icons";
+import { biliBiliDanmuTestData } from "../../../../data/BiliBiliDanmuTestData";
+import { getMessageCommand } from "../../../../command/MessageCommand";
+import { TBiliBiliDanmuContent } from "../../../../type/bilibili/TBiliBiliDanmuContent";
 
 class Props {
   receiverStatus: ReceiverStatus;
@@ -60,9 +63,20 @@ export class ConnectRoom extends React.Component<Props> {
                       if (open) {
                         window.electron.disconnect();
                       } else {
-                        window.electron.connect(
-                          get("danmuReceiver.roomid") as number
-                        );
+                        const roomid = get("danmuReceiver.roomid") as number;
+                        if (roomid == 0) {
+                          biliBiliDanmuTestData.forEach((value) => {
+                            window.electron.commandBroadcast(
+                              JSON.stringify(
+                                getMessageCommand(
+                                  value as TBiliBiliDanmuContent
+                                )
+                              )
+                            );
+                          });
+                          return;
+                        }
+                        window.electron.connect(roomid);
                       }
                     }}
                   >

@@ -5,13 +5,19 @@
 import Zlib from "zlib";
 import WebSocket from "ws";
 import { CommandBroadcastServer } from "../server/CommandBroadcastServer";
-import { getStatusUpdateMessage } from "../command/ReceiverStatusUpdate";
-import { getActivityUpdateMessage } from "../command/ActivityUpdate";
+import { getStatusUpdateMessage } from "../../command/ReceiverStatusUpdate";
+import { getActivityUpdateMessage } from "../../command/ActivityUpdate";
 import { ErrorCode } from "../ErrorCode";
-import { getJoinResponseMessage } from "../command/JoinResponse";
-import { ErrorMessage, getErrorMessageMessage } from "../command/ErrorMessage";
-import { getMessageLogMessage, MessageLog } from "../command/MessageLog";
-import { getMessageCommand } from "../command/MessageCommand";
+import { getJoinResponseMessage } from "../../command/JoinResponse";
+import {
+  ErrorMessage,
+  getErrorMessageMessage,
+} from "../../command/messagelog/ErrorMessage";
+import {
+  getMessageLogMessage,
+  MessageLog,
+} from "../../command/messagelog/MessageLog";
+import { getMessageCommand } from "../../command/MessageCommand";
 import { dialog } from "electron";
 import { ConfigManager } from "../config/ConfigManager";
 import { createViewerWindow, showWindow, viewerWindow } from "../../index";
@@ -185,7 +191,7 @@ export class DanmuReceiver {
           }
           case OpCode.message: {
             const message = this.textDecoder.decode(value.getBody());
-            this.broadcastMessage(getMessageCommand(message));
+            this.broadcastMessage(getMessageCommand(JSON.parse(message)));
             break;
           }
           default: {

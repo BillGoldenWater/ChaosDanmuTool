@@ -4,7 +4,7 @@
 
 import https from "https";
 import { TDanmuHistoryResponse } from "../../type/bilibili/danmuhistory/TDanmuHistoryResponse";
-import { DanmuMessage } from "../command/DanmuMessage";
+import { TBiliBiliDanmuContent } from "../../type/bilibili/TBiliBiliDanmuContent";
 import { TDanmuMsg } from "../../type/bilibili/TDanmuMsg";
 import { parseMedalInfo } from "../../type/bilibili/userinfo/TMedalInfo";
 import { getUserUL } from "../../type/bilibili/userinfo/TUserLevel";
@@ -13,7 +13,10 @@ export class DanmuHistoryGetter {
   historyRes: TDanmuHistoryResponse;
   historyResStr: string;
 
-  get(roomid: number, callback: (history: DanmuMessage[]) => void): void {
+  get(
+    roomid: number,
+    callback: (history: TBiliBiliDanmuContent[]) => void
+  ): void {
     this.historyResStr = "";
     https
       .get(
@@ -58,11 +61,11 @@ export class DanmuHistoryGetter {
                     userTitle1: "",
                   };
 
-                  const msg: DanmuMessage = <DanmuMessage>{};
+                  const msg: TBiliBiliDanmuContent = <TBiliBiliDanmuContent>{};
                   msg.cmd = "DANMU_MSG";
                   msg.data = danmuMsg;
 
-                  return <DanmuMessage>msg;
+                  return <TBiliBiliDanmuContent>msg;
                 })
               );
             } catch (e) {
@@ -77,11 +80,11 @@ export class DanmuHistoryGetter {
   }
 
   private static onException(
-    callback: (history: DanmuMessage[]) => void,
+    callback: (history: TBiliBiliDanmuContent[]) => void,
     message?: string
   ) {
     callback([
-      <DanmuMessage>{
+      <TBiliBiliDanmuContent>{
         cmd: "DANMU_MSG",
         data: <TDanmuMsg>{
           fontsize: 0,

@@ -10,12 +10,12 @@ import {
   getStatusUpdateMessageCmd,
   ReceiverStatus,
   ReceiverStatusUpdate,
-} from "../../../utils/command/ReceiverStatusUpdate";
+} from "../../../command/ReceiverStatusUpdate";
 import { ConfigContext } from "../utils/ConfigContext";
 import {
   ConfigUpdate,
   getConfigUpdateCmd,
-} from "../../../utils/command/ConfigUpdate";
+} from "../../../command/ConfigUpdate";
 import { WebsocketClient } from "../../../utils/client/WebsocketClient";
 import { ConfigProvider, Layout, Menu, notification } from "antd";
 import {

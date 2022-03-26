@@ -2,7 +2,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-export type DanmuMessage = {
+export type TBiliBiliDanmuContent = {
+  //region cmd
   cmd:
     | string
     | "INTERACT_WORD"
@@ -38,18 +39,20 @@ export type DanmuMessage = {
     | "ONLINE_RANK_COUNT"
     | "ONLINE_RANK_TOP3"
     | "ONLINE_RANK_V2"
-    //planToDo
     | "ENTRY_EFFECT"
     | "ANCHOR_LOT_AWARD"
     | "ANCHOR_LOT_CHECKSTATUS"
     | "ANCHOR_LOT_END"
     | "ANCHOR_LOT_START"
     | "HOT_RANK_CHANGED"
-    | "HOT_RANK_SETTLEMENT";
+    | "HOT_RANK_SETTLEMENT"
+    //planToDo
+    | "WATCHED_CHANGE";
+  //endregion
   [key: string]: unknown;
 };
 
 export type DanmuMessageWithKey = {
   key: number;
-  msg: DanmuMessage;
+  msg: TBiliBiliDanmuContent;
 };

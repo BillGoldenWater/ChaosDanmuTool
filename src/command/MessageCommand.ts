@@ -2,14 +2,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { TBiliBiliDanmuContent } from "../type/bilibili/TBiliBiliDanmuContent";
+
 export type MessageCommandCmd = "messageCommand";
 
 export type MessageCommand = {
   cmd: MessageCommandCmd;
-  data: string;
+  data: TBiliBiliDanmuContent;
 };
 
-export function getMessageCommand(data: string): MessageCommand {
+export function getMessageCommand(data: TBiliBiliDanmuContent): MessageCommand {
   return {
     cmd: "messageCommand",
     data: data,

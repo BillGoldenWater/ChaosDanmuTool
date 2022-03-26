@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Config } from "../config/Config";
+import { Config } from "../utils/config/Config";
 
 export type ConfigUpdateCmd = "updateConfig";
 
