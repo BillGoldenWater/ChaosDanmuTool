@@ -55,7 +55,10 @@ export class ConnectRoom extends React.Component<Props> {
                   <InputNumber
                     min={0}
                     value={get("danmuReceiver.roomid") as number}
-                    onChange={(value) => set("danmuReceiver.roomid", value)}
+                    onChange={(value) => {
+                      if (value == null) return;
+                      set("danmuReceiver.roomid", value);
+                    }}
                   />
                   <Button
                     type={"primary"}

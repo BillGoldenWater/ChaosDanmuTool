@@ -40,14 +40,16 @@ export class CommandBroadcastServer {
           )
         )
       );
-      new DanmuHistoryGetter().get(
-        get("danmuReceiver.roomid") as number,
-        (history) => {
-          history.forEach((value) => {
-            socket.send(JSON.stringify(getMessageCommand(value)));
-          });
-        }
-      );
+      if (get("danmuReceiver.roomid") != null) {
+        new DanmuHistoryGetter().get(
+          get("danmuReceiver.roomid") as number,
+          (history) => {
+            history.forEach((value) => {
+              socket.send(JSON.stringify(getMessageCommand(value)));
+            });
+          }
+        );
+      }
     });
   }
 
