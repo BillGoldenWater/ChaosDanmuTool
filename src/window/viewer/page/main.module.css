@@ -11,6 +11,7 @@
   border-radius: 0.4em;
 }
 
-.main:hover {
+.main_selectable {
+  -webkit-app-region: no-drag;
   overflow-y: auto;
 }

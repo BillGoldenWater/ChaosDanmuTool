@@ -58,6 +58,7 @@ class State {
   fansNumber: number;
   statusMessage: string | ReactNode;
   giftConfig: TGiftConfig;
+  selectable: boolean;
 }
 
 export class Main extends React.Component<Props, State> {
@@ -82,6 +83,7 @@ export class Main extends React.Component<Props, State> {
       fansNumber: 0,
       statusMessage: "",
       giftConfig: undefined,
+      selectable: false,
     };
 
     this.serverAddress = window.location.hostname;
@@ -126,6 +128,21 @@ export class Main extends React.Component<Props, State> {
     this.websocketClient.connect(this.serverAddress, this.serverPort);
 
     this.tts = new TextToSpeech();
+
+    window.addEventListener("keydown", (e) => {
+      if (e.code == "AltLeft" || e.code == "AltRight") {
+        this.setState({
+          selectable: true,
+        });
+      }
+    });
+    window.addEventListener("keyup", (e) => {
+      if (e.code == "AltLeft" || e.code == "AltRight") {
+        this.setState({
+          selectable: false,
+        });
+      }
+    });
   }
 
   tryReconnect(): void {
@@ -373,44 +390,44 @@ export class Main extends React.Component<Props, State> {
   }
 
   render(): JSX.Element {
+    const s = this.state;
     let status = null;
 
-    if (this.state.connectState == "open") {
-      if (this.state.config.statusBarDisplay) {
+    if (s.connectState == "open") {
+      if (s.config.statusBarDisplay) {
         status = (
           <StatusBar
-            message={this.state.statusMessage}
+            message={s.statusMessage}
             style={{
-              backgroundColor:
-                this.state.config.style.mainStyle.backgroundColor,
-              borderColor: this.state.config.style.mainStyle.backgroundColor,
-              color: this.state.config.style.mainStyle.color,
+              backgroundColor: s.config.style.mainStyle.backgroundColor,
+              borderColor: s.config.style.mainStyle.backgroundColor,
+              color: s.config.style.mainStyle.color,
             }}
           >
             <div>
               人气:
-              {this.state.config.numberFormat.formatActivity
-                ? formatNumber(this.state.activity)
-                : this.state.activity}
+              {s.config.numberFormat.formatActivity
+                ? formatNumber(s.activity)
+                : s.activity}
             </div>
             <div>
               粉丝数:
-              {this.state.config.numberFormat.formatFansNum
-                ? formatNumber(this.state.fansNumber)
-                : this.state.fansNumber}
+              {s.config.numberFormat.formatFansNum
+                ? formatNumber(s.fansNumber)
+                : s.fansNumber}
             </div>
           </StatusBar>
         );
       }
     } else {
       if (
-        this.state.connectAttemptNumber < this.maxAttemptNumber ||
+        s.connectAttemptNumber < this.maxAttemptNumber ||
         this.infiniteAttempt
       ) {
         status = (
           <LoadingPage
             action={"连接中"}
-            description={"尝试次数: " + this.state.connectAttemptNumber}
+            description={"尝试次数: " + s.connectAttemptNumber}
           />
         );
       } else {
@@ -431,15 +448,20 @@ export class Main extends React.Component<Props, State> {
     }
 
     return (
-      <div className={style.main} style={this.state.config.style.mainStyle}>
+      <div
+        className={
+          style.main + (s.selectable ? ` ${style.main_selectable}` : "")
+        }
+        style={s.config.style.mainStyle}
+      >
         <ConfigContext.Provider
           value={{
-            config: this.state.config,
-            giftConfig: this.state.giftConfig,
+            config: s.config,
+            giftConfig: s.giftConfig,
           }}
         >
           {status}
-          <DanmuRender danmuList={this.state.danmuList} />
+          <DanmuRender danmuList={s.danmuList} />
         </ConfigContext.Provider>
       </div>
     );
