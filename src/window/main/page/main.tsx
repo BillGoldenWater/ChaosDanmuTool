@@ -49,17 +49,17 @@ type PageKey =
   | "settings"
   | "about";
 
-class State {
+export class MainState {
   config: Config;
   siderCollapsed: boolean;
   pageKey: PageKey;
   receiverStatus: ReceiverStatus;
   updateInfo: ReactNode;
+  danmuHistory: MessageLog<TAnyMessage>[];
 }
 
-export class Main extends React.Component<Props, State> {
+export class Main extends React.Component<Props, MainState> {
   websocketClient: WebsocketClient;
-  configContext: TConfigContext;
 
   constructor(props: Props) {
     super(props);
@@ -70,6 +70,7 @@ export class Main extends React.Component<Props, State> {
       pageKey: "dashboard",
       receiverStatus: "close",
       updateInfo: null,
+      danmuHistory: window.electron.getDanmuHistory(),
     };
 
     this.websocketClient = new WebsocketClient(
@@ -98,29 +99,14 @@ export class Main extends React.Component<Props, State> {
         this.setState({ updateInfo: updateInfo });
       }
     );
-
-    this.configContext = {
-      get: (key: string, defaultValue?: unknown) => {
-        return getProperty(this.state.config, key, defaultValue);
-      },
-      set: (key: string, value: unknown) => {
-        this.setState((prevState) => {
-          setProperty(prevState.config, key, value);
-          window.electron.updateConfig(prevState.config);
-          return prevState;
-        });
-      },
-      updateConfig: (config: Config) => {
-        this.setState({
-          config: config,
-        });
-        window.electron.updateConfig(config);
-      },
-    };
   }
 
   onMessage(event: MessageEvent): void {
     const msgObj: MessageLog<TAnyMessage> = JSON.parse(event.data);
+    this.setState((prevState) => {
+      prevState.danmuHistory.push(msgObj);
+      return prevState;
+    });
 
     const anyMsg: TAnyMessage = msgObj.message;
 
@@ -142,7 +128,7 @@ export class Main extends React.Component<Props, State> {
   }
 
   render(): ReactNode {
-    const state = this.state;
+    const s = this.state;
 
     if (this.state.config.darkTheme) {
       import("./main.dark.module.css");
@@ -152,18 +138,18 @@ export class Main extends React.Component<Props, State> {
 
     let currentPage: ReactNode;
 
-    switch (state.pageKey) {
+    switch (s.pageKey) {
       case "dashboard": {
         currentPage = (
           <Dashboard
-            receiverStatus={state.receiverStatus}
+            receiverStatus={s.receiverStatus}
             httpServerPort={this.state.config.httpServerPort}
           />
         );
         break;
       }
       case "connectRoom": {
-        currentPage = <ConnectRoom receiverStatus={state.receiverStatus} />;
+        currentPage = <ConnectRoom receiverStatus={s.receiverStatus} />;
         break;
       }
       case "danmuViewerControl": {
@@ -178,7 +164,7 @@ export class Main extends React.Component<Props, State> {
         currentPage = (
           <About
             checkUpdate={(whenDone) => {
-              UpdateChecker.checkUpdate(state.config, true).then(
+              UpdateChecker.checkUpdate(s.config, true).then(
                 (updateInfo: ReactNode) => {
                   this.setState({ updateInfo: updateInfo });
                   whenDone();
@@ -194,16 +180,36 @@ export class Main extends React.Component<Props, State> {
       }
     }
 
+    const configContext: TConfigContext = {
+      get: (key: string, defaultValue?: unknown) => {
+        return getProperty(this.state.config, key, defaultValue);
+      },
+      set: (key: string, value: unknown) => {
+        this.setState((prevState) => {
+          setProperty(prevState.config, key, value);
+          window.electron.updateConfig(prevState.config);
+          return prevState;
+        });
+      },
+      updateConfig: (config: Config) => {
+        this.setState({
+          config: config,
+        });
+        window.electron.updateConfig(config);
+      },
+      state: s,
+    };
+
     return (
-      <ConfigContext.Provider value={this.configContext}>
+      <ConfigContext.Provider value={configContext}>
         <ConfigProvider>
-          {state.updateInfo}
+          {s.updateInfo}
           <Layout>
             <Sider
               collapsible={true}
               collapsedWidth={"4em"}
-              collapsed={state.siderCollapsed}
-              theme={state.config.darkTheme ? "dark" : "light"}
+              collapsed={s.siderCollapsed}
+              theme={s.config.darkTheme ? "dark" : "light"}
               onCollapse={(collapsed) => {
                 this.setState({ siderCollapsed: collapsed });
               }}
@@ -215,7 +221,7 @@ export class Main extends React.Component<Props, State> {
                   this.setState({ pageKey: event.key as PageKey });
                 }}
                 defaultSelectedKeys={["dashboard"]}
-                theme={state.config.darkTheme ? "dark" : "light"}
+                theme={s.config.darkTheme ? "dark" : "light"}
               >
                 <Menu.Item key={"dashboard"} icon={<DashboardOutlined />}>
                   总览
@@ -247,7 +253,7 @@ export class Main extends React.Component<Props, State> {
               <div
                 className={style.main_content}
                 style={
-                  state.config.darkTheme
+                  s.config.darkTheme
                     ? { backgroundColor: "#1f1f1f" }
                     : { backgroundColor: "#fff" }
                 }

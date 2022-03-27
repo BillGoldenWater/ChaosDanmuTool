@@ -9,6 +9,7 @@ import { Divider } from "antd";
 import { DanmuViewerSwitch } from "../danmuviewercontrol/DanmuViewerControl";
 import { DanmuAnalysis_old } from "../danmuanalysis/DanmuAnalysis_old";
 import { ConfigItem } from "../../../../component/configitem/ConfigItem";
+import { DanmuAnalysis } from "../danmuanalysis/DanmuAnalysis";
 
 class Props {
   receiverStatus: ReceiverStatus;
@@ -16,7 +17,7 @@ class Props {
 }
 
 class State {
-  updatePer: number;
+  mergePer: number;
 }
 
 export class Dashboard extends React.Component<Props, State> {
@@ -24,7 +25,7 @@ export class Dashboard extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      updatePer: 30,
+      mergePer: 30,
     };
   }
 
@@ -40,10 +41,10 @@ export class Dashboard extends React.Component<Props, State> {
         <Divider orientation={"left"}>统计</Divider>
         <ConfigItem
           type={"number"}
-          value={s.updatePer}
+          value={s.mergePer}
           setNumber={(value) => {
             this.setState({
-              updatePer: value,
+              mergePer: value,
             });
           }}
           name={"统计间隔"}
@@ -58,8 +59,9 @@ export class Dashboard extends React.Component<Props, State> {
         />
         <DanmuAnalysis_old
           httpServerPort={p.httpServerPort}
-          updatePer={s.updatePer}
+          updatePer={s.mergePer}
         />
+        <DanmuAnalysis mergePer={s.mergePer} />
       </div>
     );
   }
