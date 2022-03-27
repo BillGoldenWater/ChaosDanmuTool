@@ -2,9 +2,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React, { ReactNode } from "react";
-import style from "./StatusBar.module.css";
-import { StatusBarTemplate } from "./StatusBarTemplate";
+import React, {ReactNode} from "react";
+import "./StatusBar.css";
+import {StatusBarTemplate} from "./StatusBarTemplate";
 
 class Props {
   message: string | ReactNode;
@@ -16,14 +16,14 @@ export class StatusBar extends React.Component<Props> {
     return (
       <div>
         <StatusBarTemplate
-          className={style.statusBar}
+          className="statusBar"
           message={this.props.message}
           style={this.props.style}
         >
           {this.props.children}
         </StatusBarTemplate>
         <StatusBarTemplate
-          className={style.statusBar_placeholder + " " + style.statusBar}
+          className={"statusBar_placeholder statusBar"}
           message={this.props.message}
           style={this.props.style}
         >

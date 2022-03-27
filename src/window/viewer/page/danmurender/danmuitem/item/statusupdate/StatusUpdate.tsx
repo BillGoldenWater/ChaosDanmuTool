@@ -3,7 +3,7 @@
  */
 
 import React, { ReactNode } from "react";
-import style from "./StatusUpdate.module.css";
+import "./StatusUpdate.css";
 import { TBiliBiliDanmuContent } from "../../../../../../../type/bilibili/TBiliBiliDanmuContent";
 import { ReceiverStatusUpdate } from "../../../../../../../command/ReceiverStatusUpdate";
 
@@ -42,7 +42,7 @@ export class StatusUpdate extends React.Component<Props> {
 
     return (
       <div
-        className={style.StatusUpdate}
+        className="StatusUpdate"
         style={{
           color: color,
         }}

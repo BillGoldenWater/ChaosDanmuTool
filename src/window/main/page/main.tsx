@@ -3,7 +3,7 @@
  */
 
 import React, { ReactNode } from "react";
-import style from "./main.module.css";
+import "./main.css";
 import { Config } from "../../../utils/config/Config";
 import { getProperty, setProperty } from "dot-prop";
 import {
@@ -131,9 +131,9 @@ export class Main extends React.Component<Props, MainState> {
     const s = this.state;
 
     if (this.state.config.darkTheme) {
-      import("./main.dark.module.css");
+      import("./main.dark.css");
     } else {
-      import("./main.light.module.css");
+      import("./main.light.css");
     }
 
     let currentPage: ReactNode;
@@ -251,7 +251,7 @@ export class Main extends React.Component<Props, MainState> {
             </Sider>
             <Content style={{ minHeight: "100vh" }}>
               <div
-                className={style.main_content}
+                className="main_content"
                 style={
                   s.config.darkTheme
                     ? { backgroundColor: "#1f1f1f" }

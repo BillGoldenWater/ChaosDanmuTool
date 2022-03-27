@@ -3,7 +3,7 @@
  */
 
 import React from "react";
-import style from "./DanmuMsg.module.css";
+import "./DanmuMsg.css";
 import { TDanmuMsg } from "../../../../../../../type/bilibili/TDanmuMsg";
 import { UserInfo } from "../../../../../../../component/bilibili/userinfo/UserInfo";
 import { emptyUserInfo } from "../../../../../../../type/bilibili/userinfo/TUserInfo";
@@ -18,7 +18,7 @@ export class DanmuMsg extends React.Component<Props> {
     const data: TDanmuMsg = this.props.data;
 
     return (
-      <div className={style.DanmuMsg}>
+      <div className="DanmuMsg">
         <UserInfo
           userInfo={{
             ...emptyUserInfo,

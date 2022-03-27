@@ -3,7 +3,7 @@
  */
 
 import React, { ReactNode } from "react";
-import style from "./SendGift.module.css";
+import "./SendGift.css";
 import { TSendGift } from "../../../../../../../type/bilibili/TSendGift";
 import { UserInfo } from "../../../../../../../component/bilibili/userinfo/UserInfo";
 import { emptyUserInfo } from "../../../../../../../type/bilibili/userinfo/TUserInfo";
@@ -33,7 +33,7 @@ export class SendGift extends React.Component<Props> {
           }
 
           return (
-            <div className={style.SendGift}>
+            <div className="SendGift">
               <UserInfo
                 userInfo={{
                   ...emptyUserInfo,

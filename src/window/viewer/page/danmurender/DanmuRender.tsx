@@ -3,10 +3,10 @@
  */
 
 import React from "react";
-import style from "./DanmuRender.module.css";
-import { DanmuItem } from "./danmuitem/DanmuItem";
-import { DanmuMessageWithKey } from "../../../../type/bilibili/TBiliBiliDanmuContent";
-import { ConfigContext } from "../../utils/ConfigContext";
+import "./DanmuRender.css";
+import {DanmuItem} from "./danmuitem/DanmuItem";
+import {DanmuMessageWithKey} from "../../../../type/bilibili/TBiliBiliDanmuContent";
+import {ConfigContext} from "../../utils/ConfigContext";
 
 class Props {
   danmuList: DanmuMessageWithKey[];
@@ -19,14 +19,14 @@ export class DanmuRender extends React.Component<Props> {
 
   render(): JSX.Element {
     const danmuItems = this.props.danmuList.map((value) => {
-      return <DanmuItem key={value.key} message={value.msg} />;
+      return <DanmuItem key={value.key} message={value.msg}/>;
     });
 
     return (
       <ConfigContext.Consumer>
-        {({ config }) => (
+        {({config}) => (
           <div
-            className={style.DanmuRender}
+            className="DanmuRender"
             style={{
               margin: config.style.listMargin,
               lineHeight: config.style.mainStyle.lineHeight,
