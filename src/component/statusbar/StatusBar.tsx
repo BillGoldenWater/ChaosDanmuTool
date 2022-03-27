@@ -2,9 +2,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React, {ReactNode} from "react";
+import React, { ReactNode } from "react";
 import "./StatusBar.css";
-import {StatusBarTemplate} from "./StatusBarTemplate";
+import { StatusBarTemplate } from "./StatusBarTemplate";
 
 class Props {
   message: string | ReactNode;

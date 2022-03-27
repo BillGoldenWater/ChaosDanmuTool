@@ -105,7 +105,6 @@ export class ConfigItem extends React.Component<Props> {
             onChange={(value) => {
               if (p.setBoolean) {
                 p.setBoolean(value as boolean);
-                console.log("1");
               } else {
                 set(p.valueKey, value);
               }

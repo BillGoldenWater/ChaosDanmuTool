@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 export function getTag(obj: unknown): string {
   return Object.prototype.toString.call(obj);
 }

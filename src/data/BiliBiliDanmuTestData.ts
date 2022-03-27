@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 const medalInfo = {
   anchor_roomid: 999999999,
   anchor_uname: "诶嘿",

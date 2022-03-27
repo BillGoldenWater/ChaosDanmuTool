@@ -7,7 +7,6 @@ import { ConnectRoom } from "../connectroom/ConnectRoom";
 import { ReceiverStatus } from "../../../../command/ReceiverStatusUpdate";
 import { Divider } from "antd";
 import { DanmuViewerSwitch } from "../danmuviewercontrol/DanmuViewerControl";
-import { DanmuAnalysis_old } from "../danmuanalysis/DanmuAnalysis_old";
 import { ConfigItem } from "../../../../component/configitem/ConfigItem";
 import { DanmuAnalysis } from "../danmuanalysis/DanmuAnalysis";
 
@@ -56,10 +55,6 @@ export class Dashboard extends React.Component<Props, State> {
               建议使用整数
             </div>
           }
-        />
-        <DanmuAnalysis_old
-          httpServerPort={p.httpServerPort}
-          updatePer={s.mergePer}
         />
         <DanmuAnalysis mergePer={s.mergePer} />
       </div>

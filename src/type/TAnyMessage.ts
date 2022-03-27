@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 import { ErrorMessage } from "../command/messagelog/ErrorMessage";
 import { ActivityUpdate } from "../command/ActivityUpdate";
 import { ConfigUpdate } from "../command/ConfigUpdate";

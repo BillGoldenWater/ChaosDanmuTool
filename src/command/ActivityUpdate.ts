@@ -6,17 +6,13 @@ export type ActivityUpdateCmd = "activityUpdate";
 
 export type ActivityUpdate = {
   cmd: ActivityUpdateCmd;
-  data: {
-    activity: number;
-  };
+  activity: number;
 };
 
 export function getActivityUpdateMessage(activity: number): ActivityUpdate {
   return {
     cmd: "activityUpdate",
-    data: {
-      activity: activity,
-    },
+    activity: activity,
   };
 }
 

@@ -4,10 +4,10 @@
 
 import React from "react";
 import "./SuperChatMessage.css";
-import {UserInfo} from "../../../../../../../component/bilibili/userinfo/UserInfo";
-import {TSuperChatMessage} from "../../../../../../../type/bilibili/TSuperChatMessage";
-import {DanmuContent} from "../../../../../../../component/bilibili/danmucontent/DanmuContent";
-import {ConfigContext} from "../../../../../utils/ConfigContext";
+import { UserInfo } from "../../../../../../../component/bilibili/userinfo/UserInfo";
+import { TSuperChatMessage } from "../../../../../../../type/bilibili/TSuperChatMessage";
+import { DanmuContent } from "../../../../../../../component/bilibili/danmucontent/DanmuContent";
+import { ConfigContext } from "../../../../../utils/ConfigContext";
 
 class Props {
   superChatMessage: TSuperChatMessage;
@@ -27,7 +27,7 @@ export class SuperChatMessage extends React.Component<Props, State> {
     };
 
     this.updateIntervalId = window.setInterval(() => {
-      this.setState({ts: new Date().getTime() / 1000});
+      this.setState({ ts: new Date().getTime() / 1000 });
       const scm: TSuperChatMessage = this.props.superChatMessage;
       if (this.state.ts > scm.data.end_time) {
         window.clearInterval(this.updateIntervalId);
@@ -43,7 +43,7 @@ export class SuperChatMessage extends React.Component<Props, State> {
     const scm: TSuperChatMessage = this.props.superChatMessage;
     return (
       <ConfigContext.Consumer>
-        {({config}) => (
+        {({ config }) => (
           <div
             className={
               "SuperChatMessage" +
@@ -54,7 +54,7 @@ export class SuperChatMessage extends React.Component<Props, State> {
           >
             <img
               src={scm.data.background_image}
-              style={{display: "none"}}
+              style={{ display: "none" }}
               alt={""}
             />
             {/* load img to cache for "background-image" to bypass referrer policy */}
@@ -78,7 +78,7 @@ export class SuperChatMessage extends React.Component<Props, State> {
               className="SuperChatMessage_progress"
               max={scm.data.time}
               value={scm.data.time - (scm.data.end_time - this.state.ts)}
-              style={{backgroundColor: scm.data.background_bottom_color}}
+              style={{ backgroundColor: scm.data.background_bottom_color }}
             />
             <div
               className="SuperChatMessage_bottom"

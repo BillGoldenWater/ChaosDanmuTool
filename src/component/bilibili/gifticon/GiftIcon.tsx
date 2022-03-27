@@ -2,8 +2,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React, {ReactNode} from "react";
-import {ConfigContext} from "../../../window/viewer/utils/ConfigContext";
+import React, { ReactNode } from "react";
+import { ConfigContext } from "../../../window/viewer/utils/ConfigContext";
 import "./GiftIcon.css";
 
 class Props {
@@ -14,7 +14,7 @@ export class GiftIcon extends React.Component<Props> {
   render(): ReactNode {
     return (
       <ConfigContext.Consumer>
-        {({config}) => (
+        {({ config }) => (
           <img
             className="GiftIcon"
             src={this.props.src}

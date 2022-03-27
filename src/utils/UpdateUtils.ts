@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 import { TGithubReleases } from "../type/github/TGithubReleases";
 import { getGithubApi, getString } from "./HttpUtils";
 import { app } from "electron";

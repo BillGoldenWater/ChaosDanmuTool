@@ -13,7 +13,7 @@ export class UserFace extends React.Component<Props> {
   render(): JSX.Element {
     return (
       <div className="UserFace">
-        <img className="UserFace_face" src={this.props.face} alt={""}/>
+        <img className="UserFace_face" src={this.props.face} alt={""} />
       </div>
     );
   }

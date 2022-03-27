@@ -4,8 +4,8 @@
 
 import React from "react";
 import "./DanmuContent.css";
-import {TEmojiData} from "../../../type/bilibili/TEmojiData";
-import {ConfigContext} from "../../../window/viewer/utils/ConfigContext";
+import { TEmojiData } from "../../../type/bilibili/TEmojiData";
+import { ConfigContext } from "../../../window/viewer/utils/ConfigContext";
 
 class Props {
   content?: string;
@@ -20,7 +20,7 @@ export class DanmuContent extends React.Component<Props> {
 
     return (
       <ConfigContext.Consumer>
-        {({config}) => (
+        {({ config }) => (
           <div
             className="DanmuContent"
             style={{
@@ -35,7 +35,7 @@ export class DanmuContent extends React.Component<Props> {
             ) : (
               <img
                 className="DanmuContent_emoji"
-                style={{maxHeight: config.style.mainStyle.lineHeight}}
+                style={{ maxHeight: config.style.mainStyle.lineHeight }}
                 src={emojiData.url}
                 alt={content}
               />
