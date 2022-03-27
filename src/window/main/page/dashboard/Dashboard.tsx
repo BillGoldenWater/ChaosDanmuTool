@@ -7,7 +7,7 @@ import { ConnectRoom } from "../connectroom/ConnectRoom";
 import { ReceiverStatus } from "../../../../command/ReceiverStatusUpdate";
 import { Divider } from "antd";
 import { DanmuViewerSwitch } from "../danmuviewercontrol/DanmuViewerControl";
-import { DanmuAnalysis } from "../danmuanalysis/DanmuAnalysis";
+import { DanmuAnalysis_old } from "../danmuanalysis/DanmuAnalysis_old";
 import { ConfigItem } from "../../../../component/configitem/ConfigItem";
 
 class Props {
@@ -56,7 +56,7 @@ export class Dashboard extends React.Component<Props, State> {
             </div>
           }
         />
-        <DanmuAnalysis
+        <DanmuAnalysis_old
           httpServerPort={p.httpServerPort}
           updatePer={s.updatePer}
         />

@@ -52,6 +52,8 @@
     "fork-ts-checker-webpack-plugin": "^7.2.1",
     "koa": "^2.13.1",
     "koa-static": "^5.0.0",
+    "less": "^4.1.2",
+    "less-loader": "^10.2.0",
     "lodash-es": "^4.17.21",
     "markdown-it": "^12.3.0",
     "node-loader": "^2.0.0",

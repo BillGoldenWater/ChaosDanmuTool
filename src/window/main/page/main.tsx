@@ -11,7 +11,7 @@ import {
   ReceiverStatus,
   ReceiverStatusUpdate,
 } from "../../../command/ReceiverStatusUpdate";
-import { ConfigContext } from "../utils/ConfigContext";
+import { ConfigContext, TConfigContext } from "../utils/ConfigContext";
 import {
   ConfigUpdate,
   getConfigUpdateCmd,
@@ -34,6 +34,8 @@ import { Settings } from "./settings/Settings";
 import { UpdateChecker } from "../utils/UpdateChecker";
 import { Dashboard } from "./dashboard/Dashboard";
 import { About } from "./about/About";
+import { MessageLog } from "../../../command/messagelog/MessageLog";
+import { TAnyMessage } from "../../../type/TAnyMessage";
 
 const { Sider, Content } = Layout;
 
@@ -57,6 +59,7 @@ class State {
 
 export class Main extends React.Component<Props, State> {
   websocketClient: WebsocketClient;
+  configContext: TConfigContext;
 
   constructor(props: Props) {
     super(props);
@@ -95,20 +98,41 @@ export class Main extends React.Component<Props, State> {
         this.setState({ updateInfo: updateInfo });
       }
     );
+
+    this.configContext = {
+      get: (key: string, defaultValue?: unknown) => {
+        return getProperty(this.state.config, key, defaultValue);
+      },
+      set: (key: string, value: unknown) => {
+        this.setState((prevState) => {
+          setProperty(prevState.config, key, value);
+          window.electron.updateConfig(prevState.config);
+          return prevState;
+        });
+      },
+      updateConfig: (config: Config) => {
+        this.setState({
+          config: config,
+        });
+        window.electron.updateConfig(config);
+      },
+    };
   }
 
   onMessage(event: MessageEvent): void {
-    const msgObj = JSON.parse(event.data);
+    const msgObj: MessageLog<TAnyMessage> = JSON.parse(event.data);
 
-    switch (msgObj.cmd) {
+    const anyMsg: TAnyMessage = msgObj.message;
+
+    switch (anyMsg.cmd) {
       case getStatusUpdateMessageCmd(): {
-        const msg: ReceiverStatusUpdate = msgObj;
+        const msg: ReceiverStatusUpdate = anyMsg;
 
         this.setState({ receiverStatus: msg.data.status });
         break;
       }
       case getConfigUpdateCmd(): {
-        const msg: ConfigUpdate = msgObj;
+        const msg: ConfigUpdate = anyMsg;
         this.setState({
           config: msg.data,
         });
@@ -125,25 +149,6 @@ export class Main extends React.Component<Props, State> {
     } else {
       import("./main.light.module.css");
     }
-
-    const configContext = {
-      get: (key: string, defaultValue?: unknown) => {
-        return getProperty(state.config, key, defaultValue);
-      },
-      set: (key: string, value: unknown) => {
-        this.setState((prevState) => {
-          setProperty(prevState.config, key, value);
-          window.electron.updateConfig(prevState.config);
-          return prevState;
-        });
-      },
-      updateConfig: (config: Config) => {
-        this.setState({
-          config: config,
-        });
-        window.electron.updateConfig(config);
-      },
-    };
 
     let currentPage: ReactNode;
 
@@ -190,7 +195,7 @@ export class Main extends React.Component<Props, State> {
     }
 
     return (
-      <ConfigContext.Provider value={configContext}>
+      <ConfigContext.Provider value={this.configContext}>
         <ConfigProvider>
           {state.updateInfo}
           <Layout>

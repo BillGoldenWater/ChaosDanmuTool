@@ -15,6 +15,7 @@ import {
 import { biliBiliDanmuTestData } from "../../../../data/BiliBiliDanmuTestData";
 import { getMessageCommand } from "../../../../command/MessageCommand";
 import { TBiliBiliDanmuContent } from "../../../../type/bilibili/TBiliBiliDanmuContent";
+import { getMessageLogMessage } from "../../../../command/messagelog/MessageLog";
 
 class Props {
   receiverStatus: ReceiverStatus;
@@ -71,8 +72,10 @@ export class ConnectRoom extends React.Component<Props> {
                           biliBiliDanmuTestData.forEach((value) => {
                             window.electron.commandBroadcast(
                               JSON.stringify(
-                                getMessageCommand(
-                                  value as TBiliBiliDanmuContent
+                                getMessageLogMessage(
+                                  getMessageCommand(
+                                    value as TBiliBiliDanmuContent
+                                  )
                                 )
                               )
                             );

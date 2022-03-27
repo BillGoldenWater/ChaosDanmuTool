@@ -4,21 +4,13 @@
 
 import Zlib from "zlib";
 import WebSocket from "ws";
-import { CommandBroadcastServer } from "../server/CommandBroadcastServer";
+import { CommandBroadcastServer as CBS } from "../server/CommandBroadcastServer";
 import { getStatusUpdateMessage } from "../../command/ReceiverStatusUpdate";
 import { getActivityUpdateMessage } from "../../command/ActivityUpdate";
 import { ErrorCode } from "../ErrorCode";
 import { getJoinResponseMessage } from "../../command/JoinResponse";
-import {
-  ErrorMessage,
-  getErrorMessageMessage,
-} from "../../command/messagelog/ErrorMessage";
-import {
-  getMessageLogMessage,
-  MessageLog,
-} from "../../command/messagelog/MessageLog";
+import { getErrorMessageMessage } from "../../command/messagelog/ErrorMessage";
 import { getMessageCommand } from "../../command/MessageCommand";
-import { dialog } from "electron";
 import { ConfigManager } from "../config/ConfigManager";
 import { createViewerWindow, showWindow, viewerWindow } from "../../index";
 
@@ -118,7 +110,6 @@ export class DanmuReceiver {
   static heartBeatId: NodeJS.Timer;
   static heartBeatInterval: number;
   static textDecoder: TextDecoder;
-  static messageHistory: MessageLog[];
 
   static connect(
     url: string,
@@ -132,7 +123,6 @@ export class DanmuReceiver {
     this.connection = new WebSocket(url);
     this.connection.binaryType = "arraybuffer";
     this.textDecoder = new TextDecoder("utf-8");
-    this.messageHistory = [];
 
     this.connection.on("open", () => {
       this.connection.send(
@@ -146,7 +136,7 @@ export class DanmuReceiver {
       );
       this.startHeartBeat();
 
-      this.broadcastMessage(getStatusUpdateMessage("open"));
+      CBS.broadcastMessage(getStatusUpdateMessage("open"));
 
       if (get("danmuViewConfig.autoOpenWhenConnect")) {
         showWindow(viewerWindow, createViewerWindow);
@@ -154,12 +144,12 @@ export class DanmuReceiver {
     });
 
     this.connection.on("close", () => {
-      this.broadcastMessage(getStatusUpdateMessage("close"));
+      CBS.broadcastMessage(getStatusUpdateMessage("close"));
     });
 
     this.connection.on("error", (err) => {
       console.log(err);
-      this.broadcastMessage(getStatusUpdateMessage("error"));
+      CBS.broadcastMessage(getStatusUpdateMessage("error"));
     });
 
     this.connection.on("message", async (data: ArrayBuffer) => {
@@ -171,14 +161,14 @@ export class DanmuReceiver {
             ErrorCode.dataTypeIncorrect +
             " " +
             value.getDataType();
-          this.alertMessage(getErrorMessageMessage(message, value));
+          CBS.alertMessage(getErrorMessageMessage(message, value));
           return;
         }
         switch (value.getOpCode()) {
           case OpCode.heartbeatResponse: {
             const activity = value.getBody().getInt32(0, false);
             const message = getActivityUpdateMessage(activity);
-            this.broadcastMessage(message);
+            CBS.broadcastMessage(message);
             break;
           }
           case OpCode.joinResponse: {
@@ -186,12 +176,12 @@ export class DanmuReceiver {
               this.textDecoder.decode(value.getBody())
             );
             const message = getJoinResponseMessage(responseBody["code"]);
-            this.broadcastMessage(message);
+            CBS.broadcastMessage(message);
             break;
           }
           case OpCode.message: {
             const message = this.textDecoder.decode(value.getBody());
-            this.broadcastMessage(getMessageCommand(JSON.parse(message)));
+            CBS.broadcastMessage(getMessageCommand(JSON.parse(message)));
             break;
           }
           default: {
@@ -200,24 +190,14 @@ export class DanmuReceiver {
               ErrorCode.unknownOpCode +
               " " +
               value.getOpCode();
-            this.alertMessage(getErrorMessageMessage(message, value));
+            CBS.alertMessage(getErrorMessageMessage(message, value));
             break;
           }
         }
       });
     });
 
-    this.broadcastMessage(getStatusUpdateMessage("connecting"));
-  }
-
-  static broadcastMessage(message: unknown): void {
-    CommandBroadcastServer.broadcast(JSON.stringify(message));
-    this.messageHistory.push(getMessageLogMessage(message));
-  }
-
-  static alertMessage(jsonMessage: ErrorMessage): void {
-    dialog.showErrorBox("错误", jsonMessage["data"]["errorMessage"]);
-    this.messageHistory.push(getMessageLogMessage(jsonMessage));
+    CBS.broadcastMessage(getStatusUpdateMessage("connecting"));
   }
 
   static startHeartBeat(): void {
@@ -339,9 +319,5 @@ export class DanmuReceiver {
         return [data];
       }
     }
-  }
-
-  static getMessageHistory(): MessageLog[] {
-    return this.messageHistory;
   }
 }

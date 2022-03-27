@@ -564,7 +564,7 @@ function init(): void {
     let result: unknown = "";
     switch (args[0]) {
       case "getDanmuHistory": {
-        result = DanmuReceiver.getMessageHistory();
+        result = CommandBroadcastServer.getMessageHistory();
         break;
       }
     }

@@ -128,8 +128,8 @@ export class ConfigManager {
   }
 
   static onChange(): void {
-    CommandBroadcastServer.broadcast(
-      JSON.stringify(getConfigUpdateMessage(this.config))
+    CommandBroadcastServer.broadcastMessage(
+      getConfigUpdateMessage(this.config)
     );
     this.get("autoSaveOnChange") ? this.save() : "";
   }

@@ -8,6 +8,7 @@ import { Config } from "../../utils/config/Config";
 import { MessageLog } from "../../command/messagelog/MessageLog";
 import { TGithubRelease } from "../../type/github/TGithubRelease";
 import { UpdateUtilsResult } from "../../type/TUpdateUtilsResult";
+import { TAnyMessage } from "../../type/TAnyMessage";
 
 export interface ApiElectron {
   getPlatform: () => string;
@@ -38,7 +39,7 @@ export interface ApiElectron {
   getLatestRelease: () => Promise<UpdateUtilsResult<TGithubRelease>>;
   getChangeLog: () => Promise<UpdateUtilsResult<string>>;
 
-  getDanmuHistory: () => MessageLog[];
+  getDanmuHistory: () => MessageLog<TAnyMessage>[];
 
   writeClipboard: (str: string) => void;
 }
@@ -56,87 +57,87 @@ function putCallback(callback: (...args: unknown[]) => void): string {
 }
 
 const apiElectron: ApiElectron = {
-  getPlatform: (): string => {
+  getPlatform: () => {
     return ipcRenderer.sendSync("app", "getPlatform");
   },
-  getArch: (): string => {
+  getArch: () => {
     return ipcRenderer.sendSync("app", "getArch");
   },
-  isUnderARM64Translation: (): boolean => {
+  isUnderARM64Translation: () => {
     return ipcRenderer.sendSync("app", "isUnderARM64Translation");
   },
-  getVersion: (): string => {
+  getVersion: () => {
     return ipcRenderer.sendSync("app", "getVersion");
   },
-  getPath: (name: string): string => {
+  getPath: (name: string) => {
     return ipcRenderer.sendSync("app", "getPath", name);
   },
 
-  connect: (roomid: number): void => {
+  connect: (roomid: number) => {
     ipcRenderer.sendSync("connection", "connect", roomid);
   },
-  disconnect: (): void => {
+  disconnect: () => {
     ipcRenderer.sendSync("connection", "disconnect");
   },
 
-  loadConfig: (): void => {
+  loadConfig: () => {
     ipcRenderer.sendSync("config", "load");
   },
-  saveConfig: (): void => {
+  saveConfig: () => {
     ipcRenderer.sendSync("config", "save");
   },
-  getConfig: (): Config => {
+  getConfig: () => {
     return ipcRenderer.sendSync("config", "get");
   },
-  updateConfig: (config: Config): void => {
+  updateConfig: (config: Config) => {
     ipcRenderer.sendSync("config", "update", config);
   },
 
-  runKoaServer: (port: number): void => {
+  runKoaServer: (port: number) => {
     ipcRenderer.sendSync("koaServer", "run", port);
   },
-  closeKoaServer: (): void => {
+  closeKoaServer: () => {
     ipcRenderer.sendSync("koaServer", "close");
   },
 
-  runCommandBroadcastServer: (port: number): void => {
+  runCommandBroadcastServer: (port: number) => {
     ipcRenderer.sendSync("commandBroadcastServer", "run", port);
   },
-  closeCommandBroadcastServer: (): void => {
+  closeCommandBroadcastServer: () => {
     ipcRenderer.sendSync("commandBroadcastServer", "close");
   },
-  commandBroadcast: (data: string): void => {
+  commandBroadcast: (data: string) => {
     ipcRenderer.sendSync("commandBroadcastServer", "broadcast", data);
   },
 
-  openViewer: (): void => {
+  openViewer: () => {
     ipcRenderer.sendSync("windowControl", "openViewer");
   },
-  closeViewer: (): void => {
+  closeViewer: () => {
     ipcRenderer.sendSync("windowControl", "closeViewer");
   },
 
-  checkUpdate: (): Promise<UpdateUtilsResult<boolean>> => {
+  checkUpdate: () => {
     return new Promise((resolve) => {
       ipcRenderer.send("update", "checkUpdate", putCallback(resolve));
     });
   },
-  getLatestRelease: (): Promise<UpdateUtilsResult<TGithubRelease>> => {
+  getLatestRelease: () => {
     return new Promise((resolve) => {
       ipcRenderer.send("update", "getLatestRelease", putCallback(resolve));
     });
   },
-  getChangeLog: (): Promise<UpdateUtilsResult<string>> => {
+  getChangeLog: () => {
     return new Promise((resolve) => {
       ipcRenderer.send("update", "getChangeLog", putCallback(resolve));
     });
   },
 
-  getDanmuHistory: (): MessageLog[] => {
+  getDanmuHistory: () => {
     return ipcRenderer.sendSync("danmu", "getDanmuHistory");
   },
 
-  writeClipboard: (str: string): void => {
+  writeClipboard: (str: string) => {
     clipboard.writeText(str);
   },
 };

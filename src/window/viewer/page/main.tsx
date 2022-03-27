@@ -46,6 +46,8 @@ import { getStatusUpdateMessageCmd } from "../../../command/ReceiverStatusUpdate
 import { TSuperChatMessage } from "../../../type/bilibili/TSuperChatMessage";
 import { parseDanmuMsg } from "../../../type/bilibili/TDanmuMsg";
 import { TextToSpeech } from "../utils/TextToSpeech";
+import { MessageLog } from "../../../command/messagelog/MessageLog";
+import { TAnyMessage } from "../../../type/TAnyMessage";
 
 class Props {}
 
@@ -172,11 +174,12 @@ export class Main extends React.Component<Props, State> {
   }
 
   processCommand(commandStr: string): void {
-    const command = JSON.parse(commandStr);
+    const msgLog: MessageLog<TAnyMessage> = JSON.parse(commandStr);
+    const anyMsg: TAnyMessage = msgLog.message;
 
-    switch (command.cmd) {
+    switch (anyMsg.cmd) {
       case getConfigUpdateCmd(): {
-        const config: Config = command.data;
+        const config: Config = anyMsg.data;
         const uuid = getParam("uuid");
         let viewConfig: DanmuViewCustomConfig = null;
         let defaultViewConfig: DanmuViewCustomConfig = null;
@@ -205,23 +208,23 @@ export class Main extends React.Component<Props, State> {
         break;
       }
       case getGiftConfigUpdateCmd(): {
-        const giftConfig: TGiftConfigResponse = command.data;
+        const giftConfig: TGiftConfigResponse = anyMsg.data;
         this.setState({ giftConfig: parseGiftConfig(giftConfig) });
         break;
       }
       case getActivityUpdateMessageCmd(): {
-        const cmd: ActivityUpdate = command;
+        const cmd: ActivityUpdate = anyMsg;
         this.setState({
           activity: cmd.data.activity,
         });
         break;
       }
       case getStatusUpdateMessageCmd(): {
-        this.addToList(command);
+        this.addToList(anyMsg);
         break;
       }
       case getMessageCommandCmd(): {
-        const msg: TBiliBiliDanmuContent = command.data;
+        const msg: TBiliBiliDanmuContent = anyMsg.data;
         switch (msg.cmd) {
           case "INTERACT_WORD": {
             this.processInteractWord(msg as TInteractWord);

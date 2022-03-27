@@ -4,13 +4,13 @@
 
 export type MessageLogCmd = "messageLog";
 
-export type MessageLog = {
+export type MessageLog<T> = {
   cmd: MessageLogCmd;
   timestamp: number;
-  message: unknown;
+  message: T;
 };
 
-export function getMessageLogMessage(message: unknown): MessageLog {
+export function getMessageLogMessage<T>(message: T): MessageLog<T> {
   return {
     cmd: "messageLog",
     timestamp: new Date().getTime(),
