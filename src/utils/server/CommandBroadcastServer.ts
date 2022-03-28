@@ -12,25 +12,20 @@ import { getStatusUpdateMessage } from "../../command/ReceiverStatusUpdate";
 import { DanmuReceiver } from "../client/DanmuReceiver";
 import { DanmuHistoryGetter } from "../data/DanmuHistoryGetter";
 import { getMessageCommand } from "../../command/MessageCommand";
-import {
-  getMessageLogMessage,
-  MessageLog,
-} from "../../command/messagelog/MessageLog";
+import { getMessageLogMessage } from "../../command/messagelog/MessageLog";
 import { ErrorMessage } from "../../command/messagelog/ErrorMessage";
 import { dialog } from "electron";
 import { TAnyMessage } from "../../type/TAnyMessage";
+import { CommandHistoryManager } from "../CommandHistoryManager";
 
 const get = ConfigManager.get.bind(ConfigManager);
 const getConfig = ConfigManager.getConfig.bind(ConfigManager);
 
 export class CommandBroadcastServer {
   static server: WebSocketServer;
-  static messageHistory: MessageLog<TAnyMessage>[];
 
   static run(server: HttpServer): void {
     this.close();
-    this.messageHistory = [];
-
     this.server = new WebSocketServer({ server });
     this.server.on("connection", (socket) => {
       this.sendMessage(socket, getConfigUpdateMessage(getConfig()));
@@ -86,15 +81,11 @@ export class CommandBroadcastServer {
   static broadcastMessage(message: TAnyMessage): void {
     const messageLog = getMessageLogMessage(message);
     CommandBroadcastServer.broadcast(JSON.stringify(messageLog));
-    this.messageHistory.push(messageLog);
+    CommandHistoryManager.writeCommand(messageLog);
   }
 
   static alertMessage(message: ErrorMessage): void {
     dialog.showErrorBox("错误", message["data"]["errorMessage"]);
-    this.messageHistory.push(getMessageLogMessage(message));
-  }
-
-  static getMessageHistory(): MessageLog<TAnyMessage>[] {
-    return this.messageHistory;
+    CommandHistoryManager.writeCommand(getMessageLogMessage(message));
   }
 }

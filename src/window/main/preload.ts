@@ -25,6 +25,10 @@ export interface ApiElectron {
   getConfig: () => Config;
   updateConfig: (config: Config) => void;
 
+  newCommandHistoryFile: () => void;
+  getCommandHistory: (fileName?: string) => Promise<MessageLog<TAnyMessage>[]>;
+  getCommandHistoryFiles: () => string[];
+
   runKoaServer: (port: number) => void;
   closeKoaServer: () => void;
 
@@ -38,8 +42,6 @@ export interface ApiElectron {
   checkUpdate: () => Promise<UpdateUtilsResult<boolean>>;
   getLatestRelease: () => Promise<UpdateUtilsResult<TGithubRelease>>;
   getChangeLog: () => Promise<UpdateUtilsResult<string>>;
-
-  getDanmuHistory: () => MessageLog<TAnyMessage>[];
 
   writeClipboard: (str: string) => void;
 }
@@ -93,6 +95,23 @@ const apiElectron: ApiElectron = {
     ipcRenderer.sendSync("config", "update", config);
   },
 
+  newCommandHistoryFile: () => {
+    ipcRenderer.sendSync("commandHistory", "new");
+  },
+  getCommandHistory: (fileName?: string) => {
+    return new Promise((resolve) => {
+      ipcRenderer.send(
+        "commandHistory",
+        "getHistory",
+        putCallback(resolve),
+        fileName
+      );
+    });
+  },
+  getCommandHistoryFiles: () => {
+    return ipcRenderer.sendSync("commandHistory", "getFiles");
+  },
+
   runKoaServer: (port: number) => {
     ipcRenderer.sendSync("koaServer", "run", port);
   },
@@ -131,10 +150,6 @@ const apiElectron: ApiElectron = {
     return new Promise((resolve) => {
       ipcRenderer.send("update", "getChangeLog", putCallback(resolve));
     });
-  },
-
-  getDanmuHistory: () => {
-    return ipcRenderer.sendSync("danmu", "getDanmuHistory");
   },
 
   writeClipboard: (str: string) => {

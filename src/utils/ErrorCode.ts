@@ -14,4 +14,5 @@ export enum ErrorCode {
   githubReleasesGetFail,
   githubReleasesParseFail,
   githubChangeLogGetFail,
+  commandHistoryInitFail,
 }

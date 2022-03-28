@@ -55,7 +55,6 @@ export class MainState {
   pageKey: PageKey;
   receiverStatus: ReceiverStatus;
   updateInfo: ReactNode;
-  danmuHistory: MessageLog<TAnyMessage>[];
 }
 
 export class Main extends React.Component<Props, MainState> {
@@ -70,7 +69,6 @@ export class Main extends React.Component<Props, MainState> {
       pageKey: "dashboard",
       receiverStatus: "close",
       updateInfo: null,
-      danmuHistory: window.electron.getDanmuHistory(),
     };
 
     this.websocketClient = new WebsocketClient(
@@ -103,10 +101,6 @@ export class Main extends React.Component<Props, MainState> {
 
   onMessage(event: MessageEvent): void {
     const msgObj: MessageLog<TAnyMessage> = JSON.parse(event.data);
-    this.setState((prevState) => {
-      prevState.danmuHistory.push(msgObj);
-      return prevState;
-    });
 
     const anyMsg: TAnyMessage = msgObj.message;
 

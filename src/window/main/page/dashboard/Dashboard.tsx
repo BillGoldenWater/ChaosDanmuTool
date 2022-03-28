@@ -8,7 +8,6 @@ import { ReceiverStatus } from "../../../../command/ReceiverStatusUpdate";
 import { Button, Divider } from "antd";
 import { DanmuViewerSwitch } from "../danmuviewercontrol/DanmuViewerControl";
 import { ConfigItem } from "../../../../component/configitem/ConfigItem";
-import { DanmuAnalysis } from "../danmuanalysis/DanmuAnalysis";
 
 class Props {
   receiverStatus: ReceiverStatus;
@@ -67,7 +66,7 @@ export class Dashboard extends React.Component<Props, State> {
         >
           修复统计出界
         </Button>
-        <DanmuAnalysis mergePer={s.mergePer} />
+        {/*<DanmuAnalysis mergePer={s.mergePer} />*/}
       </div>
     );
   }
