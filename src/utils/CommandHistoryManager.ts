@@ -4,9 +4,9 @@
 
 import * as fs from "fs";
 import * as path from "path";
-import { formatTime } from "./FormatUtils";
-import { MessageLog } from "../command/messagelog/MessageLog";
-import { TAnyMessage } from "../type/TAnyMessage";
+import {formatTime} from "./FormatUtils";
+import {MessageLog} from "../command/messagelog/MessageLog";
+import {TAnyMessage} from "../type/TAnyMessage";
 
 export class CommandHistoryManager {
   static path: string;
@@ -74,21 +74,11 @@ export class CommandHistoryManager {
 
     let data;
     try {
-      data = await new Promise<Buffer>((resolve, reject) => {
-        fs.readFile(
-          fileName ? path.join(this.path, fileName) : this.filePath,
-          (err, data) => {
-            if (err) {
-              reject();
-              return;
-            }
-            resolve(data);
-          }
-        );
-      });
+      data = await fs.promises.readFile(fileName ? path.join(this.path, fileName) : this.filePath);
     } catch (e) {
       return result;
     }
+
     if (data == null || data.toString() === "") return result;
     const dataStr = data.toString("utf-8");
 
