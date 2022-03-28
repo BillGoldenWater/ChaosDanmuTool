@@ -51,26 +51,6 @@ type GraphItem = {
   type: "line";
 };
 
-export const analysisItemList: AnalysisItemName[] = [
-  "弹幕",
-  "粉丝数",
-  "看过人数",
-  "人气",
-  "付费礼物",
-  "免费礼物",
-  "礼物",
-  "分享",
-  "关注",
-  "进入",
-];
-
-export type AnalysisFilterItem = {
-  name: AnalysisItemName;
-  enable: boolean;
-};
-
-export type AnalysisFilter = AnalysisFilterItem[];
-
 export class DanmuAnalysis extends React.Component<Props> {
   init(
     danmuHistory: MessageLog<TAnyMessage>[],
@@ -266,6 +246,16 @@ export class DanmuAnalysis extends React.Component<Props> {
           xAxisIndex: 0,
           filterMode: "none",
         },
+        {
+          type: "slider",
+          yAxisIndex: 0,
+          filterMode: "none",
+        },
+        {
+          type: "inside",
+          yAxisIndex: 0,
+          filterMode: "none",
+        },
       ],
       textStyle: {
         color: darkTheme ? "rgba(255,255,255,0.85)" : "rgba(0,0,0,0.85)",
@@ -299,9 +289,9 @@ export class DanmuAnalysis extends React.Component<Props> {
           );
 
           return (
-            <div style={{ width: "99%", overflow: "visible" }}>
-              <EChartsReact option={optionList[1]} />
+            <div>
               <EChartsReact option={optionList[0]} />
+              <EChartsReact option={optionList[1]} />
             </div>
           );
         }}

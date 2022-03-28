@@ -5,7 +5,7 @@
 import React, { ReactNode } from "react";
 import { ConnectRoom } from "../connectroom/ConnectRoom";
 import { ReceiverStatus } from "../../../../command/ReceiverStatusUpdate";
-import { Divider } from "antd";
+import { Button, Divider } from "antd";
 import { DanmuViewerSwitch } from "../danmuviewercontrol/DanmuViewerControl";
 import { ConfigItem } from "../../../../component/configitem/ConfigItem";
 import { DanmuAnalysis } from "../danmuanalysis/DanmuAnalysis";
@@ -56,6 +56,19 @@ export class Dashboard extends React.Component<Props, State> {
             </div>
           }
         />
+        <Button
+          onClick={() => {
+            window.setTimeout(() => {
+              const width = window.outerWidth;
+              window.resizeTo(width - 1, window.outerHeight);
+              window.setTimeout(() => {
+                window.resizeTo(width, window.outerHeight);
+              }, 100);
+            }, 1e3);
+          }}
+        >
+          修复统计出界
+        </Button>
         <DanmuAnalysis mergePer={s.mergePer} />
       </div>
     );
