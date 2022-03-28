@@ -3,11 +3,11 @@
  */
 
 import https from "https";
-import { TDanmuHistoryResponse } from "../../type/bilibili/danmuhistory/TDanmuHistoryResponse";
-import { TBiliBiliDanmuContent } from "../../type/bilibili/TBiliBiliDanmuContent";
-import { TDanmuMsg } from "../../type/bilibili/TDanmuMsg";
-import { parseMedalInfo } from "../../type/bilibili/userinfo/TMedalInfo";
-import { getUserUL } from "../../type/bilibili/userinfo/TUserLevel";
+import {TDanmuHistoryResponse} from "../../type/bilibili/danmuhistory/TDanmuHistoryResponse";
+import {TBiliBiliDanmuContent} from "../../type/bilibili/TBiliBiliDanmuContent";
+import {TDanmuMsg} from "../../type/bilibili/TDanmuMsg";
+import {parseMedalInfo} from "../../type/bilibili/userinfo/TMedalInfo";
+import {getUserUL} from "../../type/bilibili/userinfo/TUserLevel";
 
 export class DanmuHistoryGetter {
   historyRes: TDanmuHistoryResponse;
@@ -33,39 +33,40 @@ export class DanmuHistoryGetter {
             try {
               callback(
                 this.historyRes.data.room.map((value) => {
-                  const danmuMsg: TDanmuMsg = <TDanmuMsg>{
-                    fontsize: 0,
-                    color: 0,
-                    timestamp: value.check_info.ts,
-                    emojiData:
-                      value.emoticon && value.emoticon.url
-                        ? value.emoticon
-                        : null,
+                  const msg: TDanmuMsg = {
+                    cmd: "DANMU_MSG",
+                    data: {
+                      fontsize: 0,
+                      color: 0,
+                      timestamp: value.check_info.ts,
+                      emojiData:
+                        value.emoticon && value.emoticon.url
+                          ? value.emoticon
+                          : null,
 
-                    content: value.text,
+                      content: value.text,
 
-                    uid: value.uid,
-                    uName: value.nickname,
-                    isAdmin: value.isadmin,
-                    isVip: value.vip,
-                    isSVip: value.svip,
+                      uid: value.uid,
+                      uName: value.nickname,
+                      isAdmin: value.isadmin,
+                      isVip: value.vip,
+                      isSVip: value.svip,
 
-                    medalInfo: parseMedalInfo(value.medal),
+                      medalInfo: parseMedalInfo(value.medal),
 
-                    userUL: getUserUL(value.user_level),
+                      userUL: getUserUL(value.user_level),
 
-                    userTitle:
-                      value.title && value.title.length > 0
-                        ? value.title[0]
-                        : "",
-                    userTitle1: "",
+                      userTitle:
+                        value.title && value.title.length > 0
+                          ? value.title[0]
+                          : "",
+                      userTitle1: "",
+
+                      count: 1
+                    },
                   };
 
-                  const msg: TBiliBiliDanmuContent = <TBiliBiliDanmuContent>{};
-                  msg.cmd = "DANMU_MSG";
-                  msg.data = danmuMsg;
-
-                  return <TBiliBiliDanmuContent>msg;
+                  return <TDanmuMsg>msg;
                 })
               );
             } catch (e) {
@@ -84,9 +85,9 @@ export class DanmuHistoryGetter {
     message?: string
   ) {
     callback([
-      <TBiliBiliDanmuContent>{
+      {
         cmd: "DANMU_MSG",
-        data: <TDanmuMsg>{
+        data: {
           fontsize: 0,
           color: 0,
           timestamp: new Date().getTime() / 1000,
@@ -106,6 +107,8 @@ export class DanmuHistoryGetter {
 
           userTitle: "",
           userTitle1: "",
+
+          count: 1
         },
       },
     ]);

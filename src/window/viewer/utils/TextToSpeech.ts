@@ -83,8 +83,8 @@ export class TextToSpeech {
 
     const di: DanmuItem = {
       ts: new Date().getTime(),
-      uName: danmuMsg.uName,
-      content: danmuMsg.content,
+      uName: danmuMsg.data.uName,
+      content: danmuMsg.data.content,
     };
 
     this.danmuHistory = this.danmuHistory.filter((value) => {
