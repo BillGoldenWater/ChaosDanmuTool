@@ -58,13 +58,11 @@ export class Dashboard extends React.Component<Props, State> {
         />
         <Button
           onClick={() => {
+            const width = window.outerWidth;
+            window.resizeTo(width - 1, window.outerHeight);
             window.setTimeout(() => {
-              const width = window.outerWidth;
-              window.resizeTo(width - 1, window.outerHeight);
-              window.setTimeout(() => {
-                window.resizeTo(width, window.outerHeight);
-              }, 100);
-            }, 1e3);
+              window.resizeTo(width, window.outerHeight);
+            }, 100);
           }}
         >
           修复统计出界

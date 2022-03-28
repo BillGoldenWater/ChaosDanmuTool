@@ -242,17 +242,7 @@ export class DanmuAnalysis extends React.Component<Props> {
           filterMode: "none",
         },
         {
-          type: "inside",
-          xAxisIndex: 0,
-          filterMode: "none",
-        },
-        {
           type: "slider",
-          yAxisIndex: 0,
-          filterMode: "none",
-        },
-        {
-          type: "inside",
           yAxisIndex: 0,
           filterMode: "none",
         },
