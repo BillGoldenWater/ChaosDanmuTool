@@ -3,7 +3,7 @@
  */
 
 import React, { ReactNode } from "react";
-import "./main.css";
+import "./main.less";
 import { Config } from "../../../utils/config/Config";
 import { getProperty, setProperty } from "dot-prop";
 import {
@@ -36,6 +36,7 @@ import { Dashboard } from "./dashboard/Dashboard";
 import { About } from "./about/About";
 import { MessageLog } from "../../../command/messagelog/MessageLog";
 import { TAnyMessage } from "../../../type/TAnyMessage";
+import { History } from "./history/History";
 
 const { Sider, Content } = Layout;
 
@@ -45,7 +46,7 @@ type PageKey =
   | "dashboard"
   | "connectRoom"
   | "danmuViewerControl"
-  | "danmuHistory"
+  | "history"
   | "settings"
   | "about";
 
@@ -66,7 +67,7 @@ export class Main extends React.Component<Props, MainState> {
     this.state = {
       config: window.electron.getConfig(),
       siderCollapsed: true,
-      pageKey: "dashboard",
+      pageKey: "history",
       receiverStatus: "close",
       updateInfo: null,
     };
@@ -125,9 +126,9 @@ export class Main extends React.Component<Props, MainState> {
     const s = this.state;
 
     if (this.state.config.darkTheme) {
-      import("./main.dark.css");
+      import("antd/dist/antd.dark.less");
     } else {
-      import("./main.light.css");
+      import("antd/dist/antd.less");
     }
 
     let currentPage: ReactNode;
@@ -148,6 +149,10 @@ export class Main extends React.Component<Props, MainState> {
       }
       case "danmuViewerControl": {
         currentPage = <DanmuViewerControl />;
+        break;
+      }
+      case "history": {
+        currentPage = <History />;
         break;
       }
       case "settings": {
@@ -232,8 +237,8 @@ export class Main extends React.Component<Props, MainState> {
                     弹幕查看器
                   </Menu.Item>
                 </SubMenu>
-                <Menu.Item key={"danmuHistory"} icon={<HistoryOutlined />}>
-                  弹幕历史记录
+                <Menu.Item key={"history"} icon={<HistoryOutlined />}>
+                  历史记录
                 </Menu.Item>
                 <Menu.Item key={"settings"} icon={<SettingOutlined />}>
                   设置

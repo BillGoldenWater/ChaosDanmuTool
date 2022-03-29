@@ -524,6 +524,16 @@ function init(): void {
         event.returnValue = CommandHistoryManager.getFiles();
         break;
       }
+      case "deleteFile": {
+        CommandHistoryManager.deleteFile(args[1]);
+        event.returnValue = "";
+        break;
+      }
+      case "showInFolder": {
+        CommandHistoryManager.showInFolder(args[1]);
+        event.returnValue = "";
+        break;
+      }
     }
   });
   //endregion

@@ -1,0 +1,20 @@
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+@main_content_padding: 2em;
+@main_content_margin: 1em;
+@main_content_minHeight: calc(100vh - (@main_content_margin * 2));
+
+.main_content {
+  margin: @main_content_margin;
+  min-height: @main_content_minHeight;
+  border-bottom-right-radius: 0.4em;
+}
+
+.main_content > div {
+  padding: @main_content_padding;
+}
+
+.main_content_without_padding {
+  padding: 0 !important;
+}

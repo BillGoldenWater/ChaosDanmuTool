@@ -4,9 +4,10 @@
 
 import * as fs from "fs";
 import * as path from "path";
-import {formatTime} from "./FormatUtils";
-import {MessageLog} from "../command/messagelog/MessageLog";
-import {TAnyMessage} from "../type/TAnyMessage";
+import { formatTime } from "./FormatUtils";
+import { MessageLog } from "../command/messagelog/MessageLog";
+import { TAnyMessage } from "../type/TAnyMessage";
+import { shell } from "electron";
 
 export class CommandHistoryManager {
   static path: string;
@@ -74,7 +75,9 @@ export class CommandHistoryManager {
 
     let data;
     try {
-      data = await fs.promises.readFile(fileName ? path.join(this.path, fileName) : this.filePath);
+      data = await fs.promises.readFile(
+        fileName ? path.join(this.path, fileName) : this.filePath
+      );
     } catch (e) {
       return result;
     }
@@ -93,5 +96,16 @@ export class CommandHistoryManager {
   static getFiles(): string[] {
     if (!fs.existsSync(this.path)) return [];
     return fs.readdirSync(this.path);
+  }
+
+  static deleteFile(fileName: string) {
+    const filePath = path.join(this.path, fileName);
+    shell.trashItem(filePath).catch(() => {
+      fs.rmSync(filePath);
+    });
+  }
+
+  static showInFolder(fileName: string) {
+    shell.showItemInFolder(path.join(this.path, fileName));
   }
 }

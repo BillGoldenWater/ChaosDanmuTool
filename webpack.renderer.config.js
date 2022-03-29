@@ -10,7 +10,18 @@ const plugins = require("./webpack.plugins");
 rules.push(
   {
     test: /\.less$/i,
-    use: [{ loader: "less-loader" }],
+    use: [
+      { loader: "style-loader" },
+      { loader: "css-loader" },
+      {
+        loader: "less-loader",
+        options: {
+          lessOptions: {
+            javascriptEnabled: true,
+          },
+        },
+      },
+    ],
   },
   {
     test: /\.css$/,

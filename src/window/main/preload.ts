@@ -28,6 +28,8 @@ export interface ApiElectron {
   newCommandHistoryFile: () => void;
   getCommandHistory: (fileName?: string) => Promise<MessageLog<TAnyMessage>[]>;
   getCommandHistoryFiles: () => string[];
+  deleteCommandHistoryFile: (fileName: string) => void;
+  showCommandHistoryFolder: (fileName: string) => void;
 
   runKoaServer: (port: number) => void;
   closeKoaServer: () => void;
@@ -110,6 +112,12 @@ const apiElectron: ApiElectron = {
   },
   getCommandHistoryFiles: () => {
     return ipcRenderer.sendSync("commandHistory", "getFiles");
+  },
+  deleteCommandHistoryFile: (fileName: string) => {
+    ipcRenderer.sendSync("commandHistory", "deleteFile", fileName);
+  },
+  showCommandHistoryFolder: (fileName: string) => {
+    ipcRenderer.sendSync("commandHistory", "showInFolder", fileName);
   },
 
   runKoaServer: (port: number) => {
