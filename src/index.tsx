@@ -507,6 +507,7 @@ function init(): void {
     switch (args[0]) {
       case "new": {
         CommandHistoryManager.new();
+        event.returnValue = "";
         break;
       }
       case "getHistory": {
