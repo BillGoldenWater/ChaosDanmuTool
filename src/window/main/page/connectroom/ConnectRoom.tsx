@@ -29,6 +29,7 @@ export class ConnectRoom extends React.Component<Props> {
           const p = this.props;
 
           const open = p.receiverStatus == "open";
+          const connecting = p.receiverStatus == "connecting";
           let icon = <></>;
           switch (p.receiverStatus) {
             case "connecting": {
@@ -64,7 +65,7 @@ export class ConnectRoom extends React.Component<Props> {
                   <Button
                     type={"primary"}
                     onClick={() => {
-                      if (open) {
+                      if (open || connecting) {
                         window.electron.disconnect();
                       } else {
                         const roomid = get("danmuReceiver.roomid") as number;
@@ -86,7 +87,7 @@ export class ConnectRoom extends React.Component<Props> {
                       }
                     }}
                   >
-                    {!open ? "连接" : "断开"}
+                    {open || connecting ? "断开" : "连接"}
                   </Button>
                   {icon}
                 </Space>

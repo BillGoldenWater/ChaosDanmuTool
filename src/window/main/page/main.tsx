@@ -67,7 +67,7 @@ export class Main extends React.Component<Props, MainState> {
     this.state = {
       config: window.electron.getConfig(),
       siderCollapsed: true,
-      pageKey: "settings",
+      pageKey: "dashboard",
       receiverStatus: "close",
       updateInfo: null,
     };
