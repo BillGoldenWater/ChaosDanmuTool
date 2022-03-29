@@ -2,24 +2,24 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React, {ReactNode} from "react";
-import {ConfigContext} from "../../utils/ConfigContext";
-import {TBiliBiliDanmuContent} from "../../../../type/bilibili/TBiliBiliDanmuContent";
+import React, { ReactNode } from "react";
+import { ConfigContext } from "../../utils/ConfigContext";
+import { TBiliBiliDanmuContent } from "../../../../type/bilibili/TBiliBiliDanmuContent";
 import {
   InteractWordType,
   TInteractWord,
 } from "../../../../type/bilibili/TInteractWord";
-import {TWatchedChange} from "../../../../type/bilibili/TWatchedChange";
-import {TRoomRealTimeMessageUpdate} from "../../../../type/bilibili/TRoomRealTimeMessageUpdate";
-import {TSendGift} from "../../../../type/bilibili/TSendGift";
+import { TWatchedChange } from "../../../../type/bilibili/TWatchedChange";
+import { TRoomRealTimeMessageUpdate } from "../../../../type/bilibili/TRoomRealTimeMessageUpdate";
+import { TSendGift } from "../../../../type/bilibili/TSendGift";
 import EChartsReact from "echarts-for-react";
-import {MessageLog} from "../../../../command/messagelog/MessageLog";
-import {TAnyMessage} from "../../../../type/TAnyMessage";
-import {formatTime} from "../../../../utils/FormatUtils";
+import { MessageLog } from "../../../../command/messagelog/MessageLog";
+import { TAnyMessage } from "../../../../type/TAnyMessage";
+import { formatTime } from "../../../../utils/FormatUtils";
 
 class Props {
   mergePer: number;
-  danmuHistory: MessageLog<TAnyMessage>[]
+  danmuHistory: MessageLog<TAnyMessage>[];
 }
 
 type MessageCount = {
@@ -266,8 +266,8 @@ export class DanmuAnalysis extends React.Component<Props> {
   render(): ReactNode {
     return (
       <ConfigContext.Consumer>
-        {({get}) => {
-          const dh = this.props.danmuHistory
+        {({ get }) => {
+          const dh = this.props.danmuHistory;
 
           const msgCount = new Map<string, MessageCount>();
 
@@ -282,8 +282,8 @@ export class DanmuAnalysis extends React.Component<Props> {
 
           return (
             <div>
-              <EChartsReact option={optionList[0]}/>
-              <EChartsReact option={optionList[1]}/>
+              <EChartsReact option={optionList[0]} />
+              <EChartsReact option={optionList[1]} />
             </div>
           );
         }}

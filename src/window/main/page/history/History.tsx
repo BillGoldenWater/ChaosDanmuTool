@@ -4,21 +4,16 @@
 
 import React from "react";
 import "./History.less";
-import { Button, Divider, List, Popconfirm, Tooltip, Typography } from "antd";
-import {
-  DeleteOutlined,
-  FolderOpenOutlined,
-  ReloadOutlined,
-  SyncOutlined,
-} from "@ant-design/icons";
+import { Divider } from "antd";
 import { DanmuAnalysis } from "../../component/danmuanalysis/DanmuAnalysis";
 import { MessageLog } from "../../../../command/messagelog/MessageLog";
 import { TAnyMessage } from "../../../../type/TAnyMessage";
 import { ConfigItem } from "../../../../component/configitem/ConfigItem";
+import { HistoryBrowser } from "./HistoryBrowser";
 
 class Props {}
 
-class State {
+export class HistoryState {
   selectFile: string;
   files: string[];
   commandHistory: MessageLog<TAnyMessage>[];
@@ -26,7 +21,7 @@ class State {
   autoReload: boolean;
 }
 
-export class History extends React.Component<Props, State> {
+export class History extends React.Component<Props, HistoryState> {
   autoReloadTimerId: number;
 
   constructor(props: Props) {
@@ -70,7 +65,7 @@ export class History extends React.Component<Props, State> {
     if (this.state.autoReload) {
       window.clearInterval(this.autoReloadTimerId);
       this.autoReloadTimerId = window.setInterval(() => {
-        this.reloadFile();
+        this.resetSelectedFile();
       }, 1900);
     } else {
       window.clearInterval(this.autoReloadTimerId);
@@ -86,85 +81,11 @@ export class History extends React.Component<Props, State> {
 
     return (
       <div className={"main_content_without_padding"}>
-        <div className={"HistoryBrowser"}>
-          <List
-            bordered
-            size={"small"}
-            dataSource={s.files}
-            style={{
-              overflow: "auto",
-            }}
-            header={[
-              <Button
-                key={"reload"}
-                icon={<ReloadOutlined />}
-                onClick={() => {
-                  this.resetSelectedFile();
-                }}
-              />,
-              <Tooltip key={"autoReload"} title={"自动更新 间隔2秒"}>
-                <Button
-                  icon={<SyncOutlined spin={s.autoReload} />}
-                  onClick={() => {
-                    this.setState((prevState) => ({
-                      autoReload: !prevState.autoReload,
-                    }));
-                  }}
-                />
-              </Tooltip>,
-              <Popconfirm
-                key={"delete"}
-                disabled={s.selectFile === ""}
-                title={`确定要删除 ${this.getNameOnly(
-                  s.selectFile
-                )} 吗, 不可撤销`}
-                onConfirm={() => {
-                  window.electron.deleteCommandHistoryFile(s.selectFile);
-                  this.resetSelectedFile();
-                }}
-              >
-                <Button
-                  disabled={s.selectFile === ""}
-                  icon={<DeleteOutlined />}
-                />
-              </Popconfirm>,
-              <Tooltip
-                title={`在 ${
-                  window.electron.getPlatform() === "darwin"
-                    ? "Finder"
-                    : "文件管理器"
-                } 中打开`}
-              >
-                <Button
-                  icon={<FolderOpenOutlined />}
-                  disabled={s.selectFile === ""}
-                  onClick={() => {
-                    window.electron.showCommandHistoryFolder(s.selectFile);
-                  }}
-                />
-              </Tooltip>,
-            ]}
-            renderItem={(item) => (
-              <List.Item
-                onClick={() => {
-                  this.setState({
-                    selectFile: item,
-                  });
-                  window.electron.getCommandHistory(item).then((value) => {
-                    this.setState({
-                      commandHistory: value,
-                    });
-                  });
-                }}
-                style={{ userSelect: "none" }}
-              >
-                <Typography.Text strong={s.selectFile === item}>
-                  {this.getNameOnly(item)}
-                </Typography.Text>
-              </List.Item>
-            )}
-          />
-        </div>
+        <HistoryBrowser
+          state={s}
+          setState={this.setState.bind(this)}
+          resetSelectedFile={this.resetSelectedFile.bind(this)}
+        />
         <div className={"DanmuAnalysis"}>
           <ConfigItem
             type={"number"}
@@ -192,9 +113,5 @@ export class History extends React.Component<Props, State> {
         </div>
       </div>
     );
-  }
-
-  getNameOnly(fileName: string) {
-    return fileName.replace(".cdtch", "").replace(/-0$/, "");
   }
 }

@@ -6,17 +6,13 @@ export type JoinResponseCmd = "joinResponse";
 
 export type JoinResponse = {
   cmd: JoinResponseCmd;
-  data: {
-    code: number;
-  };
+  code: number;
 };
 
 export function getJoinResponseMessage(code: number): JoinResponse {
   return {
     cmd: "joinResponse",
-    data: {
-      code: code,
-    },
+    code: code,
   };
 }
 

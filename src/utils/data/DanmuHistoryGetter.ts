@@ -3,11 +3,11 @@
  */
 
 import https from "https";
-import {TDanmuHistoryResponse} from "../../type/bilibili/danmuhistory/TDanmuHistoryResponse";
-import {TBiliBiliDanmuContent} from "../../type/bilibili/TBiliBiliDanmuContent";
-import {TDanmuMsg} from "../../type/bilibili/TDanmuMsg";
-import {parseMedalInfo} from "../../type/bilibili/userinfo/TMedalInfo";
-import {getUserUL} from "../../type/bilibili/userinfo/TUserLevel";
+import { TDanmuHistoryResponse } from "../../type/bilibili/danmuhistory/TDanmuHistoryResponse";
+import { TBiliBiliDanmuContent } from "../../type/bilibili/TBiliBiliDanmuContent";
+import { TDanmuMsg } from "../../type/bilibili/TDanmuMsg";
+import { parseMedalInfo } from "../../type/bilibili/userinfo/TMedalInfo";
+import { getUserUL } from "../../type/bilibili/userinfo/TUserLevel";
 
 export class DanmuHistoryGetter {
   historyRes: TDanmuHistoryResponse;
@@ -62,7 +62,7 @@ export class DanmuHistoryGetter {
                           : "",
                       userTitle1: "",
 
-                      count: 1
+                      count: 1,
                     },
                   };
 
@@ -108,7 +108,7 @@ export class DanmuHistoryGetter {
           userTitle: "",
           userTitle1: "",
 
-          count: 1
+          count: 1,
         },
       },
     ]);

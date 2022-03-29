@@ -8,6 +8,7 @@ import { formatTime } from "./FormatUtils";
 import { MessageLog } from "../command/messagelog/MessageLog";
 import { TAnyMessage } from "../type/TAnyMessage";
 import { shell } from "electron";
+import { ConfigManager } from "./config/ConfigManager";
 
 export class CommandHistoryManager {
   static path: string;
@@ -63,9 +64,27 @@ export class CommandHistoryManager {
   static writeCommand(cmd: MessageLog<TAnyMessage>) {
     if (cmd.message.cmd == "updateConfig") return;
 
-    fs.appendFileSync(this.filePath, `${JSON.stringify(cmd)}\n`, {
-      encoding: "utf-8",
-    });
+    if (ConfigManager.get("history.autoCutAt") > 0) {
+      try {
+        const fileSizeInBytes = fs.lstatSync(this.filePath).size;
+        const fileSizeInMB = fileSizeInBytes / 1000 / 1000;
+        if (fileSizeInMB > ConfigManager.get("history.autoCutAt")) {
+          this.count++;
+          this.toAvailableFilePath();
+        }
+        // eslint-disable-next-line no-empty
+      } catch (e) {}
+    }
+
+    fs.appendFile(
+      this.filePath,
+      `${JSON.stringify(cmd)}\n`,
+      {
+        encoding: "utf-8",
+      },
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      () => {}
+    );
   }
 
   static async getHistory(
@@ -87,7 +106,10 @@ export class CommandHistoryManager {
 
     for (const cmd of dataStr.split("\n")) {
       if (cmd == "") continue;
-      result.push(JSON.parse(cmd));
+      try {
+        result.push(JSON.parse(cmd));
+        // eslint-disable-next-line no-empty
+      } catch (e) {}
     }
 
     return result;

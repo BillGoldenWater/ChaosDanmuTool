@@ -27,6 +27,20 @@ export class MainConfigModifier extends React.Component {
               />
 
               <Collapse>
+                <Collapse.Panel key={"history"} header={"历史记录设置"}>
+                  <ConfigItem
+                    configContext={configContext}
+                    type={"number"}
+                    name={"文件大小上限"}
+                    description={
+                      <div>
+                        达到上限时自动更换新文件 使用-1禁用此功能 <br />
+                        单位MB
+                      </div>
+                    }
+                    valueKey={"history.autoCutAt"}
+                  />
+                </Collapse.Panel>
                 <Collapse.Panel
                   key={"autoSave"}
                   header={"配置文件自动保存设置"}

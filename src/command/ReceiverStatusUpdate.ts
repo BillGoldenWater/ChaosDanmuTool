@@ -8,9 +8,7 @@ export type ReceiverStatusUpdateCmd = "receiverStatusUpdate";
 
 export type ReceiverStatusUpdate = {
   cmd: ReceiverStatusUpdateCmd;
-  data: {
-    status: ReceiverStatus;
-  };
+  status: ReceiverStatus;
 };
 
 export function getStatusUpdateMessage(
@@ -18,9 +16,7 @@ export function getStatusUpdateMessage(
 ): ReceiverStatusUpdate {
   return {
     cmd: "receiverStatusUpdate",
-    data: {
-      status: status,
-    },
+    status: status,
   };
 }
 

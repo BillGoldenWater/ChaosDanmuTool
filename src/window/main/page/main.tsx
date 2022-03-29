@@ -67,7 +67,7 @@ export class Main extends React.Component<Props, MainState> {
     this.state = {
       config: window.electron.getConfig(),
       siderCollapsed: true,
-      pageKey: "history",
+      pageKey: "settings",
       receiverStatus: "close",
       updateInfo: null,
     };
@@ -109,7 +109,7 @@ export class Main extends React.Component<Props, MainState> {
       case getStatusUpdateMessageCmd(): {
         const msg: ReceiverStatusUpdate = anyMsg;
 
-        this.setState({ receiverStatus: msg.data.status });
+        this.setState({ receiverStatus: msg.status });
         break;
       }
       case getConfigUpdateCmd(): {

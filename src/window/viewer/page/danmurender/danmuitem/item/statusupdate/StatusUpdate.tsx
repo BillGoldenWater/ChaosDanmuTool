@@ -17,7 +17,7 @@ export class StatusUpdate extends React.Component<Props> {
     let statusMsg = "NULL";
     let color = "#fff";
 
-    switch (rsu.data.status) {
+    switch (rsu.status) {
       case "connecting": {
         statusMsg = "连接中";
         color = "#e90";

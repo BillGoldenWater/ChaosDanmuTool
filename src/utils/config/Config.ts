@@ -7,6 +7,10 @@ import { cloneDeep, defaultsDeep } from "lodash-es";
 import { arrayTag, getArrayDiff, getDiff, getTag } from "../ObjectUtils";
 import { v4 as uuidv4 } from "uuid";
 
+export type HistoryConfig = {
+  autoCutAt: number;
+};
+
 export type UpdateConfig = {
   ignoreVersion: string;
 };
@@ -94,6 +98,7 @@ export type Config = {
   autoSaveOnChange: boolean;
   httpServerPort: number;
   darkTheme: boolean;
+  history: HistoryConfig;
   update: UpdateConfig;
   danmuReceiver: DanmuReceiverConfig;
   danmuViewConfig: DanmuViewConfig;
@@ -218,6 +223,9 @@ const defaultConfig: Config = {
   autoSaveOnChange: true,
   httpServerPort: 25555,
   darkTheme: true,
+  history: {
+    autoCutAt: 15,
+  },
   update: {
     ignoreVersion: "",
   },

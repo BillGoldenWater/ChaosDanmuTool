@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React, {ReactNode} from "react";
+import React, { ReactNode } from "react";
 import "./main.css";
 import {
   Config,
@@ -11,12 +11,12 @@ import {
   getDefaultConfig,
   getDefaultDanmuViewCustomConfig,
 } from "../../../utils/config/Config";
-import {WebsocketClient} from "../../../utils/client/WebsocketClient";
-import {getParam} from "../utils/UrlParamGeter";
-import {LoadingPage} from "./loadingpage/LoadingPage";
-import {ConnectFail} from "./connectfail/ConnectFail";
-import {getConfigUpdateCmd} from "../../../command/ConfigUpdate";
-import {getMessageCommandCmd} from "../../../command/MessageCommand";
+import { WebsocketClient } from "../../../utils/client/WebsocketClient";
+import { getParam } from "../utils/UrlParamGeter";
+import { LoadingPage } from "./loadingpage/LoadingPage";
+import { ConnectFail } from "./connectfail/ConnectFail";
+import { getConfigUpdateCmd } from "../../../command/ConfigUpdate";
+import { getMessageCommandCmd } from "../../../command/MessageCommand";
 import {
   ActivityUpdate,
   getActivityUpdateMessageCmd,
@@ -29,28 +29,27 @@ import {
   InteractWordType,
   TInteractWord as TInteractWord,
 } from "../../../type/bilibili/TInteractWord";
-import {ConfigContext} from "../utils/ConfigContext";
-import {StatusBar} from "../../../component/statusbar/StatusBar";
-import {DanmuRender} from "./danmurender/DanmuRender";
-import {InteractWord} from "./danmurender/danmuitem/item/interactword/InteractWord";
-import {formatNumber} from "../../../utils/FormatConverters";
-import {TRoomRealTimeMessageUpdate} from "../../../type/bilibili/TRoomRealTimeMessageUpdate";
+import { ConfigContext } from "../utils/ConfigContext";
+import { StatusBar } from "../../../component/statusbar/StatusBar";
+import { DanmuRender } from "./danmurender/DanmuRender";
+import { InteractWord } from "./danmurender/danmuitem/item/interactword/InteractWord";
+import { formatNumber } from "../../../utils/FormatConverters";
+import { TRoomRealTimeMessageUpdate } from "../../../type/bilibili/TRoomRealTimeMessageUpdate";
 import {
   parseGiftConfig,
   TGiftConfig,
   TGiftConfigResponse,
 } from "../../../type/bilibili/giftconfig/TGiftConfig";
-import {getGiftConfigUpdateCmd} from "../../../command/GiftConfigUpdate";
-import {TSendGift} from "../../../type/bilibili/TSendGift";
-import {getStatusUpdateMessageCmd} from "../../../command/ReceiverStatusUpdate";
-import {TSuperChatMessage} from "../../../type/bilibili/TSuperChatMessage";
-import {parseDanmuMsg, TDanmuMsg} from "../../../type/bilibili/TDanmuMsg";
-import {TextToSpeech} from "../utils/TextToSpeech";
-import {MessageLog} from "../../../command/messagelog/MessageLog";
-import {TAnyMessage} from "../../../type/TAnyMessage";
+import { getGiftConfigUpdateCmd } from "../../../command/GiftConfigUpdate";
+import { TSendGift } from "../../../type/bilibili/TSendGift";
+import { getStatusUpdateMessageCmd } from "../../../command/ReceiverStatusUpdate";
+import { TSuperChatMessage } from "../../../type/bilibili/TSuperChatMessage";
+import { parseDanmuMsg, TDanmuMsg } from "../../../type/bilibili/TDanmuMsg";
+import { TextToSpeech } from "../utils/TextToSpeech";
+import { MessageLog } from "../../../command/messagelog/MessageLog";
+import { TAnyMessage } from "../../../type/TAnyMessage";
 
-class Props {
-}
+class Props {}
 
 class State {
   config: DanmuViewCustomConfig;
@@ -210,7 +209,7 @@ export class Main extends React.Component<Props, State> {
       }
       case getGiftConfigUpdateCmd(): {
         const giftConfig: TGiftConfigResponse = anyMsg.data;
-        this.setState({giftConfig: parseGiftConfig(giftConfig)});
+        this.setState({ giftConfig: parseGiftConfig(giftConfig) });
         break;
       }
       case getActivityUpdateMessageCmd(): {
@@ -331,7 +330,7 @@ export class Main extends React.Component<Props, State> {
           sgData.uid == sendGift.data.uid &&
           sgData.giftId == sendGift.data.giftId &&
           sendGift.data.timestamp - sgData.timestamp <=
-          sendGift.data.combo_stay_time
+            sendGift.data.combo_stay_time
         ) {
           needRemove.push(key);
           totalNum += sgData.num;
@@ -342,7 +341,7 @@ export class Main extends React.Component<Props, State> {
     this.addToList(
       {
         ...sendGift,
-        data: {...sendGift.data, num: sendGift.data.num + totalNum},
+        data: { ...sendGift.data, num: sendGift.data.num + totalNum },
       } as TSendGift,
       needRemove
     );
@@ -360,7 +359,7 @@ export class Main extends React.Component<Props, State> {
     switch (interactWord.data.msg_type) {
       case InteractWordType.join: {
         this.setState({
-          statusMessage: <InteractWord interactWord={interactWord}/>,
+          statusMessage: <InteractWord interactWord={interactWord} />,
         });
         break;
       }
@@ -483,7 +482,7 @@ export class Main extends React.Component<Props, State> {
           }}
         >
           {status}
-          <DanmuRender danmuList={s.danmuList}/>
+          <DanmuRender danmuList={s.danmuList} />
         </ConfigContext.Provider>
       </div>
     );
