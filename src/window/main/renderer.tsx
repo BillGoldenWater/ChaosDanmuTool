@@ -35,6 +35,12 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import { Main } from "./page/main";
 import { ApiElectron } from "./preload";
+import zhCN from "antd/lib/locale/zh_CN";
+import moment from "moment";
+import "moment/locale/zh-cn";
+import { ConfigProvider } from "antd";
+
+moment.locale("zh-cn");
 
 console.log("Rendering");
 
@@ -44,4 +50,9 @@ declare global {
   }
 }
 
-ReactDOM.render(<Main />, document.querySelector("#app"));
+ReactDOM.render(
+  <ConfigProvider locale={zhCN}>
+    <Main />
+  </ConfigProvider>,
+  document.querySelector("#app")
+);
