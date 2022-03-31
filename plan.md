@@ -1,6 +1,5 @@
 ChaosDanmuTool
 
-- 菜单不与内容同步滚动
 - 关于界面 许可证声明
 - 设置界面布局转用 json 存储 动态构建
   - number string boolean custom etc.

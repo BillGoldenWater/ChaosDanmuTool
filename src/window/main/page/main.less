@@ -3,12 +3,17 @@
  */
 @main_content_padding: 2em;
 @main_content_margin: 1em;
-@main_content_minHeight: calc(100vh - (@main_content_margin * 2));
+@main_content_height: calc(100vh - (@main_content_margin * 2));
 
 .main_content {
   margin: @main_content_margin;
-  min-height: @main_content_minHeight;
+  height: @main_content_height;
   border-bottom-right-radius: 0.4em;
+  overflow: auto;
+}
+
+.main_content::-webkit-scrollbar {
+  width: 0;
 }
 
 .main_content > div {
