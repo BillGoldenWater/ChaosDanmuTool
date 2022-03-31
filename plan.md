@@ -1,8 +1,12 @@
 ChaosDanmuTool
 
+- 当运行在转译环境下时更新信息的复制链接使用 arm 的链接
+- 加载时只加载实现了的数据以优化性能
+- 数据分组 \[弹幕, 礼物\] \[进入, 关注, 分享\] \[人气, 看过人数\] \[粉丝数\] (待定)
+- 在没有数据时使用 -1 而不是 0 (粉丝数, 人气, 看过人数)
 - 设置界面布局转用 json 存储 动态构建
-  - number string boolean custom etc.
-  - custom: (value, setValue)=>{...}
+    - number string boolean custom etc.
+    - custom: (value, setValue)=>{...}
 - 启动时自动连接直播间 默认不启用
 - 语音播报 Anti 复读的间隔的 min 设为 0
 - 语音播报 语音选择
