@@ -16,7 +16,7 @@
 
 .statusBar_content {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: space-between;
   border: 0.1em #bfbfbf solid;
   border-radius: 0 0 0.4em 0.4em;
@@ -25,12 +25,27 @@
 }
 
 .statusBar_statusMessage {
+  word-break: keep-all;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.statusBar_statusMessage > div {
+  display: inline-flex;
+}
+
+.statusBar_statusMessage div {
+  word-break: keep-all;
+  white-space: nowrap;
+  flex-wrap: nowrap;
 }
 
 .statusBar_itemList {
   display: flex;
   flex-direction: row-reverse;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  word-break: keep-all;
+  white-space: nowrap;
 }
 
 .statusBar_itemList > div {
