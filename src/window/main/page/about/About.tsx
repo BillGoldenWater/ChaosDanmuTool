@@ -142,6 +142,16 @@ export class About extends React.Component<Props, State> {
           >
             Github 存储库主页: github.com/BiliGoldenWater/ChaosDanmuTool
           </Paragraph>
+          <Paragraph>
+            Chaos Danmu Tool 使用 AGPL-3.0-only 许可证开源
+            <br />
+            你应该随程序获得一份许可证副本(文件 COPYING).
+            <br />
+            如果没有, 请看:{" "}
+            <Typography.Link>
+              https://www.gnu.org/licenses/agpl-3.0.txt
+            </Typography.Link>
+          </Paragraph>
           <Divider orientation="left">更新记录</Divider>
           {changelog}
         </Typography>
