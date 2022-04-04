@@ -314,7 +314,10 @@ export class Main extends React.Component<Props, State> {
       })
       .map((value) => value.key);
 
-    if (count + 1 < this.state.config.danmuMergeMinNum) {
+    if (
+      this.state.config.danmuMergeMinNum === -1 ||
+      count + 1 < this.state.config.danmuMergeMinNum
+    ) {
       this.addToList(danmuMsg);
       return;
     }
