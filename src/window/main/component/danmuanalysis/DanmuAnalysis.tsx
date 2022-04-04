@@ -211,21 +211,24 @@ export class DanmuAnalysis extends React.Component<Props> {
     }
 
     const items: GraphItem[] = [];
-
     this.addItemToGraphItems(items, "弹幕", danmuMsg);
-    this.addItemToGraphItems(items, "进入", join);
-    this.addItemToGraphItems(items, "关注", follow);
-    this.addItemToGraphItems(items, "分享", share);
     this.addItemToGraphItems(items, "礼物", gift);
     this.addItemToGraphItems(items, "免费礼物", giftFree);
     this.addItemToGraphItems(items, "付费礼物", giftPaid);
 
     const items2: GraphItem[] = [];
-    this.addItemToGraphItems(items2, "人气", activity);
-    this.addItemToGraphItems(items2, "看过人数", watched);
-    this.addItemToGraphItems(items2, "粉丝数", fansNum);
+    this.addItemToGraphItems(items2, "进入", join);
+    this.addItemToGraphItems(items2, "关注", follow);
+    this.addItemToGraphItems(items2, "分享", share);
 
-    const option1 = {
+    const items3: GraphItem[] = [];
+    this.addItemToGraphItems(items3, "人气", activity);
+    this.addItemToGraphItems(items3, "看过人数", watched);
+
+    const items4: GraphItem[] = [];
+    this.addItemToGraphItems(items4, "粉丝数", fansNum);
+
+    const option = {
       xAxis: {
         type: "category",
         data: msgCountKeys,
@@ -255,10 +258,18 @@ export class DanmuAnalysis extends React.Component<Props> {
     };
 
     return [
-      option1,
+      option,
       {
-        ...option1,
+        ...option,
         series: items2,
+      },
+      {
+        ...option,
+        series: items3,
+      },
+      {
+        ...option,
+        series: items4,
       },
     ];
   }
@@ -284,6 +295,8 @@ export class DanmuAnalysis extends React.Component<Props> {
             <div>
               <EChartsReact option={optionList[0]} />
               <EChartsReact option={optionList[1]} />
+              <EChartsReact option={optionList[2]} />
+              <EChartsReact option={optionList[3]} />
             </div>
           );
         }}
