@@ -12,7 +12,7 @@ export function formatTime(
   format = "{month}-{date} {hours}:{minutes}:{seconds}"
 ) {
   const year = time.getFullYear();
-  const month = time.getMonth();
+  const month = time.getMonth() + 1;
   const date = time.getDate();
   const hours = time.getHours();
   const minutes = time.getMinutes();
