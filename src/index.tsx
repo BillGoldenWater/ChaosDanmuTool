@@ -342,6 +342,7 @@ export function createViewerWindow(): void {
       visibleOnFullScreen: true,
     });
     app.dock ? app.dock.show().then() : "";
+    showWindow(mainWindow, createMainWindow);
   });
 
   viewerWindow.on("move", () => {
