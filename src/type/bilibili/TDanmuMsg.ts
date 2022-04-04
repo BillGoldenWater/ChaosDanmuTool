@@ -31,6 +31,7 @@ export type TDanmuMsg = {
     userTitle: string;
     userTitle1: string;
 
+    isHistory: undefined | boolean;
     count: number;
   };
 };

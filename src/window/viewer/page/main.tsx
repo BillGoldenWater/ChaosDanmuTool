@@ -242,7 +242,7 @@ export class Main extends React.Component<Props, State> {
           }
           case "DANMU_MSG": {
             const danmuMsg = parseDanmuMsg(msg);
-            this.tts.speakDanmu(danmuMsg);
+            !danmuMsg.data.isHistory && this.tts.speakDanmu(danmuMsg);
             this.processDanmuMsg(danmuMsg);
             break;
           }

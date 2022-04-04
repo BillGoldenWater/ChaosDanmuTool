@@ -62,6 +62,7 @@ export class DanmuHistoryGetter {
                           : "",
                       userTitle1: "",
 
+                      isHistory: true,
                       count: 1,
                     },
                   };
@@ -108,6 +109,7 @@ export class DanmuHistoryGetter {
           userTitle: "",
           userTitle1: "",
 
+          isHistory: true,
           count: 1,
         },
       },
