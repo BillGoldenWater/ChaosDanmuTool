@@ -308,13 +308,19 @@ export class Main extends React.Component<Props, State> {
         if (value.msg.cmd !== "DANMU_MSG") return false; // 是弹幕
         const dm = parseDanmuMsg(value.msg);
         if (dm.data.content !== danmuMsg.data.content) return false; // 相同内容
+        if (danmuMsg.data.timestamp - dm.data.timestamp > 120) return false; // 2分钟内
         count += dm.data.count;
         return true;
       })
       .map((value) => value.key);
+
+    if (count + 1 < this.state.config.danmuMergeMinNum) {
+      this.addToList(danmuMsg);
+      return;
+    }
     danmuMsg.data.count += count;
 
-    this.addToList(danmuMsg as unknown as TBiliBiliDanmuContent, needRemove);
+    this.addToList(danmuMsg, needRemove);
   }
 
   processSendGift(sendGift: TSendGift): void {

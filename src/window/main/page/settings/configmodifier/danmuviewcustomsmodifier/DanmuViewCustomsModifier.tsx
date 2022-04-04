@@ -190,6 +190,21 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
 
               <ConfigItem
                 configContext={dvcContext}
+                type={"number"}
+                name={"弹幕合并数量下限"}
+                description={
+                  <div>
+                    弹幕查看器中在合并同内容弹幕前允许存在的数量
+                    <br />
+                    -1 禁用
+                  </div>
+                }
+                valueKey={"danmuMergeMinNum"}
+                min={-1}
+              />
+
+              <ConfigItem
+                configContext={dvcContext}
                 type={"boolean"}
                 name={"显示状态栏"}
                 description={<div>在弹幕查看器底部显示信息</div>}

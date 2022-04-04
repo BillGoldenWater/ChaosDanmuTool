@@ -85,6 +85,7 @@ export type DanmuViewCustomConfig = {
   name: string;
   uuid: string;
   maxDanmuNumber: number;
+  danmuMergeMinNum: number;
   statusBarDisplay: boolean;
   superChatAlwaysOnTop: boolean;
   numberFormat: NumberFormatConfig;
@@ -122,6 +123,7 @@ const defaultDanmuViewCustom: DanmuViewCustomConfig = {
   name: "default",
   uuid: "00000000-0000-0000-0000-000000000000",
   maxDanmuNumber: 100,
+  danmuMergeMinNum: 10,
   statusBarDisplay: true,
   superChatAlwaysOnTop: true,
   numberFormat: {
