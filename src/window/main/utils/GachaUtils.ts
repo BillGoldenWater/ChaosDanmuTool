@@ -9,15 +9,15 @@ import {
 } from "../../../type/bilibili/userinfo/TUserInfo";
 
 enum GachaCheckResult {
-  WrongContent,
-  LowUserLevel,
-  EmptyMedal,
-  MedalNotLighted,
-  WrongMedal,
-  LowMedalLevel,
-  Joined,
+  WrongContent = "Wrong content",
+  LowUserLevel = "Low user level",
+  EmptyMedal = "Empty medal",
+  MedalNotLighted = "Medal not lighted",
+  WrongMedal = "Wrong medal",
+  LowMedalLevel = "Low medal level",
+  Joined = "Joined",
 
-  JoinSuccess,
+  Ok = "Ok",
 }
 
 type TGachaUser = {
@@ -49,7 +49,7 @@ class GachaUtils {
       return GachaCheckResult.LowUserLevel;
 
     const medal = d.medalInfo;
-    if (this.medalLevelLimit !== -1) {
+    if (this.medalLevelLimit !== -1 && this.medalRoomid !== -1) {
       if (!medal) return GachaCheckResult.EmptyMedal; // 没戴
       if (medal.is_lighted !== 1) return GachaCheckResult.MedalNotLighted; // 没亮
       if (medal.anchor_roomid !== this.medalRoomid)
@@ -58,7 +58,7 @@ class GachaUtils {
         return GachaCheckResult.LowMedalLevel; // 等级不够
     }
 
-    return GachaCheckResult.JoinSuccess;
+    return GachaCheckResult.Ok;
   }
 
   static join(danmu: TDanmuMsg) {
@@ -118,8 +118,6 @@ class GachaUtils {
   }
 }
 
-// GachaUtils.joinText = "1";
-//
 // // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // // @ts-ignore
 // window.test = GachaUtils;
