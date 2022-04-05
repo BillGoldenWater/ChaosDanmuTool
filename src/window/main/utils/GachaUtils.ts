@@ -99,7 +99,7 @@ class GachaUtils {
     );
 
     for (let i = 0; i < shuffledUsers.length; i++) {
-      if (i <= this.winNum) {
+      if (i < this.winNum) {
         this.winners.set(shuffledUsers[i][0], shuffledUsers[i][1]);
       } else {
         this.losers.set(shuffledUsers[i][0], shuffledUsers[i][1]);
