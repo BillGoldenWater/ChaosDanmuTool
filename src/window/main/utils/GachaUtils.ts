@@ -106,6 +106,16 @@ class GachaUtils {
       }
     }
   }
+
+  static clear() {
+    this.joinedUsers.clear();
+    this.clearResult();
+  }
+
+  static clearResult() {
+    this.winners.clear();
+    this.losers.clear();
+  }
 }
 
 // GachaUtils.joinText = "1";
