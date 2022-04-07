@@ -55,16 +55,22 @@ type PageKey =
   | "settings"
   | "about";
 
+type MessageListener = (message: TAnyMessage) => void;
+
 export class MainState {
   config: Config;
   siderCollapsed: boolean;
   pageKey: PageKey;
   receiverStatus: ReceiverStatus;
   updateInfo: ReactNode;
+  addMessageListener: (id: string, listener: MessageListener) => void;
+  hasMessageListener: (id: string) => boolean;
+  removeMessageListener: (id: string) => void;
 }
 
 export class Main extends React.Component<Props, MainState> {
   websocketClient: WebsocketClient;
+  messageListeners: Map<string, MessageListener> = new Map();
 
   constructor(props: Props) {
     super(props);
@@ -75,6 +81,15 @@ export class Main extends React.Component<Props, MainState> {
       pageKey: defaultKey,
       receiverStatus: "close",
       updateInfo: null,
+      addMessageListener: (id, listener) => {
+        this.messageListeners.set(id, listener);
+      },
+      hasMessageListener: (id) => {
+        return this.messageListeners.has(id);
+      },
+      removeMessageListener: (id) => {
+        this.messageListeners.delete(id);
+      },
     };
 
     this.websocketClient = new WebsocketClient(
@@ -125,6 +140,16 @@ export class Main extends React.Component<Props, MainState> {
         break;
       }
     }
+
+    Array.from(this.messageListeners.values()).forEach((value) => {
+      try {
+        value(anyMsg);
+      } catch (e) {
+        console.error(
+          `Main.onMessage.callEvent\n${e.name}\n${e.message}\n${e.stack}`
+        );
+      }
+    });
   }
 
   render(): ReactNode {

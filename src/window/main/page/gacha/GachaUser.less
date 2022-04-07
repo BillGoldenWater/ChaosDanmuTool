@@ -2,8 +2,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+@import "Gacha.less";
+
 .GachaUser {
-  margin: 1em;
+  margin: 0.5em;
   flex-grow: 1;
   flex-basis: 12em;
 
@@ -11,7 +13,7 @@
   flex-direction: column;
   align-content: center;
 
-  background-color: #fff1;
+  background-color: @gacha-card-background-color;
 
   border-radius: 0.5em;
 
@@ -19,7 +21,7 @@
 }
 
 .GachaUserWinner {
-  background-color: #1e90ff11;
+  background-color: #ff03;
 }
 
 .GachaUserLatestDanmu {

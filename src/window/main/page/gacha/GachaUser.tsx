@@ -17,7 +17,7 @@ export class GachaUser extends React.Component<Props> {
       user: {
         userInfo: { uname },
         latestDanmu: {
-          data: { content },
+          data: { content, uid },
         },
       },
       isWinner,
@@ -25,7 +25,9 @@ export class GachaUser extends React.Component<Props> {
 
     return (
       <div className={"GachaUser" + (isWinner ? " GachaUserWinner" : "")}>
-        <div>{uname}</div>
+        <div>
+          {uname} UID:{uid}
+        </div>
         <div className={"GachaUserLatestDanmu"}>{content}</div>
       </div>
     );

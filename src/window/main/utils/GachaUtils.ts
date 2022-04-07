@@ -29,13 +29,16 @@ export type TGachaUser = {
 };
 
 export class GachaUtils {
-  static joinText = "";
+  static joinText = "参加抽奖";
+
   static userLevelLimit = -1;
 
   static medalLevelLimit = -1;
   static medalRoomid = -1;
 
   static winNum = 1;
+
+  static item = "";
 
   static readonly joinedUsers: Map<number, TGachaUser> = new Map();
   static readonly winners: Map<number, TGachaUser> = new Map();
@@ -119,7 +122,3 @@ export class GachaUtils {
     this.losers.clear();
   }
 }
-
-// // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// // @ts-ignore
-// window.test = GachaUtils;

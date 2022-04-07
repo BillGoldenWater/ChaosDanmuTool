@@ -2,6 +2,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+@gacha-card-background-color: #2a2a2a;
+
 .Gacha {
   height: 100%;
 }
@@ -30,16 +32,28 @@
 }
 
 .GachaInfos {
+  margin: 1em;
   padding: 1em;
+
+  background-color: @gacha-card-background-color;
+
+  border-radius: 0.5em;
 }
 
 .GachaUsers {
+  max-height: 100%;
+  overflow: auto;
+
   flex-grow: 1;
-  padding: 1em;
+  padding: 0.5em;
 
   display: flex;
   flex-wrap: wrap;
   align-content: flex-start;
+}
+
+.GachaUsers::-webkit-scrollbar {
+  width: 0;
 }
 
 .GachaControls {
@@ -49,6 +63,18 @@
 }
 
 .GachaLog {
+  max-height: 100%;
+  overflow: auto;
+
   flex-grow: 1;
   padding: 1em;
+  margin: 1em;
+
+  background-color: @gacha-card-background-color;
+
+  border-radius: 0.5em;
+}
+
+.GachaLog::-webkit-scrollbar {
+  width: 0;
 }
