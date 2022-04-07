@@ -1,6 +1,5 @@
 ChaosDanmuTool
 
-- 加载时只加载实现了的数据以优化性能
 - 进入消息与直播间信息分2行显示 横向列表 滚动显示
 - 设置界面布局转用 json 存储 动态构建
     - number string boolean custom etc.

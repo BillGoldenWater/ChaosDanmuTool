@@ -16,7 +16,7 @@ import { getMessageLogMessage } from "../../command/messagelog/MessageLog";
 import { ErrorMessage } from "../../command/messagelog/ErrorMessage";
 import { dialog } from "electron";
 import { TAnyMessage } from "../../type/TAnyMessage";
-import { CommandHistoryManager } from "../CommandHistoryManager";
+import { CommandHistoryManager } from "../history/CommandHistoryManager";
 
 const get = ConfigManager.get.bind(ConfigManager);
 const getConfig = ConfigManager.getConfig.bind(ConfigManager);

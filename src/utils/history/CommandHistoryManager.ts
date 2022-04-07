@@ -4,11 +4,12 @@
 
 import * as fs from "fs";
 import * as path from "path";
-import { formatTime } from "./FormatUtils";
-import { MessageLog } from "../command/messagelog/MessageLog";
-import { TAnyMessage } from "../type/TAnyMessage";
+import { formatTime } from "../FormatUtils";
+import { MessageLog } from "../../command/messagelog/MessageLog";
+import { TAnyMessage } from "../../type/TAnyMessage";
 import { shell } from "electron";
-import { ConfigManager } from "./config/ConfigManager";
+import { ConfigManager } from "../config/ConfigManager";
+import { isImplementedCommand } from "./CommandHistoryImplemented";
 
 export class CommandHistoryManager {
   static path: string;
@@ -90,6 +91,7 @@ export class CommandHistoryManager {
   static async getHistory(
     fileName?: string
   ): Promise<MessageLog<TAnyMessage>[]> {
+    // const startTime = new Date();
     const result: MessageLog<TAnyMessage>[] = [];
 
     let data;
@@ -100,6 +102,7 @@ export class CommandHistoryManager {
     } catch (e) {
       return result;
     }
+    // const readTime = new Date();
 
     if (data == null || data.toString() === "") return result;
     const dataStr = data.toString("utf-8");
@@ -107,10 +110,20 @@ export class CommandHistoryManager {
     for (const cmd of dataStr.split("\n")) {
       if (cmd == "") continue;
       try {
-        result.push(JSON.parse(cmd));
+        const obj: MessageLog<TAnyMessage> = JSON.parse(cmd);
+        if (isImplementedCommand(obj.message)) result.push(obj);
         // eslint-disable-next-line no-empty
       } catch (e) {}
     }
+
+    //     const parseTime = new Date();
+    //
+    //     console.log(
+    //       `File name: ${fileName}
+    // Read cost: ${readTime.getTime() - startTime.getTime()}ms
+    // Parse cost: ${parseTime.getTime() - readTime.getTime()}ms
+    // Total cost: ${parseTime.getTime() - startTime.getTime()}ms\n`
+    //     );
 
     return result;
   }
