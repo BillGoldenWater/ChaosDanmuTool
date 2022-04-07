@@ -21,6 +21,7 @@ import { ConfigProvider, Layout, Menu, notification } from "antd";
 import {
   ApiOutlined,
   AppstoreOutlined,
+  CompassOutlined,
   DashboardOutlined,
   EyeOutlined,
   HistoryOutlined,
@@ -37,8 +38,11 @@ import { About } from "./about/About";
 import { MessageLog } from "../../../command/messagelog/MessageLog";
 import { TAnyMessage } from "../../../type/TAnyMessage";
 import { History } from "./history/History";
+import { Gacha } from "./gacha/Gacha";
 
 const { Sider, Content } = Layout;
+
+const defaultKey: PageKey = "dashboard";
 
 class Props {}
 
@@ -46,6 +50,7 @@ type PageKey =
   | "dashboard"
   | "connectRoom"
   | "danmuViewerControl"
+  | "gacha"
   | "history"
   | "settings"
   | "about";
@@ -67,7 +72,7 @@ export class Main extends React.Component<Props, MainState> {
     this.state = {
       config: window.electron.getConfig(),
       siderCollapsed: true,
-      pageKey: "dashboard",
+      pageKey: defaultKey,
       receiverStatus: "close",
       updateInfo: null,
     };
@@ -147,6 +152,7 @@ export class Main extends React.Component<Props, MainState> {
         currentPage = <ConnectRoom receiverStatus={s.receiverStatus} />;
         break;
       }
+
       case "danmuViewerControl": {
         currentPage = <DanmuViewerControl />;
         break;
@@ -155,6 +161,11 @@ export class Main extends React.Component<Props, MainState> {
         currentPage = <History />;
         break;
       }
+      case "gacha": {
+        currentPage = <Gacha />;
+        break;
+      }
+
       case "settings": {
         currentPage = <Settings />;
         break;
@@ -219,7 +230,7 @@ export class Main extends React.Component<Props, MainState> {
                 onClick={(event) => {
                   this.setState({ pageKey: event.key as PageKey });
                 }}
-                defaultSelectedKeys={["dashboard"]}
+                defaultSelectedKeys={[defaultKey]}
                 theme={s.config.darkTheme ? "dark" : "light"}
               >
                 <Menu.Item key={"dashboard"} icon={<DashboardOutlined />}>
@@ -235,6 +246,12 @@ export class Main extends React.Component<Props, MainState> {
                   </Menu.Item>
                   <Menu.Item key={"danmuViewerControl"} icon={<EyeOutlined />}>
                     弹幕查看器
+                  </Menu.Item>
+                  <Menu.Item
+                    key={"gacha"}
+                    icon={<CompassOutlined spin={true} />}
+                  >
+                    弹幕抽奖
                   </Menu.Item>
                 </SubMenu>
                 <Menu.Item key={"history"} icon={<HistoryOutlined />}>
