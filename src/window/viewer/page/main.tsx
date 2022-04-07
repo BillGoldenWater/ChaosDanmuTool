@@ -51,19 +51,23 @@ import { TAnyMessage } from "../../../type/TAnyMessage";
 
 class Props {}
 
-class State {
+type StatusMessageListener = (node: ReactNode) => void;
+
+export class MainState {
   config: DanmuViewCustomConfig;
   danmuList: DanmuMessageWithKey[];
   connectState: "open" | "close" | "error";
   connectAttemptNumber: number;
   activity: number;
   fansNumber: number;
-  statusMessage: string | ReactNode;
   giftConfig: TGiftConfig;
   selectable: boolean;
+
+  addMessageListener: (id: string, listener: StatusMessageListener) => void;
+  removeMessageListener: (id: string) => void;
 }
 
-export class Main extends React.Component<Props, State> {
+export class Main extends React.Component<Props, MainState> {
   websocketClient: WebsocketClient;
   tts: TextToSpeech;
   maxAttemptNumber: number;
@@ -72,6 +76,8 @@ export class Main extends React.Component<Props, State> {
   serverPort: number;
   reconnectId: number;
   danmuCount: number;
+
+  statusMessageListeners: Map<string, StatusMessageListener> = new Map();
 
   constructor(props: Props) {
     super(props);
@@ -83,9 +89,15 @@ export class Main extends React.Component<Props, State> {
       connectAttemptNumber: 0,
       activity: 0,
       fansNumber: 0,
-      statusMessage: "",
       giftConfig: undefined,
       selectable: false,
+
+      addMessageListener: (id, listener) => {
+        this.statusMessageListeners.set(id, listener);
+      },
+      removeMessageListener: (id) => {
+        this.statusMessageListeners.delete(id);
+      },
     };
 
     this.serverAddress = window.location.hostname;
@@ -367,8 +379,14 @@ export class Main extends React.Component<Props, State> {
   processInteractWord(interactWord: TInteractWord): void {
     switch (interactWord.data.msg_type) {
       case InteractWordType.join: {
-        this.setState({
-          statusMessage: <InteractWord interactWord={interactWord} />,
+        Array.from(this.statusMessageListeners.values()).forEach((value) => {
+          try {
+            value(<InteractWord interactWord={interactWord} />);
+          } catch (e) {
+            console.error(
+              `Main.processInteractWord.callEvent\n${e.name}\n${e.message}\n${e.stack}`
+            );
+          }
         });
         break;
       }
@@ -429,7 +447,7 @@ export class Main extends React.Component<Props, State> {
       if (s.config.statusBarDisplay) {
         status = (
           <StatusBar
-            message={s.statusMessage}
+            state={s}
             style={{
               backgroundColor: s.config.style.mainStyle.backgroundColor,
               borderColor: s.config.style.mainStyle.backgroundColor,
@@ -488,6 +506,7 @@ export class Main extends React.Component<Props, State> {
           value={{
             config: s.config,
             giftConfig: s.giftConfig,
+            state: this.state,
           }}
         >
           {status}
