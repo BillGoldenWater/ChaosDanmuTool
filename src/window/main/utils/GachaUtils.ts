@@ -8,7 +8,7 @@ import {
   TUserInfo,
 } from "../../../type/bilibili/userinfo/TUserInfo";
 
-enum GachaCheckResult {
+export enum GachaCheckResult {
   WrongContent = "Wrong content",
   LowUserLevel = "Low user level",
   EmptyMedal = "Empty medal",
@@ -20,13 +20,15 @@ enum GachaCheckResult {
   Ok = "Ok",
 }
 
-type TGachaUser = {
+export type GachaCheckResultWithUName = [string, GachaCheckResult];
+
+export type TGachaUser = {
   userInfo: TUserInfo;
   danmuMsg: TDanmuMsg;
   latestDanmu: TDanmuMsg;
 };
 
-class GachaUtils {
+export class GachaUtils {
   static joinText = "";
   static userLevelLimit = -1;
 
