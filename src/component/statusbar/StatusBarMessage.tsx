@@ -12,7 +12,8 @@ class Props {
   id?: string;
 }
 
-const updatePerMS = 10;
+const fps = 48;
+const updatePerMS = 1000 / fps;
 
 type MessageDetail = {
   uuid: string;
@@ -48,6 +49,16 @@ export class StatusBarMessage extends React.Component<Props, State> {
     this.timerId = window.setInterval(this.update.bind(this), updatePerMS);
   }
 
+  getElementTotalWidth(element: HTMLElement) {
+    if (!element) return 0;
+    const style = window.getComputedStyle(element);
+    return (
+      Number.parseFloat(style.marginLeft) +
+      Number.parseFloat(style.width) +
+      Number.parseFloat(style.marginRight)
+    );
+  }
+
   update() {
     if (this.contentRef.current) {
       const content = this.contentRef.current;
@@ -59,20 +70,37 @@ export class StatusBarMessage extends React.Component<Props, State> {
       list.forEach((value) => {
         const c = value.ref.current;
         if (c) {
-          const style = window.getComputedStyle(c);
-          totalWidth += Number.parseFloat(style.width);
-          latestWidth = Number.parseFloat(style.width);
+          const currentWidth = this.getElementTotalWidth(c);
+
+          totalWidth += currentWidth;
+          latestWidth = currentWidth;
         }
       });
 
       const targetScroll = totalWidth - latestWidth;
       const needScroll = targetScroll - this.scrollLeft;
-      this.scrollLeft += Math.min(
-        needScroll / 8,
-        targetScroll / (900 / updatePerMS)
-      );
+      this.scrollLeft += Math.min(needScroll / fps, targetScroll / fps);
 
-      if (needScroll < 0.5 && this.scrollLeft > 1) {
+      if (list.length > 20) {
+        let cutWidth = 0;
+        this.setState(
+          (prevState) => {
+            const l = prevState.messageList;
+            for (let i = 0; i < l.length / 2; i++) {
+              const item = l[i].ref.current;
+              cutWidth += this.getElementTotalWidth(item);
+              l.shift();
+            }
+
+            return {
+              messageList: l,
+            };
+          },
+          () => {
+            this.scrollLeft = Math.max(this.scrollLeft - cutWidth, 0);
+          }
+        );
+      } else if (needScroll < 0.5 && this.scrollLeft > 1) {
         this.setState(
           (prev: State) => {
             return {
@@ -95,7 +123,7 @@ export class StatusBarMessage extends React.Component<Props, State> {
       const uuid = uuidv4();
 
       const message: ReactNode = (
-        <div ref={ref} key={uuid}>
+        <div ref={ref} className={"statusBar_statusMessageItem"} key={uuid}>
           {node}
         </div>
       );

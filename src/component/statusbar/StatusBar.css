@@ -31,10 +31,14 @@
   height: 0;
 }
 
-.statusBar_statusMessage > div {
+.statusBar_statusMessageItem {
   display: inline-flex;
-  padding-right: 0.5em;
+  padding: 0.2em 0.5em;
+  margin-right: 0.2em;
   box-sizing: border-box;
+
+  background-color: #0003;
+  border-radius: 0.5em;
 }
 
 .statusBar_statusMessage div {
@@ -52,9 +56,10 @@
 }
 
 .statusBar_itemList > div {
+  padding: 0.1em 0.5em;
+  margin-top: 0.2em;
   margin-right: 0.2em;
-  padding-right: 0.2em;
-  border-width: 0 0.1em 0 0;
-  border-color: #bfbfbf;
-  border-style: solid;
+
+  background-color: #0003;
+  border-radius: 0.5em;
 }
