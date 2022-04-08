@@ -38,7 +38,7 @@ export class DanmuHistoryGetter {
                     data: {
                       fontsize: 0,
                       color: 0,
-                      timestamp: value.check_info.ts,
+                      timestamp: value.check_info.ts * 1000,
                       emojiData:
                         value.emoticon && value.emoticon.url
                           ? value.emoticon
@@ -91,7 +91,7 @@ export class DanmuHistoryGetter {
         data: {
           fontsize: 0,
           color: 0,
-          timestamp: new Date().getTime() / 1000,
+          timestamp: new Date().getTime(),
           emojiData: null,
 
           content: "弹幕历史记录获取失败" + (message ? " " + message : ""),

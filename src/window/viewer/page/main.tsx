@@ -320,7 +320,9 @@ export class Main extends React.Component<Props, MainState> {
         if (value.msg.cmd !== "DANMU_MSG") return false; // 是弹幕
         const dm = parseDanmuMsg(value.msg);
         if (dm.data.content !== danmuMsg.data.content) return false; // 相同内容
-        if (danmuMsg.data.timestamp - dm.data.timestamp > 120) return false; // 2分钟内
+        if (danmuMsg.data.timestamp - dm.data.timestamp > 120 * 1e3)
+          return false; // 2分钟内
+
         count += dm.data.count;
         return true;
       })
