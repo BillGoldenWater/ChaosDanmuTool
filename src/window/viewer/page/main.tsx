@@ -449,8 +449,6 @@ export class Main extends React.Component<Props, MainState> {
           <StatusBar
             state={s}
             style={{
-              backgroundColor: s.config.style.mainStyle.backgroundColor,
-              borderColor: s.config.style.mainStyle.backgroundColor,
               color: s.config.style.mainStyle.color,
             }}
           >
