@@ -79,7 +79,7 @@ export class StatusBarMessage extends React.Component<Props, State> {
 
       const targetScroll = totalWidth - latestWidth;
       const needScroll = targetScroll - this.scrollLeft;
-      this.scrollLeft += Math.min(needScroll / fps, targetScroll / fps);
+      this.scrollLeft += Math.min(needScroll / (fps / 4), targetScroll / fps);
 
       if (list.length > 20) {
         let cutWidth = 0;
