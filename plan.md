@@ -1,5 +1,10 @@
 ChaosDanmuTool
 
+- 修复刷新查看器悬浮窗时会打开主窗口的问题
+- 实现了看过人数, 管理员警告, 管理员切断的显示
+- 添加用于切换状态消息显示的开关
+- 添加弹幕查看器的鼠标穿透功能
+- 直播间自动重连
 - 设置界面布局转用 json 存储 动态构建
     - number string boolean custom etc.
     - custom: (value, setValue)=>{...}

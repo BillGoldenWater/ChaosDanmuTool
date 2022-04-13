@@ -1,4 +1,5 @@
 /*
+ * Copyright 2021-2022 Golden_Water
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
@@ -27,14 +28,11 @@ export class ConfigItem extends React.Component<Props> {
   render(): ReactNode {
     const p = this.props;
     let { get, set }: TConfigContext = {
-      get: null,
-      set: null,
+      get: p?.configContext?.get,
+      set: p?.configContext?.set,
       updateConfig: null,
     };
-    if (p.configContext) {
-      get = p.configContext.get;
-      set = p.configContext.set;
-    } else {
+    if (!p.configContext) {
       get = () => {
         return p.value;
       };
