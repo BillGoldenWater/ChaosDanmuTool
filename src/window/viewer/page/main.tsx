@@ -31,7 +31,7 @@ import {
   TInteractWord as TInteractWord,
 } from "../../../type/bilibili/TInteractWord";
 import { ConfigContext } from "../utils/ConfigContext";
-import { StatusBar } from "../../../component/statusbar/StatusBar";
+import { StatusBar } from "../component/statusbar/StatusBar";
 import { DanmuRender } from "./danmurender/DanmuRender";
 import { InteractWord } from "./danmurender/danmuitem/item/interactword/InteractWord";
 import { formatNumber } from "../../../utils/FormatConverters";

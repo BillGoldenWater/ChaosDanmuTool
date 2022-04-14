@@ -215,6 +215,20 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
               <ConfigItem
                 configContext={dvcContext}
                 type={"boolean"}
+                name={"显示状态消息"}
+                description={
+                  <div>
+                    在弹幕查看器底部显示状态消息
+                    <br />
+                    例:进入消息
+                  </div>
+                }
+                valueKey={"statusMessageDisplay"}
+              />
+
+              <ConfigItem
+                configContext={dvcContext}
+                type={"boolean"}
                 name={"置顶SC"}
                 description={<div>在SC持续时间内保持SC的显示</div>}
                 valueKey={"superChatAlwaysOnTop"}

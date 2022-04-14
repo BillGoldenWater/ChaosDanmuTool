@@ -6,7 +6,7 @@
 import React, { ReactNode, RefObject } from "react";
 import "./StatusBar.css";
 import { v4 as uuidv4 } from "uuid";
-import { MainState } from "../../window/viewer/page/main";
+import { MainState } from "../../page/main";
 
 class Props {
   state: MainState;

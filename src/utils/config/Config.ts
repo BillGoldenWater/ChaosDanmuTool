@@ -89,6 +89,7 @@ export type DanmuViewCustomConfig = {
   maxDanmuNumber: number;
   danmuMergeMinNum: number;
   statusBarDisplay: boolean;
+  statusMessageDisplay: boolean;
   superChatAlwaysOnTop: boolean;
   numberFormat: NumberFormatConfig;
   tts: TextToSpeechConfig;
@@ -127,6 +128,7 @@ const defaultDanmuViewCustom: DanmuViewCustomConfig = {
   maxDanmuNumber: 100,
   danmuMergeMinNum: 10,
   statusBarDisplay: true,
+  statusMessageDisplay: true,
   superChatAlwaysOnTop: true,
   numberFormat: {
     formatActivity: true,
