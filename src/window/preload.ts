@@ -5,11 +5,11 @@
 
 import { clipboard, contextBridge, ipcRenderer } from "electron";
 import { v4 as uuid4 } from "uuid";
-import { Config } from "../../utils/config/Config";
-import { MessageLog } from "../../command/messagelog/MessageLog";
-import { TGithubRelease } from "../../type/github/TGithubRelease";
-import { UpdateUtilsResult } from "../../type/TUpdateUtilsResult";
-import { TAnyMessage } from "../../type/TAnyMessage";
+import { Config } from "../utils/config/Config";
+import { MessageLog } from "../command/messagelog/MessageLog";
+import { TGithubRelease } from "../type/github/TGithubRelease";
+import { UpdateUtilsResult } from "../type/TUpdateUtilsResult";
+import { TAnyMessage } from "../type/TAnyMessage";
 
 export interface ApiElectron {
   getPlatform: () => string;
@@ -41,6 +41,7 @@ export interface ApiElectron {
 
   openViewer: () => void;
   closeViewer: () => void;
+  setViewerIgnoreMouseEvent: (ignore: boolean) => void;
 
   checkUpdate: () => Promise<UpdateUtilsResult<boolean>>;
   getLatestRelease: () => Promise<UpdateUtilsResult<TGithubRelease>>;
@@ -143,6 +144,9 @@ const apiElectron: ApiElectron = {
   },
   closeViewer: () => {
     ipcRenderer.sendSync("windowControl", "closeViewer");
+  },
+  setViewerIgnoreMouseEvent: (ignore: boolean) => {
+    ipcRenderer.sendSync("windowControl", "setViewerIgnoreMouseEvent", ignore);
   },
 
   checkUpdate: () => {

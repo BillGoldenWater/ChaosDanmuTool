@@ -6,7 +6,14 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { Main } from "./page/main";
+import { ApiElectron } from "../preload";
 
 console.log("Rendering");
+
+declare global {
+  interface Window {
+    electron: ApiElectron;
+  }
+}
 
 ReactDOM.render(<Main />, document.querySelector("#app"));

@@ -1,6 +1,5 @@
 ChaosDanmuTool
 
-- 添加弹幕查看器的鼠标穿透功能
 - 直播间自动重连
 - 设置界面布局转用 json 存储 动态构建
     - number string boolean custom etc.

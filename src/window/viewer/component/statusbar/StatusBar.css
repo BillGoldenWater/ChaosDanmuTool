@@ -54,6 +54,11 @@
   flex-wrap: nowrap;
   word-break: keep-all;
   white-space: nowrap;
+  overflow-y: scroll;
+}
+
+.statusBar_itemList::-webkit-scrollbar {
+  height: 0;
 }
 
 .statusBar_itemList > div {

@@ -35,7 +35,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import { Main } from "./page/main";
-import { ApiElectron } from "./preload";
+import { ApiElectron } from "../preload";
 import zhCN from "antd/lib/locale/zh_CN";
 import moment from "moment";
 import "moment/locale/zh-cn";

@@ -315,6 +315,9 @@ export async function createViewerWindow(): Promise<void> {
     frame: false,
     autoHideMenuBar: true,
     hasShadow: false,
+    webPreferences: {
+      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+    },
   });
 
   viewerWindow.setAlwaysOnTop(
@@ -584,6 +587,11 @@ function init(): void {
       case "closeViewer": {
         closeWindow(viewerWindow);
         break;
+      }
+      case "setViewerIgnoreMouseEvent": {
+        if (viewerWindow) {
+          viewerWindow.setIgnoreMouseEvents(args[1], { forward: true });
+        }
       }
     }
     event.returnValue = "";

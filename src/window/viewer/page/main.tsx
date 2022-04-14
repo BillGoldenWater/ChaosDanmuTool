@@ -50,6 +50,7 @@ import { TextToSpeech } from "../utils/TextToSpeech";
 import { MessageLog } from "../../../command/messagelog/MessageLog";
 import { TAnyMessage } from "../../../type/TAnyMessage";
 import { TWatchedChange } from "../../../type/bilibili/TWatchedChange";
+import { LockOutlined, UnlockOutlined } from "@ant-design/icons";
 
 class Props {}
 
@@ -65,6 +66,7 @@ export class MainState {
   fansNumber: number;
   giftConfig: TGiftConfig;
   selectable: boolean;
+  mouseIgnore: boolean;
 
   addMessageListener: (id: string, listener: StatusMessageListener) => void;
   removeMessageListener: (id: string) => void;
@@ -95,6 +97,7 @@ export class Main extends React.Component<Props, MainState> {
       fansNumber: -1,
       giftConfig: undefined,
       selectable: false,
+      mouseIgnore: false,
 
       addMessageListener: (id, listener) => {
         this.statusMessageListeners.set(id, listener);
@@ -462,10 +465,29 @@ export class Main extends React.Component<Props, MainState> {
               color: s.config.style.mainStyle.color,
             }}
           >
+            {window.electron ? (
+              <div
+                onMouseEnter={() => {
+                  window.electron.setViewerIgnoreMouseEvent(false);
+                }}
+                onMouseLeave={() => {
+                  window.electron.setViewerIgnoreMouseEvent(s.mouseIgnore);
+                }}
+                onClick={() => {
+                  this.setState((prevState) => ({
+                    mouseIgnore: !prevState.mouseIgnore,
+                  }));
+                }}
+              >
+                {s.mouseIgnore ? <LockOutlined /> : <UnlockOutlined />}
+              </div>
+            ) : (
+              ""
+            )}
             <div>
               {s.config.numberFormat.formatWatched
                 ? formatNumber(s.watched)
-                : `${s.watched} `}
+                : s.watched}{" "}
               人看过
             </div>
             <div>
