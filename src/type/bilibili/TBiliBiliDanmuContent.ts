@@ -7,6 +7,7 @@ export type TBiliBiliDanmuContent = {
   //region cmd
   cmd:
     | string
+    | "WATCHED_CHANGE"
     | "INTERACT_WORD"
     | "SEND_GIFT"
     | "ROOM_REAL_TIME_MESSAGE_UPDATE"
@@ -16,6 +17,8 @@ export type TBiliBiliDanmuContent = {
     | "LIVE"
     | "PREPARING"
     | "GUARD_BUY"
+    | "WARNING"
+    | "CUT_OFF"
     //ignore
     | "STOP_LIVE_ROOM_LIST"
     | "COMBO_SEND"
@@ -46,9 +49,8 @@ export type TBiliBiliDanmuContent = {
     | "ANCHOR_LOT_END"
     | "ANCHOR_LOT_START"
     | "HOT_RANK_CHANGED"
-    | "HOT_RANK_SETTLEMENT"
-    //planToDo
-    | "WATCHED_CHANGE";
+    | "HOT_RANK_SETTLEMENT";
+  //planToDo
   //endregion
   [key: string]: unknown;
 };

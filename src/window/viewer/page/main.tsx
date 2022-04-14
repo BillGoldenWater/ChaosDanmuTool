@@ -23,8 +23,8 @@ import {
   getActivityUpdateMessageCmd,
 } from "../../../command/ActivityUpdate";
 import {
-  TBiliBiliDanmuContent,
   DanmuMessageWithKey,
+  TBiliBiliDanmuContent,
 } from "../../../type/bilibili/TBiliBiliDanmuContent";
 import {
   InteractWordType,
@@ -49,6 +49,7 @@ import { parseDanmuMsg, TDanmuMsg } from "../../../type/bilibili/TDanmuMsg";
 import { TextToSpeech } from "../utils/TextToSpeech";
 import { MessageLog } from "../../../command/messagelog/MessageLog";
 import { TAnyMessage } from "../../../type/TAnyMessage";
+import { TWatchedChange } from "../../../type/bilibili/TWatchedChange";
 
 class Props {}
 
@@ -60,6 +61,7 @@ export class MainState {
   connectState: "open" | "close" | "error";
   connectAttemptNumber: number;
   activity: number;
+  watched: number;
   fansNumber: number;
   giftConfig: TGiftConfig;
   selectable: boolean;
@@ -88,8 +90,9 @@ export class Main extends React.Component<Props, MainState> {
       danmuList: [],
       connectState: "close",
       connectAttemptNumber: 0,
-      activity: 0,
-      fansNumber: 0,
+      activity: -1,
+      watched: -1,
+      fansNumber: -1,
       giftConfig: undefined,
       selectable: false,
 
@@ -239,6 +242,10 @@ export class Main extends React.Component<Props, MainState> {
       case getMessageCommandCmd(): {
         const msg: TBiliBiliDanmuContent = anyMsg.data;
         switch (msg.cmd) {
+          case "WATCHED_CHANGE": {
+            this.setState({ watched: (msg as TWatchedChange).data.num });
+            break;
+          }
           case "INTERACT_WORD": {
             this.processInteractWord(msg as TInteractWord);
             break;
@@ -263,7 +270,9 @@ export class Main extends React.Component<Props, MainState> {
           case "ROOM_BLOCK_MSG":
           case "LIVE":
           case "PREPARING":
-          case "GUARD_BUY": {
+          case "GUARD_BUY":
+          case "WARNING":
+          case "CUT_OFF": {
             this.addToList(msg);
             break;
           }
@@ -296,9 +305,7 @@ export class Main extends React.Component<Props, MainState> {
           case "ANCHOR_LOT_END":
           case "ANCHOR_LOT_START":
           case "HOT_RANK_CHANGED":
-          case "HOT_RANK_SETTLEMENT":
-          case "WATCHED_CHANGE": {
-            // planToDo
+          case "HOT_RANK_SETTLEMENT": {
             break;
           }
           default: {
@@ -456,13 +463,19 @@ export class Main extends React.Component<Props, MainState> {
             }}
           >
             <div>
-              人气:
+              {s.config.numberFormat.formatWatched
+                ? formatNumber(s.watched)
+                : `${s.watched} `}
+              人看过
+            </div>
+            <div>
+              人气:{" "}
               {s.config.numberFormat.formatActivity
                 ? formatNumber(s.activity)
                 : s.activity}
             </div>
             <div>
-              粉丝数:
+              粉丝数:{" "}
               {s.config.numberFormat.formatFansNum
                 ? formatNumber(s.fansNumber)
                 : s.fansNumber}

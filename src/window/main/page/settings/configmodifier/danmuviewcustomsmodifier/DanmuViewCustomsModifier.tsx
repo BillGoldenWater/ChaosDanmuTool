@@ -350,6 +350,13 @@ export class DanmuViewCustomsModifier extends React.Component<Props, State> {
                     valueKey={"numberFormat.formatFansNum"}
                     name={"格式化粉丝数"}
                   />
+
+                  <ConfigItem
+                    configContext={dvcContext}
+                    type={"boolean"}
+                    valueKey={"numberFormat.formatWatched"}
+                    name={"格式化看过人数"}
+                  />
                 </Collapse.Panel>
                 <Collapse.Panel key={"style"} header={"外观"}>
                   <Typography.Paragraph type={"secondary"}>

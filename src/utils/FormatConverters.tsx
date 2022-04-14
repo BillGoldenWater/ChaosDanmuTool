@@ -4,6 +4,8 @@
  */
 
 export function formatNumber(num: number): string {
+  if (isNaN(num)) return num.toString();
+
   if (num <= 999) {
     return num.toString();
   } else if (num <= 9999) {

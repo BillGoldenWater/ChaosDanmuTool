@@ -187,7 +187,7 @@ export const biliBiliDanmuTestData: unknown[] = [
       },
     },
     roomid: 123456789,
-  }, // SUPER_CHAT_MESSAGE
+  },
   {
     cmd: "SEND_GIFT",
     data: {
@@ -320,5 +320,15 @@ export const biliBiliDanmuTestData: unknown[] = [
       start_time: 1628333080,
       end_time: 1628333080,
     },
+  },
+  {
+    cmd: "WARNING",
+    msg: "违反直播分区规范，请立即更换至游戏区",
+    roomid: 123456789,
+  },
+  {
+    cmd: "CUT_OFF",
+    msg: "禁播游戏",
+    roomid: 123456789,
   },
 ];

@@ -34,6 +34,7 @@ export type DanmuViewConfig = {
 export type NumberFormatConfig = {
   formatActivity: boolean;
   formatFansNum: boolean;
+  formatWatched: boolean;
 };
 
 export type TextIconStyleConfig = {
@@ -130,6 +131,7 @@ const defaultDanmuViewCustom: DanmuViewCustomConfig = {
   numberFormat: {
     formatActivity: true,
     formatFansNum: true,
+    formatWatched: true,
   },
   tts: {
     enable: false,

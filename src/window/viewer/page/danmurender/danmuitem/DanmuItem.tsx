@@ -21,6 +21,10 @@ import { TSuperChatMessage } from "../../../../../type/bilibili/TSuperChatMessag
 import { TPreparing } from "../../../../../type/bilibili/TPreparing";
 import { TLive } from "../../../../../type/bilibili/TLive";
 import { TGuardBuy } from "../../../../../type/bilibili/TGuardBuy";
+import { Warning } from "./item/warning/Warning";
+import { TWarning } from "../../../../../type/bilibili/admin/TWarning";
+import { CutOff } from "./item/cutoff/CutOff";
+import { TCutOff } from "../../../../../type/bilibili/admin/TCutOff";
 
 class Props {
   message: TBiliBiliDanmuContent;
@@ -54,6 +58,12 @@ export class DanmuItem extends React.Component<Props> {
       }
       case "GUARD_BUY": {
         return <GuardBuy guardBuy={msg as TGuardBuy} />;
+      }
+      case "WARNING": {
+        return <Warning warning={msg as TWarning} />;
+      }
+      case "CUT_OFF": {
+        return <CutOff cutOff={msg as TCutOff} />;
       }
     }
     console.log("unknown: ");
