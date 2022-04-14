@@ -70,7 +70,7 @@ export function showWindow(
     }
     window.focus();
   } else {
-    createWindow();
+    createWindow ? createWindow() : "";
   }
 }
 
@@ -303,7 +303,7 @@ function createMainWindow(): void {
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY).then();
 }
 
-export function createViewerWindow(): void {
+export async function createViewerWindow(): Promise<void> {
   closeWindow(viewerWindow);
 
   viewerWindow = new BrowserWindow({
@@ -323,28 +323,21 @@ export function createViewerWindow(): void {
   );
 
   // http://127.0.0.1:25556/viewer/?port=25555&maxReconnectAttemptNum=5&name=internal
-  viewerWindow
-    .loadURL(
-      constructURL(
-        VIEWER_WEBPACK_ENTRY,
-        get("httpServerPort") as number,
-        get("danmuViewConfig.maxReconnectAttemptNumber") as number,
-        defaultViewCustomInternalUUID
-      )
+  await viewerWindow.loadURL(
+    constructURL(
+      VIEWER_WEBPACK_ENTRY,
+      get("httpServerPort") as number,
+      get("danmuViewConfig.maxReconnectAttemptNumber") as number,
+      defaultViewCustomInternalUUID
     )
-    .then()
-    .catch(() => {
-      return;
-    });
+  );
 
-  viewerWindow.on("ready-to-show", () => {
-    viewerWindow.setVisibleOnAllWorkspaces(true, {
-      skipTransformProcessType: false,
-      visibleOnFullScreen: true,
-    });
-    app.dock ? app.dock.show().then() : "";
-    showWindow(mainWindow, createMainWindow);
+  viewerWindow.setVisibleOnAllWorkspaces(true, {
+    skipTransformProcessType: false,
+    visibleOnFullScreen: true,
   });
+  app.dock ? app.dock.show().then() : "";
+  showWindow(mainWindow, null);
 
   viewerWindow.on("move", () => {
     const [x, y] = viewerWindow.getPosition();
@@ -358,11 +351,11 @@ export function createViewerWindow(): void {
     set("danmuViewConfig.height", height);
   });
 
-  viewerWindow.on("enter-full-screen", () => {
-    setTimeout(() => {
-      viewerWindow.setFullScreen(false);
-    }, 100);
-  });
+  // viewerWindow.on("enter-full-screen", () => {
+  //   setTimeout(() => {
+  //     viewerWindow.setFullScreen(false);
+  //   }, 100);
+  // });
 
   if (process.platform == "win32") {
     viewerWindow.on("will-move", (event, newBounds) => {
@@ -585,7 +578,7 @@ function init(): void {
   ipcMain.on("windowControl", (event, ...args) => {
     switch (args[0]) {
       case "openViewer": {
-        createViewerWindow();
+        createViewerWindow().then();
         break;
       }
       case "closeViewer": {
