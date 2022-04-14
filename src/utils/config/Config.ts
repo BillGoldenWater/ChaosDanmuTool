@@ -20,6 +20,7 @@ export type DanmuReceiverConfig = {
   serverUrl: string;
   roomid: number;
   heartBeatInterval: number;
+  autoReconnect: boolean;
 };
 
 export type DanmuViewConfig = {
@@ -240,6 +241,7 @@ const defaultConfig: Config = {
     serverUrl: "wss://broadcastlv.chat.bilibili.com/sub",
     roomid: 0,
     heartBeatInterval: 30,
+    autoReconnect: false,
   },
   danmuViewConfig: {
     autoOpenWhenConnect: true,

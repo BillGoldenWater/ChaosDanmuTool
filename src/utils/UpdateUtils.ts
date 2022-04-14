@@ -38,7 +38,7 @@ export class UpdateUtils {
     try {
       response = await getGithubApi(this.releaseUrl);
     } catch (e) {
-      printError(e);
+      printError("UpdateUtils.getReleasesInfo.getData", e);
       result.status = ResultStatus.Failed;
       result.message = "无法获取更新信息, 请检查网络连接或忽略";
       return result;
@@ -64,8 +64,8 @@ export class UpdateUtils {
           ).toLocaleString()}`
         );
       } catch (e) {
-        console.log(response);
-        printError(e);
+        printError("UpdateUtils.getReleasesInfo.parseData", e);
+        console.error(response);
         return onReleasesParseFailed();
       }
     }
@@ -85,7 +85,7 @@ export class UpdateUtils {
       result.result = await getString(this.changeLogUrl);
       result.status = ResultStatus.Success;
     } catch (e) {
-      printError(e);
+      printError("UpdateUtils.getChangeLog.getData", e);
       result.status = ResultStatus.Failed;
       result.message = "无法获取更新记录, 请检查网络连接或忽略";
     }

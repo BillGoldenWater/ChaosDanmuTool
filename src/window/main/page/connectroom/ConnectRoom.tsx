@@ -17,6 +17,7 @@ import { biliBiliDanmuTestData } from "../../../../data/BiliBiliDanmuTestData";
 import { getMessageCommand } from "../../../../command/MessageCommand";
 import { TBiliBiliDanmuContent } from "../../../../type/bilibili/TBiliBiliDanmuContent";
 import { getMessageLogMessage } from "../../../../command/messagelog/MessageLog";
+import { ConfigItem } from "../../../../component/configitem/ConfigItem";
 
 class Props {
   receiverStatus: ReceiverStatus;
@@ -93,6 +94,15 @@ export class ConnectRoom extends React.Component<Props> {
                   {icon}
                 </Space>
               </Form.Item>
+              <ConfigItem
+                type={"boolean"}
+                name={"自动重连"}
+                value={get("danmuReceiver.autoReconnect")}
+                setBoolean={(value) => {
+                  set("danmuReceiver.autoReconnect", value);
+                }}
+                description={"在异常断开直播间时自动重连, 延迟1秒, 最多尝试5次"}
+              />
             </div>
           );
         }}

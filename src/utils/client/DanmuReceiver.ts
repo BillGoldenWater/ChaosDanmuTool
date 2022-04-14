@@ -14,6 +14,7 @@ import { getErrorMessageMessage } from "../../command/messagelog/ErrorMessage";
 import { getMessageCommand } from "../../command/MessageCommand";
 import { ConfigManager } from "../config/ConfigManager";
 import { createViewerWindow, showWindow, viewerWindow } from "../../index";
+import { printError } from "../ErrorUtils";
 
 const get = ConfigManager.get.bind(ConfigManager);
 
@@ -111,6 +112,24 @@ export class DanmuReceiver {
   static heartBeatId: NodeJS.Timer;
   static heartBeatInterval: number;
   static textDecoder: TextDecoder;
+  static reconnectTimeout: NodeJS.Timeout;
+  static reconnectCount = 0;
+
+  static tryReconnect(
+    url: string,
+    roomid: number,
+    heartBeatInterval: number,
+    protocolVersion?: number,
+    platform?: string
+  ) {
+    if (get("danmuReceiver.autoReconnect") && this.reconnectCount <= 5) {
+      clearTimeout(this.reconnectTimeout);
+      this.reconnectTimeout = setTimeout(() => {
+        this.reconnectCount++;
+        this.connect(url, roomid, heartBeatInterval, protocolVersion, platform);
+      }, 1e3);
+    }
+  }
 
   static connect(
     url: string,
@@ -124,6 +143,8 @@ export class DanmuReceiver {
     this.connection = new WebSocket(url);
     this.connection.binaryType = "arraybuffer";
     this.textDecoder = new TextDecoder("utf-8");
+
+    CBS.broadcastMessage(getStatusUpdateMessage("connecting"));
 
     this.connection.on("open", () => {
       this.connection.send(
@@ -142,14 +163,25 @@ export class DanmuReceiver {
       if (get("danmuViewConfig.autoOpenWhenConnect")) {
         showWindow(viewerWindow, createViewerWindow);
       }
+
+      this.reconnectCount = 0;
     });
 
-    this.connection.on("close", () => {
+    this.connection.on("close", (code) => {
       CBS.broadcastMessage(getStatusUpdateMessage("close"));
+      if (code == 1006) {
+        this.tryReconnect(
+          url,
+          roomid,
+          heartBeatInterval,
+          protocolVersion,
+          platform
+        );
+      }
     });
 
     this.connection.on("error", (err) => {
-      console.log(err);
+      printError("DanmuReceiver.connection.onError", err);
       CBS.broadcastMessage(getStatusUpdateMessage("error"));
     });
 
@@ -197,8 +229,6 @@ export class DanmuReceiver {
         }
       });
     });
-
-    CBS.broadcastMessage(getStatusUpdateMessage("connecting"));
   }
 
   static startHeartBeat(): void {
@@ -215,7 +245,11 @@ export class DanmuReceiver {
   static close(): boolean {
     if (this.connection) {
       if (this.connection.readyState != WebSocket.CLOSED) {
-        this.connection.terminate();
+        if (this.connection.readyState == WebSocket.OPEN) {
+          this.connection.close(1000);
+        } else {
+          this.connection.terminate();
+        }
       }
     }
     this.heartBeatId ? this.stopHeartBeat() : "";

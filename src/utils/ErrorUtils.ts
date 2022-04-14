@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-export function printError(e: Error) {
-  console.log(`\n${e.name}\n${e.message}\n${e.stack}`);
+export function printError(location: string, e: Error) {
+  console.error(
+    `\n==========\n${location}\n${e.name}\n${e.message}\n${e.stack}\n==========\n`
+  );
 }
