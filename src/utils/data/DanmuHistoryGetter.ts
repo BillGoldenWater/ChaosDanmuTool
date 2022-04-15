@@ -4,7 +4,7 @@
  */
 
 import https from "https";
-import { TDanmuHistoryResponse } from "../../type/bilibili/danmuhistory/TDanmuHistoryResponse";
+import { TDanmuHistoryResponse } from "../../type/bilibili/request/danmuhistory/TDanmuHistoryResponse";
 import { TBiliBiliDanmuContent } from "../../type/bilibili/TBiliBiliDanmuContent";
 import { TDanmuMsg } from "../../type/bilibili/TDanmuMsg";
 import { parseMedalInfo } from "../../type/bilibili/userinfo/TMedalInfo";

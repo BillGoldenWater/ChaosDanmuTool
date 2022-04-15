@@ -66,7 +66,7 @@ export class ConnectRoom extends React.Component<Props> {
                   />
                   <Button
                     type={"primary"}
-                    onClick={() => {
+                    onClick={async () => {
                       if (open || connecting) {
                         window.electron.disconnect();
                       } else {
@@ -85,7 +85,9 @@ export class ConnectRoom extends React.Component<Props> {
                           });
                           return;
                         }
-                        window.electron.connect(roomid);
+                        
+                        const id = await window.electron.getRoomid(roomid);
+                        window.electron.connect(id);
                       }
                     }}
                   >

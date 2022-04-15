@@ -40,7 +40,7 @@ import {
   parseGiftConfig,
   TGiftConfig,
   TGiftConfigResponse,
-} from "../../../type/bilibili/giftconfig/TGiftConfig";
+} from "../../../type/bilibili/request/giftconfig/TGiftConfig";
 import { getGiftConfigUpdateCmd } from "../../../command/GiftConfigUpdate";
 import { TSendGift } from "../../../type/bilibili/TSendGift";
 import { getStatusUpdateMessageCmd } from "../../../command/ReceiverStatusUpdate";

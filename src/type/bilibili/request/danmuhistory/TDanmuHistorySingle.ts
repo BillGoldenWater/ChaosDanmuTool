@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { TMedal } from "../userinfo/TMedal";
-import { TUserLevel } from "../userinfo/TUserLevel";
-import { TEmojiData } from "../TEmojiData";
+import { TMedal } from "../../userinfo/TMedal";
+import { TUserLevel } from "../../userinfo/TUserLevel";
+import { TEmojiData } from "../../TEmojiData";
 
 export type TDanmuHistorySingle = {
   text: string;

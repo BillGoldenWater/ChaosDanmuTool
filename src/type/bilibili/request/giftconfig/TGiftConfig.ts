@@ -4,6 +4,7 @@
  */
 
 import { TGiftInfo } from "./TGiftInfo";
+import { TBiliBiliResponse } from "../TBiliBiliResponse";
 
 export type TGiftConfig = {
   data: Map<number, TGiftInfo>;
@@ -26,13 +27,8 @@ export function parseGiftConfig(
   return giftConfig;
 }
 
-export type TGiftConfigResponse = {
-  code: number;
-  message: string;
-  ttl: number;
-  data: {
-    list: TGiftInfo[];
-    combo_resources: [];
-    guard_resources: [];
-  };
-};
+export type TGiftConfigResponse = TBiliBiliResponse<{
+  list: TGiftInfo[];
+  combo_resources: [];
+  guard_resources: [];
+}>;

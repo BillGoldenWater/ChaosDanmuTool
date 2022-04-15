@@ -9,8 +9,8 @@ import { TSendGift } from "../../../../../../../type/bilibili/TSendGift";
 import { UserInfo } from "../../../../../../../component/bilibili/userinfo/UserInfo";
 import { emptyUserInfo } from "../../../../../../../type/bilibili/userinfo/TUserInfo";
 import { ConfigContext } from "../../../../../utils/ConfigContext";
-import { TGiftConfig } from "../../../../../../../type/bilibili/giftconfig/TGiftConfig";
-import { TGiftInfo } from "../../../../../../../type/bilibili/giftconfig/TGiftInfo";
+import { TGiftConfig } from "../../../../../../../type/bilibili/request/giftconfig/TGiftConfig";
+import { TGiftInfo } from "../../../../../../../type/bilibili/request/giftconfig/TGiftInfo";
 import { GiftContent } from "../../../../../../../component/bilibili/giftcontent/GiftContent";
 
 class Props {

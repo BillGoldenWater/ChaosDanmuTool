@@ -9,7 +9,7 @@ import {
   getDefaultDanmuViewCustomConfig,
 } from "../../../utils/config/Config";
 import { MainState } from "../page/main";
-import { TGiftConfig } from "../../../type/bilibili/giftconfig/TGiftConfig";
+import { TGiftConfig } from "../../../type/bilibili/request/giftconfig/TGiftConfig";
 
 export type TConfigContext = {
   config: DanmuViewCustomConfig;

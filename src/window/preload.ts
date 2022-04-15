@@ -47,6 +47,8 @@ export interface ApiElectron {
   getLatestRelease: () => Promise<UpdateUtilsResult<TGithubRelease>>;
   getChangeLog: () => Promise<UpdateUtilsResult<string>>;
 
+  getRoomid: (roomid: number) => Promise<number>;
+
   writeClipboard: (str: string) => void;
 }
 
@@ -162,6 +164,12 @@ const apiElectron: ApiElectron = {
   getChangeLog: () => {
     return new Promise((resolve) => {
       ipcRenderer.send("update", "getChangeLog", putCallback(resolve));
+    });
+  },
+
+  getRoomid: (roomid: number) => {
+    return new Promise((resolve) => {
+      ipcRenderer.send("utils", "getRoomid", putCallback(resolve), roomid);
     });
   },
 
