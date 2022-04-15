@@ -85,7 +85,7 @@ export class ConnectRoom extends React.Component<Props> {
                           });
                           return;
                         }
-                        
+
                         const id = await window.electron.getRoomid(roomid);
                         window.electron.connect(id);
                       }

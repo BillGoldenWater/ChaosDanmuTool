@@ -13,7 +13,7 @@ import { getJoinResponseMessage } from "../../command/JoinResponse";
 import { getErrorMessageMessage } from "../../command/messagelog/ErrorMessage";
 import { getMessageCommand } from "../../command/MessageCommand";
 import { ConfigManager } from "../config/ConfigManager";
-import { createViewerWindow, showWindow, viewerWindow } from "../../index";
+import { createViewerWindow, isExists, viewerWindow } from "../../index";
 import { printError } from "../ErrorUtils";
 
 const get = ConfigManager.get.bind(ConfigManager);
@@ -160,8 +160,11 @@ export class DanmuReceiver {
 
       CBS.broadcastMessage(getStatusUpdateMessage("open"));
 
-      if (get("danmuViewConfig.autoOpenWhenConnect")) {
-        showWindow(viewerWindow, createViewerWindow);
+      if (
+        get("danmuViewConfig.autoOpenWhenConnect") &&
+        !isExists(viewerWindow)
+      ) {
+        createViewerWindow().then();
       }
 
       this.reconnectCount = 0;
