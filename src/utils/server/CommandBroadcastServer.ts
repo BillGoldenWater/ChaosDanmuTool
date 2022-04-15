@@ -18,6 +18,9 @@ import { ErrorMessage } from "../../command/messagelog/ErrorMessage";
 import { dialog } from "electron";
 import { TAnyMessage } from "../../type/TAnyMessage";
 import { CommandHistoryManager } from "../history/CommandHistoryManager";
+import { MasterInfoGetter } from "../data/MasterInfoGetter";
+import { RoomInitGetter } from "../data/RoomInitGetter";
+import { TRoomRealTimeMessageUpdate } from "../../type/bilibili/TRoomRealTimeMessageUpdate";
 
 const get = ConfigManager.get.bind(ConfigManager);
 const getConfig = ConfigManager.getConfig.bind(ConfigManager);
@@ -28,7 +31,7 @@ export class CommandBroadcastServer {
   static run(server: HttpServer): void {
     this.close();
     this.server = new WebSocketServer({ server });
-    this.server.on("connection", (socket) => {
+    this.server.on("connection", async (socket) => {
       this.sendMessage(socket, getConfigUpdateMessage(getConfig()));
       this.sendMessage(
         socket,
@@ -44,16 +47,29 @@ export class CommandBroadcastServer {
             : "error"
         )
       );
-      if (get("danmuReceiver.roomid") != null) {
-        new DanmuHistoryGetter().get(
-          get("danmuReceiver.roomid") as number,
-          (history) => {
-            history.forEach((value) => {
-              this.sendMessage(socket, getMessageCommand(value));
-            });
-          }
-        );
-      }
+
+      const roomid = get("danmuReceiver.roomid");
+      if (roomid == null) return;
+      const id = await RoomInitGetter.getId(roomid);
+      const uid = await RoomInitGetter.getUid(roomid);
+      const fansNum = await MasterInfoGetter.getFansNum(uid);
+
+      const roomRealTimeMessageUpdate: TRoomRealTimeMessageUpdate = {
+        cmd: "ROOM_REAL_TIME_MESSAGE_UPDATE",
+        data: {
+          roomid: id,
+          fans: fansNum,
+          red_notice: 0,
+          fans_club: -1,
+        },
+      };
+      this.sendMessage(socket, getMessageCommand(roomRealTimeMessageUpdate));
+
+      new DanmuHistoryGetter().get(id, (history) => {
+        history.forEach((value) => {
+          this.sendMessage(socket, getMessageCommand(value));
+        });
+      });
     });
   }
 
