@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import {getString as httpGet} from "../HttpUtils";
-import {TRoomInitResponse} from "../../type/bilibili/request/TRoomInitResponse";
+import { getString as httpGet } from "../HttpUtils";
+import { TRoomInitResponse } from "../../type/bilibili/request/TRoomInitResponse";
 
 export class RoomInitGetter {
   static async get(roomid: number): Promise<TRoomInitResponse> {
