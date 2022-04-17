@@ -10,6 +10,7 @@ import { dialog } from "electron";
 import { CommandBroadcastServer } from "../server/CommandBroadcastServer";
 import { getConfigUpdateMessage } from "../../command/ConfigUpdate";
 import { getProperty, setProperty } from "dot-prop";
+import { ObjectPath } from "../../type/TObjectPath";
 
 export class ConfigManager {
   private static config: Config;
@@ -110,11 +111,11 @@ export class ConfigManager {
     return this.inited && this.loaded;
   }
 
-  static get(key: string, defaultValue?: unknown): unknown {
+  static get(key: ObjectPath<Config>, defaultValue?: unknown): unknown {
     return getProperty(this.config, key, defaultValue);
   }
 
-  static set(key: string, value: unknown): void {
+  static set(key: ObjectPath<Config>, value: unknown): void {
     setProperty(this.config, key, value);
     this.onChange();
   }
