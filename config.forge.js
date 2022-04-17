@@ -19,16 +19,16 @@ module.exports = {
           config: "./webpack.renderer.config.js",
           entryPoints: [
             {
-              html: "./src/window/main/index.html",
-              js: "./src/window/main/renderer.tsx",
+              html: "./src/renderer/main/index.html",
+              js: "./src/renderer/main/index.tsx",
               name: "main_window",
               preload: {
-                js: "./src/window/preload.ts",
+                js: "./src/renderer/preload.ts",
               },
             },
             {
-              html: "./src/window/viewer/index.html",
-              js: "./src/window/viewer/renderer.tsx",
+              html: "./src/renderer/viewer/index.html",
+              js: "./src/renderer/viewer/index.tsx",
               name: "viewer",
             },
           ],
