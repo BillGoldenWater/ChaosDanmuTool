@@ -38,18 +38,15 @@ export class UpdateInfo extends React.Component<Props, State> {
     const s = this.state;
 
     const platform = window.electron.getPlatform();
-    const arch = window.electron.isUnderARM64Translation
+    const arch = window.electron.isUnderARM64Translation()
       ? "arm"
       : window.electron.getArch();
-    let dlLink = p.githubRelease.assets.find(
-      (value) => value.name.includes(platform) && value.name.includes(arch)
-    )?.browser_download_url;
+    const dlLink =
+      p.githubRelease.assets.find(
+        (value) => value.name.includes(platform) && value.name.includes(arch)
+      )?.browser_download_url ?? "";
 
-    let downloadAvailable = true;
-    if (!dlLink) {
-      dlLink = "";
-      downloadAvailable = false;
-    }
+    const downloadAvailable = dlLink !== "";
 
     return (
       <ConfigContext.Consumer>
