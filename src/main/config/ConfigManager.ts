@@ -3,7 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Config, getDefaultConfig, getDiffConfig } from "./Config";
+import {
+  Config,
+  getDefaultConfig,
+  getDiffConfig,
+} from "../../share/config/Config";
 import * as fs from "fs";
 import { dialog } from "electron";
 import { getProperty, setProperty } from "dot-prop";

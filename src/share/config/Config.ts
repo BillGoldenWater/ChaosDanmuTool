@@ -5,7 +5,12 @@
 
 import { CSSProperties } from "react";
 import { cloneDeep, defaultsDeep } from "lodash-es";
-import { arrayTag, getArrayDiff, getDiff, getTag } from "../utils/ObjectUtils";
+import {
+  arrayTag,
+  getArrayDiff,
+  getDiff,
+  getTag,
+} from "../../main/utils/ObjectUtils";
 import { v4 as uuidv4 } from "uuid";
 
 export type HistoryConfig = {
