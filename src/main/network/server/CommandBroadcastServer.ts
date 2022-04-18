@@ -5,7 +5,7 @@
 
 import WebSocket, { WebSocketServer } from "ws";
 import { Server as HttpServer } from "http";
-import { ConfigManager } from "../../config/ConfigManager";
+import { ConfigManager as Config } from "../../config/ConfigManager";
 import { getConfigUpdateCommand } from "../../../share/type/commandPack/appCommand/command/TConfigUpdate";
 import { GiftConfigGetter } from "../apiRequest/GiftConfigGetter";
 import { getGiftConfigUpdateCommand } from "../../../share/type/commandPack/appCommand/command/TGiftConfigUpdate";
@@ -23,14 +23,11 @@ import { CommandHistoryManager } from "../../utils/commandPack/CommandHistoryMan
 import { getReceiverStatusUpdateCommand } from "../../../share/type/commandPack/appCommand/command/TReceiverStatusUpdate";
 import { DanmuReceiver } from "../client/danmuReceiver/DanmuReceiver";
 
-const get = ConfigManager.get.bind(ConfigManager);
-const getConfig = ConfigManager.getConfig.bind(ConfigManager);
-
 export class CommandBroadcastServer {
   static server: WebSocketServer;
 
   static async onConnection(socket: WebSocket) {
-    this.sendAppCommand(socket, getConfigUpdateCommand(getConfig()));
+    this.sendAppCommand(socket, getConfigUpdateCommand(Config.getConfig()));
     this.sendAppCommand(
       socket,
       getGiftConfigUpdateCommand(await GiftConfigGetter.get())
@@ -40,7 +37,7 @@ export class CommandBroadcastServer {
       getReceiverStatusUpdateCommand(DanmuReceiver.status)
     );
 
-    const roomid = get("danmuReceiver.roomid") ?? 0;
+    const roomid = <number>Config.get("danmuReceiver.roomid") ?? 0;
     const id = await RoomInitGetter.getId(roomid);
     const uid = await RoomInitGetter.getUid(roomid);
     const fansNum = await MasterInfoGetter.getFansNum(uid);

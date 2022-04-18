@@ -6,7 +6,7 @@
 import WebSocket from "ws";
 import Zlib from "zlib";
 import { CommandBroadcastServer as CBS } from "../../server/CommandBroadcastServer";
-import { ConfigManager } from "../../../config/ConfigManager";
+import { ConfigManager as Config } from "../../../config/ConfigManager";
 import {
   getReceiverStatusUpdateCommand,
   TReceiverStatus,
@@ -24,8 +24,6 @@ import { DataType } from "./DDataType";
 import { OpCode } from "./DOpCode";
 import { Packet } from "./Packet";
 import { decodeString } from "../../../utils/StringUtils";
-
-const get = ConfigManager.get.bind(ConfigManager);
 
 function alertPacketParseError(message: string, data: Packet): void {
   dialog.showErrorBox("错误", message);
@@ -51,7 +49,7 @@ export class DanmuReceiver {
     protocolVersion?: number,
     platform?: string
   ) {
-    if (get("danmuReceiver.autoReconnect") && this.reconnectCount <= 5) {
+    if (Config.get("danmuReceiver.autoReconnect") && this.reconnectCount <= 5) {
       clearTimeout(this.reconnectTimeout);
       this.reconnectTimeout = setTimeout(() => {
         this.reconnectCount++;
@@ -95,7 +93,7 @@ export class DanmuReceiver {
       this.broadcastStatusUpdate("open");
 
       if (
-        get("danmuViewConfig.autoOpenWhenConnect") &&
+        Config.get("danmuViewConfig.autoOpenWhenConnect") &&
         !isExists(viewerWindow)
       ) {
         createViewerWindow().then();
