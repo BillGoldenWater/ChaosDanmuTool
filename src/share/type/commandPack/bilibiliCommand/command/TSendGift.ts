@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { TMedalInfo } from "../../../bilibili/userinfo/TMedalInfo";
+
 export type TSendGift = {
   cmd: "SEND_GIFT";
   data: {
@@ -34,7 +36,7 @@ export type TSendGift = {
     is_first: true;
     is_special_batch: number;
     magnification: number;
-    medal_info: unknown; // TODO
+    medal_info: TMedalInfo;
     name_color: string;
     num: number;
     original_gift_name: string;

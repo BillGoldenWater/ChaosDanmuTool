@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { TMedalInfo } from "../../../bilibili/userinfo/TMedalInfo";
+import { TUserInfo } from "../../../bilibili/userinfo/TUserInfo";
+
 export type TSuperChatMessage = {
   cmd: "SUPER_CHAT_MESSAGE";
   data: {
@@ -24,7 +27,7 @@ export type TSuperChatMessage = {
     id: number;
     is_ranked: number;
     is_send_audit: string;
-    medal_info: unknown; // TODO
+    medal_info: TMedalInfo;
     message: string;
     message_font_color: string;
     message_trans: string;
@@ -36,7 +39,7 @@ export type TSuperChatMessage = {
     trans_mark: number;
     ts: number;
     uid: number;
-    user_info: unknown; // TODO
+    user_info: TUserInfo;
   };
   roomid: string;
 };

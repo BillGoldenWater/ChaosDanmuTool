@@ -3,13 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { TGiftConfigResponse } from "../../../bilibili/request/giftconfig/TGiftConfig";
+
 export type TGiftConfigUpdate = {
   cmd: "giftConfigUpdate";
-  data: unknown; // TODO
+  data: TGiftConfigResponse;
 };
 
 export function getGiftConfigUpdateCommand(
-  data: unknown /*TODO*/
+  data: TGiftConfigResponse
 ): TGiftConfigUpdate {
   return {
     cmd: "giftConfigUpdate",

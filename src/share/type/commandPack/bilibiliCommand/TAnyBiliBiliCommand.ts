@@ -18,7 +18,7 @@ import { TRoomRealTimeMessageUpdate } from "./command/TRoomRealTimeMessageUpdate
 import { TSendGift } from "./command/TSendGift";
 import { TWatchedChange } from "./command/TWatchedChange";
 
-export type TAnyBiliBiliCommand =  // TODO
+export type TAnyBiliBiliCommand =
   | TActivityUpdate
   | TCutOff
   | TDanmuMsg

@@ -3,15 +3,29 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { TDanmuMsg } from "./TDanmuMsg";
+import {TDanmuMsg} from "./TDanmuMsg";
+import {TEmojiData} from "../../../bilibili/TEmojiData";
+import {TRawUserLevel} from "../../../bilibili/userinfo/TRawUserLevel";
+import {getUserUL} from "../../../bilibili/userinfo/TUserLevel";
+import {TRawMedal} from "../../../bilibili/userinfo/TRawMedal";
+import {
+  parseRawMedal,
+  TMedalInfo,
+} from "../../../bilibili/userinfo/TMedalInfo";
+
+export type TDanmuType = 0 | 1
 
 export type TParsedDanmuMsg = {
   cmd: "parsedDanmuMsg";
 
   fontsize: number;
   color: number;
+  /**
+   * ms
+   * */
   timestamp: number;
-  emojiData: unknown; // TODO
+  danmu_type: TDanmuType;
+  emojiData: TEmojiData;
 
   content: string;
 
@@ -21,7 +35,7 @@ export type TParsedDanmuMsg = {
   isVip: number;
   isSVip: number;
 
-  medalInfo: unknown; // TODO
+  medalInfo: TMedalInfo;
 
   userUL: number;
 
@@ -32,8 +46,13 @@ export type TParsedDanmuMsg = {
   count: number;
 };
 
+export enum danmuType {
+  normal = 0,
+  emoji = 1,
+}
+
 export function parseDanmuMsg(danmuMsg: TDanmuMsg): TParsedDanmuMsg {
-  const result: TParsedDanmuMsg = <TParsedDanmuMsg>{ cmd: "parsedDanmuMsg" };
+  const result: TParsedDanmuMsg = <TParsedDanmuMsg>{cmd: "parsedDanmuMsg"};
   const danmuMsgRaw: unknown[] = danmuMsg.info;
 
   const danmuMeta: unknown[] = <unknown[]>danmuMsgRaw[0];
@@ -41,7 +60,8 @@ export function parseDanmuMsg(danmuMsg: TDanmuMsg): TParsedDanmuMsg {
     result.fontsize = <number>danmuMeta[2];
     result.color = <number>danmuMeta[3];
     result.timestamp = <number>danmuMeta[4];
-    // result.emojiData = <TEmojiData>danmuMeta[13]; // TODO
+    result.danmu_type = <TDanmuType>danmuMeta[12];
+    result.emojiData = <TEmojiData>danmuMeta[13];
   }
 
   result.content = <string>danmuMsgRaw[1];
@@ -55,13 +75,11 @@ export function parseDanmuMsg(danmuMsg: TDanmuMsg): TParsedDanmuMsg {
     result.isSVip = <number>userData[4];
   }
 
-  // TODO medalInfo
-  // const medalInfo: TMedal = <TMedal>danmuMsgRaw[3];
-  // result.medalInfo = parseMedalInfo(medalInfo);
+  const medalInfo: TRawMedal = <TRawMedal>danmuMsgRaw[3];
+  result.medalInfo = parseRawMedal(medalInfo);
 
-  // TODO levelInfo
-  // const levelInfo: TUserLevel = <TUserLevel>danmuMsgRaw[4];
-  // result.userUL = getUserUL(levelInfo);
+  const levelInfo: TRawUserLevel = <TRawUserLevel>danmuMsgRaw[4];
+  result.userUL = getUserUL(levelInfo);
 
   const titleInfo: unknown[] = <unknown[]>danmuMsgRaw[5];
   if (titleInfo && titleInfo.length > 0) {
@@ -77,13 +95,14 @@ export function parseDanmuMsg(danmuMsg: TDanmuMsg): TParsedDanmuMsg {
 export function getParsedDanmuMsgCommand(
   content: string,
   timestamp = new Date().getTime(),
-  emojiData: unknown = null, // TODO
+  emojiData: TEmojiData = null,
   uid = 1,
   uName = "[CDT]",
   isAdmin = 0,
   isVip = 0,
   isSVip = 0,
-  medalInfo: unknown = null,
+  danmu_type: TDanmuType = emojiData ? 1 : 0,
+  medalInfo: TMedalInfo = null,
   userUL = 0,
   userTitle = "",
   userTitle1 = "",
@@ -95,6 +114,7 @@ export function getParsedDanmuMsgCommand(
     fontsize: 0,
     color: 0,
     timestamp: timestamp,
+    danmu_type: danmu_type,
     emojiData: emojiData,
 
     content: content,

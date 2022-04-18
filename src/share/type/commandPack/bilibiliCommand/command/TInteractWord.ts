@@ -3,12 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { TFansMedal } from "../../../bilibili/userinfo/TFansMedal";
+
 export type TInteractWord = {
   cmd: "INTERACT_WORD";
   data: {
     contribution: unknown;
     dmscore: number;
-    fans_medal: unknown; // TODO
+    fans_medal: TFansMedal;
     identities: unknown;
     is_spread: number;
     msg_type: number;

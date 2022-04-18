@@ -11,7 +11,7 @@ import {
 import * as fs from "fs";
 import { dialog } from "electron";
 import { getProperty, setProperty } from "dot-prop";
-import { ObjectPath } from "../type/TObjectPath";
+import { ObjectPath } from "../../share/type/TObjectPath";
 
 export class ConfigManager {
   private static config: Config;
