@@ -7,6 +7,8 @@ import { clipboard, contextBridge, ipcRenderer } from "electron";
 import { v4 as uuid4 } from "uuid";
 import { Config } from "../share/config/Config";
 import { TCommandPack } from "../share/type/commandPack/TCommandPack";
+import { Result } from "../share/type/TResult";
+import { TGithubRelease } from "../main/type/request/github/TGithubRelease";
 
 export interface ApiElectron {
   getPlatform: () => string;
@@ -40,9 +42,9 @@ export interface ApiElectron {
   closeViewer: () => void;
   setViewerIgnoreMouseEvent: (ignore: boolean) => void;
 
-  // checkUpdate: () => Promise<UpdateUtilsResult<boolean>>; TODO
-  // getLatestRelease: () => Promise<UpdateUtilsResult<TGithubRelease>>; TODO
-  // getChangeLog: () => Promise<UpdateUtilsResult<string>>; TODO
+  checkUpdate: () => Promise<Result<boolean>>;
+  getLatestRelease: () => Promise<Result<TGithubRelease>>;
+  getChangeLog: () => Promise<Result<string>>;
 
   getRoomid: (roomid: number) => Promise<number>;
 
@@ -148,21 +150,21 @@ const apiElectron: ApiElectron = {
     ipcRenderer.sendSync("windowControl", "setViewerIgnoreMouseEvent", ignore);
   },
 
-  // checkUpdate: () => {
-  //   return new Promise((resolve) => {
-  //     ipcRenderer.send("update", "checkUpdate", putCallback(resolve));
-  //   });
-  // },
-  // getLatestRelease: () => {
-  //   return new Promise((resolve) => {
-  //     ipcRenderer.send("update", "getLatestRelease", putCallback(resolve));
-  //   });
-  // },
-  // getChangeLog: () => {
-  //   return new Promise((resolve) => {
-  //     ipcRenderer.send("update", "getChangeLog", putCallback(resolve));
-  //   });
-  // },
+  checkUpdate: () => {
+    return new Promise((resolve) => {
+      ipcRenderer.send("update", "checkUpdate", putCallback(resolve));
+    });
+  },
+  getLatestRelease: () => {
+    return new Promise((resolve) => {
+      ipcRenderer.send("update", "getLatestRelease", putCallback(resolve));
+    });
+  },
+  getChangeLog: () => {
+    return new Promise((resolve) => {
+      ipcRenderer.send("update", "getChangeLog", putCallback(resolve));
+    });
+  },
 
   getRoomid: (roomid: number) => {
     return new Promise((resolve) => {
