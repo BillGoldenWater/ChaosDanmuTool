@@ -7,3 +7,7 @@ export type TAppCommand<T> = {
   cmd: "appCommand";
   data: T;
 };
+
+export function getAppCommand<T>(data: T): TAppCommand<T> {
+  return { cmd: "appCommand", data: data };
+}

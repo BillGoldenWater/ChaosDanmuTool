@@ -6,6 +6,7 @@
 import { clipboard, contextBridge, ipcRenderer } from "electron";
 import { v4 as uuid4 } from "uuid";
 import { Config } from "../share/config/Config";
+import { TCommandPack } from "../share/type/commandPack/TCommandPack";
 
 export interface ApiElectron {
   getPlatform: () => string;
@@ -23,7 +24,7 @@ export interface ApiElectron {
   updateConfig: (config: Config) => void;
 
   newCommandHistoryFile: () => void;
-  // getCommandHistory: (fileName?: string) => Promise<MessageLog<TAnyMessage>[]>; TODO
+  getCommandHistory: (fileName?: string) => Promise<TCommandPack[]>;
   getCommandHistoryFiles: () => string[];
   deleteCommandHistoryFile: (fileName: string) => void;
   showCommandHistoryFolder: (fileName: string) => void;
@@ -100,16 +101,16 @@ const apiElectron: ApiElectron = {
   newCommandHistoryFile: () => {
     ipcRenderer.sendSync("commandHistory", "new");
   },
-  // getCommandHistory: (fileName?: string) => {
-  //   return new Promise((resolve) => {
-  //     ipcRenderer.send(
-  //       "commandHistory",
-  //       "getHistory",
-  //       putCallback(resolve),
-  //       fileName
-  //     );
-  //   });
-  // },
+  getCommandHistory: (fileName?: string) => {
+    return new Promise((resolve) => {
+      ipcRenderer.send(
+        "commandHistory",
+        "getHistory",
+        putCallback(resolve),
+        fileName
+      );
+    });
+  },
   getCommandHistoryFiles: () => {
     return ipcRenderer.sendSync("commandHistory", "getFiles");
   },

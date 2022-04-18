@@ -7,3 +7,7 @@ export type TBiliBiliCommand<T> = {
   cmd: "bilibiliCommand";
   data: T;
 };
+
+export function getBiliBiliCommand<T>(data: T): TBiliBiliCommand<T> {
+  return { cmd: "bilibiliCommand", data: data };
+}
