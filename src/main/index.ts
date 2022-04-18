@@ -457,9 +457,8 @@ if (isDev || app.releaseSingleInstanceLock()) {
     if (ConfigManager.isSafeToSave() && get("autoSaveOnQuit")) {
       ConfigManager.save();
     }
-    // TODO: close servers
-    // CommandBroadcastServer.close();
-    // KoaServer.close();
+    CommandBroadcastServer.close();
+    WebServer.close();
   });
 } else {
   app.quit();
