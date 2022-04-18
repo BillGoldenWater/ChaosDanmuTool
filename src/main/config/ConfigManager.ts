@@ -12,6 +12,8 @@ import * as fs from "fs";
 import { dialog } from "electron";
 import { getProperty, setProperty } from "dot-prop";
 import { ObjectPath } from "../../share/type/TObjectPath";
+import { CommandBroadcastServer } from "../network/server/CommandBroadcastServer";
+import { getConfigUpdateCommand } from "../../share/type/commandPack/appCommand/command/TConfigUpdate";
 
 export class ConfigManager {
   private static config: Config;
@@ -131,10 +133,9 @@ export class ConfigManager {
   }
 
   static onChange(): void {
-    // TODO: CommandBroadcastServer
-    // CommandBroadcastServer.broadcastMessage(
-    //   getConfigUpdateMessage(this.config)
-    // );
+    CommandBroadcastServer.broadcastAppCommand(
+      getConfigUpdateCommand(this.config)
+    );
     this.get("autoSaveOnChange") ? this.save() : "";
   }
 }

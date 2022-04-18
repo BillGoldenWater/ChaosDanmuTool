@@ -99,9 +99,17 @@ export class CommandBroadcastServer {
     }
   }
 
-  static broadcastMessage(message: TAnyCommandType): void {
-    const commandPack = getCommandPack(message);
-    CommandBroadcastServer.broadcast(JSON.stringify(commandPack));
+  static broadcastAppCommand(command: TAnyAppCommand): void {
+    this.broadcastCommand(getAppCommand(command));
+  }
+
+  static broadcastBiliBiliCommand(command: TAnyBiliBiliCommand): void {
+    this.broadcastCommand(getBiliBiliCommand(command));
+  }
+
+  static broadcastCommand(command: TAnyCommandType): void {
+    const commandPack = getCommandPack(command);
+    this.broadcast(JSON.stringify(commandPack));
     CommandHistoryManager.writeCommand(commandPack);
   }
 
