@@ -5,7 +5,6 @@
 
 import WebSocket, { WebSocketServer } from "ws";
 import { Server as HttpServer } from "http";
-import { dialog } from "electron";
 import { ConfigManager } from "../../config/ConfigManager";
 import { getConfigUpdateCommand } from "../../../share/type/commandPack/appCommand/command/TConfigUpdate";
 import { GiftConfigGetter } from "../apiRequest/GiftConfigGetter";
@@ -21,7 +20,8 @@ import { getAppCommand } from "../../../share/type/commandPack/appCommand/TAppCo
 import { TAnyBiliBiliCommand } from "../../../share/type/commandPack/bilibiliCommand/TAnyBiliBiliCommand";
 import { TAnyAppCommand } from "../../../share/type/commandPack/appCommand/TAnyAppCommand";
 import { CommandHistoryManager } from "../../utils/commandPack/CommandHistoryManager";
-import { TBiliBiliPackParseError } from "../../../share/type/commandPack/appCommand/command/TBiliBiliPackParseError";
+import { getReceiverStatusUpdateCommand } from "../../../share/type/commandPack/appCommand/command/TReceiverStatusUpdate";
+import { DanmuReceiver } from "../client/danmuReceiver/DanmuReceiver";
 
 const get = ConfigManager.get.bind(ConfigManager);
 const getConfig = ConfigManager.getConfig.bind(ConfigManager);
@@ -35,17 +35,10 @@ export class CommandBroadcastServer {
       socket,
       getGiftConfigUpdateCommand(await GiftConfigGetter.get())
     );
-    // TODO receiverStatusUpdate
-    // this.sendAppCommand(
-    //   socket,
-    //   getReceiverStatusUpdateCommand(
-    //     DanmuReceiver.isOpen()
-    //       ? "open"
-    //       : DanmuReceiver.isClosed()
-    //         ? "close"
-    //         : "error"
-    //   )
-    // );
+    this.sendAppCommand(
+      socket,
+      getReceiverStatusUpdateCommand(DanmuReceiver.status)
+    );
 
     const roomid = get("danmuReceiver.roomid") ?? 0;
     const id = await RoomInitGetter.getId(roomid);
@@ -111,10 +104,5 @@ export class CommandBroadcastServer {
     const commandPack = getCommandPack(command);
     this.broadcast(JSON.stringify(commandPack));
     CommandHistoryManager.writeCommand(commandPack);
-  }
-
-  static alertMessage(message: TBiliBiliPackParseError): void {
-    dialog.showErrorBox("错误", message.message);
-    CommandHistoryManager.writeCommand(getCommandPack(getAppCommand(message)));
   }
 }

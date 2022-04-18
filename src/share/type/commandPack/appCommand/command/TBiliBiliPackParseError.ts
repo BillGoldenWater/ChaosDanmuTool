@@ -3,15 +3,17 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { Packet } from "../../../../../main/network/client/danmuReceiver/Packet";
+
 export type TBiliBiliPackParseError = {
   cmd: "bilibiliPackParseError";
   message: string;
-  packet: unknown; // TODO
+  packet: Packet;
 };
 
 export function getBiliBiliPackParseErrorCommand(
   message: string,
-  packet: unknown // TODO
+  packet: Packet
 ): TBiliBiliPackParseError {
   return {
     cmd: "bilibiliPackParseError",
