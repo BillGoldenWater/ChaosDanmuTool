@@ -27,7 +27,7 @@ import { decodeString } from "../../../utils/StringUtils";
 
 const get = ConfigManager.get.bind(ConfigManager);
 
-function alertPacketParseError(message: string, data: unknown): void {
+function alertPacketParseError(message: string, data: Packet): void {
   dialog.showErrorBox("错误", message);
   CommandHistoryManager.writeCommand(
     getCommandPack(
