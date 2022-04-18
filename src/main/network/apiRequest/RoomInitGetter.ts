@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { TRoomInitResponse } from "../../../share/type/bilibili/request/TRoomInitResponse";
+import { TRoomInitResponse } from "../../type/request/bilibili/TRoomInitResponse";
 import { getString } from "../../utils/HttpUtils";
 
 export class RoomInitGetter {

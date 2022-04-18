@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { TMasterInfoResponse } from "../../../share/type/bilibili/request/TMasterInfoResponse";
+import { TMasterInfoResponse } from "../../type/request/bilibili/TMasterInfoResponse";
 import { getString } from "../../utils/HttpUtils";
 
 export class MasterInfoGetter {
