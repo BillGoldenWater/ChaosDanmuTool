@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-export type TAppCommand<T> = {
-  cmd: "appCommand";
-  data: T;
+export type TDanmuMsg = {
+  cmd: "DANMU_MSG";
+  info: unknown[];
 };

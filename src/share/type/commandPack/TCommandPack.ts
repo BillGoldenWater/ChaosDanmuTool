@@ -4,9 +4,12 @@
  */
 
 import { TAppCommand } from "./appCommand/TAppCommand";
+import { TAnyAppCommand } from "./appCommand/TAnyAppCommand";
+import { TBiliBiliCommand } from "./bilibiliCommand/TBiliBiliCommand";
+import { TAnyBiliBiliCommand } from "./bilibiliCommand/TAnyBiliBiliCommand";
 
 export type TCommandPack = {
   uuid: string;
   timestamp: number;
-  data: TAppCommand; // TODO
+  data: TAppCommand<TAnyAppCommand> | TBiliBiliCommand<TAnyBiliBiliCommand>;
 };

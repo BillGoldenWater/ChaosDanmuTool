@@ -15,7 +15,7 @@ export type TReceiverStatusUpdate = {
   status: TReceiverStatus;
 };
 
-export function getStatusUpdateMessage(
+export function getReceiverStatusUpdateCommand(
   status: TReceiverStatus
 ): TReceiverStatusUpdate {
   return {

@@ -8,7 +8,9 @@ export type TGiftConfigUpdate = {
   data: unknown; // TODO
 };
 
-export function getGiftConfigUpdate(data: unknown /*TODO*/): TGiftConfigUpdate {
+export function getGiftConfigUpdateCommand(
+  data: unknown /*TODO*/
+): TGiftConfigUpdate {
   return {
     cmd: "giftConfigUpdate",
     data: data,

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-export type TAppCommand<T> = {
-  cmd: "appCommand";
+export type TBiliBiliCommand<T> = {
+  cmd: "bilibiliCommand";
   data: T;
 };
