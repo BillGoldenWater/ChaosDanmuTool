@@ -6,10 +6,10 @@
 import fs from "fs";
 import path from "path";
 import { shell } from "electron";
-import { formatTime } from "../TimeUtils";
+import { formatTime } from "../../../share/utils/TimeUtils";
 import { TCommandPack } from "../../../share/type/commandPack/TCommandPack";
 import { ConfigManager } from "../../config/ConfigManager";
-import { isImplementedCommand } from "./CommandHistoryImplemented";
+import { isImplementedCommand } from "../../../share/utils/commandPack/CommandHistoryImplemented";
 
 export class CommandHistoryManager {
   static path: string;

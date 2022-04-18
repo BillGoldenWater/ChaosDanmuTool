@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { TCommandPack } from "../../../share/type/commandPack/TCommandPack";
-import { TAnyAppCommand } from "../../../share/type/commandPack/appCommand/TAnyAppCommand";
-import { TAnyBiliBiliCommand } from "../../../share/type/commandPack/bilibiliCommand/TAnyBiliBiliCommand";
+import { TCommandPack } from "../../type/commandPack/TCommandPack";
+import { TAnyAppCommand } from "../../type/commandPack/appCommand/TAnyAppCommand";
+import { TAnyBiliBiliCommand } from "../../type/commandPack/bilibiliCommand/TAnyBiliBiliCommand";
 
 type CommandHistoryImplemented = {
   appCommand: TAnyAppCommand["cmd"][];

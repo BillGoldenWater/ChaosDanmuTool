@@ -3,20 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { TAppCommand } from "./appCommand/TAppCommand";
-import { TAnyAppCommand } from "./appCommand/TAnyAppCommand";
-import { TBiliBiliCommand } from "./bilibiliCommand/TBiliBiliCommand";
-import { TAnyBiliBiliCommand } from "./bilibiliCommand/TAnyBiliBiliCommand";
 import { v4 } from "uuid";
+import { TAnyCommandType } from "./TAnyCommandType";
 
 export type TCommandPack = {
   uuid: string;
   timestamp: number;
-  data: TAppCommand<TAnyAppCommand> | TBiliBiliCommand<TAnyBiliBiliCommand>;
+  data: TAnyCommandType;
 };
 
-export function getCommandPack(
-  data: TAppCommand<TAnyAppCommand> | TBiliBiliCommand<TAnyBiliBiliCommand>
-): TCommandPack {
+export function getCommandPack(data: TAnyCommandType): TCommandPack {
   return { uuid: v4(), timestamp: new Date().getTime(), data: data };
 }
