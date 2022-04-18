@@ -6,16 +6,16 @@
 export type TBiliBiliPackParseError = {
   cmd: "bilibiliPackParseError";
   message: string;
-  pack: unknown; // TODO
+  packet: unknown; // TODO
 };
 
 export function getBiliBiliPackParseErrorCommand(
   message: string,
-  pack: unknown // TODO
+  packet: unknown // TODO
 ): TBiliBiliPackParseError {
   return {
     cmd: "bilibiliPackParseError",
     message: message,
-    pack: pack,
+    packet: packet,
   };
 }
