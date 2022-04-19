@@ -5,7 +5,8 @@
 
 import ReactDOM from "react-dom";
 import React from "react";
+import { App } from "./App";
 
 console.log("Rendering");
 
-ReactDOM.render(<div>123</div>, document.querySelector("#app"));
+ReactDOM.render(<App />, document.querySelector("#app"));
