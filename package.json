@@ -21,6 +21,7 @@
     "forge": "./config.forge.js"
   },
   "devDependencies": {
+    "@ant-design/colors": "^6.0.0",
     "@ant-design/icons": "^4.7.0",
     "@electron-forge/cli": "^6.0.0-beta.63",
     "@electron-forge/maker-deb": "^6.0.0-beta.63",
@@ -30,6 +31,7 @@
     "@electron-forge/plugin-webpack": "6.0.0-beta.63",
     "@types/koa": "^2.13.4",
     "@types/koa-static": "^4.0.2",
+    "@types/less": "^3.0.3",
     "@types/lodash-es": "^4.17.5",
     "@types/markdown-it": "^12.2.3",
     "@types/react": "^17.0.20",
@@ -40,7 +42,6 @@
     "@typescript-eslint/parser": "^5.14.0",
     "@vercel/webpack-asset-relocator-loader": "1.7.0",
     "adm-zip": "^0.5.9",
-    "antd": "^4.17.4",
     "cross-zip": "^4.0.0",
     "css-loader": "^6.0.0",
     "dot-prop": "^7.2.0",
