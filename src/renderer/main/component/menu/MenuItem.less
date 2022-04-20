@@ -4,7 +4,7 @@
  */
 
 .MenuItem {
-  transition: all 0.30s;
+  transition: all 0.30s ease-in;
 
   margin: var(--spacerWidthQuarter);
   padding: var(--spacerWidthHalf);
@@ -16,6 +16,7 @@
   }
 
   &:active {
+    transition: all 0.10s ease-in;
     background-color: var(--itemActiveBackgroundColor);
   }
 }
@@ -31,6 +32,7 @@
   }
 
   &:active {
+    transition: all 0.10s ease-in;
     background-color: var(--itemSelectedActiveBackgroundColor);
   }
 }

@@ -18,6 +18,7 @@ class State {}
 export class Menu extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
+    console.log(props);
 
     this.state = {};
   }
