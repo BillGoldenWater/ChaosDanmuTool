@@ -5,6 +5,7 @@
 
 .MenuItem {
   transition: all 0.30s ease-in;
+  display: flex;
 
   margin: var(--spacerWidthQuarter);
   padding: var(--spacerWidthHalf);
@@ -41,4 +42,28 @@
   display: flex;
 
   font-size: 1.3em;
+}
+
+.MenuItemName {
+  transition: margin-left 0.2s ease-in, width 0.2s ease-in, opacity 0.2s ease-in;
+
+  user-select: none;
+
+  width: 0;
+  font-size: 0.95em;
+
+  overflow-x: hidden;
+  word-break: keep-all;
+
+  opacity: 0;
+}
+
+.MenuShowName:hover .MenuItemName {
+  transition: margin-left 0.2s ease-in, width 0.2s ease-in, opacity 0.5s ease-in;
+
+  margin-left: 1em;
+
+  width: 5em;
+
+  opacity: 1;
 }

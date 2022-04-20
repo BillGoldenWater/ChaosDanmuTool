@@ -5,7 +5,8 @@
 
 import React, { ReactNode } from "react";
 import "./Menu.less";
-import { MenuItemProps } from "./MenuItem";
+import { MenuItem, MenuItemProps } from "./MenuItem";
+import { EllipsisOutlined, QuestionOutlined } from "@ant-design/icons";
 
 class Props {
   itemList: ReactNode[];
@@ -13,18 +14,23 @@ class Props {
   onSelectNew: (key: string) => void;
 }
 
-class State {}
+class State {
+  showName: boolean;
+}
 
 export class Menu extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    console.log(props);
 
-    this.state = {};
+    this.state = {
+      showName: false,
+    };
   }
 
   render(): ReactNode {
     const { itemList: items, selectedKey, onSelectNew } = this.props;
+    const { showName } = this.state;
+
     const itemList = items.map((value) => {
       if (!React.isValidElement(value)) return value;
 
@@ -33,7 +39,7 @@ export class Menu extends React.Component<Props, State> {
       };
 
       const props: MenuItemProps = {
-        icon: value.props.icon,
+        ...value.props,
         selected: false,
         onClick: onClick,
       };
@@ -45,6 +51,19 @@ export class Menu extends React.Component<Props, State> {
       }
     });
 
-    return <div className={"Menu"}>{itemList}</div>;
+    return (
+      <div className={showName ? "MenuShowName" : "Menu"}>
+        <div className={"MenuItemList"}>{itemList}</div>
+        <div className={"MenuItemListShowNameSwitch"}>
+          <MenuItem
+            name={"收起"}
+            icon={showName ? <EllipsisOutlined /> : <QuestionOutlined />}
+            onClick={() => {
+              this.setState((prevState) => ({ showName: !prevState.showName }));
+            }}
+          />
+        </div>
+      </div>
+    );
   }
 }

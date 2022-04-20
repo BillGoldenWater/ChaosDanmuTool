@@ -8,6 +8,9 @@ import "./MenuItem.less";
 
 export class MenuItemProps {
   icon?: ReactNode;
+  name?: string;
+
+  className?: string;
   selected?: boolean;
   onClick?: MouseEventHandler<HTMLDivElement>;
 }
@@ -22,15 +25,15 @@ export class MenuItem extends React.Component<MenuItemProps, State> {
   }
 
   render(): ReactNode {
-    const { children, icon, selected, onClick } = this.props;
-    const withIconClass = icon ? ` MenuItemIcon` : "";
-    const selectedClass = selected ? ` MenuItemSelected` : "";
+    const { icon, name, selected, onClick, className } = this.props;
+
+    const mainClassName =
+      (selected ? "MenuItemSelected" : "MenuItem") +
+      (className ? ` ${className}` : "");
     return (
-      <div
-        className={`MenuItem${withIconClass}${selectedClass}`}
-        onClick={onClick}
-      >
-        {icon ?? children}
+      <div className={mainClassName} onClick={onClick}>
+        <div className={"MenuItemIcon"}>{icon}</div>
+        <div className={"MenuItemName"}>{name}</div>
       </div>
     );
   }

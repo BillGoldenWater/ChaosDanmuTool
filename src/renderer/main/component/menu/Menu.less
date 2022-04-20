@@ -4,9 +4,28 @@
  */
 
 .Menu {
-  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 
   height: 100%;
+}
+
+.MenuShowName {
+  .Menu();
+}
+
+.MenuItemList {
+  flex-grow: 1;
+
+  box-sizing: border-box;
+
+  padding: var(--spacerWidthQuarter);
+
+  background-color: var(--contentBackgroundColor);
+}
+
+.MenuItemListShowNameSwitch {
+  box-sizing: border-box;
 
   padding: var(--spacerWidthQuarter);
 

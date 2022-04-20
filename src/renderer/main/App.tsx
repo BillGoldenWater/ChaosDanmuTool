@@ -43,11 +43,31 @@ export class App extends React.Component<Props, State> {
             <Menu
               selectedKey={this.state.selected}
               itemList={[
-                <MenuItem key={"dashboard"} icon={<DashboardOutlined />} />,
-                <MenuItem key={"function"} icon={<AppstoreOutlined />} />,
-                <MenuItem key={"history"} icon={<HistoryOutlined />} />,
-                <MenuItem key={"setting"} icon={<SettingOutlined />} />,
-                <MenuItem key={"about"} icon={<InfoCircleOutlined />} />,
+                <MenuItem
+                  key={"dashboard"}
+                  icon={<DashboardOutlined />}
+                  name={"总览"}
+                />,
+                <MenuItem
+                  key={"function"}
+                  icon={<AppstoreOutlined />}
+                  name={"功能"}
+                />,
+                <MenuItem
+                  key={"history"}
+                  icon={<HistoryOutlined />}
+                  name={"历史记录"}
+                />,
+                <MenuItem
+                  key={"setting"}
+                  icon={<SettingOutlined />}
+                  name={"设置"}
+                />,
+                <MenuItem
+                  key={"about"}
+                  icon={<InfoCircleOutlined />}
+                  name={"关于"}
+                />,
               ]}
               onSelectNew={(value) => {
                 this.setState({ selected: value });
