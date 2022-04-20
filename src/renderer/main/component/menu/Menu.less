@@ -8,10 +8,18 @@
   flex-direction: column;
 
   height: 100%;
+
+  .MenuItemListShowNameSwitch .MenuItemIcon {
+    transition: all 0.2s cubic-bezier(0.25, 0, 0, 1);
+  }
 }
 
 .MenuShowName {
   .Menu();
+
+  .MenuItemListShowNameSwitch .MenuItemIcon {
+    transform: rotate(-180deg);
+  }
 }
 
 .MenuItemList {

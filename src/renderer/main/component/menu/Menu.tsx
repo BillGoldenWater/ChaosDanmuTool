@@ -6,7 +6,7 @@
 import React, { ReactNode, RefObject } from "react";
 import "./Menu.less";
 import { MenuItem, MenuItemProps } from "./MenuItem";
-import { EllipsisOutlined, QuestionOutlined } from "@ant-design/icons";
+import { RightCircleOutlined } from "@ant-design/icons";
 
 class Props {
   itemList: ReactNode[];
@@ -100,7 +100,7 @@ export class Menu extends React.Component<Props, State> {
         <div className={"MenuItemListShowNameSwitch"}>
           <MenuItem
             name={"收起"}
-            icon={showName ? <EllipsisOutlined /> : <QuestionOutlined />}
+            icon={<RightCircleOutlined />}
             onClick={() => {
               this.setState((prevState) => ({ showName: !prevState.showName }));
             }}
