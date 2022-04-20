@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React, { ReactNode } from "react";
+import React, { ReactNode, RefObject } from "react";
 import "./Menu.less";
 import { MenuItem, MenuItemProps } from "./MenuItem";
 import { EllipsisOutlined, QuestionOutlined } from "@ant-design/icons";
@@ -19,12 +19,48 @@ class State {
 }
 
 export class Menu extends React.Component<Props, State> {
+  cursorRef: RefObject<HTMLDivElement> = React.createRef();
+  itemRefs: Map<string, RefObject<HTMLDivElement>> = new Map();
+
   constructor(props: Props) {
     super(props);
 
     this.state = {
       showName: false,
     };
+
+    this.updateItemRefs();
+  }
+
+  componentDidUpdate() {
+    this.updateItemRefs();
+  }
+
+  updateItemRefs() {
+    this.props.itemList.forEach((value) => {
+      if (!React.isValidElement(value)) return value;
+      const prev = this.itemRefs.get(value.key as string);
+      if (!prev) this.itemRefs.set(value.key as string, React.createRef());
+    });
+  }
+
+  updateCursor() {
+    const { selectedKey } = this.props;
+
+    const cursor: HTMLDivElement = this.cursorRef?.current;
+    if (cursor) {
+      const targetItem = this.itemRefs.get(selectedKey)?.current;
+      if (targetItem) {
+        const cursorRect = cursor.getBoundingClientRect();
+        const targetRect = targetItem.getBoundingClientRect();
+        const heightCenter = targetRect.top + targetRect.height / 2;
+        const targetTop = heightCenter - cursorRect.height / 2;
+        const targetLeft = targetRect.left + cursorRect.width * (1 - 0.2);
+
+        cursor.style.top = `${targetTop}px`;
+        cursor.style.left = `${targetLeft}px`;
+      }
+    }
   }
 
   render(): ReactNode {
@@ -38,21 +74,28 @@ export class Menu extends React.Component<Props, State> {
         onSelectNew(value.key as string);
       };
 
+      const ref = this.itemRefs.get(value.key as string);
+
       const props: MenuItemProps = {
-        ...value.props,
         selected: false,
         onClick: onClick,
       };
-      if (value.key === selectedKey) {
-        props.selected = true;
-        return React.cloneElement(value, props);
-      } else {
-        return React.cloneElement(value, props);
-      }
+      if (value.key === selectedKey) props.selected = true;
+      return (
+        <div ref={ref} key={value.key}>
+          {React.cloneElement(value, props)}
+        </div>
+      );
     });
 
+    this.updateCursor();
+
     return (
-      <div className={showName ? "MenuShowName" : "Menu"}>
+      <div
+        ref={() => window.setTimeout(this.updateCursor.bind(this), 10)}
+        className={showName ? "MenuShowName" : "Menu"}
+      >
+        <div ref={this.cursorRef} className={"MenuCursor"} />
         <div className={"MenuItemList"}>{itemList}</div>
         <div className={"MenuItemListShowNameSwitch"}>
           <MenuItem
