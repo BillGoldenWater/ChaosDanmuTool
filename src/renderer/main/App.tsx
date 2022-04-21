@@ -23,7 +23,7 @@ export class App extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      path: createPagePath(pageList[0].key, ""),
+      path: createPagePath("", pageList[0].key),
     };
 
     toggleDarkMode(true);

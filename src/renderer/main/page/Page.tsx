@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React, {ReactNode} from "react";
+import React, { ReactNode } from "react";
 import {
   AppstoreOutlined,
   DashboardOutlined,
@@ -26,48 +26,44 @@ export type PageInfo<K extends PageKey> = {
   render?: () => ReactNode;
 };
 
-export function createPagePath(
-  defaultPageKey: PageKey,
-  previousPath: string
-): URL {
+export function createPagePath(path: string, defaultPageKey: PageKey): URL {
   const defaultPath = new URL(`https://${defaultPageKey}`);
 
   try {
-    const path = new URL(previousPath);
-    if (pageList.find((value) => value.key === path.host) == null)
-      return defaultPath
-    return path;
+    const result = new URL(path);
+    if (pageList.find((value) => value.key === result.host) == null)
+      return defaultPath;
+    return result;
     // eslint-disable-next-line no-empty
-  } catch (e) {
-  }
+  } catch (e) {}
 
-  return defaultPath
+  return defaultPath;
 }
 
 export const pageList: PageInfo<PageKey>[] = [
   {
     key: "dashboard",
     name: "总览",
-    icon: <DashboardOutlined/>,
+    icon: <DashboardOutlined />,
   },
   {
     key: "function",
     name: "功能",
-    icon: <AppstoreOutlined/>,
+    icon: <AppstoreOutlined />,
   },
   {
     key: "history",
     name: "历史记录",
-    icon: <HistoryOutlined/>,
+    icon: <HistoryOutlined />,
   },
   {
     key: "setting",
     name: "设置",
-    icon: <SettingOutlined/>,
+    icon: <SettingOutlined />,
   },
   {
     key: "about",
     name: "关于",
-    icon: <InfoCircleOutlined/>,
+    icon: <InfoCircleOutlined />,
   },
 ];
