@@ -99,10 +99,16 @@ export type DanmuViewCustomConfig = {
 
 export type Config = {
   forChaosDanmuTool: boolean;
+
   autoSaveOnQuit: boolean;
   autoSaveOnChange: boolean;
+
   httpServerPort: number;
+
   darkTheme: boolean;
+
+  path: string;
+
   history: HistoryConfig;
   update: UpdateConfig;
   danmuReceiver: DanmuReceiverConfig;
@@ -231,6 +237,7 @@ const defaultConfig: Config = {
   autoSaveOnChange: true,
   httpServerPort: 25555,
   darkTheme: true,
+  path: "",
   history: {
     autoCutAt: 15,
   },

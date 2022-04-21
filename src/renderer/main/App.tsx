@@ -16,6 +16,7 @@ import { ConfigP, TConfigContext } from "../ConfigContext";
 import { MainEventTarget, NewMessageEvent } from "../MainEventTarget";
 import { TCommandPack } from "../../share/type/commandPack/TCommandPack";
 import { WebSocketClient } from "../../share/network/client/WebSocketClient";
+import { getProperty, setProperty } from "dot-prop";
 
 class Props {}
 
@@ -26,13 +27,12 @@ export class App extends React.Component<Props, MainState> {
   constructor(props: Props) {
     super(props);
 
+    const cfg = window.electron.getConfig();
     this.state = {
-      config: window.electron.getConfig(),
+      config: cfg,
 
-      path: createPagePath("", pageList[0].key),
+      path: createPagePath(cfg.path, pageList[0].key),
     };
-
-    const { config: cfg } = this.state;
 
     toggleDarkMode(cfg.darkTheme);
 
@@ -67,6 +67,16 @@ export class App extends React.Component<Props, MainState> {
       state: s,
       setState: this.setState,
       eventTarget: this.eventTarget,
+      get: (path, defaultValue) => {
+        return getProperty(s.config, path, defaultValue);
+      },
+      set: (path, value) => {
+        this.setState((prevState) => {
+          const config = prevState.config;
+          setProperty(config, path, value);
+          window.electron.updateConfig(config);
+        });
+      },
     };
 
     return (
@@ -80,10 +90,15 @@ export class App extends React.Component<Props, MainState> {
                   <MenuItem key={v.key} name={v.name} icon={v.icon} />
                 ))}
                 onSelectNew={(value: PageKey) => {
-                  this.setState((prev) => {
-                    prev.path.host = value;
-                    return { path: prev.path };
-                  });
+                  this.setState(
+                    (prev) => {
+                      prev.path.host = value;
+                      return { path: prev.path };
+                    },
+                    () => {
+                      configContext.set("path", s.path.toString());
+                    }
+                  );
                 }}
               />
             }
