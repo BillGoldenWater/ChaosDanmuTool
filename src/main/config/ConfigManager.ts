@@ -132,10 +132,14 @@ export class ConfigManager {
     this.onChange();
   }
 
-  static onChange(): void {
+  static broadcast(): void {
     CommandBroadcastServer.broadcastAppCommand(
       getConfigUpdateCommand(this.config)
     );
+  }
+
+  static onChange(): void {
+    this.broadcast();
     this.get("autoSaveOnChange") ? this.save() : "";
   }
 }

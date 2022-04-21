@@ -16,6 +16,7 @@ export type TConfigContext = {
 
   get?: (path: ObjectPath<Config>, defaultValue?: unknown) => unknown;
   set?: (path: ObjectPath<Config>, value: unknown) => void;
+  setPathOption?: (key: string, value: string) => void;
 };
 
 const defaultContext: TConfigContext = {

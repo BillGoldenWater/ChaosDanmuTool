@@ -58,8 +58,11 @@ export function toggleDarkMode(isDark = !isDarkTheme) {
     set("--secondaryTextColor", 0.6);
     set("--disableColor", 0.5);
 
+    set("--dividerColor", 0.15);
+
     set("--backgroundColor", 0.05);
     set("--contentBackgroundColor", 0.15);
+    set("--itemBackgroundColor", 0.2);
     set("--itemHoverBackgroundColor", 0.3);
     set("--itemActiveBackgroundColor", 0.25);
   } else {
@@ -70,8 +73,9 @@ export function toggleDarkMode(isDark = !isDarkTheme) {
 
     set("--backgroundColor", 0.15);
     set("--contentBackgroundColor", 0.05);
-    set("--itemHoverBackgroundColor", 0.15);
-    set("--itemActiveBackgroundColor", 0.1);
+    set("--itemBackgroundColor", 0.1);
+    set("--itemHoverBackgroundColor", 0.2);
+    set("--itemActiveBackgroundColor", 0.15);
   }
 }
 

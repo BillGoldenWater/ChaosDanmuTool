@@ -11,6 +11,7 @@ import {
   InfoCircleOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
+import { Function } from "./function/Function";
 
 export type PageKey =
   | "dashboard"
@@ -50,6 +51,7 @@ export const pageList: PageInfo<PageKey>[] = [
     key: "function",
     name: "功能",
     icon: <AppstoreOutlined />,
+    render: () => <Function />,
   },
   {
     key: "history",

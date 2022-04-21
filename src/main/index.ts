@@ -253,6 +253,7 @@ function init(): void {
     switch (args[0]) {
       case "load": {
         ConfigManager.load();
+        ConfigManager.broadcast();
         break;
       }
       case "save": {
