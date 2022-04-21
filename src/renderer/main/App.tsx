@@ -11,14 +11,14 @@ import { Content } from "./component/content/Content";
 import { Menu } from "./component/menu/Menu";
 import { createPagePath, PageKey, pageList } from "./page/Page";
 import { MenuItem } from "./component/menu/MenuItem";
+import { MainState } from "../MainState";
+import { ConfigProvider, TConfigContext } from "../ConfigContext";
 
 class Props {}
 
-class State {
-  path: URL;
-}
+export class App extends React.Component<Props, MainState> {
+  eventTarget = new EventTarget();
 
-export class App extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
@@ -37,27 +37,35 @@ export class App extends React.Component<Props, State> {
       .find((value) => value.key === path.host)
       ?.render?.() ?? <Content padding>{path.host} 未完成</Content>;
 
+    const configContext: TConfigContext = {
+      state: s,
+      setState: this.setState,
+      eventTarget: this.eventTarget,
+    };
+
     return (
-      <div>
-        <Layout
-          sider={
-            <Menu
-              selectedKey={path.host}
-              itemList={pageList.map((v) => (
-                <MenuItem key={v.key} name={v.name} icon={v.icon} />
-              ))}
-              onSelectNew={(value: PageKey) => {
-                this.setState((prev) => {
-                  prev.path.host = value;
-                  return { path: prev.path };
-                });
-              }}
-            />
-          }
-        >
-          {currentPage}
-        </Layout>
-      </div>
+      <ConfigProvider value={configContext}>
+        <div>
+          <Layout
+            sider={
+              <Menu
+                selectedKey={path.host}
+                itemList={pageList.map((v) => (
+                  <MenuItem key={v.key} name={v.name} icon={v.icon} />
+                ))}
+                onSelectNew={(value: PageKey) => {
+                  this.setState((prev) => {
+                    prev.path.host = value;
+                    return { path: prev.path };
+                  });
+                }}
+              />
+            }
+          >
+            {currentPage}
+          </Layout>
+        </div>
+      </ConfigProvider>
     );
   }
 }
