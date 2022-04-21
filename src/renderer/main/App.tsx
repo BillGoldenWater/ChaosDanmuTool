@@ -9,19 +9,13 @@ import { Layout } from "./component/layout/Layout";
 import { toggleDarkMode } from "./utils/ThemeUtils";
 import { Content } from "./component/content/Content";
 import { Menu } from "./component/menu/Menu";
+import { createPagePath, PageKey, pageList } from "./page/Page";
 import { MenuItem } from "./component/menu/MenuItem";
-import {
-  AppstoreOutlined,
-  DashboardOutlined,
-  HistoryOutlined,
-  InfoCircleOutlined,
-  SettingOutlined,
-} from "@ant-design/icons";
 
 class Props {}
 
 class State {
-  selected: string;
+  path: URL;
 }
 
 export class App extends React.Component<Props, State> {
@@ -29,53 +23,39 @@ export class App extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      selected: "dashboard",
+      path: createPagePath(pageList[0].key, ""),
     };
 
-    toggleDarkMode(false);
+    toggleDarkMode(true);
   }
 
   render(): ReactNode {
+    const s = this.state;
+    const path = s.path;
+
+    const currentPage = pageList
+      .find((value) => value.key === path.host)
+      ?.render?.() ?? <Content padding>{path.host} 未完成</Content>;
+
     return (
       <div>
         <Layout
           sider={
             <Menu
-              selectedKey={this.state.selected}
-              itemList={[
-                <MenuItem
-                  key={"dashboard"}
-                  icon={<DashboardOutlined />}
-                  name={"总览"}
-                />,
-                <MenuItem
-                  key={"function"}
-                  icon={<AppstoreOutlined />}
-                  name={"功能"}
-                />,
-                <MenuItem
-                  key={"history"}
-                  icon={<HistoryOutlined />}
-                  name={"历史记录"}
-                />,
-                <MenuItem
-                  key={"setting"}
-                  icon={<SettingOutlined />}
-                  name={"设置"}
-                />,
-                <MenuItem
-                  key={"about"}
-                  icon={<InfoCircleOutlined />}
-                  name={"关于"}
-                />,
-              ]}
-              onSelectNew={(value) => {
-                this.setState({ selected: value });
+              selectedKey={path.host}
+              itemList={pageList.map((v) => (
+                <MenuItem key={v.key} name={v.name} icon={v.icon} />
+              ))}
+              onSelectNew={(value: PageKey) => {
+                this.setState((prev) => {
+                  prev.path.host = value;
+                  return { path: prev.path };
+                });
               }}
             />
           }
         >
-          <Content padding>App</Content>
+          {currentPage}
         </Layout>
       </div>
     );
