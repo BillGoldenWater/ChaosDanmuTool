@@ -16,15 +16,7 @@ export class MenuItemProps {
   onClick?: MouseEventHandler<HTMLDivElement>;
 }
 
-class State {}
-
-export class MenuItem extends React.Component<MenuItemProps, State> {
-  constructor(props: MenuItemProps) {
-    super(props);
-
-    this.state = {};
-  }
-
+export class MenuItem extends React.Component<MenuItemProps> {
   render(): ReactNode {
     const { icon, name, ref, className, selected, onClick } = this.props;
 
