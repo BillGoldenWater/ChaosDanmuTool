@@ -74,11 +74,12 @@ export class CommandBroadcastServer {
   static close(): void {
     if (this.server) {
       this.server.clients.forEach((value) => {
-        value.close();
+        value.close(1000);
       });
       this.server.close();
     }
     this.server = null;
+    console.log("[CommandBroadcastServer.close] Closed");
   }
 
   static broadcast(data: string): void {

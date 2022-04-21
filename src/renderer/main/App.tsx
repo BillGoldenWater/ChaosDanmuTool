@@ -15,12 +15,13 @@ import { MainState } from "../MainState";
 import { ConfigP, TConfigContext } from "../ConfigContext";
 import { MainEventTarget, NewMessageEvent } from "../MainEventTarget";
 import { TCommandPack } from "../../share/type/commandPack/TCommandPack";
+import { WebSocketClient } from "../../share/network/client/WebSocketClient";
 
 class Props {}
 
 export class App extends React.Component<Props, MainState> {
   eventTarget: MainEventTarget = new MainEventTarget();
-  webSocketClient: WebSocket;
+  webSocketClient: WebSocketClient = new WebSocketClient();
 
   constructor(props: Props) {
     super(props);
@@ -35,18 +36,21 @@ export class App extends React.Component<Props, MainState> {
 
     toggleDarkMode(cfg.darkTheme);
 
-    this.webSocketClient = new WebSocket(
-      `ws://localhost:${cfg.httpServerPort}`
-    );
-    this.webSocketClient.onmessage = this.onMessage.bind(this);
+    this.webSocketClient.updateOption({
+      port: cfg.httpServerPort,
+
+      location: "App.webSocketClient",
+      onMessage: this.onMessage.bind(this),
+    });
+    this.webSocketClient.open();
   }
 
   componentWillUnmount() {
-    this.webSocketClient.close(1000);
+    this.webSocketClient.close();
   }
 
-  onMessage(msgStr: string): void {
-    const commandPack: TCommandPack = JSON.parse(msgStr);
+  onMessage(event: MessageEvent): void {
+    const commandPack: TCommandPack = JSON.parse(event.data);
 
     this.eventTarget.dispatchEvent(new NewMessageEvent(commandPack));
   }
