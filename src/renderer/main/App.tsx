@@ -12,21 +12,43 @@ import { Menu } from "./component/menu/Menu";
 import { createPagePath, PageKey, pageList } from "./page/Page";
 import { MenuItem } from "./component/menu/MenuItem";
 import { MainState } from "../MainState";
-import { ConfigProvider, TConfigContext } from "../ConfigContext";
+import { ConfigP, TConfigContext } from "../ConfigContext";
+import { MainEventTarget, NewMessageEvent } from "../MainEventTarget";
+import { TCommandPack } from "../../share/type/commandPack/TCommandPack";
 
 class Props {}
 
 export class App extends React.Component<Props, MainState> {
-  eventTarget = new EventTarget();
+  eventTarget: MainEventTarget = new MainEventTarget();
+  webSocketClient: WebSocket;
 
   constructor(props: Props) {
     super(props);
 
     this.state = {
+      config: window.electron.getConfig(),
+
       path: createPagePath("", pageList[0].key),
     };
 
-    toggleDarkMode(true);
+    const { config: cfg } = this.state;
+
+    toggleDarkMode(cfg.darkTheme);
+
+    this.webSocketClient = new WebSocket(
+      `ws://localhost:${cfg.httpServerPort}`
+    );
+    this.webSocketClient.onmessage = this.onMessage.bind(this);
+  }
+
+  componentWillUnmount() {
+    this.webSocketClient.close(1000);
+  }
+
+  onMessage(msgStr: string): void {
+    const commandPack: TCommandPack = JSON.parse(msgStr);
+
+    this.eventTarget.dispatchEvent(new NewMessageEvent(commandPack));
   }
 
   render(): ReactNode {
@@ -44,7 +66,7 @@ export class App extends React.Component<Props, MainState> {
     };
 
     return (
-      <ConfigProvider value={configContext}>
+      <ConfigP value={configContext}>
         <div>
           <Layout
             sider={
@@ -65,7 +87,7 @@ export class App extends React.Component<Props, MainState> {
             {currentPage}
           </Layout>
         </div>
-      </ConfigProvider>
+      </ConfigP>
     );
   }
 }

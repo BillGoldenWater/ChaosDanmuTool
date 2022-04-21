@@ -5,20 +5,21 @@
 
 import React from "react";
 import { MainState } from "./MainState";
+import { MainEventTarget } from "./MainEventTarget";
 
 export type TConfigContext = {
   state: MainState;
   setState: React.Component["setState"];
-  eventTarget: EventTarget;
+  eventTarget: MainEventTarget;
 };
 
 const defaultContext: TConfigContext = {
   state: null,
   setState: () => null,
-  eventTarget: new EventTarget(),
+  eventTarget: new MainEventTarget(),
 };
 
 export const ConfigContext = React.createContext(defaultContext);
 
-export const ConfigProvider = ConfigContext.Provider;
-export const ConfigConsumer = ConfigContext.Consumer;
+export const ConfigP = ConfigContext.Provider;
+export const ConfigC = ConfigContext.Consumer;
