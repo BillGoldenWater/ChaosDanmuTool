@@ -23,7 +23,7 @@ module.exports = {
               js: "./src/renderer/main/index.tsx",
               name: "main_window",
               preload: {
-                js: "./src/renderer/preload.ts",
+                js: "./src/rendererShare/preload.ts",
               },
             },
             {

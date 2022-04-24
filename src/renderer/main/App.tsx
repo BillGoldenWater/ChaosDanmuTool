@@ -3,25 +3,30 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React, {ReactNode} from "react";
+import React, { ReactNode } from "react";
 import "./App.less";
-import {Layout} from "./component/layout/Layout";
-import {toggleDarkMode} from "./utils/ThemeUtils";
-import {Content} from "./component/content/Content";
-import {Menu} from "./component/menu/Menu";
-import {createPagePath, PageKey, pageList} from "./page/Page";
-import {MenuItem} from "./component/menu/MenuItem";
-import {MainState} from "../MainState";
-import {ConfigP, TConfigContext} from "../ConfigContext";
-import {MainEventTarget, NewMessageEvent} from "../MainEventTarget";
-import {TCommandPack} from "../../share/type/commandPack/TCommandPack";
-import {WebSocketClient} from "../../share/network/client/WebSocketClient";
-import {getProperty, setProperty} from "dot-prop";
-import {TAnyAppCommand} from "../../share/type/commandPack/appCommand/TAnyAppCommand";
-import {functionPagePathKey} from "./page/function/Function";
+import { Layout } from "./component/layout/Layout";
+import { toggleDarkMode } from "../../rendererShare/style/ThemeUtils";
+import { Content } from "./component/content/Content";
+import { Menu } from "./component/menu/Menu";
+import { createPagePath, PageKey, pageList } from "./page/Page";
+import { MenuItem } from "./component/menu/MenuItem";
+import { MainState } from "../../rendererShare/state/MainState";
+import {
+  ConfigP,
+  TConfigContext,
+} from "../../rendererShare/state/ConfigContext";
+import {
+  MainEventTarget,
+  NewMessageEvent,
+} from "../../rendererShare/event/MainEventTarget";
+import { TCommandPack } from "../../share/type/commandPack/TCommandPack";
+import { WebSocketClient } from "../../share/network/client/WebSocketClient";
+import { getProperty, setProperty } from "dot-prop";
+import { TAnyAppCommand } from "../../share/type/commandPack/appCommand/TAnyAppCommand";
+import { functionPagePathKey } from "./page/function/Function";
 
-class Props {
-}
+class Props {}
 
 export class App extends React.Component<Props, MainState> {
   eventTarget: MainEventTarget = new MainEventTarget();
@@ -53,7 +58,7 @@ export class App extends React.Component<Props, MainState> {
   }
 
   getPath(path: string): URL {
-    return createPagePath(path, pageList[0].key)
+    return createPagePath(path, pageList[0].key);
   }
 
   onMessage(event: MessageEvent): void {
@@ -69,7 +74,7 @@ export class App extends React.Component<Props, MainState> {
           case "configUpdate": {
             this.setState({
               config: appCommand.config,
-              path: this.getPath(appCommand.config.path)
+              path: this.getPath(appCommand.config.path),
             });
           }
         }
@@ -115,7 +120,7 @@ export class App extends React.Component<Props, MainState> {
               <Menu
                 selectedKey={path.host}
                 itemList={pageList.map((v) => (
-                  <MenuItem key={v.key} name={v.name} icon={v.icon}/>
+                  <MenuItem key={v.key} name={v.name} icon={v.icon} />
                 ))}
                 onSelectNew={(value: PageKey) => {
                   this.setState(
@@ -124,7 +129,7 @@ export class App extends React.Component<Props, MainState> {
                         prev.path.searchParams.set(functionPagePathKey, "");
 
                       prev.path.host = value;
-                      return {path: prev.path};
+                      return { path: prev.path };
                     },
                     () => {
                       configContext.set("path", s.path.toString());

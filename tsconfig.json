@@ -14,7 +14,7 @@
       "*": ["node_modules/*"]
     },
     "jsx": "react",
-    "lib": ["dom", "es5", "scripthost", "es2021"]
+    "lib": ["dom", "scripthost", "es2021"]
   },
   "include": ["src/**/*"]
 }

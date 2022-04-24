@@ -53,12 +53,12 @@ export function toggleDarkMode(isDark = !isDarkTheme) {
   setWithTheme("--itemSelectedActiveBackgroundColor", 0.25);
 
   if (isDarkTheme) {
-    set("--titleTextColor", 0.95);
-    set("--primaryTextColor", 0.9);
-    set("--secondaryTextColor", 0.6);
-    set("--disableColor", 0.5);
+    set("--titleTextColor", 0.85);
+    set("--primaryTextColor", 0.85);
+    set("--secondaryTextColor", 0.45);
+    set("--disableColor", 0.3);
 
-    set("--dividerColor", 0.15);
+    set("--dividerColor", 0.12);
 
     set("--backgroundColor", 0.05);
     set("--contentBackgroundColor", 0.15);
@@ -66,16 +66,18 @@ export function toggleDarkMode(isDark = !isDarkTheme) {
     set("--itemHoverBackgroundColor", 0.3);
     set("--itemActiveBackgroundColor", 0.25);
   } else {
-    set("--titleTextColor", 0.95);
-    set("--primaryTextColor", 0.9);
-    set("--secondaryTextColor", 0.6);
-    set("--disableColor", 0.5);
+    set("--titleTextColor", 0.85);
+    set("--primaryTextColor", 0.85);
+    set("--secondaryTextColor", 0.45);
+    set("--disableColor", 0.3);
+
+    set("--dividerColor", 0.6);
 
     set("--backgroundColor", 0.15);
-    set("--contentBackgroundColor", 0.05);
-    set("--itemBackgroundColor", 0.1);
-    set("--itemHoverBackgroundColor", 0.2);
-    set("--itemActiveBackgroundColor", 0.15);
+    set("--contentBackgroundColor", 0.06);
+    set("--itemBackgroundColor", 0.12);
+    set("--itemHoverBackgroundColor", 0.16);
+    set("--itemActiveBackgroundColor", 0.2);
   }
 }
 

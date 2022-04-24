@@ -5,9 +5,9 @@
 
 import React from "react";
 import { MainState } from "./MainState";
-import { MainEventTarget } from "./MainEventTarget";
-import { ObjectPath } from "../share/type/TObjectPath";
-import { Config } from "../share/config/Config";
+import { MainEventTarget } from "../event/MainEventTarget";
+import { ObjectPath } from "../../share/type/TObjectPath";
+import { Config } from "../../share/config/Config";
 
 export type TConfigContext = {
   state: MainState;

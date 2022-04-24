@@ -5,7 +5,7 @@
 
 import React, { ReactNode } from "react";
 import "./Function.less";
-import { ConfigC } from "../../../ConfigContext";
+import { ConfigC } from "../../../../rendererShare/state/ConfigContext";
 import { Content } from "../../component/content/Content";
 import { FunctionPageKey, functionPageList } from "./FunctionPage";
 import { FunctionInfo } from "./FunctionInfo";
