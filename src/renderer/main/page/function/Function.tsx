@@ -33,7 +33,7 @@ export class Function extends React.Component {
             ));
 
             return (
-              <Content>
+              <Content noPadding>
                 <div className={"Function"}>{pages}</div>
               </Content>
             );
@@ -42,7 +42,7 @@ export class Function extends React.Component {
           return (
             functionPageList
               .find((value) => value.key === pageKey)
-              ?.render?.() ?? <Content padding>{pageKey} 未完成</Content>
+              ?.render?.() ?? <Content>{pageKey} 未完成</Content>
           );
         }}
       </ConfigC>

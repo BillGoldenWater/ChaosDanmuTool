@@ -1,0 +1,28 @@
+/*
+ * Copyright 2021-2022 Golden_Water
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+.Input {
+  transition: all ease-in-out 0.2s;
+  outline: none;
+
+  color: var(--unfocusedTextColor);
+
+  background-color: var(--itemBackgroundColor);
+
+  border: none;
+  border-radius: var(--contentBorderRadius);
+  padding: calc(var(--spacerWidthHalf));
+
+  font-size: 1em;
+
+  &::-webkit-inner-spin-button, &::-webkit-outer-spin-button {
+    display: none;
+  }
+
+  &:hover, &:focus {
+    background-color: var(--itemHoverBackgroundColor);
+    color: var(--focusedTextColor);
+  }
+}

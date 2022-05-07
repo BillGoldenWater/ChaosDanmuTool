@@ -17,20 +17,18 @@ import {
   TConfigContext,
 } from "../../rendererShare/state/ConfigContext";
 import {
+  ConfigUpdateEvent,
   MainEventTarget,
-  NewMessageEvent,
 } from "../../rendererShare/event/MainEventTarget";
-import { TCommandPack } from "../../share/type/commandPack/TCommandPack";
-import { WebSocketClient } from "../../share/network/client/WebSocketClient";
+import { CommandReceiver } from "../../share/network/client/CommandReceiver";
 import { getProperty, setProperty } from "dot-prop";
-import { TAnyAppCommand } from "../../share/type/commandPack/appCommand/TAnyAppCommand";
 import { functionPagePathKey } from "./page/function/Function";
 
 class Props {}
 
 export class App extends React.Component<Props, MainState> {
   eventTarget: MainEventTarget = new MainEventTarget();
-  webSocketClient: WebSocketClient = new WebSocketClient();
+  webSocketClient: CommandReceiver = new CommandReceiver();
 
   constructor(props: Props) {
     super(props);
@@ -44,11 +42,13 @@ export class App extends React.Component<Props, MainState> {
 
     toggleDarkMode(cfg.darkTheme);
 
+    this.registerEvents();
+
     this.webSocketClient.updateOption({
       port: cfg.httpServerPort,
 
       location: "App.webSocketClient",
-      onMessage: this.onMessage.bind(this),
+      eventTarget: this.eventTarget,
     });
     this.webSocketClient.open();
   }
@@ -61,25 +61,17 @@ export class App extends React.Component<Props, MainState> {
     return createPagePath(path, pageList[0].key);
   }
 
-  onMessage(event: MessageEvent): void {
-    const commandPack: TCommandPack = JSON.parse(event.data);
+  registerEvents() {
+    const a = this.eventTarget.addEventListener;
 
-    this.eventTarget.dispatchEvent(new NewMessageEvent(commandPack));
+    a("configUpdate", this.onConfigUpdate.bind(this));
+  }
 
-    switch (commandPack.data.cmd) {
-      case "appCommand": {
-        const appCommand: TAnyAppCommand = commandPack.data.data;
-
-        switch (appCommand.cmd) {
-          case "configUpdate": {
-            this.setState({
-              config: appCommand.config,
-              path: this.getPath(appCommand.config.path),
-            });
-          }
-        }
-      }
-    }
+  onConfigUpdate(event: ConfigUpdateEvent) {
+    this.setState({
+      config: event.config,
+      path: this.getPath(event.config.path),
+    });
   }
 
   render(): ReactNode {
@@ -88,7 +80,7 @@ export class App extends React.Component<Props, MainState> {
 
     const currentPage = pageList
       .find((value) => value.key === path.host)
-      ?.render?.() ?? <Content padding>{path.host} 未完成</Content>;
+      ?.render?.() ?? <Content>{path.host} 未完成</Content>;
 
     const configSet: TConfigContext["set"] = (path, value) => {
       this.setState((prevState) => {

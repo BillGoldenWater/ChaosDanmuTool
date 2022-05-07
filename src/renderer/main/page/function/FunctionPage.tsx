@@ -5,6 +5,7 @@
 
 import React, { ReactNode } from "react";
 import { ApiOutlined, CompassOutlined, EyeOutlined } from "@ant-design/icons";
+import { ConnectRoom } from "./connectRoom/ConnectRoom";
 
 export type FunctionPageKey = "" | "connectRoom" | "danmuViewer" | "gacha";
 
@@ -22,6 +23,7 @@ export const functionPageList: FunctionPageInfo<FunctionPageKey>[] = [
     name: "连接直播间",
     description: "管理与直播间的连接",
     icon: <ApiOutlined />,
+    render: () => <ConnectRoom />,
   },
   {
     key: "danmuViewer",

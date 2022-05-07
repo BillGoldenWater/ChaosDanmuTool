@@ -7,13 +7,13 @@ import React, { ReactNode } from "react";
 import "./Content.less";
 
 class Props {
-  padding?: boolean;
+  noPadding?: boolean;
 }
 
 export class Content extends React.Component<Props> {
   render(): ReactNode {
-    const { children, padding } = this.props;
-    const paddingClass = padding ? ` ContentPadding` : "";
+    const { children, noPadding } = this.props;
+    const paddingClass = noPadding ? "" : " ContentPadding";
 
     return <div className={`Content${paddingClass}`}>{children}</div>;
   }

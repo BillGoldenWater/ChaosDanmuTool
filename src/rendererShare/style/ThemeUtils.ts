@@ -56,6 +56,8 @@ export function toggleDarkMode(isDark = !isDarkTheme) {
     set("--titleTextColor", 0.85);
     set("--primaryTextColor", 0.85);
     set("--secondaryTextColor", 0.45);
+    set("--unfocusedTextColor", 0.75);
+    set("--focusedTextColor", 0.8);
     set("--disableColor", 0.3);
 
     set("--dividerColor", 0.12);
@@ -69,6 +71,8 @@ export function toggleDarkMode(isDark = !isDarkTheme) {
     set("--titleTextColor", 0.85);
     set("--primaryTextColor", 0.85);
     set("--secondaryTextColor", 0.45);
+    set("--unfocusedTextColor", 0.65);
+    set("--focusedTextColor", 0.8);
     set("--disableColor", 0.3);
 
     set("--dividerColor", 0.6);

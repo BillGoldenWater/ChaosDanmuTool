@@ -3,12 +3,17 @@ ChaosDanmuTool
 - 设置界面布局转用 json 存储 动态构建
     - number string boolean custom etc.
     - custom: (value, setValue)=>{...}
+- InteractWordType-5 互粉
 - 抽奖
-  - 卡片仅中奖后显示最新弹幕
-  - 停止统计时依旧更新最新弹幕
-  - 重抽提示
-  - 更多的动画
+    - 卡片仅中奖后显示最新弹幕
+    - 停止统计时依旧更新最新弹幕
+    - 重抽提示
+    - 更多的动画
 - 点歌
+- 合并多条弹幕成一个长文本
+    - abcd&+=
+    - ef
+    - 合并为 abcdef
 - 启动时自动连接直播间 默认不启用
 - 语音播报 Anti 复读的间隔的 min 设为 0
 - 语音播报 语音选择
