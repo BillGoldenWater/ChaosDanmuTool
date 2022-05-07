@@ -11,15 +11,7 @@ type Props = React.DetailedHTMLProps<
   HTMLInputElement
 >;
 
-class State {}
-
-export class Input extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-
-    this.state = {};
-  }
-
+export class Input extends React.Component<Props> {
   render(): ReactNode {
     return <input className={"Input"} {...this.props} />;
   }

@@ -4,8 +4,10 @@
  */
 
 import React, { ReactNode } from "react";
+import { ConfigC } from "../../../../../rendererShare/state/ConfigContext";
 import { Content } from "../../../component/content/Content";
 import { Input } from "../../../component/input/Input";
+import { Button } from "../../../component/button/Button";
 
 class Props {}
 
@@ -20,10 +22,30 @@ export class ConnectRoom extends React.Component<Props, State> {
 
   render(): ReactNode {
     return (
-      <Content>
-        房间号: <Input type={"number"} defaultValue={114514} />
-        {/*<button>连接</button>*/}
-      </Content>
+      <ConfigC>
+        {({ state }) => {
+          const { config } = state;
+
+          return (
+            <Content>
+              房间号:{" "}
+              <Input
+                type={"number"}
+                defaultValue={config.danmuReceiver.roomid}
+              />
+              <Button
+                primary
+                style={{
+                  marginLeft: "0.5em",
+                }}
+                // onClick={() => alert("test")}
+              >
+                连 接
+              </Button>
+            </Content>
+          );
+        }}
+      </ConfigC>
     );
   }
 }
