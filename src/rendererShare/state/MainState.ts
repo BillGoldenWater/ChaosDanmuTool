@@ -4,10 +4,12 @@
  */
 
 import { Config, DanmuViewCustomConfig } from "../../share/config/Config";
+import { TReceiverStatus } from "../../share/type/commandPack/appCommand/command/TReceiverStatusUpdate";
 
 export class MainState {
   config: Config;
   customConfig?: DanmuViewCustomConfig;
 
   path: URL;
+  receiverStatus: TReceiverStatus;
 }

@@ -4,48 +4,15 @@
  */
 
 import React, { ReactNode } from "react";
-import { ConfigC } from "../../../../../rendererShare/state/ConfigContext";
-import { Content } from "../../../component/content/Content";
-import { Input } from "../../../component/input/Input";
-import { Button } from "../../../component/button/Button";
+import { Content } from "../../../../../rendererShare/component/content/Content";
+import { ConnectionManager } from "./ConnectionManager";
 
-class Props {}
-
-class State {}
-
-export class ConnectRoom extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-
-    this.state = {};
-  }
-
+export class ConnectRoom extends React.Component {
   render(): ReactNode {
     return (
-      <ConfigC>
-        {({ state }) => {
-          const { config } = state;
-
-          return (
-            <Content>
-              房间号:{" "}
-              <Input
-                type={"number"}
-                defaultValue={config.danmuReceiver.roomid}
-              />
-              <Button
-                primary
-                style={{
-                  marginLeft: "0.5em",
-                }}
-                // onClick={() => alert("test")}
-              >
-                连 接
-              </Button>
-            </Content>
-          );
-        }}
-      </ConfigC>
+      <Content>
+        <ConnectionManager />
+      </Content>
     );
   }
 }

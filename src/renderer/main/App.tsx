@@ -5,12 +5,12 @@
 
 import React, { ReactNode } from "react";
 import "./App.less";
-import { Layout } from "./component/layout/Layout";
+import { Layout } from "../../rendererShare/component/layout/Layout";
 import { toggleDarkMode } from "../../rendererShare/style/ThemeUtils";
-import { Content } from "./component/content/Content";
-import { Menu } from "./component/menu/Menu";
+import { Content } from "../../rendererShare/component/content/Content";
+import { Menu } from "../../rendererShare/component/menu/Menu";
 import { createPagePath, PageKey, pageList } from "./page/Page";
-import { MenuItem } from "./component/menu/MenuItem";
+import { MenuItem } from "../../rendererShare/component/menu/MenuItem";
 import { MainState } from "../../rendererShare/state/MainState";
 import {
   ConfigP,
@@ -19,14 +19,18 @@ import {
 import {
   ConfigUpdateEvent,
   MainEventTarget,
+  ReceiverStatusUpdateEvent,
 } from "../../rendererShare/event/MainEventTarget";
 import { CommandReceiver } from "../../share/network/client/CommandReceiver";
 import { getProperty, setProperty } from "dot-prop";
 import { functionPagePathKey } from "./page/function/Function";
+import { ALoggableComponent } from "../../rendererShare/interface/ALoggableComponent";
 
 class Props {}
 
-export class App extends React.Component<Props, MainState> {
+export class App extends ALoggableComponent<Props, MainState> {
+  location = "App";
+
   eventTarget: MainEventTarget = new MainEventTarget();
   webSocketClient: CommandReceiver = new CommandReceiver();
 
@@ -38,6 +42,7 @@ export class App extends React.Component<Props, MainState> {
       config: cfg,
 
       path: this.getPath(cfg.path),
+      receiverStatus: "close",
     };
 
     toggleDarkMode(cfg.darkTheme);
@@ -65,6 +70,7 @@ export class App extends React.Component<Props, MainState> {
     const a = this.eventTarget.addEventListener;
 
     a("configUpdate", this.onConfigUpdate.bind(this));
+    a("receiverStatusUpdate", this.onReceiverStatusUpdate.bind(this));
   }
 
   onConfigUpdate(event: ConfigUpdateEvent) {
@@ -72,6 +78,17 @@ export class App extends React.Component<Props, MainState> {
       config: event.config,
       path: this.getPath(event.config.path),
     });
+    this.log("onConfigUpdate", "Config updated.");
+  }
+
+  onReceiverStatusUpdate(event: ReceiverStatusUpdateEvent) {
+    this.setState({
+      receiverStatus: event.status,
+    });
+    this.log(
+      "onReceiverStatusUpdate",
+      `Receiver status update to: ${event.status}`
+    );
   }
 
   render(): ReactNode {
