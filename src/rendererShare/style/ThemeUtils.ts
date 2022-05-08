@@ -58,13 +58,13 @@ export function toggleDarkMode(isDark = !isDarkTheme) {
     set("--secondaryTextColor", 0.45);
     set("--unfocusedTextColor", 0.75);
     set("--focusedTextColor", 0.8);
-    set("--disableColor", 0.3);
+
+    set("--disabledBackgroundColor", 0.1);
+    set("--disabledTextColor", 0.35);
 
     set("--buttonBackgroundColor", 0.3);
     set("--buttonHoverBackgroundColor", 0.4);
     set("--buttonActiveBackgroundColor", 0.35);
-    set("--disableButtonBackgroundColor", 0.1);
-    set("--disableButtonTextColor", 0.35);
 
     set("--primaryButtonTextColor", 1.0);
     setWithTheme("--primaryButtonBackgroundColor", 0.9);
@@ -84,13 +84,13 @@ export function toggleDarkMode(isDark = !isDarkTheme) {
     set("--secondaryTextColor", 0.45);
     set("--unfocusedTextColor", 0.65);
     set("--focusedTextColor", 0.8);
-    set("--disableColor", 0.3);
+
+    set("--disabledBackgroundColor", 0.15);
+    set("--disabledTextColor", 0.4);
 
     set("--buttonBackgroundColor", 0.18);
     set("--buttonHoverBackgroundColor", 0.26);
     set("--buttonActiveBackgroundColor", 0.22);
-    set("--disableButtonBackgroundColor", 0.15);
-    set("--disableButtonTextColor", 0.4);
 
     set("--primaryButtonTextColor", 0.0);
     setWithTheme("--primaryButtonBackgroundColor", 0.75);
