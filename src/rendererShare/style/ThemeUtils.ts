@@ -67,9 +67,9 @@ export function toggleDarkMode(isDark = !isDarkTheme) {
     set("--disableButtonTextColor", 0.35);
 
     set("--primaryButtonTextColor", 1.0);
-    setWithTheme("--primaryButtonBackgroundColor", 0.75);
-    setWithTheme("--primaryButtonHoverBackgroundColor", 0.9);
-    setWithTheme("--primaryButtonActiveBackgroundColor", 0.6);
+    setWithTheme("--primaryButtonBackgroundColor", 0.9);
+    setWithTheme("--primaryButtonHoverBackgroundColor", 1.0);
+    setWithTheme("--primaryButtonActiveBackgroundColor", 0.8);
 
     set("--dividerColor", 0.12);
 
