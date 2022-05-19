@@ -1,0 +1,68 @@
+/*
+ * Copyright 2021-2022 Golden_Water
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+.SwitchBase {
+  transition: all 0.2s ease-in-out;
+  display: inline-block;
+
+  box-sizing: border-box;
+
+  padding: var(--spacerWidthQuarter);
+
+  width: 3em;
+
+  border-radius: calc(var(--spacerWidthHalf) + 1em);
+}
+
+.Switch {
+  .SwitchBase();
+
+  background-color: var(--itemBackgroundColor);
+
+  &:hover {
+    background-color: var(--itemHoverBackgroundColor);
+  }
+}
+
+.SwitchDisabled {
+  .SwitchBase();
+
+  background-color: var(--disabledBackgroundColor) !important;
+}
+
+.SwitchChecked {
+  transition: transform 0.2s cubic-bezier(0.25, 0, 0, 1);
+
+  background-color: var(--primaryButtonBackgroundColor);
+
+  &:hover {
+    background-color: var(--primaryButtonHoverBackgroundColor);
+  }
+
+  .Slider {
+    transform: translateX(1.5em);
+  }
+}
+
+.SliderBase {
+  transition: transform 0.2s cubic-bezier(0.25, 0, 0, 1);
+
+  height: 1em;
+  width: 1em;
+
+  border-radius: 50%;
+}
+
+.Slider {
+  .SliderBase();
+
+  background-color: var(--primaryButtonTextColor);
+}
+
+.SliderDisabled {
+  .SliderBase();
+
+  background-color: var(--disabledTextColor);
+}
