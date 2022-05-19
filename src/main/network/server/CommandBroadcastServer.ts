@@ -9,7 +9,7 @@ import { ConfigManager as Config } from "../../config/ConfigManager";
 import { getConfigUpdateCommand } from "../../../share/type/commandPack/appCommand/command/TConfigUpdate";
 import { GiftConfigGetter } from "../apiRequest/GiftConfigGetter";
 import { getGiftConfigUpdateCommand } from "../../../share/type/commandPack/appCommand/command/TGiftConfigUpdate";
-import { RoomInitGetter } from "../apiRequest/RoomInitGetter";
+import { RoomInfoGetter } from "../apiRequest/RoomInfoGetter";
 import { MasterInfoGetter } from "../apiRequest/MasterInfoGetter";
 import { getRoomRealTimeMessageUpdateCommand } from "../../../share/type/commandPack/bilibiliCommand/command/TRoomRealTimeMessageUpdate";
 import { DanmuHistoryGetter } from "../apiRequest/DanmuHistoryGetter";
@@ -38,8 +38,8 @@ export class CommandBroadcastServer {
     );
 
     const roomid = <number>Config.get("danmuReceiver.roomid") ?? 0;
-    const id = await RoomInitGetter.getId(roomid);
-    const uid = await RoomInitGetter.getUid(roomid);
+    const id = await RoomInfoGetter.getId(roomid);
+    const uid = await RoomInfoGetter.getUid(roomid);
     const fansNum = await MasterInfoGetter.getFansNum(uid);
 
     this.sendBiliBiliCommand(

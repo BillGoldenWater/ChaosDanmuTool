@@ -6,7 +6,7 @@
 import { TRoomInitResponse } from "../../type/request/bilibili/TRoomInitResponse";
 import { getString } from "../../utils/HttpUtils";
 
-export class RoomInitGetter {
+export class RoomInfoGetter {
   static async get(roomid: number): Promise<TRoomInitResponse> {
     return JSON.parse(
       await getString(
