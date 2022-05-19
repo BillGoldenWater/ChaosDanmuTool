@@ -57,6 +57,7 @@ export class CommandBroadcastServer {
     this.close();
     this.server = new WebSocketServer({ server });
     this.server.on("connection", this.onConnection.bind(this));
+    console.log("[CommandBroadcastServer.run] Running");
   }
 
   static sendAppCommand(socket: WebSocket, data: TAnyAppCommand) {
@@ -77,9 +78,9 @@ export class CommandBroadcastServer {
         value.close(1000);
       });
       this.server.close();
+      console.log("[CommandBroadcastServer.close] Closed");
     }
     this.server = null;
-    console.log("[CommandBroadcastServer.close] Closed");
   }
 
   static broadcast(data: string): void {
