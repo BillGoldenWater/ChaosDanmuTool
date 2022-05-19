@@ -38,7 +38,7 @@ export class CommandBroadcastServer {
     );
 
     const roomid = <number>Config.get("danmuReceiver.roomid") ?? 0;
-    const id = await RoomInfoGetter.getId(roomid);
+    const actualRoomid = await RoomInfoGetter.getId(roomid);
     const uid = await RoomInfoGetter.getUid(roomid);
     const fansNum = await MasterInfoGetter.getFansNum(uid);
 
@@ -47,7 +47,7 @@ export class CommandBroadcastServer {
       getRoomRealTimeMessageUpdateCommand(fansNum, 0)
     );
 
-    const danmuHistory = await DanmuHistoryGetter.getDanmuMsgList(id);
+    const danmuHistory = await DanmuHistoryGetter.getDanmuMsgList(actualRoomid);
     danmuHistory.forEach((value) => {
       this.sendBiliBiliCommand(socket, value);
     });

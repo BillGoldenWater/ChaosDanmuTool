@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { TDanmuHistoryResponse } from "../../type/request/bilibili/danmuhistory/TDanmuHistoryResponse";
+import { TDanmuHistoryResponse } from "../../../share/type/request/bilibili/danmuhistory/TDanmuHistoryResponse";
 import { getString } from "../../utils/HttpUtils";
 import {
   getParsedDanmuMsgCommand,

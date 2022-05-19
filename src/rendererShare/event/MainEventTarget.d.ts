@@ -5,7 +5,7 @@
 
 import { TAnyBiliBiliCommand } from "../../share/type/commandPack/bilibiliCommand/TAnyBiliBiliCommand";
 import { Config } from "../../share/config/Config";
-import { TGiftConfig } from "../../main/type/request/bilibili/giftconfig/TGiftConfig";
+import { TGiftConfig } from "../../share/type/request/bilibili/giftconfig/TGiftConfig";
 import { TReceiverStatus } from "../../share/type/commandPack/appCommand/command/TReceiverStatusUpdate";
 import { Packet } from "../../main/network/client/danmuReceiver/Packet";
 

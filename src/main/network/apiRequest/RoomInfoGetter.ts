@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { TRoomInitResponse } from "../../type/request/bilibili/TRoomInitResponse";
+import { TRoomInfoResponse } from "../../../share/type/request/bilibili/TRoomInfoResponse";
 import { getString } from "../../utils/HttpUtils";
 
 export class RoomInfoGetter {
-  static async get(roomid: number): Promise<TRoomInitResponse> {
+  static async get(roomid: number): Promise<TRoomInfoResponse> {
     return JSON.parse(
       await getString(
         `https://api.live.bilibili.com/room/v1/Room/room_init?id=${roomid}`

@@ -17,7 +17,6 @@ export type UpdateConfig = {
 };
 
 export type DanmuReceiverConfig = {
-  serverUrl: string;
   roomid: number;
   heartBeatInterval: number;
   autoReconnect: boolean;
@@ -245,7 +244,6 @@ const defaultConfig: Config = {
     ignoreVersion: "",
   },
   danmuReceiver: {
-    serverUrl: "wss://broadcastlv.chat.bilibili.com/sub",
     roomid: 0,
     heartBeatInterval: 30,
     autoReconnect: false,

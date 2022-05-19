@@ -5,7 +5,7 @@
 
 import { TBiliBiliResponse } from "./TBiliBiliResponse";
 
-export type TRoomInitResponse = TBiliBiliResponse<{
+export type TRoomInfoResponse = TBiliBiliResponse<{
   room_id: number;
   short_id: number;
   uid: number;

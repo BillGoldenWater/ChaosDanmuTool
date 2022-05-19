@@ -47,7 +47,8 @@ export class Packet {
   static join(
     roomId: number,
     protocolVersion: number,
-    platform: string
+    platform: string,
+    token: string
   ): Packet {
     return new Packet(
       encodeString(
@@ -55,6 +56,7 @@ export class Packet {
           roomid: roomId,
           protover: protocolVersion,
           platform: platform,
+          key: token,
         })
       ),
       OpCode.join

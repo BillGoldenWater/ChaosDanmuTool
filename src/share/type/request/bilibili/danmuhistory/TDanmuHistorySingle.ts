@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { TRawMedal } from "../../../../../share/type/bilibili/userinfo/TRawMedal";
-import { TRawUserLevel } from "../../../../../share/type/bilibili/userinfo/TRawUserLevel";
-import { TEmojiData } from "../../../../../share/type/bilibili/TEmojiData";
-import { TDanmuType } from "../../../../../share/type/commandPack/bilibiliCommand/command/TParsedDanmuMsg";
+import { TRawMedal } from "../../../bilibili/userinfo/TRawMedal";
+import { TRawUserLevel } from "../../../bilibili/userinfo/TRawUserLevel";
+import { TEmojiData } from "../../../bilibili/TEmojiData";
+import { TDanmuType } from "../../../commandPack/bilibiliCommand/command/TParsedDanmuMsg";
 
 export type TDanmuHistorySingle = {
   text: string;

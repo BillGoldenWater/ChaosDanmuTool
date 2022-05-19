@@ -24,6 +24,8 @@ import { DataType } from "./DDataType";
 import { OpCode } from "./DOpCode";
 import { Packet } from "./Packet";
 import { decodeString } from "../../../utils/StringUtils";
+import { RoomInfoGetter } from "../../apiRequest/RoomInfoGetter";
+import { DanmuServerInfoGetter } from "../../apiRequest/DanmuServerInfoGetter";
 
 function alertPacketParseError(message: string, data: Packet): void {
   dialog.showErrorBox("错误", message);
@@ -43,7 +45,6 @@ export class DanmuReceiver {
   static status: TReceiverStatus = "close";
 
   static tryReconnect(
-    url: string,
     roomid: number,
     heartBeatInterval: number,
     protocolVersion?: number,
@@ -53,7 +54,7 @@ export class DanmuReceiver {
       clearTimeout(this.reconnectTimeout);
       this.reconnectTimeout = setTimeout(() => {
         this.reconnectCount++;
-        this.connect(url, roomid, heartBeatInterval, protocolVersion, platform);
+        this.connect(roomid, heartBeatInterval, protocolVersion, platform);
       }, 1e3);
       this.broadcastStatusUpdate("reconnecting");
     }
@@ -64,16 +65,20 @@ export class DanmuReceiver {
     CBS.broadcastAppCommand(getReceiverStatusUpdateCommand(status));
   }
 
-  static connect(
-    url: string,
+  static async connect(
     roomid: number,
     heartBeatInterval: number,
     protocolVersion?: number,
     platform?: string
-  ): void {
+  ) {
     this.close();
     this.heartBeatInterval = heartBeatInterval;
-    this.connection = new WebSocket(url);
+
+    const actualRoomid = await RoomInfoGetter.getId(roomid);
+    const tokenAndUrl = await DanmuServerInfoGetter.getTokenAndAUrl(
+      actualRoomid
+    );
+    this.connection = new WebSocket(tokenAndUrl.url);
     this.connection.binaryType = "arraybuffer";
 
     this.broadcastStatusUpdate("connecting");
@@ -84,7 +89,8 @@ export class DanmuReceiver {
           Packet.join(
             roomid,
             protocolVersion ? protocolVersion : 3,
-            platform ? platform : "web"
+            platform ? platform : "web",
+            tokenAndUrl.token
           )
         )
       );
@@ -105,13 +111,7 @@ export class DanmuReceiver {
     this.connection.on("close", (code) => {
       this.broadcastStatusUpdate("close");
       if (code == 1006) {
-        this.tryReconnect(
-          url,
-          roomid,
-          heartBeatInterval,
-          protocolVersion,
-          platform
-        );
+        this.tryReconnect(roomid, heartBeatInterval, protocolVersion, platform);
       }
     });
 

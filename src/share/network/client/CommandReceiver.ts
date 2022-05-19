@@ -15,7 +15,7 @@ import {
 } from "../../../rendererShare/event/MainEventTarget";
 import { TCommandPack } from "../../type/commandPack/TCommandPack";
 import { TAnyAppCommand } from "../../type/commandPack/appCommand/TAnyAppCommand";
-import { parseGiftConfig } from "../../../main/type/request/bilibili/giftconfig/TGiftConfig";
+import { parseGiftConfig } from "../../type/request/bilibili/giftconfig/TGiftConfig";
 import { TAnyBiliBiliCommand } from "../../type/commandPack/bilibiliCommand/TAnyBiliBiliCommand";
 
 type Option = {

@@ -8,7 +8,7 @@ import { v4 as uuid4 } from "uuid";
 import { Config } from "../share/config/Config";
 import { TCommandPack } from "../share/type/commandPack/TCommandPack";
 import { Result } from "../share/type/TResult";
-import { TGithubRelease } from "../main/type/request/github/TGithubRelease";
+import { TGithubRelease } from "../share/type/request/github/TGithubRelease";
 
 export interface ApiElectron {
   getPlatform: () => string;

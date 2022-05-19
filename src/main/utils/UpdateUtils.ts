@@ -5,12 +5,12 @@
 
 import { app } from "electron";
 import { getGithubApi, getString } from "./HttpUtils";
-import { TGithubReleases } from "../type/request/github/TGithubReleases";
+import { TGithubReleases } from "../../share/type/request/github/TGithubReleases";
 import { Result } from "../../share/type/TResult";
 import { ResultStatus } from "../../share/type/TResultStatus";
 import { printError } from "../../share/utils/ErrorUtils";
-import { TGithubAPIRateLimit } from "../type/request/github/TGithubAPIRateLimit";
-import { TGithubRelease } from "../type/request/github/TGithubRelease";
+import { TGithubAPIRateLimit } from "../../share/type/request/github/TGithubAPIRateLimit";
+import { TGithubRelease } from "../../share/type/request/github/TGithubRelease";
 
 export class UpdateUtils {
   static releaseUrl: string;

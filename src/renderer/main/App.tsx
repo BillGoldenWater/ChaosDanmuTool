@@ -71,6 +71,10 @@ export class App extends ALoggableComponent<Props, MainState> {
 
     a("configUpdate", this.onConfigUpdate.bind(this));
     a("receiverStatusUpdate", this.onReceiverStatusUpdate.bind(this));
+
+    a("bilibiliCommand", (event) => {
+      console.log(event.command);
+    });
   }
 
   onConfigUpdate(event: ConfigUpdateEvent) {
