@@ -9,10 +9,6 @@
 
   padding: var(--spacerWidthHalf);
 
-  color: var(--unfocusedTextColor);
-
-  background-color: var(--itemBackgroundColor);
-
   border: none;
   border-radius: var(--contentBorderRadius);
 
@@ -23,6 +19,11 @@
   &::-webkit-inner-spin-button, &::-webkit-outer-spin-button {
     display: none;
   }
+}
+
+.InputColor {
+  background-color: var(--itemBackgroundColor);
+  color: var(--unfocusedTextColor);
 
   &:hover, &:focus {
     background-color: var(--itemHoverBackgroundColor);
@@ -30,7 +31,7 @@
   }
 }
 
-.InputDisabled {
+.InputDisabledColor {
   background-color: var(--disabledBackgroundColor);
   color: var(--disabledTextColor);
 
