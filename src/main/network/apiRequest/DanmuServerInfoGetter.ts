@@ -9,6 +9,7 @@ import { TDanmuServerTokenAndUrl } from "../../../share/type/request/bilibili/da
 
 export class DanmuServerInfoGetter {
   static async get(actualRoomid: number): Promise<TDanmuServerInfoResponse> {
+    if (actualRoomid == null || isNaN(actualRoomid)) actualRoomid = 0;
     let url =
       "https://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo";
     url += `?id=${actualRoomid.toString(10)}`;
