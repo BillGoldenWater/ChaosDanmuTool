@@ -10,6 +10,7 @@ import {
   ipcMain,
   IpcMainEvent,
   Menu,
+  session,
 } from "electron";
 import * as path from "path";
 import { Config, defaultViewCustomInternalUUID } from "../share/config/Config";
@@ -151,7 +152,55 @@ export async function createViewerWindow(): Promise<void> {
   }
 }
 
-function init(): void {
+async function init(): Promise<void> {
+  if (isDev) {
+    //region loadDevExtensions
+    const browserExtPaths = [
+      path.join("Microsoft Edge", "Default", "Extensions"),
+    ];
+    // noinspection SpellCheckingInspection
+    let devExtIds = ["fmkadmapgofadopljbjfkapdkoienihi" /* react dev tool */];
+
+    for (const browserExtPath of browserExtPaths) {
+      const loaded: string[] = [];
+
+      for (const extId of devExtIds) {
+        const fs = await import("fs/promises");
+        const extRootPath = path.join(
+          app.getPath("appData"),
+          browserExtPath,
+          extId
+        );
+
+        // 获取版本目录
+        try {
+          const extVersionFiles = await fs.readdir(extRootPath, {
+            withFileTypes: true,
+          });
+          const extVersions = extVersionFiles
+            .filter((value) => value.isDirectory())
+            .map((value) => value.name)
+            .sort()
+            .reverse();
+          if (extVersions.length > 0) {
+            await session.defaultSession.loadExtension(
+              path.join(extRootPath, extVersions[0])
+            );
+            console.log(
+              `[main.index.init.loadDevExtensions] ${extId}-${extVersions[0]} loaded`
+            );
+            loaded.push(extId);
+          }
+
+          // eslint-disable-next-line no-empty
+        } catch (e) {}
+      }
+
+      devExtIds = devExtIds.filter((value) => loaded.indexOf(value) == -1);
+    }
+    //endregion
+  }
+
   //region configInit
 
   ConfigManager.init(
