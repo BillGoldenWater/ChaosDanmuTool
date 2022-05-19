@@ -283,13 +283,13 @@ async function init(): Promise<void> {
   //endregion
 
   //region connection
-  ipcMain.on("connection", async (event, ...args) => {
+  ipcMain.on("connection", (event, ...args) => {
     switch (args[0]) {
       case "connect": {
-        await DanmuReceiver.connect(
+        DanmuReceiver.connect(
           args[1],
           get("danmuReceiver.heartBeatInterval") as number
-        );
+        ).then();
         break;
       }
       case "disconnect": {

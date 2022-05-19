@@ -44,6 +44,8 @@ export class DanmuReceiver {
   static reconnectCount = 0;
   static status: TReceiverStatus = "close";
 
+  static connecting: boolean;
+
   static tryReconnect(
     roomid: number,
     heartBeatInterval: number,
@@ -52,9 +54,14 @@ export class DanmuReceiver {
   ) {
     if (Config.get("danmuReceiver.autoReconnect") && this.reconnectCount <= 5) {
       clearTimeout(this.reconnectTimeout);
-      this.reconnectTimeout = setTimeout(() => {
+      this.reconnectTimeout = setTimeout(async () => {
         this.reconnectCount++;
-        this.connect(roomid, heartBeatInterval, protocolVersion, platform);
+        await this.connect(
+          roomid,
+          heartBeatInterval,
+          protocolVersion,
+          platform
+        );
       }, 1e3);
       this.broadcastStatusUpdate("reconnecting");
     }
@@ -71,17 +78,24 @@ export class DanmuReceiver {
     protocolVersion?: number,
     platform?: string
   ) {
-    this.close();
+    !this.isClosed() && this.close();
+    console.log(`[DanmuReceiver.connect] connecting ${roomid}`);
+
+    this.broadcastStatusUpdate("connecting");
+    this.connecting = true;
+
     this.heartBeatInterval = heartBeatInterval;
 
     const actualRoomid = await RoomInfoGetter.getId(roomid);
     const tokenAndUrl = await DanmuServerInfoGetter.getTokenAndAUrl(
       actualRoomid
     );
+    if (!this.connecting) {
+      console.log("[DanmuReceiver.connect] connect aborted");
+      return;
+    }
     this.connection = new WebSocket(tokenAndUrl.url);
     this.connection.binaryType = "arraybuffer";
-
-    this.broadcastStatusUpdate("connecting");
 
     this.connection.on("open", () => {
       this.connection.send(
@@ -106,6 +120,7 @@ export class DanmuReceiver {
       }
 
       this.reconnectCount = 0;
+      console.log("[DanmuReceiver.connect.onOpen] connected");
     });
 
     this.connection.on("close", (code) => {
@@ -113,6 +128,8 @@ export class DanmuReceiver {
       if (code == 1006) {
         this.tryReconnect(roomid, heartBeatInterval, protocolVersion, platform);
       }
+
+      console.log(`[DanmuReceiver.connect.onClose] closed ${code}`);
     });
 
     this.connection.on("error", (err) => {
@@ -121,6 +138,8 @@ export class DanmuReceiver {
     });
 
     this.connection.on("message", this.onMessage.bind(this));
+
+    this.connecting = false;
   }
 
   static async onMessage(data: ArrayBuffer): Promise<void> {
@@ -176,6 +195,11 @@ export class DanmuReceiver {
   }
 
   static close(): boolean {
+    if (this.connecting) {
+      this.connecting = false;
+      this.broadcastStatusUpdate("close");
+      console.log("[DanmuReceiver.close] abort connect");
+    }
     if (this.connection) {
       if (this.connection.readyState != WebSocket.CLOSED) {
         if (this.connection.readyState == WebSocket.OPEN) {
@@ -184,6 +208,7 @@ export class DanmuReceiver {
           this.connection.terminate();
         }
       }
+      console.log("[DanmuReceiver.close] closed");
     }
     this.heartBeatId ? this.stopHeartBeat() : "";
     return true;
