@@ -6,16 +6,14 @@
 import React from "react";
 import { MainState } from "./MainState";
 import { MainEventTarget } from "../event/MainEventTarget";
-import { ObjectPath } from "../../share/type/TObjectPath";
 import { Config } from "../../share/config/Config";
+import { TDotPropContext } from "./TDotPropContext";
 
-export type TConfigContext = {
+export type TConfigContext = TDotPropContext<Config> & {
   state: MainState;
   setState: React.Component["setState"];
   eventTarget: MainEventTarget;
 
-  get?: (path: ObjectPath<Config>, defaultValue?: unknown) => unknown;
-  set?: (path: ObjectPath<Config>, value: unknown) => void;
   setPathOption?: (key: string, value: string) => void;
 };
 
