@@ -6,12 +6,17 @@
 import React, { ReactNode } from "react";
 import { Content } from "../../../../../rendererShare/component/content/Content";
 import { ConnectionManager } from "./ConnectionManager";
+import { ConnectionSettings } from "./ConnectionSettings";
+import { Spacer } from "../../../../../rendererShare/component/spacer/Spacer";
 
 export class ConnectRoom extends React.Component {
   render(): ReactNode {
     return (
       <Content>
         <ConnectionManager />
+        <Spacer vertical />
+        <Spacer vertical />
+        <ConnectionSettings />
       </Content>
     );
   }
