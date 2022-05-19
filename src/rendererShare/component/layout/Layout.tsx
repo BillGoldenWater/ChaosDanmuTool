@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React, { ReactNode } from "react";
+import React, { PropsWithChildren, ReactNode } from "react";
 import "./Layout.less";
 
 class Props {
   sider?: ReactNode;
 }
 
-export class Layout extends React.Component<Props> {
+export class Layout extends React.Component<PropsWithChildren<Props>> {
   render(): ReactNode {
     const { children, sider } = this.props;
 

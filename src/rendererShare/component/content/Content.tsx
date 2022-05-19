@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React, { ReactNode } from "react";
+import React, { PropsWithChildren, ReactNode } from "react";
 import "./Content.less";
 
 class Props {
   noPadding?: boolean;
 }
 
-export class Content extends React.Component<Props> {
+export class Content extends React.Component<PropsWithChildren<Props>> {
   render(): ReactNode {
     const { children, noPadding } = this.props;
     const paddingClass = noPadding ? "" : " ContentPadding";
