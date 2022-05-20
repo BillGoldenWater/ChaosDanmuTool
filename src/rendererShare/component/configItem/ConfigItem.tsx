@@ -50,18 +50,30 @@ class PropsStringDotProp<T extends AObject> extends PropsStringBase {
   context: TDotPropContext<T>;
   path: ObjectPath<T>;
   defaultValue?: string;
+  /**
+   * @return true if value is legal
+   */
+  inputCheck?: (value: string) => boolean;
 }
 
 class PropsNumberDotProp<T extends AObject> extends PropsNumberBase {
   context: TDotPropContext<T>;
   path: ObjectPath<T>;
   defaultValue?: number;
+  /**
+   * @return true if value is legal
+   */
+  inputCheck?: (value: number) => boolean;
 }
 
 class PropsBooleanDotProp<T extends AObject> extends PropsBooleanBase {
   context: TDotPropContext<T>;
   path: ObjectPath<T>;
   defaultValue?: boolean;
+  /**
+   * @return true if value is legal
+   */
+  inputCheck?: (value: boolean) => boolean;
 }
 
 type Props<T extends AObject> =
@@ -99,6 +111,7 @@ export class ConfigItem<T extends AObject> extends React.Component<Props<T>> {
               type={"text"}
               defaultValue={p.context.get(p.path, p.defaultValue) as string}
               onChange={(event) => {
+                if (p.inputCheck && !p.inputCheck(event.target.value)) return;
                 p.context.set(p.path, event.target.value);
               }}
             />
@@ -131,6 +144,8 @@ export class ConfigItem<T extends AObject> extends React.Component<Props<T>> {
               min={p.min}
               onChange={(event) => {
                 if (isNaN(event.target.valueAsNumber)) return;
+                if (p.inputCheck && !p.inputCheck(event.target.valueAsNumber))
+                  return;
                 p.context.set(p.path, event.target.valueAsNumber);
               }}
             />
@@ -153,6 +168,7 @@ export class ConfigItem<T extends AObject> extends React.Component<Props<T>> {
             <Switch
               defaultValue={p.context.get(p.path, p.defaultValue) as boolean}
               onChange={(value) => {
+                if (p.inputCheck && !p.inputCheck(value)) return;
                 p.context.set(p.path, value);
               }}
             />
