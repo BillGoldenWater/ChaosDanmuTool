@@ -59,7 +59,7 @@ export function toggleDarkMode(isDark = !isDarkTheme) {
   if (isDarkTheme) {
     set("--titleTextColor", 0.85);
     set("--primaryTextColor", 0.85);
-    set("--secondaryTextColor", 0.45);
+    set("--secondaryTextColor", 0.55);
     set("--unfocusedTextColor", 0.75);
     set("--focusedTextColor", 0.8);
 
@@ -85,7 +85,7 @@ export function toggleDarkMode(isDark = !isDarkTheme) {
   } else {
     set("--titleTextColor", 0.85);
     set("--primaryTextColor", 0.85);
-    set("--secondaryTextColor", 0.45);
+    set("--secondaryTextColor", 0.55);
     set("--unfocusedTextColor", 0.65);
     set("--focusedTextColor", 0.8);
 
