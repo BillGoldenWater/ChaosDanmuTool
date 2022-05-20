@@ -48,6 +48,8 @@ export function toggleDarkMode(isDark = !isDarkTheme) {
   root.style.setProperty("--spacerWidth", "1em");
 
   root.style.setProperty("--textSize", "1em");
+  root.style.setProperty("--titleTextSize", "1.15em");
+  root.style.setProperty("----secondaryTextSize", "0.85em");
 
   setWithTheme("--selectedTextColor", 0.9);
   setWithTheme("--itemSelectedBackgroundColor", 0.15);
