@@ -14,6 +14,7 @@ import { TDotPropContext } from "../../state/TDotPropContext";
 class PropsBase {
   name: string;
   description?: string;
+  inline?: boolean;
 }
 
 class PropsStringBase extends PropsBase {
@@ -75,7 +76,7 @@ type Props<T extends AObject> =
 
 export class ConfigItem<T extends AObject> extends React.Component<Props<T>> {
   render(): ReactNode {
-    const { name, description, type } = this.props;
+    const { name, description, type, inline } = this.props;
 
     let inputElement: ReactNode = <></>;
 
@@ -162,8 +163,10 @@ export class ConfigItem<T extends AObject> extends React.Component<Props<T>> {
     }
     //endregion
 
+    const configItemClass = !inline ? "ConfigItem" : "ConfigItemInline";
+
     return (
-      <div className={"ConfigItem"}>
+      <div className={configItemClass}>
         <div className={"ConfigItemNameAndInput"}>
           <div className={"ConfigItemName"}>{name}:</div>
           {inputElement}
