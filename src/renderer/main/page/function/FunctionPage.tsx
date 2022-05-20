@@ -6,7 +6,7 @@
 import React, { ReactNode } from "react";
 import { ApiOutlined, CompassOutlined, EyeOutlined } from "@ant-design/icons";
 import { ConnectRoom } from "./connectRoom/ConnectRoom";
-import { DanmuViewer } from "./danmuViewer/DanmuViewer";
+import { DanmuViewerControl } from "./danmuViewerControl/DanmuViewerControl";
 
 export type FunctionPageKey = "" | "connectRoom" | "danmuViewer" | "gacha";
 
@@ -31,6 +31,7 @@ export const functionPageList: FunctionPageInfo<FunctionPageKey>[] = [
     name: "查看弹幕",
     description: "弹幕悬浮窗开关, 使用说明, 获取链接, 调整样式",
     icon: <EyeOutlined />,
+    render: () => <DanmuViewerControl />,
   },
   {
     key: "gacha",
