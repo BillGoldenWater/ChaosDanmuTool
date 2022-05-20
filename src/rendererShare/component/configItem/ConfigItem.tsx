@@ -9,6 +9,7 @@ import { Input } from "../input/Input";
 import { Switch } from "../switch/Switch";
 import { AObject, ObjectPath } from "../../../share/type/TObjectPath";
 import { TDotPropContext } from "../../state/TDotPropContext";
+import { SecondaryText } from "../secondaryText/SecondaryText";
 
 //region defineProps
 class PropsBase {
@@ -187,7 +188,9 @@ export class ConfigItem<T extends AObject> extends React.Component<Props<T>> {
           <div className={"ConfigItemName"}>{name}:</div>
           {inputElement}
         </div>
-        <div className={"ConfigItemDescription"}>{description}</div>
+        <div className={"ConfigItemDescription"}>
+          <SecondaryText>{description}</SecondaryText>
+        </div>
       </div>
     );
   }
