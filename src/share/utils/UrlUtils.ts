@@ -27,3 +27,12 @@ export function constructViewerUrl(
     uuid: option.uuid,
   });
 }
+
+export function getParam(url: URL, key: string): string {
+  return url.searchParams.get(key);
+}
+
+export function setParam(url: URL, key: string, value: string): URL {
+  url.searchParams.set(key, value);
+  return url;
+}

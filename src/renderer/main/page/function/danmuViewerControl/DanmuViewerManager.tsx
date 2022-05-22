@@ -9,6 +9,7 @@ import { Spacer } from "../../../../../rendererShare/component/spacer/Spacer";
 import { SecondaryText } from "../../../../../rendererShare/component/secondaryText/SecondaryText";
 import { ConfigC } from "../../../../../rendererShare/state/ConfigContext";
 import { TitleText } from "../../../../../rendererShare/component/titleText/TitleText";
+import { DanmuViewerLinkGenerator } from "./DanmuViewerLinkGenerator";
 
 class Props {}
 
@@ -65,6 +66,8 @@ export class DanmuViewerManager extends React.Component<Props, State> {
                   </>
                 </SecondaryText>
               </div>
+              <Spacer vertical />
+              <DanmuViewerLinkGenerator />
             </div>
           );
         }}
