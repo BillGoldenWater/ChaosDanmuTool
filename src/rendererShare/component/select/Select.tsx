@@ -120,7 +120,7 @@ export class Select<V> extends React.Component<Props<V>, State> {
     const { disabled, list, onChange } = this.props;
     const { select } = this.state;
 
-    const selectedItem = list.find((item) => item.key === select);
+    const selectedItem = list.find((item) => item.key === select) || list[0];
     const selectedElement = this.renderItem(selectedItem);
 
     const selectItems = list.map((item) => (
