@@ -61,7 +61,7 @@ export class DanmuViewerManager extends React.Component<Props, State> {
                 <SecondaryText>
                   <>
                     注: 在其他设备中使用时需要将链接中的 localhost
-                    替换为本机的ip地址, 确保防火墙中放行端口{" "}
+                    替换为本机的ip地址, 并确保防火墙中放行端口{" "}
                     {get("httpServerPort")}
                   </>
                 </SecondaryText>
