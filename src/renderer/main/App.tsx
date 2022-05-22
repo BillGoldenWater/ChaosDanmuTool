@@ -25,6 +25,9 @@ import { CommandReceiver } from "../../share/network/client/CommandReceiver";
 import { getProperty, setProperty } from "dot-prop";
 import { functionPagePathKey } from "./page/function/Function";
 import { ALoggableComponent } from "../../rendererShare/interface/ALoggableComponent";
+import { getParam } from "../../share/utils/UrlUtils";
+import { danmuViewerCustomKey } from "./page/function/danmuViewerControl/DanmuViewerLinkGenerator";
+import { DanmuViewCustomConfig } from "../../share/config/Config";
 
 class Props {}
 
@@ -38,10 +41,12 @@ export class App extends ALoggableComponent<Props, MainState> {
     super(props);
 
     const cfg = window.electron.getConfig();
+    const path = this.getPath(cfg.path);
     this.state = {
       config: cfg,
+      customConfig: this.getCustomConfig(cfg.danmuViewCustoms, path),
 
-      path: this.getPath(cfg.path),
+      path: path,
       receiverStatus: "close",
     };
 
@@ -66,6 +71,17 @@ export class App extends ALoggableComponent<Props, MainState> {
     return createPagePath(path, pageList[0].key);
   }
 
+  getCustomConfig(
+    customs: DanmuViewCustomConfig[],
+    path: URL
+  ): DanmuViewCustomConfig {
+    return (
+      customs.find(
+        (value) => value.name === getParam(path, danmuViewerCustomKey)
+      ) || customs[0]
+    );
+  }
+
   registerEvents() {
     const a = this.eventTarget.addEventListener;
 
@@ -78,9 +94,13 @@ export class App extends ALoggableComponent<Props, MainState> {
   }
 
   onConfigUpdate(event: ConfigUpdateEvent) {
+    const cfg = event.config;
+    const path = this.getPath(event.config.path);
+
     this.setState({
-      config: event.config,
-      path: this.getPath(event.config.path),
+      config: cfg,
+      customConfig: this.getCustomConfig(cfg.danmuViewCustoms, path),
+      path: path,
     });
     this.log("onConfigUpdate", "Config updated.");
   }
