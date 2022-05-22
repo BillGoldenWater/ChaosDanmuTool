@@ -35,8 +35,9 @@ export class Select<V> extends React.Component<Props<V>, State> {
 
     const { defaultSelect, list } = props;
 
+    const defaultKey = list && list.length > 0 ? list[0].key : "";
     this.state = {
-      select: defaultSelect || (list && list.length > 0) ? list[0].key : "",
+      select: defaultSelect || defaultKey,
     };
   }
 
