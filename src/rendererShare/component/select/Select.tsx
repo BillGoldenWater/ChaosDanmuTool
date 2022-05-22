@@ -66,9 +66,11 @@ export class Select<V> extends React.Component<Props<V>, State> {
       [
         {
           height: `${startRect.height}px`,
+          width: `${startRect.width}px`,
         },
         {
           height: `${finalRect.height}px`,
+          width: `${finalRect.width}px`,
         },
       ],
       {
@@ -99,9 +101,11 @@ export class Select<V> extends React.Component<Props<V>, State> {
       [
         {
           height: `${startRect.height}px`,
+          width: `${startRect.width}px`,
         },
         {
           height: `${finalRect.height}px`,
+          width: `${finalRect.width}px`,
         },
       ],
       {
