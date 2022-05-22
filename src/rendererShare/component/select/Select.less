@@ -1,0 +1,105 @@
+/*
+ * Copyright 2021-2022 Golden_Water
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+.SelectBase {
+  display: inline-flex;
+
+  padding: var(--spacerWidthQuarter);
+  min-width: 3em;
+
+  border-radius: var(--contentBorderRadius);
+}
+
+.Select {
+  display: inline-block;
+}
+
+.SelectSelected {
+  .SelectBase();
+
+  padding-left: var(--spacerWidthHalf);
+  padding-right: var(--spacerWidthHalf);
+
+  background-color: var(--buttonBackgroundColor);
+
+  &:hover {
+    background-color: var(--buttonHoverBackgroundColor);
+  }
+}
+
+.SelectSelectedDisabled {
+  .SelectBase();
+
+  padding-left: var(--spacerWidthHalf);
+  padding-right: var(--spacerWidthHalf);
+
+  color: var(--disabledTextColor);
+
+  background-color: var(--disabledBackgroundColor);
+}
+
+.SelectList {
+  .SelectBase();
+  transition: height 0.2s cubic-bezier(0.25, 0, 0, 1);
+
+  display: none;
+
+  position: relative;
+
+  z-index: 1;
+  overflow: auto;
+
+  flex-direction: column;
+
+  max-height: 10.5em;
+
+  padding-top: calc(var(--spacerWidthQuarter) / 2);
+  padding-bottom: calc(var(--spacerWidthQuarter) / 2);
+
+  background-color: var(--buttonBackgroundColor);
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.SelectListItemBase {
+  .SelectBase();
+
+  border-radius: var(--itemBorderRadius);
+
+  margin-top: calc(var(--spacerWidthQuarter) / 2);
+  margin-bottom: calc(var(--spacerWidthQuarter) / 2);
+}
+
+.SelectListItem {
+  .SelectListItemBase();
+
+  background-color: var(--buttonBackgroundColor);
+
+  &:hover {
+    background-color: var(--buttonHoverBackgroundColor);
+  }
+
+  &:active {
+    background-color: var(--buttonActiveBackgroundColor);
+  }
+}
+
+.SelectListItemSelected {
+  .SelectListItemBase();
+
+  color: var(--primaryButtonTextColor);
+
+  background-color: var(--primaryButtonBackgroundColor);
+
+  &:hover {
+    background-color: var(--primaryButtonHoverBackgroundColor);
+  }
+
+  &:active {
+    background-color: var(--primaryButtonActiveBackgroundColor);
+  }
+}
