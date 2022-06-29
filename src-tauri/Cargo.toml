@@ -20,6 +20,7 @@ serde = { version = "1.0.137", features = ["derive"] }
 tauri = { version = "1.0.0", features = ["api-all"] }
 raw-window-handle = "0.4.3"
 cocoa = "0.24.0"
+objc = "0.2.7"
 
 [features]
 # by default Tauri runs in production mode
