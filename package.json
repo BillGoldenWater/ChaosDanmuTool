@@ -1,13 +1,19 @@
 {
   "name": "chaosdanmutool",
-  "private": true,
-  "version": "0.0.0",
+  "productName": "ChaosDanmuTool",
+  "version": "0.10.0",
+  "description": "A tool for process/view Danmu on bilibili",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri"
   },
+  "author": {
+    "name": "BiliGoldenWater",
+    "email": "2439577268@qq.com"
+  },
+  "license": "AGPL-3.0-only",
   "dependencies": {
     "@tauri-apps/api": "^1.0.1",
     "preact": "^10.5.15"

@@ -8,7 +8,7 @@
   },
   "package": {
     "productName": "ChaosDanmuTool",
-    "version": "0.1.0"
+    "version": "0.10.0"
   },
   "tauri": {
     "allowlist": {
@@ -16,7 +16,7 @@
     },
     "bundle": {
       "active": true,
-      "category": "DeveloperTool",
+      "category": "Utility",
       "copyright": "",
       "deb": {
         "depends": []
@@ -29,8 +29,8 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
-      "longDescription": "",
+      "identifier": "indi.goldenwater.chaosdanmutool",
+      "longDescription": "A tool for process/view Danmu on bilibili",
       "macOS": {
         "entitlements": null,
         "exceptionDomain": "",
@@ -39,7 +39,7 @@
         "signingIdentity": null
       },
       "resources": [],
-      "shortDescription": "",
+      "shortDescription": "A tool for process/view Danmu on bilibili",
       "targets": "all",
       "windows": {
         "certificateThumbprint": null,
