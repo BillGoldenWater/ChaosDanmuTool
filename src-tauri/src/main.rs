@@ -1,11 +1,16 @@
+/*
+ * Copyright 2021-2022 Golden_Water
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 #![cfg_attr(
 all(not(debug_assertions), target_os = "windows"),
 windows_subsystem = "windows"
 )]
 
-use cocoa::appkit::NSWindow;
-use raw_window_handle::HasRawWindowHandle;
 use tauri::{App, AppHandle, Manager, Wry};
+
+use chaosdanmutool::libs::utils::window_utils::set_visible_on_all_workspaces;
 
 fn create_main_window(app_handle: AppHandle<Wry>) {
   let main_window = tauri::WindowBuilder
@@ -21,18 +26,10 @@ fn create_main_window(app_handle: AppHandle<Wry>) {
     main_window.open_devtools()
   }
 
-  match main_window.raw_window_handle() {
-    #[cfg(target_os = "macos")]
-    raw_window_handle::RawWindowHandle::AppKit(handle) => unsafe {
-      use cocoa::{base::id};
-      use cocoa::appkit::{NSWindowCollectionBehavior};
-
-      let ns_window = handle.ns_window as id;
-      ns_window.setCollectionBehavior_(NSWindowCollectionBehavior::NSWindowCollectionBehaviorCanJoinAllSpaces);
-      // ns_window.setCollectionBehavior_(NSWindowCollectionBehavior::NSWindowCollectionBehaviorFullScreenAuxiliary);
-    }
-    _ => {}
-  }
+  set_visible_on_all_workspaces(main_window,
+                                true,
+                                true,
+                                false);
 }
 
 fn show_main_window(app_handle: AppHandle<Wry>) {
@@ -48,7 +45,7 @@ fn show_main_window(app_handle: AppHandle<Wry>) {
 fn on_ready(_app_handle: &AppHandle<Wry>) {}
 
 fn on_init(app: &mut App<Wry>) {
-  show_main_window(app.app_handle())
+  show_main_window(app.app_handle());
 }
 
 fn main() {
@@ -58,8 +55,12 @@ fn main() {
       on_init(app);
       Ok(())
     })
-    // .invoke_handler(tauri::generate_handler![test])
-    .menu(tauri::Menu::os_default("Chaos Danmu Tool"))
+    // .invoke_handler(tauri::generate_handler![set_visible_on_all_workspace])
+    .menu(if cfg!(target_os = "macos") {
+      tauri::Menu::os_default("Chaos Danmu Tool")
+    } else {
+      tauri::Menu::default()
+    })
     .build(context)
     .expect("error while building tauri application");
 
