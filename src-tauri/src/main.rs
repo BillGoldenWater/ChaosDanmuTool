@@ -78,6 +78,7 @@ fn create_main_window(app_handle: AppHandle<Wry>) {
     main_window.open_devtools()
   }
 
+  #[cfg(target_os = "macos")]
   set_visible_on_all_workspaces(main_window,
                                 true,
                                 true,

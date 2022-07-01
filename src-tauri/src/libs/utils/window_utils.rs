@@ -18,11 +18,12 @@ extern {
   fn TransformProcessType(psn: *mut ProcessSerialNumber, transform_state: u32) -> OSStatus;
 }
 
+#[cfg(target_os = "macos")]
 pub fn set_visible_on_all_workspaces(window: Window<Wry>,
-                                     visible: bool,
-                                     visible_on_full_screen: bool,
-                                     skip_transform_process_type: bool) {
-  #[cfg(target_os = "macos")] unsafe {
+                                            visible: bool,
+                                            visible_on_full_screen: bool,
+                                            skip_transform_process_type: bool) {
+  unsafe {
     use cocoa::appkit::{NSWindow, NSWindowCollectionBehavior};
 
     let ns_window = get_ns_window(window).unwrap();
