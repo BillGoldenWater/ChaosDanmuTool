@@ -7,6 +7,7 @@
 use MacTypes_sys::{OSStatus, ProcessSerialNumber};
 #[cfg(target_os = "macos")]
 use raw_window_handle::HasRawWindowHandle;
+#[cfg(target_os = "macos")]
 use tauri::{Window, Wry};
 
 #[cfg(target_os = "macos")]

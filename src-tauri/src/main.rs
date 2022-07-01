@@ -10,6 +10,7 @@ windows_subsystem = "windows"
 
 use tauri::{App, AppHandle, Manager, Wry};
 
+#[cfg(target_os = "macos")]
 use chaosdanmutool::libs::utils::window_utils::set_visible_on_all_workspaces;
 
 fn main() {
