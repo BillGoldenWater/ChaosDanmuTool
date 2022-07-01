@@ -37,12 +37,10 @@ fn main() {
       tauri::RunEvent::Ready {} => { // ready event
         on_ready(app_handle)
       }
+      #[cfg(target_os = "macos")]
       tauri::RunEvent::ExitRequested { api, .. } => { // exit requested event
-        #[cfg(target_os = "macos")]
-        {
-          println!("[RunEvent.ExitRequested] Exit prevented");
-          api.prevent_exit()
-        }
+        println!("[RunEvent.ExitRequested] Exit prevented");
+        api.prevent_exit()
       }
 
       _ => {}
