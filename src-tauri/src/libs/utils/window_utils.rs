@@ -3,10 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+#[cfg(target_os = "macos")]
 use MacTypes_sys::{OSStatus, ProcessSerialNumber};
+#[cfg(target_os = "macos")]
 use raw_window_handle::HasRawWindowHandle;
 use tauri::{Window, Wry};
 
+#[cfg(target_os = "macos")]
 use crate::libs::utils::process_utils::get_psn_ptr;
 
 #[cfg(target_os = "macos")]
@@ -53,27 +56,26 @@ pub fn set_visible_on_all_workspaces(window: Window<Wry>,
   }
 }
 
+#[cfg(target_os = "macos")]
 pub unsafe fn set_collection_behavior(ns_window: cocoa::base::id,
                                       enable: bool,
                                       collection_behavior: cocoa::appkit::NSWindowCollectionBehavior) {
-  #[cfg(target_os = "macos")]{
-    use cocoa::appkit::NSWindow;
+  use cocoa::appkit::NSWindow;
 
-    if enable {
-      ns_window.setCollectionBehavior_(ns_window.collectionBehavior() | collection_behavior);
-    } else {
-      ns_window.setCollectionBehavior_(ns_window.collectionBehavior() & (!collection_behavior));
-    }
+  if enable {
+    ns_window.setCollectionBehavior_(ns_window.collectionBehavior() | collection_behavior);
+  } else {
+    ns_window.setCollectionBehavior_(ns_window.collectionBehavior() & (!collection_behavior));
   }
 }
 
+#[cfg(target_os = "macos")]
 pub fn get_ns_window(window: Window<Wry>) -> Option<cocoa::base::id> {
-  if cfg!(target_os="macos") {
-    use raw_window_handle::RawWindowHandle::AppKit;
+  use raw_window_handle::RawWindowHandle::AppKit;
 
-    if let AppKit(handle) = window.raw_window_handle() {
-      return Some(handle.ns_window as cocoa::base::id);
-    }
+  if let AppKit(handle) = window.raw_window_handle() {
+    Some(handle.ns_window as cocoa::base::id)
+  } else {
+    None
   }
-  None
 }
