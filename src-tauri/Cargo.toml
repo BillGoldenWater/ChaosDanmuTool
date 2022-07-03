@@ -12,13 +12,28 @@ rust-version = "1.57"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = { version = "1.0.0", features = [] }
+tauri-build = { version = "1.0.2", features = [] }
 
 [dependencies]
-serde_json = "1.0.81"
-serde = { version = "1.0.137", features = ["derive"] }
-tauri = { version = "1.0.0", features = [] }
+serde_json = "1.0.82"
+serde = { version = "1.0.138", features = ["derive"] }
+tauri = { version = "1.0.2", features = [] }
 raw-window-handle = "0.4.3"
+futures-util = "0.3.21"
+tokio = "1.19.2"
+tokio-tungstenite = { version = "0.17.1", features = ["native-tls"] }
+url = "2.2.2"
+ts-rs = "6.2.0"
+# live template: tss
+# |#[derive(ts_rs::TS)]
+# |#[ts(export, export_to = "../src/share/type/rust/$PATH$")]
+# |struct $NAME$ {
+# |  $END$
+# |}
+#
+# live template: atss
+# |#[derive(ts_rs::TS)]
+# |#[ts(export, export_to = "../src/share/type/rust/$PATH$")]
 
 [target.'cfg(target_os = "macos")'.dependencies]
 cocoa = "0.24.0"
