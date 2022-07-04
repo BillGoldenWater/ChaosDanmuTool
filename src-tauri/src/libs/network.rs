@@ -3,5 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-pub mod utils;
-pub mod network;
+pub mod receiver;
+pub mod websocket;
+pub mod api_request;

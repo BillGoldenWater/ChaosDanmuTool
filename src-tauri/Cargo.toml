@@ -22,7 +22,7 @@ raw-window-handle = "0.4.3"
 futures-util = "0.3.21"
 tokio = "1.19.2"
 tokio-tungstenite = { version = "0.17.1", features = ["native-tls"] }
-url = "2.2.2"
+reqwest = { version = "0.11.11", features = ["blocking", "native-tls"] }
 ts-rs = "6.2.0"
 # live template: tss
 # |#[derive(ts_rs::TS)]

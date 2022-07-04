@@ -3,7 +3,5 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-pub struct DanmuReceiver {
-
-}
-
+pub mod danmu_server_info_getter;
+pub mod bilibili_response;
