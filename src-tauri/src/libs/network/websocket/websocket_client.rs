@@ -7,7 +7,6 @@ use std::borrow::BorrowMut;
 
 use futures_util::{SinkExt, StreamExt};
 use futures_util::stream::{SplitSink, SplitStream};
-use tauri::async_runtime::block_on;
 use tokio::{net::TcpStream, sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender}};
 use tokio_tungstenite::{connect_async, MaybeTlsStream, tungstenite::Message, WebSocketStream};
 use tokio_tungstenite::tungstenite::protocol::CloseFrame;
@@ -64,18 +63,16 @@ impl WebSocketClient {
     true
   }
 
-  pub fn disconnect(&mut self, close_frame: Option<CloseFrame<'static>>) {
+  pub async fn disconnect(&mut self, close_frame: Option<CloseFrame<'static>>) {
     if let Some(write) = self.write.borrow_mut() {
-      block_on(async move {
-        let _ = write.send(Message::Close(close_frame)).await;
-        let _ = write.close().await;
-      });
+      let _ = write.send(Message::Close(close_frame)).await;
+      let _ = write.close().await;
     }
   }
 
-  pub fn send(&mut self, message: Message) {
+  pub async fn send(&mut self, message: Message) {
     if let Some(write) = self.write.borrow_mut() {
-      let _ = block_on(write.send(message));
+      let _ = write.send(message).await;
     }
   }
 
