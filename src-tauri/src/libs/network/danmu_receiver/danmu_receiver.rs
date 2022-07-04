@@ -8,8 +8,8 @@ use std::time::Instant;
 use tokio_tungstenite::tungstenite::Message;
 
 use crate::libs::network::api_request::danmu_server_info_getter::DanmuServerInfoGetter;
-use crate::libs::network::receiver::danmu_receiver::DanmuReceiverConnectError::{FailedToConnect, GettingServerInfoFailed};
-use crate::libs::network::receiver::packet::{JoinPacketInfo, Packet};
+use crate::libs::network::danmu_receiver::danmu_receiver::DanmuReceiverConnectError::{FailedToConnect, GettingServerInfoFailed};
+use crate::libs::network::danmu_receiver::packet::{JoinPacketInfo, Packet};
 use crate::libs::network::websocket::websocket_client::WebSocketClient;
 
 pub struct DanmuReceiver {

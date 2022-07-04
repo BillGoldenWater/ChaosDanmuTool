@@ -3,6 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-pub mod receiver;
+pub mod danmu_receiver;
 pub mod websocket;
 pub mod api_request;

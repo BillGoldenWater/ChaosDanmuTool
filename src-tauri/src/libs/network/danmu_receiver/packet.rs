@@ -7,8 +7,8 @@ use std::io::Cursor;
 
 use bytes::{Buf, BufMut, BytesMut};
 
-use crate::libs::network::receiver::data_type::DataType;
-use crate::libs::network::receiver::op_code::OpCode;
+use crate::libs::network::danmu_receiver::data_type::DataType;
+use crate::libs::network::danmu_receiver::op_code::OpCode;
 
 #[derive(Debug)]
 pub struct Packet {
@@ -91,9 +91,7 @@ impl Packet {
         }];
 
         if data.capacity() > 0 {
-          result.append(&mut Self::from_bytes(
-            data.to_vec()
-          ))
+          result.append(&mut Self::from_bytes(data.to_vec()))
         }
 
         result

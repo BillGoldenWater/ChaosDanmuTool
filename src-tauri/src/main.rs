@@ -12,7 +12,7 @@ use std::sync::Mutex;
 
 use tauri::{App, AppHandle, command, Manager, State, Wry};
 
-use chaosdanmutool::libs::network::receiver::danmu_receiver::DanmuReceiver;
+use chaosdanmutool::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver;
 #[cfg(target_os = "macos")]
 use chaosdanmutool::libs::utils::window_utils::set_visible_on_all_workspaces;
 
