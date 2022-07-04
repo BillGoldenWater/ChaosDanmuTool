@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+use std::time::Instant;
+
 use tokio_tungstenite::tungstenite::Message;
 
 use crate::libs::network::api_request::danmu_server_info_getter::DanmuServerInfoGetter;
@@ -12,21 +14,19 @@ use crate::libs::network::websocket::websocket_client::WebSocketClient;
 
 pub struct DanmuReceiver {
   websocket_client: WebSocketClient,
+  last_heartbeat_ts: Instant,
+
+  heartbeat_interval: u32,
 }
 
 impl DanmuReceiver {
-  pub fn new() -> DanmuReceiver {
+  pub fn new(heartbeat_interval: u32) -> DanmuReceiver {
     DanmuReceiver {
       websocket_client: WebSocketClient::new(|message| {
-        match message {
-          Message::Binary(data) => {
-            println!("{:?}", Packet::from_bytes(data));
-          }
-          _ => {
-            println!("{:?}", message)
-          }
-        }
+        Self::on_message(message)
       }),
+      last_heartbeat_ts: Instant::now(),
+      heartbeat_interval,
     }
   }
 
@@ -61,11 +61,33 @@ impl DanmuReceiver {
   }
 
   pub fn tick(&mut self) {
-    self.websocket_client.tick()
+    self.websocket_client.tick();
+    self.tick_heartbeat();
+  }
+
+  fn tick_heartbeat(&mut self) {
+    if self.last_heartbeat_ts.elapsed().as_secs() > self.heartbeat_interval as u64 {
+      tauri::async_runtime::block_on(self.websocket_client.send(Message::Binary(
+        Packet::heartbeat().pack().to_vec()
+      )));
+
+      self.last_heartbeat_ts = Instant::now();
+    }
   }
 
   pub fn is_connected(&self) -> bool {
     self.websocket_client.is_connected()
+  }
+
+  fn on_message(message: Message) {
+    match message {
+      Message::Binary(data) => {
+        println!("{:?}", Packet::from_bytes(data));
+      }
+      _ => {
+        println!("{:?}", message)
+      }
+    }
   }
 }
 

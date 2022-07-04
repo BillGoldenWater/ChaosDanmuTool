@@ -22,8 +22,13 @@ struct Receiver {
 
 #[command]
 fn connect(receiver: State<Receiver>) {
-  tauri::async_runtime::block_on(receiver.client.lock().unwrap().connect(953650))
+  tauri::async_runtime::block_on(receiver.client.lock().unwrap().connect(34348))
     .expect("unable to connect 953650");
+}
+
+#[command]
+fn disconnect(receiver: State<Receiver>) {
+  tauri::async_runtime::block_on(receiver.client.lock().unwrap().disconnect());
 }
 
 fn main() {
@@ -36,9 +41,9 @@ fn main() {
       Ok(())
     })
     .manage(Receiver {
-      client: Mutex::new(DanmuReceiver::new())
+      client: Mutex::new(DanmuReceiver::new(30))
     })
-    .invoke_handler(tauri::generate_handler![connect])
+    .invoke_handler(tauri::generate_handler![connect,disconnect])
     .menu(if cfg!(target_os = "macos") {
       tauri::Menu::os_default("Chaos Danmu Tool")
     } else {
