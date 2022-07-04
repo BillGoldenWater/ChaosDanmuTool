@@ -3,8 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+use tokio_tungstenite::tungstenite::Message;
+
 use crate::libs::network::api_request::danmu_server_info_getter::DanmuServerInfoGetter;
 use crate::libs::network::receiver::danmu_receiver::DanmuReceiverConnectError::{FailedToConnect, GettingServerInfoFailed};
+use crate::libs::network::receiver::packet::{JoinPacketInfo, Packet};
 use crate::libs::network::websocket::websocket_client::WebSocketClient;
 
 pub struct DanmuReceiver {
@@ -15,7 +18,14 @@ impl DanmuReceiver {
   pub fn new() -> DanmuReceiver {
     DanmuReceiver {
       websocket_client: WebSocketClient::new(|message| {
-        println!("{:?}", message)
+        match message {
+          Message::Binary(data) => {
+            println!("{:?}", Packet::from_bytes(data));
+          }
+          _ => {
+            println!("{:?}", message)
+          }
+        }
       }),
     }
   }
@@ -33,16 +43,21 @@ impl DanmuReceiver {
     if !connect_success {
       return Err(FailedToConnect);
     } else { // on open
-      println!("OnOpen")
+      self.websocket_client.send(Message::Binary(
+        Packet::join(JoinPacketInfo {
+          roomid: room_id,
+          protover: 3,
+          platform: "web".to_string(),
+          key: token_and_url.token,
+        }).pack().to_vec()
+      )).await
     }
-
-    println!("1");
 
     Ok(())
   }
 
-  pub fn disconnect(&mut self) {
-    self.websocket_client.disconnect(None);
+  pub async fn disconnect(&mut self) {
+    self.websocket_client.disconnect(None).await;
   }
 
   pub fn tick(&mut self) {

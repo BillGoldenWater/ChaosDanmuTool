@@ -8,10 +8,23 @@ all(not(debug_assertions), target_os = "windows"),
 windows_subsystem = "windows"
 )]
 
-use tauri::{App, AppHandle, Manager, Wry};
+use std::sync::Mutex;
 
+use tauri::{App, AppHandle, command, Manager, State, Wry};
+
+use chaosdanmutool::libs::network::receiver::danmu_receiver::DanmuReceiver;
 #[cfg(target_os = "macos")]
 use chaosdanmutool::libs::utils::window_utils::set_visible_on_all_workspaces;
+
+struct Receiver {
+  client: Mutex<DanmuReceiver>,
+}
+
+#[command]
+fn connect(receiver: State<Receiver>) {
+  tauri::async_runtime::block_on(receiver.client.lock().unwrap().connect(953650))
+    .expect("unable to connect 953650");
+}
 
 fn main() {
   let context = tauri::generate_context!();
@@ -22,7 +35,10 @@ fn main() {
       on_init(app);
       Ok(())
     })
-    // .invoke_handler(tauri::generate_handler![set_visible_on_all_workspace])
+    .manage(Receiver {
+      client: Mutex::new(DanmuReceiver::new())
+    })
+    .invoke_handler(tauri::generate_handler![connect])
     .menu(if cfg!(target_os = "macos") {
       tauri::Menu::os_default("Chaos Danmu Tool")
     } else {
@@ -41,6 +57,10 @@ fn main() {
       tauri::RunEvent::ExitRequested { api, .. } => { // exit requested event
         println!("[RunEvent.ExitRequested] Exit prevented");
         api.prevent_exit()
+      }
+      tauri::RunEvent::MainEventsCleared => {
+        let receiver = app_handle.state::<Receiver>();
+        receiver.client.lock().unwrap().tick();
       }
 
       _ => {}

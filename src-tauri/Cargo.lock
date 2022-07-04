@@ -265,6 +265,8 @@ name = "chaosdanmutool"
 version = "0.10.0"
 dependencies = [
  "MacTypes-sys",
+ "brotli-decompressor",
+ "bytes",
  "cocoa",
  "futures-util",
  "objc",
