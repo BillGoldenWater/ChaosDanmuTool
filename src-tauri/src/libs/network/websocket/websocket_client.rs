@@ -40,9 +40,8 @@ impl WebSocketClient {
     };
   }
 
-  pub fn connect(&mut self, url: &str) -> bool {
-    let connect_result =
-      block_on(connect_async(url));
+  pub async fn connect(&mut self, url: &str) -> bool {
+    let connect_result = connect_async(url).await;
 
     if connect_result.is_err() {
       println!("[WebSocketClient.connect] Failed to connect: {}", url);
@@ -115,7 +114,7 @@ impl WebSocketClient {
         let tx = tx.clone();
         async move { // each message
           if item.is_err() {
-            println!("[WebSocketClient.recv_loop] had an error item.")
+            println!("[WebSocketClient.recv_loop] had an error: {:?}", item.err().unwrap())
           } else { // forward to main_thread
             let message = item.unwrap();
 
