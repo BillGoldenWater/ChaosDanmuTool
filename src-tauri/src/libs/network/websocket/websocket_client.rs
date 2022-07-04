@@ -40,6 +40,10 @@ impl WebSocketClient {
   }
 
   pub async fn connect(&mut self, url: &str) -> bool {
+    if self.connected {
+      self.disconnect(None).await;
+    }
+
     let connect_result = connect_async(url).await;
 
     if connect_result.is_err() {
