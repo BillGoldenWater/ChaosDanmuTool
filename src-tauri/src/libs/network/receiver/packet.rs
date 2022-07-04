@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-use std::cmp::max;
 use std::io::Cursor;
 
 use bytes::{Buf, BufMut, BytesMut};
@@ -91,11 +90,9 @@ impl Packet {
           body,
         }];
 
-        if data.capacity() > packet_len as usize {
+        if data.capacity() > 0 {
           result.append(&mut Self::from_bytes(
             data.to_vec()
-              [(packet_len as usize)..max(data.capacity() - 1, packet_len as usize)]
-              .to_vec()
           ))
         }
 
