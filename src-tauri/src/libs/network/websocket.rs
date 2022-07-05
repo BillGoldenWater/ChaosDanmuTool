@@ -3,4 +3,5 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-pub mod websocket_client;
+pub mod websocket_connection;
+pub mod websocket_server;

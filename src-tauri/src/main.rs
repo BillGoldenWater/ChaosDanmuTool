@@ -8,30 +8,99 @@ all(not(debug_assertions), target_os = "windows"),
 windows_subsystem = "windows"
 )]
 
-use std::sync::Mutex;
+use std::time::Duration;
 
-use tauri::{App, AppHandle, command, Manager, State, Wry};
+use tauri::{App, AppHandle, command, Manager, Wry};
+use tauri::async_runtime::block_on;
+use tokio_tungstenite::tungstenite::Message;
 
 use chaosdanmutool::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver;
+use chaosdanmutool::libs::network::websocket::websocket_server::WebSocketServer;
+use chaosdanmutool::libs::network::websocket::websocket_server::WebSocketServerEvent::OnConnection;
 #[cfg(target_os = "macos")]
 use chaosdanmutool::libs::utils::window_utils::set_visible_on_all_workspaces;
 
-struct Receiver {
-  client: Mutex<DanmuReceiver>,
+static mut RECEIVER: Option<DanmuReceiver> = None;
+static mut SERVER: Option<WebSocketServer> = None;
+
+#[command]
+fn connect() {
+  unsafe {
+    if let Some(receiver) = &mut RECEIVER {
+      let _ = block_on(receiver.connect(34348));
+    }
+  }
 }
 
 #[command]
-fn connect(receiver: State<Receiver>) {
-  tauri::async_runtime::block_on(receiver.client.lock().unwrap().connect(34348))
-    .expect("unable to connect 953650");
+fn disconnect() {
+  unsafe {
+    if let Some(receiver) = &mut RECEIVER {
+      block_on(receiver.disconnect());
+    }
+  }
 }
 
 #[command]
-fn disconnect(receiver: State<Receiver>) {
-  tauri::async_runtime::block_on(receiver.client.lock().unwrap().disconnect());
+fn listen() {
+  unsafe {
+    if let Some(server) = &mut SERVER {
+      server.listen("0.0.0.0:80".to_string())
+    }
+  }
+}
+
+#[command]
+fn broadcast() {
+  unsafe {
+    if let Some(server) = &mut SERVER {
+      block_on(server.broadcast(Message::Text("test".to_string())));
+    }
+  }
+}
+
+#[command]
+fn close() {
+  unsafe {
+    if let Some(server) = &mut SERVER {
+      server.close()
+    }
+  }
 }
 
 fn main() {
+  unsafe { RECEIVER = Some(DanmuReceiver::new(30)); }
+  unsafe {
+    let server = WebSocketServer::new(|event| {
+      match event {
+        OnConnection(connection_id) => {
+          println!("new connection: {}", connection_id);
+          if let Some(server) = &mut SERVER {
+            let connection = server.get_connection(connection_id);
+            if let Some(connection) = connection {
+              tauri::async_runtime::spawn(connection.send(Message::Text("test".to_string())));
+            }
+          }
+        }
+      }
+    });
+    SERVER = Some(server);
+  }
+
+  std::thread::spawn(|| {
+    unsafe {
+      loop {
+        if let Some(receiver) = &mut RECEIVER {
+          block_on(receiver.tick());
+        }
+        if let Some(server) = &mut SERVER {
+          block_on(server.tick());
+        }
+        std::thread::sleep(Duration::from_millis(100))
+      }
+    }
+  });
+
   let context = tauri::generate_context!();
 
   // region init
@@ -40,10 +109,7 @@ fn main() {
       on_init(app);
       Ok(())
     })
-    .manage(Receiver {
-      client: Mutex::new(DanmuReceiver::new(30))
-    })
-    .invoke_handler(tauri::generate_handler![connect,disconnect])
+    .invoke_handler(tauri::generate_handler![connect,disconnect,listen,broadcast,close])
     .menu(if cfg!(target_os = "macos") {
       tauri::Menu::os_default("Chaos Danmu Tool")
     } else {
@@ -62,10 +128,6 @@ fn main() {
       tauri::RunEvent::ExitRequested { api, .. } => { // exit requested event
         println!("[RunEvent.ExitRequested] Exit prevented");
         api.prevent_exit()
-      }
-      tauri::RunEvent::MainEventsCleared => {
-        let receiver = app_handle.state::<Receiver>();
-        tauri::async_runtime::block_on(receiver.client.lock().unwrap().tick());
       }
 
       _ => {}
