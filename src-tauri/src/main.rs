@@ -65,7 +65,7 @@ fn main() {
       }
       tauri::RunEvent::MainEventsCleared => {
         let receiver = app_handle.state::<Receiver>();
-        receiver.client.lock().unwrap().tick();
+        tauri::async_runtime::block_on(receiver.client.lock().unwrap().tick());
       }
 
       _ => {}

@@ -60,16 +60,16 @@ impl DanmuReceiver {
     self.websocket_client.disconnect(None).await;
   }
 
-  pub fn tick(&mut self) {
+  pub async fn tick(&mut self) {
     self.websocket_client.tick();
-    self.tick_heartbeat();
+    self.tick_heartbeat().await;
   }
 
-  fn tick_heartbeat(&mut self) {
+  async fn tick_heartbeat(&mut self) {
     if self.last_heartbeat_ts.elapsed().as_secs() > self.heartbeat_interval as u64 {
-      tauri::async_runtime::block_on(self.websocket_client.send(Message::Binary(
+      self.websocket_client.send(Message::Binary(
         Packet::heartbeat().pack().to_vec()
-      )));
+      )).await;
 
       self.last_heartbeat_ts = Instant::now();
     }
