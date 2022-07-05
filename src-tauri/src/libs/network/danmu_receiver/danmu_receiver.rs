@@ -4,6 +4,7 @@
  */
 
 use std::time::Instant;
+use bytes::BytesMut;
 
 use tokio_tungstenite::tungstenite::Message;
 
@@ -82,7 +83,7 @@ impl DanmuReceiver {
   fn on_message(message: Message) {
     match message {
       Message::Binary(data) => {
-        println!("{:?}", Packet::from_bytes(data));
+        println!("{:?}", Packet::from_bytes(&mut BytesMut::from(data.as_slice())));
       }
       _ => {
         println!("{:?}", message)

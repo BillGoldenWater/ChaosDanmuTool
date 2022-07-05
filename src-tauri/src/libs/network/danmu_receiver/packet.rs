@@ -50,9 +50,7 @@ impl Packet {
     4 + 2 + 2 + 4 + 4
   }
 
-  pub fn from_bytes(bytes: Vec<u8>) -> Vec<Packet> {
-    let mut data = BytesMut::from(bytes.as_slice());
-
+  pub fn from_bytes(data: &mut BytesMut) -> Vec<Packet> {
     let packet_len = data.get_u32();
     let header_len = data.get_u16();
     let data_type = data.get_u16();
@@ -62,7 +60,7 @@ impl Packet {
 
     match DataType::from_u16(data_type) {
       DataType::CompressedBrotli => { // brotli
-        let body = Self::get_body(&mut data, body_len);
+        let body = Self::get_body(data, body_len);
 
         let mut decompressed = vec![];
         let result = brotli_decompressor::BrotliDecompress(
@@ -74,14 +72,14 @@ impl Packet {
           return vec![];
         }
 
-        Self::from_bytes(decompressed)
+        Self::from_bytes(&mut BytesMut::from(decompressed.as_slice()))
       }
       DataType::CompressedZlib => { // zlib
         println!("unsupported compress format");
         vec![]
       }
       _ => { // other
-        let body = Self::get_body(&mut data, body_len);
+        let body = Self::get_body(data, body_len);
 
         let mut result = vec![Packet {
           data_type: DataType::from_u16(data_type),
@@ -91,7 +89,7 @@ impl Packet {
         }];
 
         if data.capacity() > 0 {
-          result.append(&mut Self::from_bytes(data.to_vec()))
+          result.append(&mut Self::from_bytes(data))
         }
 
         result
