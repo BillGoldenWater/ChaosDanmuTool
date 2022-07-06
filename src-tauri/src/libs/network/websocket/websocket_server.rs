@@ -3,26 +3,24 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+use std::sync::Mutex;
+
 use tauri::async_runtime::JoinHandle;
 use tokio::net::{TcpListener, TcpStream};
 use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
 use tokio_tungstenite::MaybeTlsStream;
 use tokio_tungstenite::tungstenite::Message;
+use tokio_tungstenite::tungstenite::protocol::CloseFrame;
 
 use crate::libs::network::websocket::websocket_connection::WebSocketConnection;
-use crate::libs::network::websocket::websocket_server::WebSocketServerEvent::OnConnection;
-
-pub struct CallbackFn(Box<dyn (FnMut(WebSocketServerEvent))>);
-
-unsafe impl Send for CallbackFn {}
-
-unsafe impl Sync for CallbackFn {}
 
 type Stream = MaybeTlsStream<TcpStream>;
 
-pub struct WebSocketServer {
-  event_handler: CallbackFn,
+lazy_static! {
+  pub static ref WEBSOCKET_SERVER_STATIC_INSTANCE: Mutex<WebSocketServer> = Mutex::new(WebSocketServer::new());
+}
 
+pub struct WebSocketServer {
   listening: bool,
   connections: Vec<WebSocketConnection>,
   rx: Option<UnboundedReceiver<Stream>>,
@@ -30,9 +28,8 @@ pub struct WebSocketServer {
 }
 
 impl WebSocketServer {
-  pub fn new<F: FnMut(WebSocketServerEvent) + 'static>(event_handler: F) -> WebSocketServer {
+  fn new() -> WebSocketServer {
     WebSocketServer {
-      event_handler: CallbackFn(Box::new(event_handler)),
       listening: false,
       connections: vec![],
       rx: None,
@@ -40,15 +37,17 @@ impl WebSocketServer {
     }
   }
 
-  pub fn listen(&mut self, url: String) {
-    self.before_listen();
+  pub fn listen(url: String) {
+    let this = &mut *WEBSOCKET_SERVER_STATIC_INSTANCE.lock().unwrap();
+
+    this.before_listen();
 
     let (tx, rx) = unbounded_channel();
-    self.rx = Some(rx);
+    this.rx = Some(rx);
 
-    self.listen_loop = Some(WebSocketServer::listen_loop(url, tx));
+    this.listen_loop = Some(WebSocketServer::listen_loop(url, tx));
 
-    self.listening = true;
+    this.listening = true;
     println!("[WebSocketServer.listen] start listening")
   }
 
@@ -70,23 +69,43 @@ impl WebSocketServer {
     })
   }
 
-  pub async fn broadcast(&mut self, message: Message) {
-    for connection in self.connections.as_mut_slice() {
+  pub async fn broadcast(message: Message) {
+    let this = &mut *WEBSOCKET_SERVER_STATIC_INSTANCE.lock().unwrap();
+
+    for connection in this.connections.as_mut_slice() {
       connection.send(message.clone()).await;
     }
   }
 
-  pub fn get_connection(&mut self, connection_id: String) -> Option<&mut WebSocketConnection> {
-    for connection in self.connections.as_mut_slice() {
-      if connection.get_id().eq(&connection_id) {
-        return Some(connection);
-      }
-    }
-    None
+  pub async fn send(connection_id: String, message: Message) {
+    let this = &mut *WEBSOCKET_SERVER_STATIC_INSTANCE.lock().unwrap();
+
+    this.send_(connection_id, message).await;
   }
 
-  pub fn is_listening(&self) -> bool {
-    self.listening
+  async fn send_(&mut self, connection_id: String, message: Message) {
+    for connection in self.connections.as_mut_slice() {
+      if connection.get_id().eq(&connection_id) {
+        connection.send(message).await;
+        break;
+      }
+    }
+  }
+
+  pub async fn disconnect(connection_id: String, close_frame: Option<CloseFrame<'static>>) {
+    let this = &mut *WEBSOCKET_SERVER_STATIC_INSTANCE.lock().unwrap();
+
+    for connection in this.connections.as_mut_slice() {
+      if connection.get_id().eq(&connection_id) {
+        connection.disconnect(close_frame).await;
+        break;
+      }
+    }
+  }
+
+  pub fn is_listening() -> bool {
+    let this = &*WEBSOCKET_SERVER_STATIC_INSTANCE.lock().unwrap();
+    this.listening
   }
 
   async fn on_stop_listening(&mut self) {
@@ -100,7 +119,13 @@ impl WebSocketServer {
     println!("[WebSocketServer.on_stop_listening] stopped");
   }
 
-  pub fn close(&mut self) {
+  pub fn close() {
+    let this = &mut *WEBSOCKET_SERVER_STATIC_INSTANCE.lock().unwrap();
+
+    this.close_()
+  }
+
+  fn close_(&mut self) {
     if let Some(handle) = &mut self.listen_loop {
       handle.abort()
     }
@@ -108,46 +133,58 @@ impl WebSocketServer {
 
   fn before_listen(&mut self) {
     if self.listening {
-      self.close();
+      self.close_()
     }
   }
 
-  pub async fn tick(&mut self) {
-    self.connections.retain(|connection| connection.is_connected());
-    if !self.listening { return; }
+  pub async fn tick() {
+    let this = &mut *WEBSOCKET_SERVER_STATIC_INSTANCE.lock().unwrap();
 
-    for connection in self.connections.as_mut_slice() {
-      connection.tick();
+    this.connections.retain(|connection| connection.is_connected());
+    if !this.listening { return; }
+
+    // region tick connections
+    let mut incoming_messages: Vec<(String, Message)> = vec![];
+    for connection in this.connections.as_mut_slice() {
+      let messages = connection.tick().await;
+      for msg in messages {
+        incoming_messages.push((connection.get_id(), msg));
+      }
     }
+    for (id, msg) in incoming_messages {
+      this.on_message(msg, id).await;
+    }
+    // endregion
 
-    if let Some(rx) = &mut self.rx {
+    if let Some(rx) = &mut this.rx {
       let rx_result = rx.try_recv(); // try_recv
       if let Ok(stream) = rx_result { // when incoming connection
-        let mut connection = WebSocketConnection::new(|message, connection_id| {
-          Self::on_message(message, connection_id);
-        });
+        let mut connection = WebSocketConnection::new();
 
         let accept_result = connection.accept(stream).await;
 
         if accept_result.is_ok() {
           let connection_id = connection.get_id();
-          self.connections.push(connection);
-          (self.event_handler.0)(OnConnection(connection_id));
+          this.connections.push(connection);
+          this.on_connection(connection_id).await;
         }
       } else if let Err(err) = rx_result { // when failed recv
         if err == tokio::sync::mpsc::error::TryRecvError::Disconnected { // when stop listening
-          self.on_stop_listening().await;
+          this.on_stop_listening().await;
         }
       }
     }
   }
 
-  fn on_message(message: Message, connection_id: String) {
-    println!("[WebSocketServer.on_message] {}: {:?} ", connection_id, message)
-  }
-}
+  async fn on_connection(&mut self, connection_id: String) {
+    println!("[WebSocketServer.on_connection] id: {} ", connection_id);
 
-pub enum WebSocketServerEvent {
-  OnConnection(String),
-  // OnMessage(Message, String),
+    self.send_(connection_id.clone(), Message::Text(connection_id)).await;
+  }
+
+  async fn on_message(&mut self, message: Message, connection_id: String) {
+    println!("[WebSocketServer.on_message] {}: {:?} ", connection_id, message);
+
+    self.send_(connection_id, message).await;
+  }
 }

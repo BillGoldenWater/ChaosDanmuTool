@@ -269,6 +269,7 @@ dependencies = [
  "bytes",
  "cocoa",
  "futures-util",
+ "lazy_static",
  "objc",
  "raw-window-handle",
  "reqwest",

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+use std::sync::Mutex;
 use std::time::Instant;
 
 use bytes::BytesMut;
@@ -12,6 +13,11 @@ use crate::libs::network::api_request::danmu_server_info_getter::DanmuServerInfo
 use crate::libs::network::danmu_receiver::danmu_receiver::DanmuReceiverConnectError::{FailedToConnect, GettingServerInfoFailed};
 use crate::libs::network::danmu_receiver::packet::{JoinPacketInfo, Packet};
 use crate::libs::network::websocket::websocket_connection::{WebSocketConnectError, WebSocketConnection};
+use crate::libs::network::websocket::websocket_server::WebSocketServer;
+
+lazy_static! {
+  pub static ref DANMU_RECEIVER_STATIC_INSTANCE: Mutex<DanmuReceiver> = Mutex::new(DanmuReceiver::new(30));
+}
 
 pub struct DanmuReceiver {
   websocket_connection: WebSocketConnection,
@@ -21,17 +27,17 @@ pub struct DanmuReceiver {
 }
 
 impl DanmuReceiver {
-  pub fn new(heartbeat_interval: u32) -> DanmuReceiver {
+  fn new(heartbeat_interval: u32) -> DanmuReceiver {
     DanmuReceiver {
-      websocket_connection: WebSocketConnection::new(|message, connection_id| {
-        Self::on_message(message, connection_id);
-      }),
+      websocket_connection: WebSocketConnection::new(),
       last_heartbeat_ts: Instant::now(),
       heartbeat_interval,
     }
   }
 
-  pub async fn connect(&mut self, room_id: i32) -> Result<(), DanmuReceiverConnectError> {
+  pub async fn connect(room_id: i32) -> Result<(), DanmuReceiverConnectError> {
+    let this = &mut *DANMU_RECEIVER_STATIC_INSTANCE.lock().unwrap();
+
     let token_and_url_result =
       DanmuServerInfoGetter::get_token_and_url(room_id).await;
 
@@ -41,12 +47,12 @@ impl DanmuReceiver {
     let token_and_url = token_and_url_result.unwrap();
 
     let connect_result =
-      self.websocket_connection.connect(token_and_url.url.as_str()).await;
+      this.websocket_connection.connect(token_and_url.url.as_str()).await;
 
     if let Err(err) = connect_result {
       return Err(FailedToConnect(err));
     } else { // on open
-      self.websocket_connection.send(Message::Binary(
+      this.websocket_connection.send(Message::Binary(
         Packet::join(JoinPacketInfo {
           roomid: room_id,
           protover: 3,
@@ -60,13 +66,20 @@ impl DanmuReceiver {
     Ok(())
   }
 
-  pub async fn disconnect(&mut self) {
-    self.websocket_connection.disconnect(None).await;
+  pub async fn disconnect() {
+    let this = &mut *DANMU_RECEIVER_STATIC_INSTANCE.lock().unwrap();
+    this.websocket_connection.disconnect(None).await;
   }
 
-  pub async fn tick(&mut self) {
-    self.websocket_connection.tick();
-    self.tick_heartbeat().await;
+  pub async fn tick() {
+    let this = &mut *DANMU_RECEIVER_STATIC_INSTANCE.lock().unwrap();
+
+    let messages = this.websocket_connection.tick().await;
+    for msg in messages {
+      this.on_message(msg).await;
+    }
+
+    this.tick_heartbeat().await;
   }
 
   async fn tick_heartbeat(&mut self) {
@@ -79,14 +92,23 @@ impl DanmuReceiver {
     }
   }
 
-  pub fn is_connected(&self) -> bool {
-    self.websocket_connection.is_connected()
+  pub fn is_connected() -> bool {
+    let this = &*DANMU_RECEIVER_STATIC_INSTANCE.lock().unwrap();
+    this.websocket_connection.is_connected()
   }
 
-  fn on_message(message: Message, _connection_id: String) {
+  pub fn set_heartbeat_interval(heartbeat_interval: u32) {
+    let this = &mut *DANMU_RECEIVER_STATIC_INSTANCE.lock().unwrap();
+
+    this.heartbeat_interval = heartbeat_interval;
+  }
+
+  async fn on_message(&self, message: Message) {
     match message {
       Message::Binary(data) => {
-        println!("{:?}", Packet::from_bytes(&mut BytesMut::from(data.as_slice())));
+        let packet = Packet::from_bytes(&mut BytesMut::from(data.as_slice()));
+        println!("{:?}", packet);
+        WebSocketServer::broadcast(Message::Text(format!("{:?}", packet))).await;
       }
       _ => {
         println!("{:?}", message)

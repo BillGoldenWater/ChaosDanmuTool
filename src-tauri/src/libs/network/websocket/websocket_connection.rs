@@ -6,6 +6,7 @@
 use std::borrow::BorrowMut;
 
 use futures_util::{SinkExt, StreamExt};
+use futures_util::future::BoxFuture;
 use futures_util::stream::{SplitSink, SplitStream};
 use tokio::{net::TcpStream, sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender}};
 use tokio_tungstenite::{connect_async, MaybeTlsStream, tungstenite::Message, WebSocketStream};
@@ -16,7 +17,7 @@ type WebSocketWriter = SplitSink<WebSocket, Message>;
 type WebSocketReader = SplitStream<WebSocket>;
 type ConnectionId = String;
 
-pub struct OnMessageCallback(Box<dyn FnMut(Message, ConnectionId)>);
+pub struct OnMessageCallback(Box<dyn FnMut(Message, ConnectionId) -> BoxFuture<'static, ()>>);
 
 unsafe impl Sync for OnMessageCallback {}
 
@@ -26,19 +27,17 @@ pub struct WebSocketConnection {
   connection_id: ConnectionId,
 
   connected: bool,
-  message_handler: OnMessageCallback,
 
   write: Option<WebSocketWriter>,
   rx: Option<UnboundedReceiver<Message>>,
 }
 
 impl WebSocketConnection {
-  pub fn new<F: FnMut(Message, ConnectionId) + 'static>(message_handler: F) -> WebSocketConnection {
+  pub fn new() -> WebSocketConnection {
     WebSocketConnection {
       connection_id: uuid::Uuid::new_v4().to_string(),
 
       connected: false,
-      message_handler: OnMessageCallback(Box::new(message_handler)),
 
       write: None,
       rx: None,
@@ -56,6 +55,7 @@ impl WebSocketConnection {
 
     self.handle_connection(ws_stream.unwrap().0.split());
 
+    println!("[WebSocketConnection.connect] connected");
     Ok(())
   }
 
@@ -71,7 +71,7 @@ impl WebSocketConnection {
 
     self.handle_connection(ws_stream.unwrap().split());
 
-
+    println!("[WebSocketConnection.accept] accepted");
     Ok(())
   }
 
@@ -84,7 +84,6 @@ impl WebSocketConnection {
     WebSocketConnection::recv_loop(read, tx);
 
     self.connected = true;
-    println!("[WebSocketConnection.connect] connected");
   }
 
   async fn before_connection(&mut self) {
@@ -106,19 +105,26 @@ impl WebSocketConnection {
     }
   }
 
-  pub fn tick(&mut self) {
-    if !self.connected { return; }
+  pub async fn tick(&mut self) -> Vec<Message> {
+    if !self.connected { return vec![]; }
 
-    if let Some(rx) = self.rx.borrow_mut() {
-      let rx_result = rx.try_recv(); // try_recv
-      if let Ok(msg) = rx_result { // when message
-        (self.message_handler.0)(msg, self.connection_id.clone())
-      } else if let Err(err) = rx_result { // when failed recv
-        if err == tokio::sync::mpsc::error::TryRecvError::Disconnected { // when disconnected
-          self.on_disconnect();
+    let mut result = vec![];
+
+    loop {
+      if let Some(rx) = self.rx.borrow_mut() {
+        let rx_result = rx.try_recv(); // try_recv
+        if let Ok(msg) = rx_result { // when message
+          result.push(msg);
+        } else if let Err(err) = rx_result { // when failed recv
+          if err == tokio::sync::mpsc::error::TryRecvError::Disconnected { // when disconnected
+            self.on_disconnect();
+          }
+          break;
         }
       }
     }
+
+    result
   }
 
   pub fn is_connected(&self) -> bool {

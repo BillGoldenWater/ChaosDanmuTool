@@ -16,88 +16,41 @@ use tokio_tungstenite::tungstenite::Message;
 
 use chaosdanmutool::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver;
 use chaosdanmutool::libs::network::websocket::websocket_server::WebSocketServer;
-use chaosdanmutool::libs::network::websocket::websocket_server::WebSocketServerEvent::OnConnection;
 #[cfg(target_os = "macos")]
 use chaosdanmutool::libs::utils::window_utils::set_visible_on_all_workspaces;
 
-static mut RECEIVER: Option<DanmuReceiver> = None;
-static mut SERVER: Option<WebSocketServer> = None;
-
 #[command]
 fn connect() {
-  unsafe {
-    if let Some(receiver) = &mut RECEIVER {
-      let _ = block_on(receiver.connect(34348));
-    }
-  }
+  block_on(DanmuReceiver::connect(953650))
+    .expect("Unable to connect");
 }
 
 #[command]
 fn disconnect() {
-  unsafe {
-    if let Some(receiver) = &mut RECEIVER {
-      block_on(receiver.disconnect());
-    }
-  }
+  block_on(DanmuReceiver::disconnect());
 }
 
 #[command]
 fn listen() {
-  unsafe {
-    if let Some(server) = &mut SERVER {
-      server.listen("0.0.0.0:80".to_string())
-    }
-  }
+  WebSocketServer::listen("0.0.0.0:80".to_string());
 }
 
 #[command]
 fn broadcast() {
-  unsafe {
-    if let Some(server) = &mut SERVER {
-      block_on(server.broadcast(Message::Text("test".to_string())));
-    }
-  }
+  block_on(WebSocketServer::broadcast(Message::Text("test".to_string())));
 }
 
 #[command]
 fn close() {
-  unsafe {
-    if let Some(server) = &mut SERVER {
-      server.close()
-    }
-  }
+  WebSocketServer::close()
 }
 
 fn main() {
-  unsafe { RECEIVER = Some(DanmuReceiver::new(30)); }
-  unsafe {
-    let server = WebSocketServer::new(|event| {
-      match event {
-        OnConnection(connection_id) => {
-          println!("new connection: {}", connection_id);
-          if let Some(server) = &mut SERVER {
-            let connection = server.get_connection(connection_id);
-            if let Some(connection) = connection {
-              tauri::async_runtime::spawn(connection.send(Message::Text("test".to_string())));
-            }
-          }
-        }
-      }
-    });
-    SERVER = Some(server);
-  }
-
   std::thread::spawn(|| {
-    unsafe {
-      loop {
-        if let Some(receiver) = &mut RECEIVER {
-          block_on(receiver.tick());
-        }
-        if let Some(server) = &mut SERVER {
-          block_on(server.tick());
-        }
-        std::thread::sleep(Duration::from_millis(100))
-      }
+    loop {
+      block_on(DanmuReceiver::tick());
+      block_on(WebSocketServer::tick());
+      std::thread::sleep(Duration::from_millis(100));
     }
   });
 
