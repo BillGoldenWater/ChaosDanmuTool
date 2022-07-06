@@ -10,50 +10,16 @@ windows_subsystem = "windows"
 
 use std::time::Duration;
 
+#[allow(unused_imports)]
 use tauri::{App, AppHandle, command, Manager, Wry};
 use tauri::async_runtime::block_on;
-use tokio_tungstenite::tungstenite::Message;
 
 use chaosdanmutool::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver;
 use chaosdanmutool::libs::network::command_broadcast_server::CommandBroadcastServer;
 #[cfg(target_os = "macos")]
 use chaosdanmutool::libs::utils::window_utils::set_visible_on_all_workspaces;
 
-#[command]
-fn connect() {
-  block_on(DanmuReceiver::connect(953650))
-    .expect("Unable to connect");
-}
-
-#[command]
-fn disconnect() {
-  block_on(DanmuReceiver::disconnect());
-}
-
-#[command]
-fn listen() {
-  CommandBroadcastServer::listen("0.0.0.0:80".to_string());
-}
-
-#[command]
-fn broadcast() {
-  block_on(CommandBroadcastServer::broadcast(Message::Text("test".to_string())));
-}
-
-#[command]
-fn close() {
-  CommandBroadcastServer::close()
-}
-
 fn main() {
-  std::thread::spawn(|| {
-    loop {
-      block_on(DanmuReceiver::tick());
-      block_on(CommandBroadcastServer::tick());
-      std::thread::sleep(Duration::from_millis(100));
-    }
-  });
-
   let context = tauri::generate_context!();
 
   // region init
@@ -62,7 +28,7 @@ fn main() {
       on_init(app);
       Ok(())
     })
-    .invoke_handler(tauri::generate_handler![connect,disconnect,listen,broadcast,close])
+    // .invoke_handler(tauri::generate_handler![connect,disconnect,listen,broadcast,close])
     .menu(if cfg!(target_os = "macos") {
       tauri::Menu::os_default("Chaos Danmu Tool")
     } else {
@@ -88,10 +54,22 @@ fn main() {
 }
 
 fn on_init(app: &mut App<Wry>) {
+  start_ticking();
+
   show_main_window(app.app_handle());
 }
 
 fn on_ready(_app_handle: &AppHandle<Wry>) {}
+
+fn start_ticking(){
+  std::thread::spawn(|| {
+    loop {
+      block_on(DanmuReceiver::tick());
+      block_on(CommandBroadcastServer::tick());
+      std::thread::sleep(Duration::from_millis(200));
+    }
+  });
+}
 
 fn show_main_window(app_handle: AppHandle<Wry>) {
   let main_window = app_handle.get_window("main");
