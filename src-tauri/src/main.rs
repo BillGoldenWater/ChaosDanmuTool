@@ -15,7 +15,7 @@ use tauri::async_runtime::block_on;
 use tokio_tungstenite::tungstenite::Message;
 
 use chaosdanmutool::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver;
-use chaosdanmutool::libs::network::websocket::websocket_server::WebSocketServer;
+use chaosdanmutool::libs::network::command_broadcast_server::CommandBroadcastServer;
 #[cfg(target_os = "macos")]
 use chaosdanmutool::libs::utils::window_utils::set_visible_on_all_workspaces;
 
@@ -32,24 +32,24 @@ fn disconnect() {
 
 #[command]
 fn listen() {
-  WebSocketServer::listen("0.0.0.0:80".to_string());
+  CommandBroadcastServer::listen("0.0.0.0:80".to_string());
 }
 
 #[command]
 fn broadcast() {
-  block_on(WebSocketServer::broadcast(Message::Text("test".to_string())));
+  block_on(CommandBroadcastServer::broadcast(Message::Text("test".to_string())));
 }
 
 #[command]
 fn close() {
-  WebSocketServer::close()
+  CommandBroadcastServer::close()
 }
 
 fn main() {
   std::thread::spawn(|| {
     loop {
       block_on(DanmuReceiver::tick());
-      block_on(WebSocketServer::tick());
+      block_on(CommandBroadcastServer::tick());
       std::thread::sleep(Duration::from_millis(100));
     }
   });

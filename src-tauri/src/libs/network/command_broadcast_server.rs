@@ -17,19 +17,19 @@ use crate::libs::network::websocket::websocket_connection::WebSocketConnection;
 type Stream = MaybeTlsStream<TcpStream>;
 
 lazy_static! {
-  pub static ref WEBSOCKET_SERVER_STATIC_INSTANCE: Mutex<WebSocketServer> = Mutex::new(WebSocketServer::new());
+  pub static ref COMMAND_BROADCAST_SERVER_STATIC_INSTANCE: Mutex<CommandBroadcastServer> = Mutex::new(CommandBroadcastServer::new());
 }
 
-pub struct WebSocketServer {
+pub struct CommandBroadcastServer {
   listening: bool,
   connections: Vec<WebSocketConnection>,
   rx: Option<UnboundedReceiver<Stream>>,
   listen_loop: Option<JoinHandle<()>>,
 }
 
-impl WebSocketServer {
-  fn new() -> WebSocketServer {
-    WebSocketServer {
+impl CommandBroadcastServer {
+  fn new() -> CommandBroadcastServer {
+    CommandBroadcastServer {
       listening: false,
       connections: vec![],
       rx: None,
@@ -38,14 +38,14 @@ impl WebSocketServer {
   }
 
   pub fn listen(url: String) {
-    let this = &mut *WEBSOCKET_SERVER_STATIC_INSTANCE.lock().unwrap();
+    let this = &mut *COMMAND_BROADCAST_SERVER_STATIC_INSTANCE.lock().unwrap();
 
     this.before_listen();
 
     let (tx, rx) = unbounded_channel();
     this.rx = Some(rx);
 
-    this.listen_loop = Some(WebSocketServer::listen_loop(url, tx));
+    this.listen_loop = Some(CommandBroadcastServer::listen_loop(url, tx));
 
     this.listening = true;
     println!("[WebSocketServer.listen] start listening")
@@ -70,7 +70,7 @@ impl WebSocketServer {
   }
 
   pub async fn broadcast(message: Message) {
-    let this = &mut *WEBSOCKET_SERVER_STATIC_INSTANCE.lock().unwrap();
+    let this = &mut *COMMAND_BROADCAST_SERVER_STATIC_INSTANCE.lock().unwrap();
 
     for connection in this.connections.as_mut_slice() {
       connection.send(message.clone()).await;
@@ -78,7 +78,7 @@ impl WebSocketServer {
   }
 
   pub async fn send(connection_id: String, message: Message) {
-    let this = &mut *WEBSOCKET_SERVER_STATIC_INSTANCE.lock().unwrap();
+    let this = &mut *COMMAND_BROADCAST_SERVER_STATIC_INSTANCE.lock().unwrap();
 
     this.send_(connection_id, message).await;
   }
@@ -93,7 +93,7 @@ impl WebSocketServer {
   }
 
   pub async fn disconnect(connection_id: String, close_frame: Option<CloseFrame<'static>>) {
-    let this = &mut *WEBSOCKET_SERVER_STATIC_INSTANCE.lock().unwrap();
+    let this = &mut *COMMAND_BROADCAST_SERVER_STATIC_INSTANCE.lock().unwrap();
 
     for connection in this.connections.as_mut_slice() {
       if connection.get_id().eq(&connection_id) {
@@ -104,7 +104,7 @@ impl WebSocketServer {
   }
 
   pub fn is_listening() -> bool {
-    let this = &*WEBSOCKET_SERVER_STATIC_INSTANCE.lock().unwrap();
+    let this = &*COMMAND_BROADCAST_SERVER_STATIC_INSTANCE.lock().unwrap();
     this.listening
   }
 
@@ -120,7 +120,7 @@ impl WebSocketServer {
   }
 
   pub fn close() {
-    let this = &mut *WEBSOCKET_SERVER_STATIC_INSTANCE.lock().unwrap();
+    let this = &mut *COMMAND_BROADCAST_SERVER_STATIC_INSTANCE.lock().unwrap();
 
     this.close_()
   }
@@ -138,7 +138,7 @@ impl WebSocketServer {
   }
 
   pub async fn tick() {
-    let this = &mut *WEBSOCKET_SERVER_STATIC_INSTANCE.lock().unwrap();
+    let this = &mut *COMMAND_BROADCAST_SERVER_STATIC_INSTANCE.lock().unwrap();
 
     this.connections.retain(|connection| connection.is_connected());
     if !this.listening { return; }
