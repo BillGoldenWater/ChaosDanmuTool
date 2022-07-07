@@ -5,3 +5,5 @@
 
 pub mod window_utils;
 pub mod process_utils;
+pub mod path_utils;
+pub mod debug_utils;
