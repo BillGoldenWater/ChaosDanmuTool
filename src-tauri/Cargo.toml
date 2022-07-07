@@ -17,6 +17,17 @@ tauri-build = { version = "1.0.3", features = [] }
 [dependencies]
 serde_json = "1.0.82"
 serde = { version = "1.0.138", features = ["derive"] }
+# live template: sddf (serde default define & function)
+# #[serde(default = "$fieldName$_default")]
+# #[serde(skip_serializing_if = "$skipFunctionName$")]
+# 
+# fn $defaultFunctionName$() -> $typeName$ {
+#   $defaultValue$
+# }
+# 
+# fn $skipFunctionName$(value: $typeName$) -> bool {
+#   value == $defaultFunctionName$()
+# }
 tauri = { version = "1.0.3", features = ["dialog-message", "fs-read-file", "fs-write-file", "path-all"] }
 raw-window-handle = "0.4.3"
 futures-util = "0.3.21"
@@ -30,17 +41,17 @@ lazy_static = "1.4.0"
 rfd = "0.9.1"
 ts-rs = "6.2.0"
 # live template: tss
-# |#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS)]
-# |#[serde(rename_all = "camelCase")]
-# |#[ts(export, export_to = "../src/share/type/rust/$PATH$")]
-# |pub struct $NAME$ {
-# |  $END$
-# |}
+# #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS)]
+# #[serde(rename_all = "camelCase")]
+# #[ts(export, export_to = "../src/share/type/rust/$PATH$")]
+# pub struct $NAME$ {
+#   $END$
+# }
 #
 # live template: atss
-# |#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS)]
-# |#[serde(rename_all = "camelCase")]
-# |#[ts(export, export_to = "../src/share/type/rust/$PATH$")]
+# #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS)]
+# #[serde(rename_all = "camelCase")]
+# #[ts(export, export_to = "../src/share/type/rust/$PATH$")]
 
 [target.'cfg(target_os = "macos")'.dependencies]
 cocoa = "0.24.0"
