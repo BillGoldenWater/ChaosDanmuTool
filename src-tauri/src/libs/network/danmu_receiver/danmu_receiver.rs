@@ -38,6 +38,8 @@ impl DanmuReceiver {
   pub async fn connect(room_id: i32) -> Result<(), DanmuReceiverConnectError> {
     let this = &mut *DANMU_RECEIVER_STATIC_INSTANCE.lock().unwrap();
 
+    // TODO: get actual room id
+    // TODO: Status update: connecting
     let token_and_url_result =
       DanmuServerInfoGetter::get_token_and_url(room_id).await;
 
@@ -59,8 +61,7 @@ impl DanmuReceiver {
           platform: "web".to_string(),
           key: token_and_url.token,
         }).pack().to_vec()
-      )).await;
-      // self.websocket_connection.update_message_handler(self);
+      )).await; // TODO: Status update: open
     }
 
     Ok(())
@@ -104,11 +105,12 @@ impl DanmuReceiver {
   }
 
   async fn on_message(&self, message: Message) {
-    match message {
+    match message { // TODO: Status update: close message
       Message::Binary(data) => {
         let packet = Packet::from_bytes(&mut BytesMut::from(data.as_slice()));
         println!("{:?}", packet);
         CommandBroadcastServer::broadcast(Message::Text(format!("{:?}", packet))).await;
+        // TODO: packet parse
       }
       _ => {
         println!("{:?}", message)
