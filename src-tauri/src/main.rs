@@ -13,18 +13,21 @@ use std::time::Duration;
 #[allow(unused_imports)]
 use tauri::{App, AppHandle, command, Manager, Wry};
 use tauri::{Assets, Context};
-use tauri::async_runtime::block_on;
+use tokio::time::sleep;
 
 use chaosdanmutool::libs::config::config_manager::ConfigManager;
 use chaosdanmutool::libs::network::command_broadcast_server::CommandBroadcastServer;
 use chaosdanmutool::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver;
+use chaosdanmutool::libs::network::http_server::HTTP_SERVER_STATIC_INSTANCE;
 #[cfg(target_os = "macos")]
 use chaosdanmutool::libs::utils::window_utils::set_visible_on_all_workspaces;
+use chaosdanmutool::{lprintln};
 
-fn main() {
+#[tokio::main]
+async fn main() {
   let context = tauri::generate_context!();
 
-  on_init(&context);
+  on_init(&context).await;
 
   // region init
   let app = tauri::Builder::default()
@@ -46,17 +49,17 @@ fn main() {
   app.run(|app_handle, event| match event {
     tauri::RunEvent::Ready {} => {
       // ready event
-      println!("[RunEvent.Ready] ready");
+      lprintln!("ready");
       on_ready(app_handle)
     }
     tauri::RunEvent::ExitRequested { api, .. } => {
       // exit requested event
-      println!("[RunEvent.ExitRequested] exit requested");
+      lprintln!("exit requested");
       api.prevent_exit();
-      println!("[RunEvent.ExitRequested] exit prevented");
+      lprintln!("exit prevented");
     }
     tauri::RunEvent::Exit => {
-      println!("[RunEvent.Exit] exiting");
+      lprintln!("exiting");
       ConfigManager::save();
     }
 
@@ -65,25 +68,32 @@ fn main() {
   //endregion
 }
 
-fn on_init<A: Assets>(context: &Context<A>) {
+async fn on_init<A: Assets>(context: &Context<A>) {
+  start_ticking();
+
   ConfigManager::init(context);
 }
 
-fn on_setup(app: &mut App<Wry>) {
-  start_ticking();
+fn start_ticking() {
+  tauri::async_runtime::spawn(async {
+    loop {
+      DanmuReceiver::tick().await;
+      CommandBroadcastServer::tick().await;
+      sleep(Duration::from_micros(200)).await;
+    }
+  });
+}
 
+fn on_setup(app: &mut App<Wry>) {
   show_main_window(app.app_handle());
+
+  let asset_resolver = app.asset_resolver();
+  tauri::async_runtime::spawn(async move {
+    (*HTTP_SERVER_STATIC_INSTANCE).lock().await.start_(asset_resolver, 25525); // TODO: port config
+  });
 }
 
 fn on_ready(_app_handle: &AppHandle<Wry>) {}
-
-fn start_ticking() {
-  std::thread::spawn(|| loop {
-    block_on(DanmuReceiver::tick());
-    block_on(CommandBroadcastServer::tick());
-    std::thread::sleep(Duration::from_millis(200));
-  });
-}
 
 fn show_main_window(app_handle: AppHandle<Wry>) {
   let main_window = app_handle.get_window("main");

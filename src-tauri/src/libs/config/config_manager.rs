@@ -10,10 +10,10 @@ use std::sync::Mutex;
 use rfd::{MessageButtons, MessageLevel};
 use tauri::{Assets, Context};
 use tauri::api::file::read_string;
-use crate::libs::config::config::Config;
 
+use crate::{location_info, lprintln};
+use crate::libs::config::config::Config;
 use crate::libs::utils::path_utils::get_app_dir;
-use crate::location_info;
 
 lazy_static! {
     pub static ref CONFIG_MANAGER_STATIC_INSTANCE: Mutex<ConfigManager> =
@@ -86,10 +86,10 @@ impl ConfigManager {
     if let Some(app_dir) = &self.app_dir {
       if let Some(path) = &self.config_file_path {
         if let Some(config) = &self.config {
-          println!("{}: save config", location_info!());
+          lprintln!("save config");
           let result = fs::create_dir_all(app_dir);
           if let Err(err) = result {
-            println!("{}: failed to create data folder\n{:#?}", location_info!(), err);
+            lprintln!("failed to create data folder\n{:#?}",err);
             return;
           }
           let result = fs::write(
@@ -97,10 +97,10 @@ impl ConfigManager {
             serde_json::to_string(config).unwrap(),
           );
           if let Err(err) = result {
-            println!("{}: failed to write config file\n{:#?}", location_info!(), err);
+            lprintln!("failed to write config file\n{:#?}",err);
             return;
           }
-          println!("{}: config successfully saved", location_info!());
+          lprintln!("config successfully saved");
         }
       }
     }

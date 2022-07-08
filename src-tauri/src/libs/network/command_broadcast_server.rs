@@ -3,74 +3,35 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-use std::sync::Mutex;
-
-use tauri::async_runtime::JoinHandle;
-use tokio::net::{TcpListener, TcpStream};
-use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
-use tokio_tungstenite::MaybeTlsStream;
+use tokio::net::TcpStream;
+use tokio::sync::Mutex;
+use tokio_tungstenite::{MaybeTlsStream, WebSocketStream};
 use tokio_tungstenite::tungstenite::Message;
 use tokio_tungstenite::tungstenite::protocol::CloseFrame;
 
 use crate::libs::network::websocket::websocket_connection::WebSocketConnection;
-
-type Stream = MaybeTlsStream<TcpStream>;
+use crate::{lprintln};
 
 lazy_static! {
   pub static ref COMMAND_BROADCAST_SERVER_STATIC_INSTANCE: Mutex<CommandBroadcastServer> = Mutex::new(CommandBroadcastServer::new());
 }
 
+type WebSocket = WebSocketStream<MaybeTlsStream<TcpStream>>;
+
 pub struct CommandBroadcastServer {
-  listening: bool,
   connections: Vec<WebSocketConnection>,
-  rx: Option<UnboundedReceiver<Stream>>,
-  listen_loop: Option<JoinHandle<()>>,
 }
 
 impl CommandBroadcastServer {
   fn new() -> CommandBroadcastServer {
     CommandBroadcastServer {
-      listening: false,
       connections: vec![],
-      rx: None,
-      listen_loop: None,
     }
   }
 
-  pub fn listen(url: String) {
-    let this = &mut *COMMAND_BROADCAST_SERVER_STATIC_INSTANCE.lock().unwrap();
-
-    this.before_listen();
-
-    let (tx, rx) = unbounded_channel();
-    this.rx = Some(rx);
-
-    this.listen_loop = Some(CommandBroadcastServer::listen_loop(url, tx));
-
-    this.listening = true;
-    println!("[WebSocketServer.listen] start listening")
-  }
-
-  pub fn listen_loop(url: String, tx: UnboundedSender<Stream>) -> JoinHandle<()> {
-    tauri::async_runtime::spawn(async move {
-      let try_socket = TcpListener::bind(&url).await;
-      if try_socket.is_err() {
-        println!("[WebSocketServer.listen_loop] Failed to bind");
-        return;
-      }
-      let listener = try_socket.unwrap();
-
-      while let Ok((stream, _)) = listener.accept().await {
-        let send_result = tx.send(MaybeTlsStream::Plain(stream));
-        if let Err(_) = send_result {
-          println!("[WebSocketServer.listen_loop] failed send to main thread.")
-        }
-      }
-    })
-  }
-
   pub async fn broadcast(message: Message) {
-    let this = &mut *COMMAND_BROADCAST_SERVER_STATIC_INSTANCE.lock().unwrap();
+    let this =
+      &mut *COMMAND_BROADCAST_SERVER_STATIC_INSTANCE.lock().await;
 
     for connection in this.connections.as_mut_slice() {
       connection.send(message.clone()).await;
@@ -78,7 +39,8 @@ impl CommandBroadcastServer {
   }
 
   pub async fn send(connection_id: String, message: Message) {
-    let this = &mut *COMMAND_BROADCAST_SERVER_STATIC_INSTANCE.lock().unwrap();
+    let this =
+      &mut *COMMAND_BROADCAST_SERVER_STATIC_INSTANCE.lock().await;
 
     this.send_(connection_id, message).await;
   }
@@ -93,7 +55,8 @@ impl CommandBroadcastServer {
   }
 
   pub async fn disconnect(connection_id: String, close_frame: Option<CloseFrame<'static>>) {
-    let this = &mut *COMMAND_BROADCAST_SERVER_STATIC_INSTANCE.lock().unwrap();
+    let this =
+      &mut *COMMAND_BROADCAST_SERVER_STATIC_INSTANCE.lock().await;
 
     for connection in this.connections.as_mut_slice() {
       if connection.get_id().eq(&connection_id) {
@@ -103,45 +66,26 @@ impl CommandBroadcastServer {
     }
   }
 
-  pub fn is_listening() -> bool {
-    let this = &*COMMAND_BROADCAST_SERVER_STATIC_INSTANCE.lock().unwrap();
-    this.listening
+  pub async fn close_all() {
+    let this =
+      &mut *COMMAND_BROADCAST_SERVER_STATIC_INSTANCE.lock().await;
+
+    this.close_all_().await
   }
 
-  async fn on_stop_listening(&mut self) {
+  async fn close_all_(&mut self) {
     for connection in self.connections.as_mut_slice() {
       connection.disconnect(None).await;
     }
     self.connections.clear();
-    self.listening = false;
-    self.rx = None;
-    self.listen_loop = None;
-    println!("[WebSocketServer.on_stop_listening] stopped");
-  }
-
-  pub fn close() {
-    let this = &mut *COMMAND_BROADCAST_SERVER_STATIC_INSTANCE.lock().unwrap();
-
-    this.close_()
-  }
-
-  fn close_(&mut self) {
-    if let Some(handle) = &mut self.listen_loop {
-      handle.abort()
-    }
-  }
-
-  fn before_listen(&mut self) {
-    if self.listening {
-      self.close_()
-    }
+    lprintln!("closed");
   }
 
   pub async fn tick() {
-    let this = &mut *COMMAND_BROADCAST_SERVER_STATIC_INSTANCE.lock().unwrap();
+    let this =
+      &mut *COMMAND_BROADCAST_SERVER_STATIC_INSTANCE.lock().await;
 
     this.connections.retain(|connection| connection.is_connected());
-    if !this.listening { return; }
 
     // region tick connections
     let mut incoming_messages: Vec<(String, Message)> = vec![];
@@ -155,35 +99,36 @@ impl CommandBroadcastServer {
       this.on_message(msg, id).await;
     }
     // endregion
+  }
 
-    if let Some(rx) = &mut this.rx {
-      let rx_result = rx.try_recv(); // try_recv
-      if let Ok(stream) = rx_result { // when incoming connection
-        let mut connection = WebSocketConnection::new();
+  pub async fn accept(websocket_stream: WebSocket) {
+    let this =
+      &mut *COMMAND_BROADCAST_SERVER_STATIC_INSTANCE.lock().await;
 
-        let accept_result = connection.accept(stream).await;
+    this.accept_(websocket_stream).await
+  }
 
-        if accept_result.is_ok() {
-          let connection_id = connection.get_id();
-          this.connections.push(connection);
-          this.on_connection(connection_id).await;
-        }
-      } else if let Err(err) = rx_result { // when failed recv
-        if err == tokio::sync::mpsc::error::TryRecvError::Disconnected { // when stop listening
-          this.on_stop_listening().await;
-        }
-      }
+  async fn accept_(&mut self, websocket_stream: WebSocket) {
+    let mut connection = WebSocketConnection::new();
+
+    let accept_result =
+      connection.accept(websocket_stream).await;
+
+    if accept_result.is_ok() {
+      let connection_id = connection.get_id();
+      self.connections.push(connection);
+      self.on_connection(connection_id).await;
     }
   }
 
   async fn on_connection(&mut self, connection_id: String) {
-    println!("[WebSocketServer.on_connection] id: {} ", connection_id);
+    lprintln!("new connection, id: {} ", connection_id);
 
     self.send_(connection_id.clone(), Message::Text(connection_id)).await;
   }
 
   async fn on_message(&mut self, message: Message, connection_id: String) {
-    println!("[WebSocketServer.on_message] {}: {:?} ", connection_id, message);
+    lprintln!("{}: {:?} ", connection_id, message);
 
     self.send_(connection_id, message).await;
   }

@@ -6,6 +6,7 @@
 use serde::Deserialize;
 
 use crate::libs::network::api_request::bilibili_response::BiliBiliResponse;
+use crate::lprintln;
 
 static DANMU_SERVER_INFO_API_URL: &str =
   "https://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo";
@@ -32,7 +33,7 @@ impl DanmuServerInfoGetter {
       serde_json::from_str(text.as_str());
 
     if serde_result.is_err() {
-      println!("failed parsing: {}", text);
+      lprintln!("failed parsing: {}", text);
     }
 
     let response: BiliBiliResponse<DanmuServerInfoResponse> = serde_result.unwrap();

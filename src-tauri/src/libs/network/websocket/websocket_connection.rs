@@ -3,25 +3,22 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-use std::borrow::BorrowMut;
-
+use std::borrow::Cow;
 use futures_util::{SinkExt, StreamExt};
-use futures_util::future::BoxFuture;
 use futures_util::stream::{SplitSink, SplitStream};
 use tokio::{net::TcpStream, sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender}};
 use tokio_tungstenite::{connect_async, MaybeTlsStream, tungstenite::Message, WebSocketStream};
+use tokio_tungstenite::tungstenite::Error;
+use tokio_tungstenite::tungstenite::error::ProtocolError;
 use tokio_tungstenite::tungstenite::protocol::CloseFrame;
+use tokio_tungstenite::tungstenite::protocol::frame::coding::CloseCode;
+
+use crate::{elprintln, lprintln};
 
 type WebSocket = WebSocketStream<MaybeTlsStream<TcpStream>>;
 type WebSocketWriter = SplitSink<WebSocket, Message>;
 type WebSocketReader = SplitStream<WebSocket>;
 type ConnectionId = String;
-
-pub struct OnMessageCallback(Box<dyn FnMut(Message, ConnectionId) -> BoxFuture<'static, ()>>);
-
-unsafe impl Sync for OnMessageCallback {}
-
-unsafe impl Send for OnMessageCallback {}
 
 pub struct WebSocketConnection {
   connection_id: ConnectionId,
@@ -55,23 +52,16 @@ impl WebSocketConnection {
 
     self.handle_connection(ws_stream.unwrap().0.split());
 
-    println!("[WebSocketConnection.connect] connected");
+    lprintln!("connected");
     Ok(())
   }
 
-  pub async fn accept(&mut self, stream: MaybeTlsStream<TcpStream>) -> Result<(), WebSocketAcceptError> {
+  pub async fn accept(&mut self, ws_stream: WebSocket) -> Result<(), WebSocketAcceptError> {
     self.before_connection().await;
 
-    let ws_stream =
-      tokio_tungstenite::accept_async(stream).await;
+    self.handle_connection(ws_stream.split());
 
-    if let Err(err) = ws_stream {
-      return Err(WebSocketAcceptError::HandshakeFailed(err));
-    }
-
-    self.handle_connection(ws_stream.unwrap().split());
-
-    println!("[WebSocketConnection.accept] accepted");
+    lprintln!("accepted");
     Ok(())
   }
 
@@ -93,14 +83,14 @@ impl WebSocketConnection {
   }
 
   pub async fn disconnect(&mut self, close_frame: Option<CloseFrame<'static>>) {
-    if let Some(write) = self.write.borrow_mut() {
+    if let Some(write) = &mut self.write {
       let _ = write.send(Message::Close(close_frame)).await;
       let _ = write.close().await;
     }
   }
 
   pub async fn send(&mut self, message: Message) {
-    if let Some(write) = self.write.borrow_mut() {
+    if let Some(write) = &mut self.write {
       let _ = write.send(message).await;
     }
   }
@@ -111,7 +101,7 @@ impl WebSocketConnection {
     let mut result = vec![];
 
     loop {
-      if let Some(rx) = self.rx.borrow_mut() {
+      if let Some(rx) = &mut self.rx {
         let rx_result = rx.try_recv(); // try_recv
         if let Ok(msg) = rx_result { // when message
           result.push(msg);
@@ -135,7 +125,7 @@ impl WebSocketConnection {
     self.connected = false;
     self.write = None;
     self.rx = None;
-    println!("[WebSocketConnection.on_disconnect] disconnected");
+    lprintln!("disconnected");
   }
 
   fn recv_loop(read: WebSocketReader, tx: UnboundedSender<Message>) {
@@ -143,14 +133,31 @@ impl WebSocketConnection {
       read.for_each(move |item| { // reading
         let tx = tx.clone();
         async move { // each message
-          if let Err(err) = item {
-            println!("[WebSocketConnection.recv_loop] had an error: {:?}", err)
-          } else { // forward to main_thread
-            let message = item.unwrap();
+          let item = if let Err(err) = item { // err
+          elprintln!("had an error: {:?}", err);
+            match err {
+              Error::Protocol(err) => {
+                match err {
+                  ProtocolError::ResetWithoutClosingHandshake => {
+                    Some(Message::Close(Some(CloseFrame {
+                      code: CloseCode::Abnormal,
+                      reason: Cow::Owned("unknown (ResetWithoutClosingHandshake)".to_string())
+                    })))
+                  }
+                  _ => {None}
+                }
+              }
+              _ => {None}
+            }
+          } else { // ok
+            Some(item.unwrap())
+          };
 
+          // forward
+          if let Some(message) = item {
             let send_result = tx.clone().send(message);
             if send_result.is_err() {
-              println!("[WebSocketConnection.recv_loop] failed send to main thread.")
+              elprintln!("failed to send message back")
             }
           }
         }
@@ -165,10 +172,10 @@ impl WebSocketConnection {
 
 #[derive(Debug)]
 pub enum WebSocketConnectError {
-  ConnectFailed(tokio_tungstenite::tungstenite::Error),
+  ConnectFailed(Error),
 }
 
 #[derive(Debug)]
 pub enum WebSocketAcceptError {
-  HandshakeFailed(tokio_tungstenite::tungstenite::Error),
+  HandshakeFailed(Error),
 }

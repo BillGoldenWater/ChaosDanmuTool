@@ -9,6 +9,7 @@ use bytes::{Buf, BufMut, BytesMut};
 
 use crate::libs::network::danmu_receiver::data_type::DataType;
 use crate::libs::network::danmu_receiver::op_code::OpCode;
+use crate::lprintln;
 
 #[derive(Debug)]
 pub struct Packet {
@@ -68,14 +69,14 @@ impl Packet {
           &mut Cursor::new(&mut decompressed),
         );
         if result.is_err() {
-          println!("failed to decompress");
+          lprintln!("failed to decompress");
           return vec![];
         }
 
         Self::from_bytes(&mut BytesMut::from(decompressed.as_slice()))
       }
       DataType::CompressedZlib => { // zlib
-        println!("unsupported compress format");
+        lprintln!("unsupported compress format");
         vec![]
       }
       _ => { // other

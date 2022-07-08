@@ -3,17 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-use std::sync::Mutex;
 use std::time::Instant;
 
 use bytes::BytesMut;
+use tokio::sync::Mutex;
 use tokio_tungstenite::tungstenite::Message;
 
 use crate::libs::network::api_request::danmu_server_info_getter::DanmuServerInfoGetter;
+use crate::libs::network::command_broadcast_server::CommandBroadcastServer;
 use crate::libs::network::danmu_receiver::danmu_receiver::DanmuReceiverConnectError::{FailedToConnect, GettingServerInfoFailed};
 use crate::libs::network::danmu_receiver::packet::{JoinPacketInfo, Packet};
 use crate::libs::network::websocket::websocket_connection::{WebSocketConnectError, WebSocketConnection};
-use crate::libs::network::command_broadcast_server::CommandBroadcastServer;
+use crate::{lprintln};
 
 lazy_static! {
   pub static ref DANMU_RECEIVER_STATIC_INSTANCE: Mutex<DanmuReceiver> = Mutex::new(DanmuReceiver::new(30));
@@ -36,7 +37,7 @@ impl DanmuReceiver {
   }
 
   pub async fn connect(room_id: i32) -> Result<(), DanmuReceiverConnectError> {
-    let this = &mut *DANMU_RECEIVER_STATIC_INSTANCE.lock().unwrap();
+    let this = &mut *DANMU_RECEIVER_STATIC_INSTANCE.lock().await;
 
     // TODO: get actual room id
     // TODO: Status update: connecting
@@ -64,16 +65,17 @@ impl DanmuReceiver {
       )).await; // TODO: Status update: open
     }
 
+    lprintln!("room {} connected",room_id);
     Ok(())
   }
 
   pub async fn disconnect() {
-    let this = &mut *DANMU_RECEIVER_STATIC_INSTANCE.lock().unwrap();
+    let this = &mut *DANMU_RECEIVER_STATIC_INSTANCE.lock().await;
     this.websocket_connection.disconnect(None).await;
   }
 
   pub async fn tick() {
-    let this = &mut *DANMU_RECEIVER_STATIC_INSTANCE.lock().unwrap();
+    let this = &mut *DANMU_RECEIVER_STATIC_INSTANCE.lock().await;
 
     let messages = this.websocket_connection.tick().await;
     for msg in messages {
@@ -93,13 +95,13 @@ impl DanmuReceiver {
     }
   }
 
-  pub fn is_connected() -> bool {
-    let this = &*DANMU_RECEIVER_STATIC_INSTANCE.lock().unwrap();
+  pub async fn is_connected() -> bool {
+    let this = &*DANMU_RECEIVER_STATIC_INSTANCE.lock().await;
     this.websocket_connection.is_connected()
   }
 
-  pub fn set_heartbeat_interval(heartbeat_interval: u32) {
-    let this = &mut *DANMU_RECEIVER_STATIC_INSTANCE.lock().unwrap();
+  pub async fn set_heartbeat_interval(heartbeat_interval: u32) {
+    let this = &mut *DANMU_RECEIVER_STATIC_INSTANCE.lock().await;
 
     this.heartbeat_interval = heartbeat_interval;
   }
@@ -108,12 +110,12 @@ impl DanmuReceiver {
     match message { // TODO: Status update: close message
       Message::Binary(data) => {
         let packet = Packet::from_bytes(&mut BytesMut::from(data.as_slice()));
-        println!("{:?}", packet);
+        lprintln!("{:?}", packet);
         CommandBroadcastServer::broadcast(Message::Text(format!("{:?}", packet))).await;
         // TODO: packet parse
       }
       _ => {
-        println!("{:?}", message)
+        lprintln!("{:?}", message)
       }
     }
   }
