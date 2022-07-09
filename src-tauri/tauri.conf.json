@@ -9,7 +9,7 @@
   },
   "package": {
     "productName": "ChaosDanmuTool",
-    "version": "0.10.0"
+    "version": "../package.json"
   },
   "tauri": {
     "allowlist": {

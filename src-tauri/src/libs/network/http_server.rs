@@ -70,12 +70,12 @@ impl HttpServer {
     });
   }
 
-  async fn stop() {
+  pub async fn stop() {
     let this = &mut *HTTP_SERVER_STATIC_INSTANCE.lock().await;
     this.stop_()
   }
 
-  pub fn stop_(&mut self) { // TODO stop()
+  fn stop_(&mut self) {
     if let Some(tx) = self.tx.replace(None) {
       if let Some(tx) = tx {
         let _ = tx.send(());
