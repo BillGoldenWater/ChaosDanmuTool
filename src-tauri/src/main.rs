@@ -8,12 +8,11 @@ all(not(debug_assertions), target_os = "windows"),
 windows_subsystem = "windows"
 )]
 
-use std::time::Duration;
-
 #[allow(unused_imports)]
 use tauri::{App, AppHandle, command, Manager, Wry};
 use tauri::{Assets, Context};
-use tokio::time::sleep;
+use tauri::async_runtime::block_on;
+use tokio::task;
 
 use chaosdanmutool::libs::config::config_manager::ConfigManager;
 use chaosdanmutool::libs::network::command_broadcast_server::CommandBroadcastServer;
@@ -25,6 +24,8 @@ use chaosdanmutool::{lprintln};
 
 #[tokio::main]
 async fn main() {
+  tauri::async_runtime::set(tokio::runtime::Handle::current());
+
   let context = tauri::generate_context!();
 
   on_init(&context).await;
@@ -32,7 +33,7 @@ async fn main() {
   // region init
   let app = tauri::Builder::default()
     .setup(|app| {
-      on_setup(app);
+      task::block_in_place(|| block_on(on_setup(app)));
       Ok(())
     })
     // .invoke_handler(tauri::generate_handler![connect,disconnect,listen,broadcast,close])
@@ -50,7 +51,7 @@ async fn main() {
     tauri::RunEvent::Ready {} => {
       // ready event
       lprintln!("ready");
-      on_ready(app_handle)
+      task::block_in_place(|| block_on(on_ready(app_handle)));
     }
     tauri::RunEvent::ExitRequested { api, .. } => {
       // exit requested event
@@ -60,7 +61,7 @@ async fn main() {
     }
     tauri::RunEvent::Exit => {
       lprintln!("exiting");
-      ConfigManager::save();
+      task::block_in_place(|| block_on(on_exit(app_handle)));
     }
 
     _ => {}
@@ -79,21 +80,27 @@ fn start_ticking() {
     loop {
       DanmuReceiver::tick().await;
       CommandBroadcastServer::tick().await;
-      sleep(Duration::from_micros(200)).await;
+      tokio::time::sleep(tokio::time::Duration::from_millis(200)).await;
     }
   });
 }
 
-fn on_setup(app: &mut App<Wry>) {
+async fn on_setup(app: &mut App<Wry>) {
   show_main_window(app.app_handle());
 
   let asset_resolver = app.asset_resolver();
-  tauri::async_runtime::spawn(async move {
-    HttpServer::start(asset_resolver, 25525).await;
-  });
+  HttpServer::start(asset_resolver, 25525).await;
 }
 
-fn on_ready(_app_handle: &AppHandle<Wry>) {}
+async fn on_ready(_app_handle: &AppHandle<Wry>) {}
+
+async fn on_exit(_app_handle: &AppHandle<Wry>) {
+  DanmuReceiver::disconnect().await;
+
+  HttpServer::stop().await;
+  CommandBroadcastServer::close_all().await;
+  ConfigManager::save();
+}
 
 fn show_main_window(app_handle: AppHandle<Wry>) {
   let main_window = app_handle.get_window("main");

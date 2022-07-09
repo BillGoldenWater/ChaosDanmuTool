@@ -71,7 +71,10 @@ impl DanmuReceiver {
 
   pub async fn disconnect() {
     let this = &mut *DANMU_RECEIVER_STATIC_INSTANCE.lock().await;
+
+    lprintln!("disconnecting");
     this.websocket_connection.disconnect(None).await;
+    lprintln!("disconnected");
   }
 
   pub async fn tick() {

@@ -62,6 +62,7 @@ impl HttpServer {
 
     let server = server.with_graceful_shutdown(async move {
       rx.await.ok();
+      lprintln!("server stopped");
     });
     tauri::async_runtime::spawn(async move {
       if let Err(err) = server.await {
@@ -78,6 +79,7 @@ impl HttpServer {
   fn stop_(&mut self) {
     if let Some(tx) = self.tx.replace(None) {
       if let Some(tx) = tx {
+        lprintln!("stopping server");
         let _ = tx.send(());
       }
     }

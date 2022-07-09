@@ -74,11 +74,12 @@ impl CommandBroadcastServer {
   }
 
   async fn close_all_(&mut self) {
+    lprintln!("closing all connection");
     for connection in self.connections.as_mut_slice() {
       connection.disconnect(None).await;
     }
     self.connections.clear();
-    lprintln!("closed");
+    lprintln!("all connection closed");
   }
 
   pub async fn tick() {
