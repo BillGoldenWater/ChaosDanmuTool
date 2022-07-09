@@ -20,7 +20,7 @@ use chaosdanmutool::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver
 use chaosdanmutool::libs::network::http_server::HttpServer;
 #[cfg(target_os = "macos")]
 use chaosdanmutool::libs::utils::window_utils::set_visible_on_all_workspaces;
-use chaosdanmutool::{lprintln};
+use chaosdanmutool::lprintln;
 
 #[tokio::main]
 async fn main() {
@@ -86,13 +86,13 @@ fn start_ticking() {
 }
 
 async fn on_setup(app: &mut App<Wry>) {
-  show_main_window(app.app_handle());
-
   let asset_resolver = app.asset_resolver();
   HttpServer::start(asset_resolver, 25525).await;
 }
 
-async fn on_ready(_app_handle: &AppHandle<Wry>) {}
+async fn on_ready(app_handle: &AppHandle<Wry>) {
+  show_main_window(app_handle);
+}
 
 async fn on_exit(_app_handle: &AppHandle<Wry>) {
   DanmuReceiver::disconnect().await;
@@ -102,21 +102,21 @@ async fn on_exit(_app_handle: &AppHandle<Wry>) {
   ConfigManager::save();
 }
 
-fn show_main_window(app_handle: AppHandle<Wry>) {
+fn show_main_window(app_handle: &AppHandle<Wry>) {
   let main_window = app_handle.get_window("main");
 
   if let Some(main_window) = main_window {
     main_window.show().expect("Failed to show main_window");
   } else {
-    create_main_window(app_handle)
+    create_main_window(&app_handle)
   }
 }
 
-fn create_main_window(app_handle: AppHandle<Wry>) {
+fn create_main_window(app_handle: &AppHandle<Wry>) {
   let main_window = tauri::WindowBuilder::new(
-    &app_handle,
+    app_handle,
     "main",
-    tauri::WindowUrl::App("index.html".into()),
+    tauri::WindowUrl::App("main/index.html".into()),
   )
     .build()
     .unwrap();
@@ -133,8 +133,22 @@ fn create_main_window(app_handle: AppHandle<Wry>) {
     main_window.open_devtools()
   }
 
+  // #[cfg(target_os = "macos")]
+  // window_vibrancy::apply_vibrancy(&main_window, window_vibrancy::NSVisualEffectMaterial::Popover)
+  //   .expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
+
+  // unsafe {
+  //   use cocoa::appkit::{NSWindow, NSWindowCollectionBehavior, NSColor};
+  //   use objc::*;
+  //
+  //   let ns_window = chaosdanmutool::libs::utils::window_utils::get_ns_window(&main_window).unwrap();
+  //
+  //   ns_window.setOpaque_(runtime::NO);
+  //   ns_window.setBackgroundColor_(msg_send![class!(NSColor), clearColor])
+  // }
+
   #[cfg(target_os = "macos")]
-  set_visible_on_all_workspaces(main_window, true, true, false);
+  set_visible_on_all_workspaces(&main_window, true, true, false);
 }
 
 #[allow(unused)]

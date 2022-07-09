@@ -20,7 +20,7 @@ extern {
 }
 
 #[cfg(target_os = "macos")]
-pub fn set_visible_on_all_workspaces(window: Window<Wry>,
+pub fn set_visible_on_all_workspaces(window: &Window<Wry>,
                                             visible: bool,
                                             visible_on_full_screen: bool,
                                             skip_transform_process_type: bool) {
@@ -72,7 +72,7 @@ pub unsafe fn set_collection_behavior(ns_window: cocoa::base::id,
 }
 
 #[cfg(target_os = "macos")]
-pub fn get_ns_window(window: Window<Wry>) -> Option<cocoa::base::id> {
+pub fn get_ns_window(window: &Window<Wry>) -> Option<cocoa::base::id> {
   use raw_window_handle::RawWindowHandle::AppKit;
 
   if let AppKit(handle) = window.raw_window_handle() {
