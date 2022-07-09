@@ -12,6 +12,7 @@
     "version": "../package.json"
   },
   "tauri": {
+    "macOSPrivateApi": true,
     "allowlist": {
       "all": false,
       "path": {

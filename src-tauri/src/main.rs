@@ -10,9 +10,10 @@ windows_subsystem = "windows"
 
 #[allow(unused_imports)]
 use tauri::{App, AppHandle, command, Manager, Wry};
-use tauri::{Assets, Context};
+use tauri::{Assets, Context, Window};
 use tauri::async_runtime::block_on;
 use tokio::task;
+use window_vibrancy::{apply_acrylic, apply_blur, apply_mica, apply_vibrancy};
 
 use chaosdanmutool::libs::config::config_manager::ConfigManager;
 use chaosdanmutool::libs::network::command_broadcast_server::CommandBroadcastServer;
@@ -118,6 +119,7 @@ fn create_main_window(app_handle: &AppHandle<Wry>) {
     "main",
     tauri::WindowUrl::App("main/index.html".into()),
   )
+    .transparent(true)
     .build()
     .unwrap();
 
@@ -133,22 +135,23 @@ fn create_main_window(app_handle: &AppHandle<Wry>) {
     main_window.open_devtools()
   }
 
-  // #[cfg(target_os = "macos")]
-  // window_vibrancy::apply_vibrancy(&main_window, window_vibrancy::NSVisualEffectMaterial::Popover)
-  //   .expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
-
-  // unsafe {
-  //   use cocoa::appkit::{NSWindow, NSWindowCollectionBehavior, NSColor};
-  //   use objc::*;
-  //
-  //   let ns_window = chaosdanmutool::libs::utils::window_utils::get_ns_window(&main_window).unwrap();
-  //
-  //   ns_window.setOpaque_(runtime::NO);
-  //   ns_window.setBackgroundColor_(msg_send![class!(NSColor), clearColor])
-  // }
+  apply_vibrancy_effect(&main_window);
 
   #[cfg(target_os = "macos")]
   set_visible_on_all_workspaces(&main_window, true, true, false);
+}
+
+fn apply_vibrancy_effect(window: &Window<Wry>) {
+  #[cfg(target_os = "macos")]
+    let _ = apply_vibrancy(window, window_vibrancy::NSVisualEffectMaterial::HudWindow);
+  // #[cfg(target_os = "windows")]
+  {
+    let mut result = apply_mica(window);
+    if result.is_ok() { return; }
+    result = apply_acrylic(window, Some((18, 18, 18, 125)));
+    if result.is_ok() { return; }
+    let _ = apply_blur(window, Some((18, 18, 18, 125)));
+  }
 }
 
 #[allow(unused)]
