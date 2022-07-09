@@ -18,7 +18,7 @@ use tokio::time::sleep;
 use chaosdanmutool::libs::config::config_manager::ConfigManager;
 use chaosdanmutool::libs::network::command_broadcast_server::CommandBroadcastServer;
 use chaosdanmutool::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver;
-use chaosdanmutool::libs::network::http_server::HTTP_SERVER_STATIC_INSTANCE;
+use chaosdanmutool::libs::network::http_server::HttpServer;
 #[cfg(target_os = "macos")]
 use chaosdanmutool::libs::utils::window_utils::set_visible_on_all_workspaces;
 use chaosdanmutool::{lprintln};
@@ -89,7 +89,7 @@ fn on_setup(app: &mut App<Wry>) {
 
   let asset_resolver = app.asset_resolver();
   tauri::async_runtime::spawn(async move {
-    (*HTTP_SERVER_STATIC_INSTANCE).lock().await.start_(asset_resolver, 25525); // TODO: port config
+    HttpServer::start(asset_resolver, 25525).await;
   });
 }
 

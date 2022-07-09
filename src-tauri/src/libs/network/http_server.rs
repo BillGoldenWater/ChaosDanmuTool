@@ -16,8 +16,8 @@ use tokio_tungstenite::{MaybeTlsStream, WebSocketStream};
 use tokio_tungstenite::tungstenite::handshake::derive_accept_key;
 use tokio_tungstenite::tungstenite::protocol::Role;
 
-use crate::libs::network::command_broadcast_server::CommandBroadcastServer;
 use crate::{elprintln, lprintln};
+use crate::libs::network::command_broadcast_server::CommandBroadcastServer;
 
 lazy_static! {
     pub static ref HTTP_SERVER_STATIC_INSTANCE: Mutex<HttpServer> =
@@ -37,7 +37,12 @@ impl HttpServer {
     }
   }
 
-  pub fn start_(&mut self, asset_resolver: AssetResolver<Wry>, port: u16) {
+  pub async fn start(asset_resolver: AssetResolver<Wry>, port: u16) {
+    let this = &mut *HTTP_SERVER_STATIC_INSTANCE.lock().await;
+    this.start_(asset_resolver, port)
+  }
+
+  fn start_(&mut self, asset_resolver: AssetResolver<Wry>, port: u16) {
     self.asset_resolver = Some(asset_resolver);
 
     let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), port);
@@ -65,7 +70,12 @@ impl HttpServer {
     });
   }
 
-  pub fn stop_(&mut self) {
+  async fn stop() {
+    let this = &mut *HTTP_SERVER_STATIC_INSTANCE.lock().await;
+    this.stop_()
+  }
+
+  pub fn stop_(&mut self) { // TODO stop()
     if let Some(tx) = self.tx.replace(None) {
       if let Some(tx) = tx {
         let _ = tx.send(());
@@ -73,7 +83,7 @@ impl HttpServer {
     }
   }
 
-  pub async fn on_request(mut req: HyperRequest<Body>) -> Result<Response<Body>, Infallible> {
+  async fn on_request(mut req: HyperRequest<Body>) -> Result<Response<Body>, Infallible> {
     // region try websocket
     if let Some(res) = create_websocket_upgrade_response(&req) {
       tauri::async_runtime::spawn(async move {
