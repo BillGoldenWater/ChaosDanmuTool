@@ -15,13 +15,13 @@ use tauri::async_runtime::block_on;
 use tokio::task;
 use window_vibrancy::{apply_acrylic, apply_blur, apply_mica, apply_vibrancy};
 
+use chaosdanmutool::{lprintln};
 use chaosdanmutool::libs::config::config_manager::ConfigManager;
 use chaosdanmutool::libs::network::command_broadcast_server::CommandBroadcastServer;
 use chaosdanmutool::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver;
 use chaosdanmutool::libs::network::http_server::HttpServer;
 #[cfg(target_os = "macos")]
 use chaosdanmutool::libs::utils::window_utils::set_visible_on_all_workspaces;
-use chaosdanmutool::lprintln;
 
 #[tokio::main]
 async fn main() {

@@ -6,6 +6,9 @@ export default defineConfig({
   root: "src",
   build: {
     outDir: "../dist",
+    rollupOptions: {
+      input: ["src/main/index.html"],
+    },
   },
   plugins: [react()],
 });

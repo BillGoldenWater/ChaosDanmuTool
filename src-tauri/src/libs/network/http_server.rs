@@ -53,7 +53,13 @@ impl HttpServer {
       });
 
 
-    let server = Server::bind(&addr).serve(make_service);
+    let server = Server::try_bind(&addr);
+    let server = if let Err(err) = server {
+      elprintln!("Failed to start server: {:?}",err);
+      return;
+    } else {
+      server.unwrap().serve(make_service)
+    };
 
     lprintln!("server start at: {:?}", server.local_addr());
 
