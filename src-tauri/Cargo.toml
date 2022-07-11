@@ -25,8 +25,8 @@ serde = { version = "1.0.138", features = ["derive"] }
 #   $defaultValue$
 # }
 # 
-# fn $skipFunctionName$(value: $typeName$) -> bool {
-#   value == $defaultFunctionName$()
+# fn $skipFunctionName$(value: &$typeName$) -> bool {
+#   *value == $defaultFunctionName$()
 # }
 tauri = { version = "1.0.3", features = ["devtools", "fs-read-file", "fs-write-file", "macos-private-api", "path-all"] }
 window-vibrancy = "0.1.3"
