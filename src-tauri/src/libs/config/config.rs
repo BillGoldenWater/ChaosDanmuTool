@@ -14,7 +14,7 @@ pub mod frontend_config;
 pub static INTERNAL_VIEWER_UUID: &str = "93113675-999d-469c-a280-47ed2c5a09e4";
 lazy_static! {
   pub static ref ALLOW_CONFIG_SKIP_IF: RwLock<bool> = RwLock::new(false);
-  pub static ref ALLOW_CONFIG_SKIP_IF_LOCK: Mutex<()> = Mutex::new(());
+  pub static ref ALLOW_CONFIG_SKIP_IF_LOCK: Mutex<bool> = Mutex::new(false);
 }
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug)]
@@ -49,13 +49,10 @@ fn frontend_skip_if(value: &FrontendConfig) -> bool {
 }
 //endregion
 
-pub fn serialize_config(config: Config, skip_if: bool) -> String {
-  let _ = ALLOW_CONFIG_SKIP_IF_LOCK.lock().unwrap();
-  {
-    let mut allow_config_skip_if = ALLOW_CONFIG_SKIP_IF.write().unwrap();
-    *allow_config_skip_if = skip_if;
-  }
-  serde_json::to_string(&config).unwrap_or("{}".to_string())
+pub fn serialize_config(config: &Config, skip_if: bool) -> String {
+  let _ = &*ALLOW_CONFIG_SKIP_IF_LOCK.lock().unwrap();
+  { *ALLOW_CONFIG_SKIP_IF.write().unwrap() = skip_if; }
+  serde_json::to_string(config).unwrap_or("{}".to_string())
 }
 
 #[cfg(test)]
@@ -79,7 +76,7 @@ mod test {
   #[test]
   fn write_default_config() {
     let default_config: String = serialize_config(
-      serde_json::from_str("{}").unwrap(),
+      &serde_json::from_str("{}").unwrap(),
       false,
     );
 
