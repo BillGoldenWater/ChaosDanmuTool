@@ -17,7 +17,7 @@ tauri-build = { version = "1.0.3", features = [] }
 [dependencies]
 serde_json = "1.0.82"
 serde = { version = "1.0.138", features = ["derive"] }
-# live template: sddf (serde default define & function)
+# live template: sddfc (serde default define & function - config)
 #
 # #[serde(default = "$fieldName$_default")]
 # #[serde(skip_serializing_if = "$skipFunctionName$")]
@@ -27,7 +27,7 @@ serde = { version = "1.0.138", features = ["derive"] }
 # }
 # 
 # fn $skipFunctionName$(value: &$typeName$) -> bool {
-#   *value == $defaultFunctionName$()
+#   *value == $defaultFunctionName$() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 # }
 # //ednregion
 #
