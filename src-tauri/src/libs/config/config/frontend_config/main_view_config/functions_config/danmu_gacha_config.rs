@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+use crate::libs::config::config::ALLOW_CONFIG_SKIP_IF;
 use crate::libs::config::config::frontend_config::main_view_config::functions_config::danmu_gacha_config::join_by_config::JoinByConfig;
 
 pub mod join_by_config;
@@ -13,19 +14,19 @@ pub mod join_by_config;
 pub struct DanmuGachaConfig {
   #[serde(default = "join_by_default")]
   #[serde(skip_serializing_if = "join_by_skip_if")]
-  join_by: JoinByConfig,
+  pub join_by: JoinByConfig,
   #[serde(default = "fans_medal_level_default")]
   #[serde(skip_serializing_if = "fans_medal_level_skip_if")]
-  fans_medal_level: i32,
+  pub fans_medal_level: i32,
   #[serde(default = "user_level_default")]
   #[serde(skip_serializing_if = "user_level_skip_if")]
-  user_level: i32,
+  pub user_level: i32,
   #[serde(default = "win_num_default")]
   #[serde(skip_serializing_if = "win_num_skip_if")]
-  win_num: u32,
+  pub win_num: u32,
   #[serde(default = "reward_item_default")]
   #[serde(skip_serializing_if = "reward_item_skip_if")]
-  reward_item: String,
+  pub reward_item: String,
 }
 
 fn join_by_default() -> JoinByConfig {
@@ -33,7 +34,7 @@ fn join_by_default() -> JoinByConfig {
 }
 
 fn join_by_skip_if(value: &JoinByConfig) -> bool {
-  *value == join_by_default()
+  *value == join_by_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 
 fn fans_medal_level_default() -> i32 {
@@ -41,7 +42,7 @@ fn fans_medal_level_default() -> i32 {
 }
 
 fn fans_medal_level_skip_if(value: &i32) -> bool {
-  *value == fans_medal_level_default()
+  *value == fans_medal_level_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 
 fn user_level_default() -> i32 {
@@ -49,7 +50,7 @@ fn user_level_default() -> i32 {
 }
 
 fn user_level_skip_if(value: &i32) -> bool {
-  *value == user_level_default()
+  *value == user_level_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 
 fn win_num_default() -> u32 {
@@ -57,7 +58,7 @@ fn win_num_default() -> u32 {
 }
 
 fn win_num_skip_if(value: &u32) -> bool {
-  *value == win_num_default()
+  *value == win_num_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 
 fn reward_item_default() -> String {
@@ -65,6 +66,6 @@ fn reward_item_default() -> String {
 }
 
 fn reward_item_skip_if(value: &String) -> bool {
-  *value == reward_item_default()
+  *value == reward_item_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+use crate::libs::config::config::ALLOW_CONFIG_SKIP_IF;
 use crate::libs::config::config::frontend_config::main_view_config::functions_config::FunctionsConfig;
 
 pub mod functions_config;
@@ -13,10 +14,10 @@ pub mod functions_config;
 pub struct MainViewConfig {
   #[serde(default = "path_default")]
   #[serde(skip_serializing_if = "path_skip_if")]
-  path: String,
+  pub path: String,
   #[serde(default = "functions_default")]
   #[serde(skip_serializing_if = "functions_skip_if")]
-  functions: FunctionsConfig,
+  pub functions: FunctionsConfig,
 }
 
 fn path_default() -> String {
@@ -24,7 +25,7 @@ fn path_default() -> String {
 }
 
 fn path_skip_if(value: &String) -> bool {
-  *value == path_default()
+  *value == path_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 
 
@@ -33,5 +34,5 @@ fn functions_default() -> FunctionsConfig {
 }
 
 fn functions_skip_if(value: &FunctionsConfig) -> bool {
-  *value == functions_default()
+  *value == functions_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }

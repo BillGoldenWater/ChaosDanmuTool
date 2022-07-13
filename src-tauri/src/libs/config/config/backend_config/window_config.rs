@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+use crate::libs::config::config::ALLOW_CONFIG_SKIP_IF;
 use crate::libs::config::config::backend_config::window_config::main_window_config::MainWindowConfig;
 use crate::libs::config::config::backend_config::window_config::viewer_window_config::ViewerWindowConfig;
 
@@ -15,10 +16,10 @@ pub mod viewer_window_config;
 pub struct WindowConfig {
   #[serde(default = "main_window_default")]
   #[serde(skip_serializing_if = "main_window_skip_if")]
-  main_window: MainWindowConfig,
+  pub main_window: MainWindowConfig,
   #[serde(default = "viewer_window_default")]
   #[serde(skip_serializing_if = "viewer_window_skip_if")]
-  viewer_window: ViewerWindowConfig,
+  pub viewer_window: ViewerWindowConfig,
 }
 
 
@@ -27,7 +28,7 @@ fn main_window_default() -> MainWindowConfig {
 }
 
 fn main_window_skip_if(value: &MainWindowConfig) -> bool {
-  *value == main_window_default()
+  *value == main_window_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 
 
@@ -36,7 +37,7 @@ fn viewer_window_default() -> ViewerWindowConfig {
 }
 
 fn viewer_window_skip_if(value: &ViewerWindowConfig) -> bool {
-  *value == viewer_window_default()
+  *value == viewer_window_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 
 

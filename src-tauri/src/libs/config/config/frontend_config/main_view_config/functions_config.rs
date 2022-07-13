@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+use crate::libs::config::config::ALLOW_CONFIG_SKIP_IF;
 use crate::libs::config::config::frontend_config::main_view_config::functions_config::danmu_gacha_config::DanmuGachaConfig;
 use crate::libs::config::config::frontend_config::main_view_config::functions_config::room_connection_config::RoomConnectionConfig;
 
@@ -15,10 +16,10 @@ pub mod danmu_gacha_config;
 pub struct FunctionsConfig {
   #[serde(default = "room_connection_default")]
   #[serde(skip_serializing_if = "room_connection_skip_if")]
-  room_connection: RoomConnectionConfig,
+  pub room_connection: RoomConnectionConfig,
   #[serde(default = "danmu_gacha_default")]
   #[serde(skip_serializing_if = "danmu_gacha_skip_if")]
-  danmu_gacha: DanmuGachaConfig,
+  pub danmu_gacha: DanmuGachaConfig,
 }
 
 fn room_connection_default() -> RoomConnectionConfig {
@@ -26,7 +27,7 @@ fn room_connection_default() -> RoomConnectionConfig {
 }
 
 fn room_connection_skip_if(value: &RoomConnectionConfig) -> bool {
-  *value == room_connection_default()
+  *value == room_connection_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 
 fn danmu_gacha_default() -> DanmuGachaConfig {
@@ -34,6 +35,6 @@ fn danmu_gacha_default() -> DanmuGachaConfig {
 }
 
 fn danmu_gacha_skip_if(value: &DanmuGachaConfig) -> bool {
-  *value == danmu_gacha_default()
+  *value == danmu_gacha_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 

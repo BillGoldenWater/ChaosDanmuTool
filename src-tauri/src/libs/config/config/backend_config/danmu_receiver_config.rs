@@ -3,19 +3,21 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+use crate::libs::config::config::ALLOW_CONFIG_SKIP_IF;
+
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "../src/share/type/rust/config/backendConfig/")]
 pub struct DanmuReceiverConfig {
   #[serde(default = "roomid_default")]
   #[serde(skip_serializing_if = "roomid_skip_if")]
-  roomid: i32,
+  pub roomid: i32,
   #[serde(default = "actual_roomid_default")]
   #[serde(skip_serializing_if = "actual_roomid_skip_if")]
-  actual_roomid: i32,
+  pub actual_roomid: i32,
   #[serde(default = "heartbeat_interval_default")]
   #[serde(skip_serializing_if = "heartbeat_interval_skip_if")]
-  heartbeat_interval: u8,
+  pub heartbeat_interval: u8,
 }
 
 fn roomid_default() -> i32 {
@@ -23,7 +25,7 @@ fn roomid_default() -> i32 {
 }
 
 fn roomid_skip_if(value: &i32) -> bool {
-  *value == roomid_default()
+  *value == roomid_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 
 fn actual_roomid_default() -> i32 {
@@ -31,7 +33,7 @@ fn actual_roomid_default() -> i32 {
 }
 
 fn actual_roomid_skip_if(value: &i32) -> bool {
-  *value == actual_roomid_default()
+  *value == actual_roomid_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 
 
@@ -40,5 +42,5 @@ fn heartbeat_interval_default() -> u8 {
 }
 
 fn heartbeat_interval_skip_if(value: &u8) -> bool {
-  *value == heartbeat_interval_default()
+  *value == heartbeat_interval_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }

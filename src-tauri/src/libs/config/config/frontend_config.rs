@@ -5,6 +5,7 @@
 
 use crate::libs::config::config::frontend_config::main_view_config::MainViewConfig;
 use crate::libs::config::config::frontend_config::viewer_view_config::ViewerViewConfig;
+use crate::libs::config::config::{ALLOW_CONFIG_SKIP_IF, INTERNAL_VIEWER_UUID};
 
 pub mod main_view_config;
 pub mod viewer_view_config;
@@ -15,10 +16,10 @@ pub mod viewer_view_config;
 pub struct FrontendConfig {
   #[serde(default = "main_view_default")]
   #[serde(skip_serializing_if = "main_view_skip_if")]
-  main_view: MainViewConfig,
+  pub main_view: MainViewConfig,
   #[serde(default = "viewer_view_default")]
   #[serde(skip_serializing_if = "viewer_view_skip_if")]
-  viewer_view: ViewerViewConfig,
+  pub viewer_view: Vec<ViewerViewConfig>,
 }
 
 //region main_view
@@ -27,16 +28,19 @@ fn main_view_default() -> MainViewConfig {
 }
 
 fn main_view_skip_if(value: &MainViewConfig) -> bool {
-  *value == main_view_default()
+  *value == main_view_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 //endregion
 
 //region viewer_view
-fn viewer_view_default() -> ViewerViewConfig {
-  serde_json::from_str("{}").unwrap()
+fn viewer_view_default() -> Vec<ViewerViewConfig> {
+  let mut default_internal: ViewerViewConfig = serde_json::from_str("{}").unwrap();
+  default_internal.uuid = INTERNAL_VIEWER_UUID.to_string().clone();
+  default_internal.name = "内部查看器".to_string();
+  vec![default_internal]
 }
 
-fn viewer_view_skip_if(value: &ViewerViewConfig) -> bool {
-  *value == viewer_view_default()
+fn viewer_view_skip_if(value: &Vec<ViewerViewConfig>) -> bool {
+  *value == viewer_view_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 //endregion

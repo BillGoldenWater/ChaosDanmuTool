@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+use crate::libs::config::config::ALLOW_CONFIG_SKIP_IF;
 use crate::libs::config::config::frontend_config::viewer_view_config::tts_config::tts_blacklist_config::TTSBlacklistConfig;
 use crate::libs::config::config::frontend_config::viewer_view_config::tts_config::tts_danmu_config::TTSDanmuConfig;
 use crate::libs::config::config::frontend_config::viewer_view_config::tts_config::tts_text_replacer::TTSTextReplacer;
@@ -17,28 +18,28 @@ pub mod tts_text_replacer;
 pub struct TTSConfig {
   #[serde(default = "enable_default")]
   #[serde(skip_serializing_if = "enable_skip_if")]
-  enable: bool,
+  pub enable: bool,
   #[serde(default = "max_queue_length_default")]
   #[serde(skip_serializing_if = "max_queue_length_skip_if")]
-  max_queue_length: u32,
+  pub max_queue_length: u32,
   #[serde(default = "rate_default")]
   #[serde(skip_serializing_if = "rate_skip_if")]
-  rate: f32,
+  pub rate: f32,
   #[serde(default = "pitch_default")]
   #[serde(skip_serializing_if = "pitch_skip_if")]
-  pitch: f32,
+  pub pitch: f32,
   #[serde(default = "volume_default")]
   #[serde(skip_serializing_if = "volume_skip_if")]
-  volume: f32,
+  pub volume: f32,
   #[serde(default = "tts_blacklist_default")]
   #[serde(skip_serializing_if = "tts_blacklist_skip_if")]
-  tts_blacklist: Vec<TTSBlacklistConfig>,
+  pub tts_blacklist: Vec<TTSBlacklistConfig>,
   #[serde(default = "tts_text_replacer_default")]
   #[serde(skip_serializing_if = "tts_text_replacer_skip_if")]
-  tts_text_replacer: Vec<TTSTextReplacer>,
+  pub tts_text_replacer: Vec<TTSTextReplacer>,
   #[serde(default = "tts_danmu_default")]
   #[serde(skip_serializing_if = "tts_danmu_skip_if")]
-  tts_danmu: TTSDanmuConfig,
+  pub tts_danmu: TTSDanmuConfig,
 }
 
 fn enable_default() -> bool {
@@ -46,7 +47,7 @@ fn enable_default() -> bool {
 }
 
 fn enable_skip_if(value: &bool) -> bool {
-  *value == enable_default()
+  *value == enable_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 
 fn max_queue_length_default() -> u32 {
@@ -54,7 +55,7 @@ fn max_queue_length_default() -> u32 {
 }
 
 fn max_queue_length_skip_if(value: &u32) -> bool {
-  *value == max_queue_length_default()
+  *value == max_queue_length_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 
 fn rate_default() -> f32 {
@@ -62,7 +63,7 @@ fn rate_default() -> f32 {
 }
 
 fn rate_skip_if(value: &f32) -> bool {
-  *value == rate_default()
+  *value == rate_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 
 fn pitch_default() -> f32 {
@@ -70,7 +71,7 @@ fn pitch_default() -> f32 {
 }
 
 fn pitch_skip_if(value: &f32) -> bool {
-  *value == pitch_default()
+  *value == pitch_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 
 fn volume_default() -> f32 {
@@ -78,7 +79,7 @@ fn volume_default() -> f32 {
 }
 
 fn volume_skip_if(value: &f32) -> bool {
-  *value == volume_default()
+  *value == volume_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 
 fn tts_blacklist_default() -> Vec<TTSBlacklistConfig> {
@@ -86,7 +87,7 @@ fn tts_blacklist_default() -> Vec<TTSBlacklistConfig> {
 }
 
 fn tts_blacklist_skip_if(value: &Vec<TTSBlacklistConfig>) -> bool {
-  *value == tts_blacklist_default()
+  *value == tts_blacklist_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 
 fn tts_text_replacer_default() -> Vec<TTSTextReplacer> {
@@ -94,7 +95,7 @@ fn tts_text_replacer_default() -> Vec<TTSTextReplacer> {
 }
 
 fn tts_text_replacer_skip_if(value: &Vec<TTSTextReplacer>) -> bool {
-  *value == tts_text_replacer_default()
+  *value == tts_text_replacer_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 
 fn tts_danmu_default() -> TTSDanmuConfig {
@@ -102,5 +103,5 @@ fn tts_danmu_default() -> TTSDanmuConfig {
 }
 
 fn tts_danmu_skip_if(value: &TTSDanmuConfig) -> bool {
-  *value == tts_danmu_default()
+  *value == tts_danmu_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }

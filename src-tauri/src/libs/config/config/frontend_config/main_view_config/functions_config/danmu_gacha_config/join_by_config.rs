@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+use crate::libs::config::config::ALLOW_CONFIG_SKIP_IF;
+
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug)]
 #[serde(rename_all = "camelCase", tag = "by")]
 #[ts(export, export_to = "../src/share/type/rust/config/frontendConfig/mainViewConfig/functionsConfig/danmuGachaConfig/")]
@@ -27,7 +29,7 @@ fn join_by_danmu_content_default() -> String {
 }
 
 fn join_by_danmu_content_skip_if(value: &String) -> bool {
-  *value == join_by_danmu_content_default()
+  *value == join_by_danmu_content_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 
 fn join_by_gift_gift_id_default() -> i32 {
@@ -35,7 +37,7 @@ fn join_by_gift_gift_id_default() -> i32 {
 }
 
 fn join_by_gift_gift_id_skip_if(value: &i32) -> bool {
-  *value == join_by_gift_gift_id_default()
+  *value == join_by_gift_gift_id_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 
 fn join_by_gift_gift_value_default() -> i32 {
@@ -43,7 +45,7 @@ fn join_by_gift_gift_value_default() -> i32 {
 }
 
 fn join_by_gift_gift_value_skip_if(value: &i32) -> bool {
-  *value == join_by_gift_gift_value_default()
+  *value == join_by_gift_gift_value_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 
 

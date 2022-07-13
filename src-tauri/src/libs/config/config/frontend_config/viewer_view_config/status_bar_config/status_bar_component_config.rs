@@ -3,16 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+use crate::libs::config::config::ALLOW_CONFIG_SKIP_IF;
+
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "../src/share/type/rust/config/frontendConfig/viewerViewConfig/statusBarConfig")]
 pub struct StatusBarComponentConfig {
   #[serde(default = "show_default")]
   #[serde(skip_serializing_if = "show_skip_if")]
-  show: bool,
+  pub show: bool,
   #[serde(default = "format_number_default")]
   #[serde(skip_serializing_if = "format_number_skip_if")]
-  format_number: bool,
+  pub format_number: bool,
 }
 
 fn show_default() -> bool {
@@ -20,7 +22,7 @@ fn show_default() -> bool {
 }
 
 fn show_skip_if(value: &bool) -> bool {
-  *value == show_default()
+  *value == show_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 
 fn format_number_default() -> bool {
@@ -28,6 +30,6 @@ fn format_number_default() -> bool {
 }
 
 fn format_number_skip_if(value: &bool) -> bool {
-  *value == format_number_default()
+  *value == format_number_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 
