@@ -13,7 +13,6 @@ use tauri::{App, AppHandle, command, Manager, Wry};
 use tauri::{Assets, Context, Window};
 use tauri::async_runtime::block_on;
 use tokio::task;
-use window_vibrancy::{apply_acrylic, apply_blur, apply_mica, apply_vibrancy};
 
 use chaosdanmutool::{lprintln};
 use chaosdanmutool::libs::config::config_manager::ConfigManager;
@@ -142,6 +141,11 @@ fn create_main_window(app_handle: &AppHandle<Wry>) {
   #[cfg(target_os = "macos")]
   set_visible_on_all_workspaces(&main_window, true, true, false);
 }
+
+#[cfg(target_os = "macos")]
+use window_vibrancy::apply_vibrancy;
+#[cfg(target_os = "windows")]
+use window_vibrancy::{apply_acrylic, apply_blur, apply_mica};
 
 fn apply_vibrancy_effect(window: &Window<Wry>) {
   #[cfg(target_os = "macos")]
