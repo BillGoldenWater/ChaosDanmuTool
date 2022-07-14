@@ -144,7 +144,7 @@ fn create_main_window(app_handle: &AppHandle<Wry>) {
 fn apply_vibrancy_effect(window: &Window<Wry>) {
   #[cfg(target_os = "macos")]
     let _ = apply_vibrancy(window, window_vibrancy::NSVisualEffectMaterial::HudWindow);
-  // #[cfg(target_os = "windows")]
+  #[cfg(target_os = "windows")]
   {
     let mut result = apply_mica(window);
     if ConfigManager::get_config().backend.window.main_window.use_acrylic_effect {
