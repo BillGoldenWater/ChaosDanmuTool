@@ -88,7 +88,9 @@ fn start_ticking() {
 
 async fn on_setup(app: &mut App<Wry>) {
   let asset_resolver = app.asset_resolver();
-  HttpServer::start(asset_resolver, 25525).await;
+
+  let port = ConfigManager::get_config().backend.http_server.port.clone();
+  HttpServer::start(asset_resolver, port).await;
 }
 
 async fn on_ready(app_handle: &AppHandle<Wry>) {
