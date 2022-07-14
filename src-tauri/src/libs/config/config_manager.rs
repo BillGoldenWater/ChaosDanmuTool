@@ -23,7 +23,7 @@ lazy_static! {
 pub struct ConfigManager {
   app_dir: Option<PathBuf>,
   config_file_path: Option<PathBuf>,
-  pub config: Config,
+  config: Config,
 }
 
 impl ConfigManager {
@@ -74,7 +74,24 @@ impl ConfigManager {
       config_str = result.unwrap();
     }
 
-    self.config = serde_json::from_str(config_str.as_str()).unwrap();
+    let parse_result = serde_json::from_str(config_str.as_str());
+
+    if let Err(_err) = parse_result {
+      let reset = rfd::MessageDialog::new()
+        .set_title("错误")
+        .set_level(MessageLevel::Error)
+        .set_buttons(MessageButtons::OkCancelCustom("重置".to_string(), "退出".to_string()))
+        .set_description(format!("无法解析配置文件.\n重置配置文件或退出?\n{}", location_info!()).as_str())
+        .show();
+      if reset {
+        self.reset_(true);
+        return;
+      } else {
+        std::process::exit(0);
+      }
+    }
+
+    self.config = parse_result.unwrap();
   }
 
   pub fn save() {
@@ -102,6 +119,36 @@ impl ConfigManager {
         lprintln!("config successfully saved");
       }
     }
+  }
+
+  pub fn reset(force: bool) {
+    let this = &mut *CONFIG_MANAGER_STATIC_INSTANCE.lock().unwrap();
+    this.reset_(force)
+  }
+
+  fn reset_(&mut self, force: bool) {
+    let button = MessageButtons::OkCancelCustom(
+      "重置".to_string(),
+      if force { "退出".to_string() } else { "取消".to_string() },
+    );
+
+    let reset = rfd::MessageDialog::new()
+      .set_title("警告")
+      .set_level(MessageLevel::Warning)
+      .set_buttons(button)
+      .set_description(format!("重置配置文件将会丢失所有的自定义设置!\n{}", location_info!()).as_str())
+      .show();
+    if !reset {
+      if force {
+        std::process::exit(0);
+      } else {
+        return;
+      }
+    }
+
+    lprintln!("reset config");
+    self.set_config_(serde_json::from_str("{}").unwrap());
+    self.save_();
   }
 
   pub fn get_config() -> Config {
