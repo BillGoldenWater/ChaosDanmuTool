@@ -13,7 +13,7 @@ use tauri::api::file::read_string;
 
 use crate::{location_info, lprintln};
 use crate::libs::config::config::{Config, serialize_config};
-use crate::libs::utils::path_utils::get_app_dir;
+use crate::libs::utils::fs_utils::get_app_data_dir;
 
 lazy_static! {
     pub static ref CONFIG_MANAGER_STATIC_INSTANCE: Mutex<ConfigManager> =
@@ -38,9 +38,9 @@ impl ConfigManager {
   pub fn init<A: Assets>(context: &Context<A>) {
     let this = &mut *CONFIG_MANAGER_STATIC_INSTANCE.lock().unwrap();
 
-    this.app_dir = Some(get_app_dir(context));
+    this.app_dir = Some(get_app_data_dir(context));
 
-    let mut config_file_path = get_app_dir(context);
+    let mut config_file_path = get_app_data_dir(context);
     config_file_path.push("config.json");
     this.config_file_path = Some(config_file_path);
 

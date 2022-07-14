@@ -21,6 +21,7 @@ use chaosdanmutool::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver
 use chaosdanmutool::libs::network::http_server::HttpServer;
 #[cfg(target_os = "macos")]
 use chaosdanmutool::libs::utils::window_utils::set_visible_on_all_workspaces;
+use chaosdanmutool::lprintln;
 
 #[tokio::main]
 async fn main() {
@@ -142,16 +143,17 @@ fn create_main_window(app_handle: &AppHandle<Wry>) {
   set_visible_on_all_workspaces(&main_window, true, true, false);
 }
 
-#[cfg(target_os = "macos")]
-use window_vibrancy::apply_vibrancy;
-#[cfg(target_os = "windows")]
-use window_vibrancy::{apply_acrylic, apply_blur, apply_mica};
-
 fn apply_vibrancy_effect(window: &Window<Wry>) {
   #[cfg(target_os = "macos")]
+  {
+    use window_vibrancy::apply_vibrancy;
+    
     let _ = apply_vibrancy(window, window_vibrancy::NSVisualEffectMaterial::HudWindow);
+  }
   #[cfg(target_os = "windows")]
   {
+    use window_vibrancy::{apply_acrylic, apply_blur, apply_mica};
+
     let mut result = apply_mica(window);
     if ConfigManager::get_config().backend.window.main_window.use_acrylic_effect {
       if result.is_ok() { return; }

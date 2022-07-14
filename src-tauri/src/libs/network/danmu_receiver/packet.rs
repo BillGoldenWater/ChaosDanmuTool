@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-use std::io::Cursor;
-
 use bytes::{Buf, BufMut, BytesMut};
 
 use crate::libs::network::danmu_receiver::data_type::DataType;
 use crate::libs::network::danmu_receiver::op_code::OpCode;
+use crate::libs::utils::brotli_utils::brotli_decompress;
+use crate::libs::utils::mut_bytes_utils::get_bytes;
 use crate::lprintln;
 
 #[derive(Debug)]
@@ -61,26 +61,24 @@ impl Packet {
 
     match DataType::from_u16(data_type) {
       DataType::CompressedBrotli => { // brotli
-        let body = Self::get_body(data, body_len);
+        let body = get_bytes(data, body_len as usize);
 
-        let mut decompressed = vec![];
-        let result = brotli_decompressor::BrotliDecompress(
-          &mut Cursor::new(body.to_vec()),
-          &mut Cursor::new(&mut decompressed),
-        );
-        if result.is_err() {
+        let decompress_result = brotli_decompress(&body.to_vec());
+        if decompress_result.is_err() {
           lprintln!("failed to decompress");
           return vec![];
         }
+        let decompressed = decompress_result.unwrap();
 
         Self::from_bytes(&mut BytesMut::from(decompressed.as_slice()))
       }
-      DataType::CompressedZlib => { // zlib
+      DataType::CompressedZlib => {
+        // zlib
         lprintln!("unsupported compress format");
         vec![]
       }
       _ => { // other
-        let body = Self::get_body(data, body_len);
+        let body = get_bytes(data, body_len as usize);
 
         let mut result = vec![Packet {
           data_type: DataType::from_u16(data_type),
@@ -96,16 +94,6 @@ impl Packet {
         result
       }
     }
-  }
-
-  fn get_body(data: &mut BytesMut, body_len: u32) -> BytesMut {
-    let mut body = BytesMut::with_capacity(body_len as usize);
-
-    for _ in 0..body_len {
-      body.put_u8(data.get_u8())
-    }
-
-    body
   }
 
   pub fn join(info: JoinPacketInfo) -> Packet {

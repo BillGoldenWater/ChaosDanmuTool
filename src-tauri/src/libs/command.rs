@@ -3,7 +3,5 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-pub mod utils;
-pub mod network;
-pub mod config;
-pub mod command;
+pub mod command_history_manager;
+pub mod command_history_storage;
