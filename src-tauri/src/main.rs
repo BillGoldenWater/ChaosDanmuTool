@@ -147,8 +147,10 @@ fn apply_vibrancy_effect(window: &Window<Wry>) {
   // #[cfg(target_os = "windows")]
   {
     let mut result = apply_mica(window);
-    if result.is_ok() { return; }
-    result = apply_acrylic(window, Some((18, 18, 18, 125)));
+    if ConfigManager::get_config().backend.window.main_window.use_acrylic_effect {
+      if result.is_ok() { return; }
+      result = apply_acrylic(window, Some((18, 18, 18, 125)));
+    }
     if result.is_ok() { return; }
     let _ = apply_blur(window, Some((18, 18, 18, 125)));
   }
