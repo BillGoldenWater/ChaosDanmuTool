@@ -9,10 +9,14 @@ use brotli::enc::BrotliEncoderParams;
 
 pub fn brotli_compress(data: &Vec<u8>) -> Result<Vec<u8>, std::io::Error> {
   let mut compressed = vec![];
+
+  let mut encoder_params = BrotliEncoderParams::default();
+  encoder_params.quality = 9;
+
   let _ = brotli::BrotliCompress(
     &mut Cursor::new(data),
     &mut Cursor::new(&mut compressed),
-    &BrotliEncoderParams::default(),
+    &encoder_params,
   )?;
 
   Ok(compressed)

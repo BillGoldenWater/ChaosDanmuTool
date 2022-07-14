@@ -11,17 +11,19 @@ use chrono::{DateTime, Utc};
 use tokio::fs::OpenOptions;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
-use crate::elprintln;
+use crate::{elprintln, lprintln};
 use crate::libs::utils::brotli_utils::{brotli_compress, brotli_decompress};
 use crate::libs::utils::mut_bytes_utils::get_bytes;
 
-static MAX_RECORD_PER_FILE: u64 = 500;
+static MAX_RECORD_PER_FILE: u64 = 1000;
 static RECORD_FILE_EXT: &str = ".cdtch";
 
 pub struct CommandHistoryStorage {
   data_dir: PathBuf,
   max_record_per_file: u64,
   index: u64,
+
+  readonly: bool,
 }
 
 impl CommandHistoryStorage {
@@ -34,14 +36,30 @@ impl CommandHistoryStorage {
       data_dir: data_dir.join(gen_data_dir_name(&ts, &uuid)),
       max_record_per_file: MAX_RECORD_PER_FILE,
       index: 0,
+
+      readonly: false,
     }
   }
 
-  pub fn from_folder(_folder: PathBuf) -> CommandHistoryStorage {
-    unimplemented!()
+  pub fn from_folder(folder: PathBuf) -> CommandHistoryStorage {
+    let info: Vec<&str> = folder.file_name().unwrap().to_str().unwrap()
+      .split("_")
+      .collect();
+
+    CommandHistoryStorage {
+      data_dir: folder.clone(),
+      max_record_per_file: info[1].parse().unwrap(),
+      index: 0,
+
+      readonly: true,
+    }
   }
 
   pub async fn write(&mut self, data: String) {
+    if self.readonly {
+      elprintln!("error: trying write to readonly storage");
+    }
+
     if let Err(err) = std::fs::create_dir_all(self.data_dir.as_path()) {
       elprintln!("unable to create data dir {:?}", err);
       return;
@@ -99,6 +117,7 @@ impl CommandHistoryStorage {
       let file_info = self.get_file_path(i);
 
       // region open
+      lprintln!("1");
       let open_result = OpenOptions::new()
         .read(true)
         .open(file_info.as_path())
@@ -190,7 +209,7 @@ fn gen_data_dir_name(ts: &DateTime<Utc>, uuid: &String) -> String {
   format!(
     "{}_{}_{}",
     ts.format("%Y-%m-%d-%H-%M-%S").to_string(),
+    MAX_RECORD_PER_FILE,
     uuid,
-    MAX_RECORD_PER_FILE
   )
 }

@@ -14,7 +14,6 @@ use tauri::{Assets, Context, Window};
 use tauri::async_runtime::block_on;
 use tokio::task;
 
-use chaosdanmutool::{lprintln};
 use chaosdanmutool::libs::config::config_manager::ConfigManager;
 use chaosdanmutool::libs::network::command_broadcast_server::CommandBroadcastServer;
 use chaosdanmutool::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver;
@@ -147,7 +146,7 @@ fn apply_vibrancy_effect(window: &Window<Wry>) {
   #[cfg(target_os = "macos")]
   {
     use window_vibrancy::apply_vibrancy;
-    
+
     let _ = apply_vibrancy(window, window_vibrancy::NSVisualEffectMaterial::HudWindow);
   }
   #[cfg(target_os = "windows")]
