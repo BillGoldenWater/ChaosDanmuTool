@@ -100,7 +100,7 @@ async fn on_exit(_app_handle: &AppHandle<Wry>) {
 
   HttpServer::stop().await;
   CommandBroadcastServer::close_all().await;
-  ConfigManager::save();
+  ConfigManager::on_exit();
 }
 
 fn show_main_window(app_handle: &AppHandle<Wry>) {
