@@ -5,7 +5,7 @@
 
 use crate::libs::config::config::ALLOW_CONFIG_SKIP_IF;
 
-#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug)]
+#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase", tag = "by")]
 #[ts(export, export_to = "../src/share/type/rust/config/frontendConfig/mainViewConfig/functionsConfig/danmuGachaConfig/")]
 pub enum JoinByConfig {

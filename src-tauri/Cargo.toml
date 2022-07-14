@@ -49,7 +49,7 @@ lazy_static = "1.4.0"
 rfd = "0.9.1"
 ts-rs = "6.2.0"
 # live template: tss
-# #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug)]
+# #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 # #[serde(rename_all = "camelCase")]
 # #[ts(export, export_to = "../src/share/type/rust/$PATH$")]
 # pub struct $NAME$ {
@@ -57,7 +57,7 @@ ts-rs = "6.2.0"
 # }
 #
 # live template: atss
-# #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug)]
+# #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 # #[serde(rename_all = "camelCase")]
 # #[ts(export, export_to = "../src/share/type/rust/$PATH$")]
 

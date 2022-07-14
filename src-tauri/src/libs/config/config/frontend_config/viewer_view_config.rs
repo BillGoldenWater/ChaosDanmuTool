@@ -12,7 +12,7 @@ pub mod danmu_viewer_custom_config;
 pub mod tts_config;
 pub mod status_bar_config;
 
-#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug)]
+#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "../src/share/type/rust/config/frontendConfig/")]
 pub struct ViewerViewConfig {

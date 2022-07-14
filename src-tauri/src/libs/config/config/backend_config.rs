@@ -16,7 +16,7 @@ pub mod danmu_receiver_config;
 pub mod config_manager_config;
 pub mod updater_config;
 
-#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug)]
+#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "../src/share/type/rust/config/")]
 pub struct BackendConfig {

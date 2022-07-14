@@ -8,7 +8,7 @@ use crate::libs::config::config::frontend_config::viewer_view_config::status_bar
 
 pub mod status_bar_component_config;
 
-#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug)]
+#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "../src/share/type/rust/config/frontendConfig/viewerViewConfig/")]
 pub struct StatusBarConfig {

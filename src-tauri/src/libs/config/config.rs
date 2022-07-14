@@ -17,7 +17,7 @@ lazy_static! {
   pub static ref ALLOW_CONFIG_SKIP_IF_LOCK: Mutex<bool> = Mutex::new(false);
 }
 
-#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug)]
+#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "../src/share/type/rust/config/")]
 pub struct Config {

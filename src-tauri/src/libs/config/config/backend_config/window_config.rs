@@ -10,7 +10,7 @@ use crate::libs::config::config::backend_config::window_config::viewer_window_co
 pub mod main_window_config;
 pub mod viewer_window_config;
 
-#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug)]
+#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "../src/share/type/rust/config/backendConfig/")]
 pub struct WindowConfig {

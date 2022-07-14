@@ -10,7 +10,7 @@ use crate::libs::config::config::{ALLOW_CONFIG_SKIP_IF, INTERNAL_VIEWER_UUID};
 pub mod main_view_config;
 pub mod viewer_view_config;
 
-#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug)]
+#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "../src/share/type/rust/config/")]
 pub struct FrontendConfig {

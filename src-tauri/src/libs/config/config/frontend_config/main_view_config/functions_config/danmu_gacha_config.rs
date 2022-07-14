@@ -8,7 +8,7 @@ use crate::libs::config::config::frontend_config::main_view_config::functions_co
 
 pub mod join_by_config;
 
-#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug)]
+#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "../src/share/type/rust/config/frontendConfig/mainViewConfig/functionsConfig/")]
 pub struct DanmuGachaConfig {

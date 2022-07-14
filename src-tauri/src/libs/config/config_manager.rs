@@ -104,9 +104,23 @@ impl ConfigManager {
     }
   }
 
-  pub fn on_change() {
+  pub fn get_config() -> Config {
     let this = &mut *CONFIG_MANAGER_STATIC_INSTANCE.lock().unwrap();
-    this.on_change_()
+    this.get_config_()
+  }
+
+  fn get_config_(&mut self) -> Config {
+    self.config.clone()
+  }
+
+  pub fn set_config(config: Config) {
+    let this = &mut *CONFIG_MANAGER_STATIC_INSTANCE.lock().unwrap();
+    this.set_config_(config)
+  }
+
+  fn set_config_(&mut self, config: Config) {
+    self.config = config;
+    self.on_change_();
   }
 
   fn on_change_(&mut self) {

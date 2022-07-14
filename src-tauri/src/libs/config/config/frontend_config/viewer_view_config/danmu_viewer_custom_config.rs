@@ -12,7 +12,7 @@ pub mod danmu_filter_config;
 pub mod danmu_merge_config;
 pub mod gift_display_config;
 
-#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug)]
+#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "../src/share/type/rust/config/frontendConfig/viewerViewConfig/")]
 pub struct DanmuViewerCustomConfig {

@@ -12,7 +12,7 @@ pub mod tts_danmu_config;
 pub mod tts_blacklist_config;
 pub mod tts_text_replacer;
 
-#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug)]
+#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "../src/share/type/rust/config/frontendConfig/viewerViewConfig/")]
 pub struct TTSConfig {
