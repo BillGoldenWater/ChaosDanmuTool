@@ -49,9 +49,9 @@ fn frontend_skip_if(value: &FrontendConfig) -> bool {
 }
 //endregion
 
-pub fn serialize_config(config: &Config, skip_if: bool) -> String {
+pub fn serialize_config(config: &Config, use_skip_if: bool) -> String {
   let _ = &*ALLOW_CONFIG_SKIP_IF_LOCK.lock().unwrap();
-  { *ALLOW_CONFIG_SKIP_IF.write().unwrap() = skip_if; }
+  { *ALLOW_CONFIG_SKIP_IF.write().unwrap() = use_skip_if; }
   serde_json::to_string(config).unwrap_or("{}".to_string())
 }
 

@@ -12,7 +12,7 @@ use tauri::{Assets, Context};
 use tauri::api::file::read_string;
 
 use crate::{location_info, lprintln};
-use crate::libs::config::config::Config;
+use crate::libs::config::config::{Config, serialize_config};
 use crate::libs::utils::path_utils::get_app_dir;
 
 lazy_static! {
@@ -94,7 +94,7 @@ impl ConfigManager {
           }
           let result = fs::write(
             path.as_path(),
-            serde_json::to_string(config).unwrap(),
+            serialize_config(config, true),
           );
           if let Err(err) = result {
             lprintln!("failed to write config file\n{:#?}",err);
