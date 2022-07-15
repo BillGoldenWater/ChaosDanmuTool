@@ -11,7 +11,7 @@ use chrono::{DateTime, Utc};
 use tokio::fs::OpenOptions;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
-use crate::{elprintln, lprintln};
+use crate::elprintln;
 use crate::libs::utils::brotli_utils::{brotli_compress, brotli_decompress};
 use crate::libs::utils::mut_bytes_utils::get_bytes;
 
@@ -117,7 +117,6 @@ impl CommandHistoryStorage {
       let file_info = self.get_file_path(i);
 
       // region open
-      lprintln!("1");
       let open_result = OpenOptions::new()
         .read(true)
         .open(file_info.as_path())

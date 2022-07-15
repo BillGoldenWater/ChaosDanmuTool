@@ -52,7 +52,7 @@ pub fn get_dir_file_names(dir: PathBuf) -> Result<Vec<String>, std::io::Error> {
       if let Ok(value) = value {
         if let Ok(meta) = value.metadata() {
           if meta.is_file() {
-            return Some(value.file_name().to_str().unwrap().to_string())
+            return Some(value.file_name().to_str().unwrap().to_string());
           }
         }
       }
