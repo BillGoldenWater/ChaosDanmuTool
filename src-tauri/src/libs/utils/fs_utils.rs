@@ -44,7 +44,7 @@ pub fn get_app_bundle_path() -> Option<PathBuf> {
   None
 }
 
-pub fn get_dir_file_names(dir: PathBuf) -> Result<Vec<String>, std::io::Error> {
+pub fn get_dir_file_names(dir: &PathBuf) -> Result<Vec<String>, std::io::Error> {
   let dir_info = std::fs::read_dir(dir)?;
 
   let file_names: Vec<String> = dir_info
