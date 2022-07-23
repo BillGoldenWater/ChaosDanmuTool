@@ -13,7 +13,7 @@ use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
 use crate::elprintln;
 use crate::libs::utils::brotli_utils::{brotli_compress, brotli_decompress};
-use crate::libs::utils::fs_utils::get_dir_file_names;
+use crate::libs::utils::fs_utils::get_dir_children_names;
 use crate::libs::utils::mut_bytes_utils::get_bytes;
 
 static MAX_RECORD_PER_FILE: u64 = 1000;
@@ -60,7 +60,7 @@ impl CommandHistoryStorage {
 
   async fn init_from_folder(&mut self) {
     // region get latest file id
-    let file_names_result = get_dir_file_names(&self.data_dir);
+    let file_names_result = get_dir_children_names(&self.data_dir, true);
     if let Err(err) = &file_names_result {
       elprintln!("unable to read history storage info {:?}",err);
       return;

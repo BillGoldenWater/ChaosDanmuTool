@@ -44,20 +44,22 @@ pub fn get_app_bundle_path() -> Option<PathBuf> {
   None
 }
 
-pub fn get_dir_file_names(dir: &PathBuf) -> Result<Vec<String>, std::io::Error> {
+pub fn get_dir_children_names(dir: &PathBuf, ignore_hidden: bool) -> Result<Vec<String>, std::io::Error> {
   let dir_info = std::fs::read_dir(dir)?;
 
   let file_names: Vec<String> = dir_info
     .filter_map(|value| {
       if let Ok(value) = value {
-        if let Ok(meta) = value.metadata() {
-          if meta.is_file() {
-            return Some(value.file_name().to_str().unwrap().to_string());
-          }
-        }
+        return Some(value.file_name().to_str().unwrap().to_string());
       }
       None
-    }).collect();
+    })
+    .filter(|v| {
+      let is_hidden = v.starts_with(".");
+      let need_ignore = is_hidden && ignore_hidden;
+      !need_ignore
+    })
+    .collect();
 
   Ok(file_names)
 }

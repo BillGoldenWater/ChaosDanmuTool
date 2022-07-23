@@ -14,6 +14,7 @@ use tauri::{Assets, Context, Window};
 use tauri::async_runtime::block_on;
 use tokio::task;
 
+use chaosdanmutool::libs::command::command_history_manager::CommandHistoryManager;
 use chaosdanmutool::libs::config::config_manager::ConfigManager;
 use chaosdanmutool::libs::network::command_broadcast_server::CommandBroadcastServer;
 use chaosdanmutool::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver;
@@ -70,19 +71,22 @@ async fn main() {
 }
 
 async fn on_init<A: Assets>(context: &Context<A>) {
-  start_ticking();
-
   ConfigManager::init(context);
-}
+  CommandHistoryManager::init(context);
 
-fn start_ticking() {
-  tauri::async_runtime::spawn(async {
-    loop {
-      DanmuReceiver::tick().await;
-      CommandBroadcastServer::tick().await;
-      tokio::time::sleep(tokio::time::Duration::from_millis(200)).await;
-    }
-  });
+  for i in 0..10000 {
+    CommandHistoryManager::write(i.to_string()).await;
+  }
+  let storages = CommandHistoryManager::history_storages();
+  lprintln!("{:?}",storages);
+  let _record =
+    CommandHistoryManager::read(storages[0].clone(), 999, 1001).await;
+  lprintln!("{:?}",_record);
+  lprintln!("{}",CommandHistoryManager::get_len(storages[0].clone()).await);
+
+  exit();
+
+  start_ticking();
 }
 
 async fn on_setup(app: &mut App<Wry>) {
@@ -102,6 +106,16 @@ async fn on_exit(_app_handle: &AppHandle<Wry>) {
   HttpServer::stop().await;
   CommandBroadcastServer::close_all().await;
   ConfigManager::on_exit();
+}
+
+fn start_ticking() {
+  tauri::async_runtime::spawn(async {
+    loop {
+      DanmuReceiver::tick().await;
+      CommandBroadcastServer::tick().await;
+      tokio::time::sleep(tokio::time::Duration::from_millis(200)).await;
+    }
+  });
 }
 
 fn show_main_window(app_handle: &AppHandle<Wry>) {
