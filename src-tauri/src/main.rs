@@ -21,7 +21,7 @@ use chaosdanmutool::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver
 use chaosdanmutool::libs::network::http_server::HttpServer;
 #[cfg(target_os = "macos")]
 use chaosdanmutool::libs::utils::window_utils::set_visible_on_all_workspaces;
-use chaosdanmutool::lprintln;
+use chaosdanmutool::info;
 
 #[tokio::main]
 async fn main() {
@@ -51,17 +51,17 @@ async fn main() {
   app.run(|app_handle, event| match event {
     tauri::RunEvent::Ready {} => {
       // ready event
-      lprintln!("ready");
+      info!("ready");
       task::block_in_place(|| block_on(on_ready(app_handle)));
     }
     tauri::RunEvent::ExitRequested { api, .. } => {
       // exit requested event
-      lprintln!("exit requested");
+      info!("exit requested");
       api.prevent_exit();
-      lprintln!("exit prevented");
+      info!("exit prevented");
     }
     tauri::RunEvent::Exit => {
-      lprintln!("exiting");
+      info!("exiting");
       task::block_in_place(|| block_on(on_exit(app_handle)));
     }
 

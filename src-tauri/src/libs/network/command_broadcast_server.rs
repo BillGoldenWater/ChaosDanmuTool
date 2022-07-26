@@ -9,7 +9,7 @@ use tokio_tungstenite::{MaybeTlsStream, WebSocketStream};
 use tokio_tungstenite::tungstenite::Message;
 use tokio_tungstenite::tungstenite::protocol::CloseFrame;
 
-use crate::{elprintln, lprintln};
+use crate::{error, info};
 use crate::libs::command::command_history_manager::CommandHistoryManager;
 use crate::libs::command::command_packet::app_command::AppCommand;
 use crate::libs::command::command_packet::bilibili_command::BiliBiliCommand;
@@ -42,7 +42,7 @@ impl CommandBroadcastServer {
       Self::broadcast(Message::Text(str)).await;
         CommandHistoryManager::write(&command).await;
     } else {
-      elprintln!("failed to serialize command {:?}", command_str_result)
+      error!("failed to serialize command {:?}", command_str_result)
     }
   }
 
@@ -60,7 +60,7 @@ impl CommandBroadcastServer {
     if let Ok(str) = command_str_result {
       Self::send(connection_id, Message::Text(str)).await
     } else {
-      elprintln!("failed to serialize command {:?}", command_str_result)
+      error!("failed to serialize command {:?}", command_str_result)
     }
   }
 
@@ -121,12 +121,12 @@ impl CommandBroadcastServer {
   }
 
   async fn close_all_(&mut self) {
-    lprintln!("closing all connection");
+    info!("closing all connection");
     for connection in self.connections.as_mut_slice() {
       connection.disconnect(None).await;
     }
     self.connections.clear();
-    lprintln!("all connection closed");
+    info!("all connection closed");
   }
 
   pub async fn tick() {
@@ -168,14 +168,14 @@ impl CommandBroadcastServer {
   }
 
   async fn on_connection(&mut self, connection_id: String) {
-    lprintln!("new connection, id: {} ", connection_id);
+    info!("new connection, id: {} ", connection_id);
 
     self.send_(connection_id.clone(), Message::Text(connection_id))
       .await;
   }
 
   async fn on_message(&mut self, message: Message, connection_id: String) {
-    lprintln!("{}: {:?} ", connection_id, message);
+    info!("{}: {:?} ", connection_id, message);
 
     self.send_(connection_id, message).await;
   }

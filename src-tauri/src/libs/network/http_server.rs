@@ -17,7 +17,7 @@ use tokio_tungstenite::{MaybeTlsStream, WebSocketStream};
 use tokio_tungstenite::tungstenite::handshake::derive_accept_key;
 use tokio_tungstenite::tungstenite::protocol::Role;
 
-use crate::{elprintln, lprintln};
+use crate::{error, info};
 use crate::libs::network::command_broadcast_server::CommandBroadcastServer;
 
 lazy_static! {
@@ -48,7 +48,10 @@ impl HttpServer {
   fn start_(&mut self, asset_resolver: AssetResolver<Wry>, port: u16) {
     self.asset_resolver = Some(asset_resolver);
 
-    let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), port);
+    let addr = SocketAddr::new(
+      IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)),
+      port,
+    );
 
     let make_service =
       make_service_fn(|_| {
@@ -58,25 +61,25 @@ impl HttpServer {
 
     let server = Server::try_bind(&addr);
     let server = if let Err(err) = server {
-      elprintln!("Failed to start server: {:?}",err);
+      error!("Failed to start server: {:?}",err);
       return;
     } else {
       server.unwrap().serve(make_service)
     };
 
-    lprintln!("server start at: {:?}", server.local_addr());
+    info!("server start at: {:?}", server.local_addr());
 
     let (tx, rx) = oneshot::channel::<()>();
     self.tx = Some(Some(tx));
 
     let server = server.with_graceful_shutdown(async move {
       rx.await.ok();
-      lprintln!("server stopped");
+      info!("server stopped");
     });
 
     let join_handle = tauri::async_runtime::spawn(async move {
       if let Err(err) = server.await {
-        elprintln!("server error: {}", err);
+        error!("server error: {}", err);
       }
     });
     self.server_join_handle = Some(join_handle)
@@ -90,11 +93,15 @@ impl HttpServer {
   async fn stop_(&mut self) {
     if let Some(tx) = self.tx.replace(None) {
       if let Some(tx) = tx {
-        lprintln!("stopping server");
-        let _ = tx.send(());
-        if let Some(join_handle) = &mut self.server_join_handle {
-          lprintln!("waiting server to stop");
-          let _ = join_handle.await;
+        info!("stopping server");
+        let send_result = tx.send(());
+        if send_result.is_ok() {
+          if let Some(join_handle) = &mut self.server_join_handle {
+            info!("waiting server to stop");
+            let _ = join_handle.await;
+          }
+        } else {
+          error!("failed to send stop signal");
         }
       }
     }
@@ -108,7 +115,7 @@ impl HttpServer {
           Ok(upgraded) => {
             let upgraded_parts = upgraded.downcast::<AddrStream>();
             if upgraded_parts.is_err() {
-              elprintln!("failed when convert 'Upgraded' to AddrStream")
+              error!("failed when convert 'Upgraded' to AddrStream")
             }
 
             let tcp_stream = upgraded_parts.unwrap().io.into_inner();
@@ -121,10 +128,10 @@ impl HttpServer {
               ).await;
 
             CommandBroadcastServer::accept(websocket_stream).await;
-            lprintln!("upgraded");
+            info!("upgraded");
           }
           Err(err) => {
-            elprintln!("Upgrade error: {}", err);
+            error!("Upgrade error: {}", err);
           }
         }
       });
@@ -157,7 +164,7 @@ impl HttpServer {
         let res_result = res_builder.body(Body::from(data));
 
         return if let Err(err) = res_result {
-          elprintln!("unable to build a response\n{:?}", err);
+          error!("unable to build a response\n{:?}", err);
           Ok(create_empty_response(StatusCode::INTERNAL_SERVER_ERROR))
         } else {
           Ok(res_result.unwrap())
@@ -165,7 +172,7 @@ impl HttpServer {
       }
       #[cfg(debug_assertions)]{
         let target_uri = format!("http://localhost:3000{}", req.uri().to_string());
-        lprintln!("redirecting to {}",target_uri);
+        info!("redirecting to {}",target_uri);
 
         let res = Response::builder()
           .status(StatusCode::TEMPORARY_REDIRECT)
@@ -177,7 +184,7 @@ impl HttpServer {
         return Ok(res);
       }
     } else {
-      elprintln!("unable to get asset_resolver");
+      error!("unable to get asset_resolver");
     }
     // endregion
 
@@ -238,7 +245,7 @@ fn create_websocket_upgrade_response(request: &HyperRequest<Body>) -> Option<Res
 
   let res = builder.body(Body::empty());
   if let Err(err) = res {
-    elprintln!("failed when build response {:?}", err);
+    error!("failed when build response {:?}", err);
     return None;
   }
 

@@ -6,7 +6,7 @@
 use std::{path::PathBuf, sync::Mutex};
 
 use tauri::{Assets, Context};
-use crate::elprintln;
+use crate::error;
 
 use crate::libs::command::command_history_storage::CommandHistoryStorage;
 use crate::libs::command::command_packet::CommandPacket;
@@ -73,7 +73,7 @@ impl CommandHistoryManager {
     if let Ok(str) = command_str_result {
       self.current_storage.write(str).await;
     } else {
-      elprintln!("failed to serialize command {:?}", command_str_result)
+      error!("failed to serialize command {:?}", command_str_result)
     }
   }
 

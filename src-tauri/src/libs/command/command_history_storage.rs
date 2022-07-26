@@ -11,7 +11,7 @@ use chrono::{DateTime, Utc};
 use tokio::fs::OpenOptions;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
-use crate::elprintln;
+use crate::error;
 use crate::libs::utils::brotli_utils::{brotli_compress, brotli_decompress};
 use crate::libs::utils::fs_utils::get_dir_children_names;
 use crate::libs::utils::mut_bytes_utils::get_bytes;
@@ -62,7 +62,7 @@ impl CommandHistoryStorage {
     // region get latest file id
     let file_names_result = get_dir_children_names(&self.data_dir, true);
     if let Err(err) = &file_names_result {
-      elprintln!("unable to read history storage info {:?}",err);
+      error!("unable to read history storage info {:?}",err);
       return;
     }
 
@@ -93,11 +93,11 @@ impl CommandHistoryStorage {
 
   pub async fn write(&mut self, data: String) {
     if self.readonly {
-      elprintln!("error: trying write to readonly storage");
+      error!("IllegalOperation: write to readonly storage");
     }
 
     if let Err(err) = std::fs::create_dir_all(self.data_dir.as_path()) {
-      elprintln!("unable to create data dir {:?}", err);
+      error!("unable to create data dir {:?}", err);
       return;
     }
 
@@ -109,7 +109,7 @@ impl CommandHistoryStorage {
       .await;
 
     if let Err(err) = open_result {
-      elprintln!("unable to open history file for write, {:?}", err);
+      error!("unable to open history file for write, {:?}", err);
       return;
     }
     // endregion
@@ -121,7 +121,7 @@ impl CommandHistoryStorage {
     let compress_result = brotli_compress(&data.to_vec());
 
     if let Err(err) = compress_result {
-      elprintln!("unable to compress data, {:?}",err);
+      error!("unable to compress data, {:?}",err);
       return;
     }
 
@@ -131,12 +131,12 @@ impl CommandHistoryStorage {
     // region write
     let write_result = file.write_u64(compressed.len() as u64).await;
     if let Err(err) = write_result {
-      elprintln!("unable to write data length, {:?}",err);
+      error!("unable to write data length, {:?}",err);
       return;
     }
     let write_result = file.write(compressed.as_slice()).await;
     if let Err(err) = write_result {
-      elprintln!("unable to write data, {:?}",err);
+      error!("unable to write data, {:?}",err);
       return;
     }
     // endregion
@@ -192,7 +192,7 @@ impl CommandHistoryStorage {
       match err.kind() {
         ErrorKind::NotFound => {}
         _ => {
-          elprintln!("unable to open history file for read {:?}", err);
+          error!("unable to open history file for read {:?}", err);
         }
       };
       return Err(());
@@ -206,7 +206,7 @@ impl CommandHistoryStorage {
     let read_result = file.read_to_end(&mut data).await;
 
     if let Err(err) = read_result {
-      elprintln!("unable to read history file {:?}", err);
+      error!("unable to read history file {:?}", err);
       return Err(());
     }
     // endregion

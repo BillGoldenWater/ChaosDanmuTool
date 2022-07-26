@@ -9,7 +9,7 @@ use crate::libs::network::danmu_receiver::data_type::DataType;
 use crate::libs::network::danmu_receiver::op_code::OpCode;
 use crate::libs::utils::brotli_utils::brotli_decompress;
 use crate::libs::utils::mut_bytes_utils::get_bytes;
-use crate::lprintln;
+use crate::info;
 
 #[derive(Debug)]
 pub struct Packet {
@@ -65,7 +65,7 @@ impl Packet {
 
         let decompress_result = brotli_decompress(&body.to_vec());
         if decompress_result.is_err() {
-          lprintln!("failed to decompress");
+          info!("failed to decompress");
           return vec![];
         }
         let decompressed = decompress_result.unwrap();
@@ -74,7 +74,7 @@ impl Packet {
       }
       DataType::CompressedZlib => {
         // zlib
-        lprintln!("unsupported compress format");
+        info!("unsupported compress format");
         vec![]
       }
       _ => { // other

@@ -11,7 +11,7 @@ use rfd::{MessageButtons, MessageLevel};
 use tauri::{Assets, Context};
 use tauri::api::file::read_string;
 
-use crate::{location_info, lprintln};
+use crate::{location_info, info};
 use crate::libs::config::config::{Config, serialize_config};
 use crate::libs::utils::fs_utils::get_app_data_dir;
 
@@ -102,10 +102,10 @@ impl ConfigManager {
   fn save_(&mut self) {
     if let Some(app_dir) = &self.app_dir {
       if let Some(path) = &self.config_file_path {
-        lprintln!("save config");
+        info!("save config");
         let result = fs::create_dir_all(app_dir);
         if let Err(err) = result {
-          lprintln!("failed to create data folder\n{:#?}",err);
+          info!("failed to create data folder\n{:#?}",err);
           return;
         }
         let result = fs::write(
@@ -113,10 +113,10 @@ impl ConfigManager {
           serialize_config(&self.config, true),
         );
         if let Err(err) = result {
-          lprintln!("failed to write config file\n{:#?}",err);
+          info!("failed to write config file\n{:#?}",err);
           return;
         }
-        lprintln!("config successfully saved");
+        info!("config successfully saved");
       }
     }
   }
@@ -146,7 +146,7 @@ impl ConfigManager {
       }
     }
 
-    lprintln!("reset config");
+    info!("reset config");
     self.set_config_(serde_json::from_str("{}").unwrap());
     self.save_();
   }

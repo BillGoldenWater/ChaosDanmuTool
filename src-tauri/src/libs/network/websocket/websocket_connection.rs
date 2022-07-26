@@ -13,7 +13,7 @@ use tokio_tungstenite::tungstenite::error::ProtocolError;
 use tokio_tungstenite::tungstenite::protocol::CloseFrame;
 use tokio_tungstenite::tungstenite::protocol::frame::coding::CloseCode;
 
-use crate::{elprintln, lprintln};
+use crate::{error, info};
 
 type WebSocket = WebSocketStream<MaybeTlsStream<TcpStream>>;
 type WebSocketWriter = SplitSink<WebSocket, Message>;
@@ -52,7 +52,7 @@ impl WebSocketConnection {
 
     self.handle_connection(ws_stream.unwrap().0.split());
 
-    lprintln!("connected");
+    info!("connected");
     Ok(())
   }
 
@@ -61,7 +61,7 @@ impl WebSocketConnection {
 
     self.handle_connection(ws_stream.split());
 
-    lprintln!("accepted");
+    info!("accepted");
     Ok(())
   }
 
@@ -125,7 +125,7 @@ impl WebSocketConnection {
     self.connected = false;
     self.write = None;
     self.rx = None;
-    lprintln!("disconnected");
+    info!("disconnected");
   }
 
   fn recv_loop(read: WebSocketReader, tx: UnboundedSender<Message>) {
@@ -134,7 +134,7 @@ impl WebSocketConnection {
         let tx = tx.clone();
         async move { // each message
           let item = if let Err(err) = item { // err
-          elprintln!("had an error: {:?}", err);
+          error!("had an error: {:?}", err);
             match err {
               Error::Protocol(err) => {
                 match err {
@@ -157,7 +157,7 @@ impl WebSocketConnection {
           if let Some(message) = item {
             let send_result = tx.clone().send(message);
             if send_result.is_err() {
-              elprintln!("failed to send message back")
+              error!("failed to send message back")
             }
           }
         }

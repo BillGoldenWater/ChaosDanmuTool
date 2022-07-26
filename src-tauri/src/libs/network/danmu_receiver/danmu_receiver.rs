@@ -13,7 +13,7 @@ use crate::libs::network::api_request::danmu_server_info_getter::DanmuServerInfo
 use crate::libs::network::danmu_receiver::danmu_receiver::DanmuReceiverConnectError::{FailedToConnect, GettingServerInfoFailed};
 use crate::libs::network::danmu_receiver::packet::{JoinPacketInfo, Packet};
 use crate::libs::network::websocket::websocket_connection::{WebSocketConnectError, WebSocketConnection};
-use crate::{lprintln};
+use crate::{info};
 
 lazy_static! {
   pub static ref DANMU_RECEIVER_STATIC_INSTANCE: Mutex<DanmuReceiver> = Mutex::new(DanmuReceiver::new(30));
@@ -64,16 +64,16 @@ impl DanmuReceiver {
       )).await; // TODO: Status update: open
     }
 
-    lprintln!("room {} connected",room_id);
+    info!("room {} connected",room_id);
     Ok(())
   }
 
   pub async fn disconnect() {
     let this = &mut *DANMU_RECEIVER_STATIC_INSTANCE.lock().await;
 
-    lprintln!("disconnecting");
+    info!("disconnecting");
     this.websocket_connection.disconnect(None).await;
-    lprintln!("disconnected");
+    info!("disconnected");
   }
 
   pub async fn tick() {
@@ -112,12 +112,12 @@ impl DanmuReceiver {
     match message { // TODO: Status update: close message
       Message::Binary(data) => {
         let packet = Packet::from_bytes(&mut BytesMut::from(data.as_slice()));
-        lprintln!("{:?}", packet);
+        info!("{:?}", packet);
         // CommandBroadcastServer::broadcast(Message::Text(format!("{:?}", packet))).await;
         // TODO: packet parse
       }
       _ => {
-        lprintln!("{:?}", message)
+        info!("{:?}", message)
       }
     }
   }
