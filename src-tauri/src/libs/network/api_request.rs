@@ -3,5 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-pub mod danmu_server_info_getter;
 pub mod bilibili_response;
+pub mod danmu_server_info_getter;
+pub mod gift_config_getter;

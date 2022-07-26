@@ -5,8 +5,7 @@
 
 use serde::Deserialize;
 
-use crate::libs::network::api_request::bilibili_response::BiliBiliResponse;
-use crate::lprintln;
+use crate::libs::network::api_request::bilibili_response::{BiliBiliResponse, execute_request};
 
 static DANMU_SERVER_INFO_API_URL: &str =
   "https://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo";
@@ -17,28 +16,7 @@ impl DanmuServerInfoGetter {
   pub async fn get(actual_room_id: i32) -> Option<BiliBiliResponse<DanmuServerInfoResponse>> {
     let url = format!("{}?id={}", DANMU_SERVER_INFO_API_URL, actual_room_id);
 
-    let result = reqwest::get(url.as_str()).await;
-    if result.is_err() {
-      return None;
-    }
-
-    let text_result = result.unwrap().text().await;
-    if text_result.is_err() {
-      return None;
-    }
-
-    let text = text_result.unwrap();
-
-    let serde_result =
-      serde_json::from_str(text.as_str());
-
-    if serde_result.is_err() {
-      lprintln!("failed parsing: {}", text);
-    }
-
-    let response: BiliBiliResponse<DanmuServerInfoResponse> = serde_result.unwrap();
-
-    Some(response)
+    execute_request(url.as_str()).await
   }
 
   pub async fn get_token_and_url(actual_room_id: i32) -> Option<DanmuServerAndToken> {
@@ -61,7 +39,7 @@ impl DanmuServerInfoGetter {
           token: data.token,
           url: "wss://broadcastlv.chat.bilibili.com/sub".to_string(),
         })
-      }
+      };
     }
 
     None
