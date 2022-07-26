@@ -4,6 +4,7 @@
  */
 
 use serde_json::Value;
+
 use crate::libs::command::command_packet::bilibili_command::activity_update::ActivityUpdate;
 use crate::libs::command::command_packet::bilibili_command::danmu_message::DanmuMessage;
 
@@ -20,4 +21,18 @@ pub enum BiliBiliCommand {
     #[ts(type = "unknown")]
     data: Value
   },
+}
+
+impl BiliBiliCommand {
+  pub fn from_activity_update(activity_update: ActivityUpdate) -> BiliBiliCommand {
+    BiliBiliCommand::ActivityUpdate { data: activity_update }
+  }
+
+  pub fn from_danmu_message(danmu_message: DanmuMessage) -> BiliBiliCommand {
+    BiliBiliCommand::DanmuMessage { data: danmu_message }
+  }
+
+  pub fn from_raw(raw: Value) -> BiliBiliCommand {
+    BiliBiliCommand::Raw { data: raw }
+  }
 }

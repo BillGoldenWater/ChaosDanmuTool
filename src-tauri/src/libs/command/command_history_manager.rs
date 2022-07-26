@@ -6,8 +6,10 @@
 use std::{path::PathBuf, sync::Mutex};
 
 use tauri::{Assets, Context};
+use crate::elprintln;
 
 use crate::libs::command::command_history_storage::CommandHistoryStorage;
+use crate::libs::command::command_packet::CommandPacket;
 use crate::libs::utils::fs_utils::{get_app_data_dir, get_dir_children_names};
 
 lazy_static! {
@@ -59,14 +61,33 @@ impl CommandHistoryManager {
     self.current_storage = CommandHistoryStorage::new(self.data_dir.clone());
   }
 
-  pub async fn write(command: String) {
+  pub async fn write(command: &CommandPacket) {
     let this = &mut *COMMAND_HISTORY_MANAGER_STATIC_INSTANCE.lock().unwrap();
     this.write_(command).await
   }
 
-  async fn write_(&mut self, command: String) {
+  async fn write_(&mut self, command: &CommandPacket) {
     self.check_init();
-    self.current_storage.write(command).await;
+    let command_str_result = serde_json::to_string(&command);
+
+    if let Ok(str) = command_str_result {
+      self.current_storage.write(str).await;
+    } else {
+      elprintln!("failed to serialize command {:?}", command_str_result)
+    }
+  }
+
+  pub async fn read(storage_id: &str, start_index: u64, end_index: u64) -> Vec<CommandPacket> {
+    let this = &*COMMAND_HISTORY_MANAGER_STATIC_INSTANCE.lock().unwrap();
+    this.read_(storage_id, start_index, end_index).await
+  }
+
+  async fn read_(&self, storage_id: &str, start_index: u64, end_index: u64) -> Vec<CommandPacket> {
+    let chs = self.get_storage(storage_id).await;
+
+    chs.read(start_index, end_index).await.iter()
+      .filter_map(|v| serde_json::from_str(v).ok())
+      .collect()
   }
 
   pub fn history_storages() -> Vec<String> {
@@ -83,28 +104,18 @@ impl CommandHistoryManager {
     }
   }
 
-  pub async fn get_len(storage_id: String) -> u64 {
+  pub async fn get_len(storage_id: &str) -> u64 {
     let this = &*COMMAND_HISTORY_MANAGER_STATIC_INSTANCE.lock().unwrap();
     this.get_len_(storage_id).await
   }
 
-  async fn get_len_(&self, storage_id: String) -> u64 {
+  async fn get_len_(&self, storage_id: &str) -> u64 {
+    self.get_storage(storage_id).await.len()
+  }
+
+  async fn get_storage(&self, storage_id: &str) -> CommandHistoryStorage {
     CommandHistoryStorage::from_folder(
       self.data_dir.join(storage_id)
-    )
-      .await.len()
-  }
-
-  pub async fn read(storage_id: String, start_index: u64, end_index: u64) -> Vec<String> {
-    let this = &*COMMAND_HISTORY_MANAGER_STATIC_INSTANCE.lock().unwrap();
-    this.read_(storage_id, start_index, end_index).await
-  }
-
-  async fn read_(&self, storage_id: String, start_index: u64, end_index: u64) -> Vec<String> {
-    let chs = CommandHistoryStorage::from_folder(
-      self.data_dir.join(storage_id)
-    ).await;
-
-    chs.read(start_index, end_index).await
+    ).await
   }
 }

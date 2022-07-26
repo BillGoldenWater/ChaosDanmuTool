@@ -13,6 +13,20 @@ pub mod bilibili_command;
 #[serde(rename_all = "camelCase", tag = "cmd")]
 #[ts(export, export_to = "../src/share/type/rust/command/")]
 pub enum CommandPacket {
-  AppCommand(AppCommand),
-  BiliBiliCommand(BiliBiliCommand),
+  AppCommand { data: AppCommand },
+  BiliBiliCommand { data: BiliBiliCommand },
+}
+
+impl CommandPacket {
+  pub fn from_app_command(command: AppCommand) -> CommandPacket {
+    CommandPacket::AppCommand { data: command }
+  }
+
+  pub fn from_bilibili_command(command: BiliBiliCommand) -> CommandPacket {
+    CommandPacket::BiliBiliCommand { data: command }
+  }
+
+  pub fn to_string(&self) -> Result<String, serde_json::Error> {
+    Ok(serde_json::to_string(self)?)
+  }
 }

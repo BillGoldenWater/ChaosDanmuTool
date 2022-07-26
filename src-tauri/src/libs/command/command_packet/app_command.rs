@@ -25,3 +25,27 @@ pub enum AppCommand {
   ReceiverStatusUpdate { data: ReceiverStatusUpdate },
   ViewerStatusUpdate { data: ViewerStatusUpdate },
 }
+
+impl AppCommand {
+  pub fn from_bilibili_packet_parse_error(
+    bilibili_packet_parse_error: BiliBiliPacketParseError
+  ) -> AppCommand {
+    AppCommand::BiliBiliPacketParseError { data: bilibili_packet_parse_error }
+  }
+
+  pub fn from_config_update(config_update: ConfigUpdate) -> AppCommand {
+    AppCommand::ConfigUpdate { data: config_update }
+  }
+
+  pub fn from_gift_config_update(gift_config_update: GiftConfigUpdate) -> AppCommand {
+    AppCommand::GiftConfigUpdate { data: gift_config_update }
+  }
+
+  pub fn from_receiver_status_update(receiver_status_update: ReceiverStatusUpdate) -> AppCommand {
+    AppCommand::ReceiverStatusUpdate { data: receiver_status_update }
+  }
+
+  pub fn from_viewer_status_update(viewer_status_update: ViewerStatusUpdate) -> AppCommand {
+    AppCommand::ViewerStatusUpdate { data: viewer_status_update }
+  }
+}
