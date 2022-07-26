@@ -80,7 +80,7 @@ impl CommandHistoryStorage {
     // region get the latest file's record number
     let read_result = self.read_file(last_file_item_index).await;
     if let Err(err) = read_result {
-      eprintln!("unable to read history file for get item number {:?}", err);
+      error!("unable to read history file for get item number {:?}", err);
       return;
     }
 
