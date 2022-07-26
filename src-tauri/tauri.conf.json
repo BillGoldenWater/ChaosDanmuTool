@@ -5,7 +5,7 @@
     "beforeDevCommand": "yarn dev",
     "devPath": "http://localhost:3000",
     "distDir": "../dist",
-    "withGlobalTauri": true
+    "withGlobalTauri": false
   },
   "package": {
     "productName": "ChaosDanmuTool",
@@ -14,15 +14,7 @@
   "tauri": {
     "macOSPrivateApi": true,
     "allowlist": {
-      "all": false,
-      "path": {
-        "all": true
-      },
-      "fs": {
-        "all": false,
-        "writeFile": true,
-        "readFile": true
-      }
+      "all": false
     },
     "bundle": {
       "active": true,
