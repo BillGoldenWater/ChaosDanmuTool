@@ -10,7 +10,6 @@ use tokio::sync::Mutex;
 use tokio_tungstenite::tungstenite::Message;
 
 use crate::libs::network::api_request::danmu_server_info_getter::DanmuServerInfoGetter;
-use crate::libs::network::command_broadcast_server::CommandBroadcastServer;
 use crate::libs::network::danmu_receiver::danmu_receiver::DanmuReceiverConnectError::{FailedToConnect, GettingServerInfoFailed};
 use crate::libs::network::danmu_receiver::packet::{JoinPacketInfo, Packet};
 use crate::libs::network::websocket::websocket_connection::{WebSocketConnectError, WebSocketConnection};
@@ -114,7 +113,7 @@ impl DanmuReceiver {
       Message::Binary(data) => {
         let packet = Packet::from_bytes(&mut BytesMut::from(data.as_slice()));
         lprintln!("{:?}", packet);
-        CommandBroadcastServer::broadcast(Message::Text(format!("{:?}", packet))).await;
+        // CommandBroadcastServer::broadcast(Message::Text(format!("{:?}", packet))).await;
         // TODO: packet parse
       }
       _ => {
