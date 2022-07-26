@@ -14,6 +14,7 @@ use tauri::{Assets, Context, Window};
 use tauri::async_runtime::block_on;
 use tokio::task;
 
+use chaosdanmutool::info;
 use chaosdanmutool::libs::command::command_history_manager::CommandHistoryManager;
 use chaosdanmutool::libs::config::config_manager::ConfigManager;
 use chaosdanmutool::libs::network::command_broadcast_server::CommandBroadcastServer;
@@ -21,10 +22,18 @@ use chaosdanmutool::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver
 use chaosdanmutool::libs::network::http_server::HttpServer;
 #[cfg(target_os = "macos")]
 use chaosdanmutool::libs::utils::window_utils::set_visible_on_all_workspaces;
-use chaosdanmutool::info;
 
 #[tokio::main]
 async fn main() {
+  info!(
+    "build info: {}-{} {}-{} ({} build)",
+    env!("CARGO_PKG_NAME"),
+    env!("CARGO_PKG_VERSION"),
+    std::env::consts::OS,
+    std::env::consts::ARCH,
+    if cfg!(debug_assertions) {"debug"} else {"release"}
+  );
+
   tauri::async_runtime::set(tokio::runtime::Handle::current());
 
   let context = tauri::generate_context!();
