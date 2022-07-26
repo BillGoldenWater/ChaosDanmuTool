@@ -89,7 +89,9 @@ async fn on_ready(app_handle: &AppHandle<Wry>) {
 }
 
 async fn on_exit(_app_handle: &AppHandle<Wry>) {
-  DanmuReceiver::disconnect().await;
+  if DanmuReceiver::is_connected().await {
+    DanmuReceiver::disconnect().await;
+  }
 
   HttpServer::stop().await;
   CommandBroadcastServer::close_all().await;

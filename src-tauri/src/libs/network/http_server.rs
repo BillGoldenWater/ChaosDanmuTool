@@ -11,6 +11,7 @@ use hyper::server::conn::AddrStream;
 use hyper::service::{make_service_fn, service_fn};
 use oneshot::Sender;
 use tauri::{AssetResolver, Wry};
+use tauri::async_runtime::JoinHandle;
 use tokio::sync::Mutex;
 use tokio_tungstenite::{MaybeTlsStream, WebSocketStream};
 use tokio_tungstenite::tungstenite::handshake::derive_accept_key;
@@ -27,6 +28,7 @@ lazy_static! {
 pub struct HttpServer {
   tx: Option<Option<Sender<()>>>,
   asset_resolver: Option<AssetResolver<Wry>>,
+  server_join_handle: Option<JoinHandle<()>>,
 }
 
 impl HttpServer {
@@ -34,6 +36,7 @@ impl HttpServer {
     HttpServer {
       tx: None,
       asset_resolver: None,
+      server_join_handle: None,
     }
   }
 
@@ -70,23 +73,29 @@ impl HttpServer {
       rx.await.ok();
       lprintln!("server stopped");
     });
-    tauri::async_runtime::spawn(async move {
+
+    let join_handle = tauri::async_runtime::spawn(async move {
       if let Err(err) = server.await {
         elprintln!("server error: {}", err);
       }
     });
+    self.server_join_handle = Some(join_handle)
   }
 
   pub async fn stop() {
     let this = &mut *HTTP_SERVER_STATIC_INSTANCE.lock().await;
-    this.stop_()
+    this.stop_().await
   }
 
-  fn stop_(&mut self) {
+  async fn stop_(&mut self) {
     if let Some(tx) = self.tx.replace(None) {
       if let Some(tx) = tx {
         lprintln!("stopping server");
         let _ = tx.send(());
+        if let Some(join_handle) = &mut self.server_join_handle {
+          lprintln!("waiting server to stop");
+          let _ = join_handle.await;
+        }
       }
     }
   }
