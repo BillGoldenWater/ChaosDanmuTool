@@ -155,8 +155,17 @@ impl HttpServer {
         };
       }
       #[cfg(debug_assertions)]{
-        elprintln!("please test this in production build");
-        return Ok(Response::new(Body::from("please test this in production build")));
+        let target_uri = format!("http://localhost:3000{}", req.uri().to_string());
+        lprintln!("redirecting to {}",target_uri);
+
+        let res = Response::builder()
+          .status(StatusCode::TEMPORARY_REDIRECT)
+          .header("Location", target_uri)
+          .body(Body::empty())
+          .unwrap_or(
+            Response::new(Body::from("failed when build redirect response"))
+          );
+        return Ok(res);
       }
     } else {
       elprintln!("unable to get asset_resolver");
