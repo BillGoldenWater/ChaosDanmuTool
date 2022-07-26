@@ -74,18 +74,6 @@ async fn on_init<A: Assets>(context: &Context<A>) {
   ConfigManager::init(context);
   CommandHistoryManager::init(context);
 
-  for i in 0..10000 {
-    CommandHistoryManager::write(i.to_string()).await;
-  }
-  let storages = CommandHistoryManager::history_storages();
-  lprintln!("{:?}",storages);
-  let _record =
-    CommandHistoryManager::read(storages[0].clone(), 999, 1001).await;
-  lprintln!("{:?}",_record);
-  lprintln!("{}",CommandHistoryManager::get_len(storages[0].clone()).await);
-
-  exit();
-
   start_ticking();
 }
 
