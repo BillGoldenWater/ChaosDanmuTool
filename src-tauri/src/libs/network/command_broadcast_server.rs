@@ -40,7 +40,7 @@ impl CommandBroadcastServer {
 
     if let Ok(str) = command_str_result {
       Self::broadcast(Message::Text(str)).await;
-        CommandHistoryManager::write(&command);
+        CommandHistoryManager::write(&command).await;
     } else {
       elprintln!("failed to serialize command {:?}", command_str_result)
     }
