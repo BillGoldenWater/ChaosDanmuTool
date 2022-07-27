@@ -6,14 +6,18 @@
 use std::time::Instant;
 
 use bytes::BytesMut;
+use serde_json::{Map, Value};
 use tokio::sync::Mutex;
 use tokio_tungstenite::tungstenite::Message;
 
+use crate::info;
+use crate::libs::command::command_packet::bilibili_command::danmu_message::DanmuMessage;
 use crate::libs::network::api_request::danmu_server_info_getter::DanmuServerInfoGetter;
 use crate::libs::network::danmu_receiver::danmu_receiver::DanmuReceiverConnectError::{FailedToConnect, GettingServerInfoFailed};
+use crate::libs::network::danmu_receiver::data_type::DataType;
+use crate::libs::network::danmu_receiver::op_code::OpCode;
 use crate::libs::network::danmu_receiver::packet::{JoinPacketInfo, Packet};
 use crate::libs::network::websocket::websocket_connection::{WebSocketConnectError, WebSocketConnection};
-use crate::{info};
 
 lazy_static! {
   pub static ref DANMU_RECEIVER_STATIC_INSTANCE: Mutex<DanmuReceiver> = Mutex::new(DanmuReceiver::new(30));
@@ -111,8 +115,25 @@ impl DanmuReceiver {
   async fn on_message(&self, message: Message) {
     match message { // TODO: Status update: close message
       Message::Binary(data) => {
-        let packet = Packet::from_bytes(&mut BytesMut::from(data.as_slice()));
-        info!("{:?}", packet);
+        let packets = Packet::from_bytes(&mut BytesMut::from(data.as_slice()));
+        // info!("{:?}", packets);
+        for packet in packets {
+          if packet.data_type == DataType::Json && packet.op_code == OpCode::Message {
+            let raw: Value = serde_json::from_slice(packet.body.as_ref())
+              .unwrap_or(Value::Null);
+
+            if raw.as_object().unwrap_or(&Map::new())
+              .get("cmd").unwrap_or(&Value::Null)
+              .as_str().unwrap_or("")
+              .starts_with("DANMU_MSG") {
+              let result =
+                DanmuMessage::from_raw(
+                  raw
+                );
+              info!("{:?}", result)
+            }
+          }
+        }
         // CommandBroadcastServer::broadcast(Message::Text(format!("{:?}", packet))).await;
         // TODO: packet parse
       }
