@@ -7,7 +7,7 @@ use crate::libs::config::config::ALLOW_CONFIG_SKIP_IF;
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, export_to = "../src/share/type/rust/config/frontendConfig/viewerViewConfig/statusBarConfig")]
+#[ts(export, export_to = "../src/share/type/rust/config/frontendConfig/viewerViewConfig/statusBarConfig/")]
 pub struct StatusBarComponentConfig {
   #[serde(default = "show_default")]
   #[serde(skip_serializing_if = "show_skip_if")]
