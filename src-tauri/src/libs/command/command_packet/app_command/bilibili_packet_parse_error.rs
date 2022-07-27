@@ -9,3 +9,11 @@
 pub struct BiliBiliPacketParseError {
   message: String,
 }
+
+impl BiliBiliPacketParseError {
+  pub fn new(message: String) -> BiliBiliPacketParseError {
+    BiliBiliPacketParseError {
+      message
+    }
+  }
+}

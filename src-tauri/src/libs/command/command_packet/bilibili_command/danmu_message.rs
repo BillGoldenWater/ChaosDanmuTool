@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+use serde_json::Value;
+
 use crate::libs::types::bilibili::emoji_data::EmojiData;
 use crate::libs::types::bilibili::user_info::medal_info::MedalInfo;
 
@@ -36,4 +38,10 @@ pub struct DanmuMessage {
 
   is_history: bool,
   count: i32,
+}
+
+impl DanmuMessage {
+  pub fn from_raw(_raw: Value) -> DanmuMessage {
+    todo!()
+  }
 }

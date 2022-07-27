@@ -12,3 +12,11 @@ pub struct GiftConfigUpdate {
   #[ts(type = "unknown")]
   gift_config_response: Value,
 }
+
+impl GiftConfigUpdate {
+  pub fn new(gift_config_response: Value) -> GiftConfigUpdate {
+    GiftConfigUpdate {
+      gift_config_response
+    }
+  }
+}

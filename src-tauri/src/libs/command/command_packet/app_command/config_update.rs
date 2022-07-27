@@ -9,5 +9,13 @@ use crate::libs::config::config::Config;
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "../src/share/type/rust/command/commandPacket/appCommand/")]
 pub struct ConfigUpdate {
-  config: Config
+  config: Config,
+}
+
+impl ConfigUpdate {
+  pub fn new(config: Config) -> ConfigUpdate {
+    ConfigUpdate {
+      config
+    }
+  }
 }

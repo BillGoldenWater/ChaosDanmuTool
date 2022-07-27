@@ -5,14 +5,17 @@
 
 use std::fs;
 use std::path::PathBuf;
-use std::sync::Mutex;
 
 use rfd::{MessageButtons, MessageLevel};
 use tauri::{Assets, Context};
 use tauri::api::file::read_string;
+use tokio::sync::Mutex;
 
-use crate::{location_info, info};
+use crate::{info, location_info};
+use crate::libs::command::command_packet::app_command::AppCommand;
+use crate::libs::command::command_packet::app_command::config_update::ConfigUpdate;
 use crate::libs::config::config::{Config, serialize_config};
+use crate::libs::network::command_broadcast_server::CommandBroadcastServer;
 use crate::libs::utils::fs_utils::get_app_data_dir;
 
 lazy_static! {
@@ -35,8 +38,8 @@ impl ConfigManager {
     }
   }
 
-  pub fn init<A: Assets>(context: &Context<A>) {
-    let this = &mut *CONFIG_MANAGER_STATIC_INSTANCE.lock().unwrap();
+  pub async fn init<A: Assets>(context: &Context<A>) {
+    let this = &mut *CONFIG_MANAGER_STATIC_INSTANCE.lock().await;
 
     this.app_dir = Some(get_app_data_dir(context));
 
@@ -44,15 +47,15 @@ impl ConfigManager {
     config_file_path.push("config.json");
     this.config_file_path = Some(config_file_path);
 
-    this.load_();
+    this.load_().await;
   }
 
-  pub fn load() {
-    let this = &mut *CONFIG_MANAGER_STATIC_INSTANCE.lock().unwrap();
-    this.load_();
+  pub async fn load() {
+    let this = &mut *CONFIG_MANAGER_STATIC_INSTANCE.lock().await;
+    this.load_().await;
   }
 
-  fn load_(&mut self) {
+  async fn load_(&mut self) {
     if self.config_file_path.is_none() {
       return;
     }
@@ -84,7 +87,7 @@ impl ConfigManager {
         .set_description(format!("无法解析配置文件.\n重置配置文件或退出?\n{}", location_info!()).as_str())
         .show();
       if reset {
-        self.reset_(true);
+        self.reset_(true).await;
         return;
       } else {
         std::process::exit(0);
@@ -94,8 +97,8 @@ impl ConfigManager {
     self.config = parse_result.unwrap();
   }
 
-  pub fn save() {
-    let this = &mut *CONFIG_MANAGER_STATIC_INSTANCE.lock().unwrap();
+  pub async fn save() {
+    let this = &mut *CONFIG_MANAGER_STATIC_INSTANCE.lock().await;
     this.save_();
   }
 
@@ -121,12 +124,12 @@ impl ConfigManager {
     }
   }
 
-  pub fn reset(force: bool) {
-    let this = &mut *CONFIG_MANAGER_STATIC_INSTANCE.lock().unwrap();
-    this.reset_(force)
+  pub async fn reset(force: bool) {
+    let this = &mut *CONFIG_MANAGER_STATIC_INSTANCE.lock().await;
+    this.reset_(force).await
   }
 
-  fn reset_(&mut self, force: bool) {
+  async fn reset_(&mut self, force: bool) {
     let button = MessageButtons::OkCancelCustom(
       "重置".to_string(),
       if force { "退出".to_string() } else { "取消".to_string() },
@@ -147,12 +150,12 @@ impl ConfigManager {
     }
 
     info!("reset config");
-    self.set_config_(serde_json::from_str("{}").unwrap());
+    self.set_config_(serde_json::from_str("{}").unwrap(), true).await;
     self.save_();
   }
 
-  pub fn get_config() -> Config {
-    let this = &mut *CONFIG_MANAGER_STATIC_INSTANCE.lock().unwrap();
+  pub async fn get_config() -> Config {
+    let this = &mut *CONFIG_MANAGER_STATIC_INSTANCE.lock().await;
     this.get_config_()
   }
 
@@ -160,24 +163,31 @@ impl ConfigManager {
     self.config.clone()
   }
 
-  pub fn set_config(config: Config) {
-    let this = &mut *CONFIG_MANAGER_STATIC_INSTANCE.lock().unwrap();
-    this.set_config_(config)
+  pub async fn set_config(config: Config, broadcast: bool) {
+    let this = &mut *CONFIG_MANAGER_STATIC_INSTANCE.lock().await;
+    this.set_config_(config, broadcast).await
   }
 
-  fn set_config_(&mut self, config: Config) {
+  async fn set_config_(&mut self, config: Config, broadcast: bool) {
     self.config = config;
-    self.on_change_();
+    self.on_change_(broadcast).await;
   }
 
-  fn on_change_(&mut self) {
+  async fn on_change_(&mut self, broadcast: bool) {
     if self.config.backend.config_manager.save_on_change {
       self.save_();
+      if broadcast {
+        CommandBroadcastServer::broadcast_app_command(
+          AppCommand::from_config_update(
+            ConfigUpdate::new(self.config.clone())
+          )
+        ).await;
+      }
     }
   }
 
-  pub fn on_exit() {
-    let this = &mut *CONFIG_MANAGER_STATIC_INSTANCE.lock().unwrap();
+  pub async fn on_exit() {
+    let this = &mut *CONFIG_MANAGER_STATIC_INSTANCE.lock().await;
     this.on_exit_()
   }
 

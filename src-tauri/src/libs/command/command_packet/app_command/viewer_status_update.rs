@@ -10,6 +10,14 @@ pub struct ViewerStatusUpdate {
   status: ViewerStatus,
 }
 
+impl ViewerStatusUpdate {
+  pub fn new(status: ViewerStatus) -> ViewerStatusUpdate {
+    ViewerStatusUpdate {
+      status
+    }
+  }
+}
+
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "../src/share/type/rust/command/commandPacket/appCommand/viewerStatusUpdate/")]

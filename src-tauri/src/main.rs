@@ -80,7 +80,7 @@ async fn main() {
 }
 
 async fn on_init<A: Assets>(context: &Context<A>) {
-  ConfigManager::init(context);
+  ConfigManager::init(context).await;
   CommandHistoryManager::init(context);
 
   start_ticking();
@@ -89,7 +89,8 @@ async fn on_init<A: Assets>(context: &Context<A>) {
 async fn on_setup(app: &mut App<Wry>) {
   let asset_resolver = app.asset_resolver();
 
-  let port = ConfigManager::get_config().backend.http_server.port.clone();
+  let port = ConfigManager::get_config().await
+    .backend.http_server.port.clone();
   HttpServer::start(asset_resolver, port).await;
 }
 
@@ -104,7 +105,7 @@ async fn on_exit(_app_handle: &AppHandle<Wry>) {
 
   HttpServer::stop().await;
   CommandBroadcastServer::close_all().await;
-  ConfigManager::on_exit();
+  ConfigManager::on_exit().await;
 }
 
 fn start_ticking() {
