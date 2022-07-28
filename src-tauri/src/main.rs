@@ -12,6 +12,7 @@ windows_subsystem = "windows"
 use tauri::{App, AppHandle, command, Manager, Wry};
 use tauri::{Assets, Context, Window};
 use tauri::async_runtime::block_on;
+use tokio::sync::RwLock;
 use tokio::task;
 
 use chaosdanmutool::info;
@@ -22,6 +23,8 @@ use chaosdanmutool::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver
 use chaosdanmutool::libs::network::http_server::HttpServer;
 #[cfg(target_os = "macos")]
 use chaosdanmutool::libs::utils::window_utils::set_visible_on_all_workspaces;
+
+static VIBRANCY_APPLIED: RwLock<bool> = RwLock::const_new(false);
 
 #[tokio::main]
 async fn main() {
@@ -46,7 +49,7 @@ async fn main() {
       task::block_in_place(|| block_on(on_setup(app)));
       Ok(())
     })
-    // .invoke_handler(tauri::generate_handler![connect,disconnect,listen,broadcast,close])
+    .invoke_handler(tauri::generate_handler![is_vibrancy_applied])
     .menu(if cfg!(target_os = "macos") {
       tauri::Menu::os_default("Chaos Danmu Tool")
     } else {
@@ -157,24 +160,29 @@ async fn create_main_window(app_handle: &AppHandle<Wry>) {
 }
 
 async fn apply_vibrancy_effect(window: &Window<Wry>) {
+  let result;
+
   #[cfg(target_os = "macos")]
   {
     use window_vibrancy::apply_vibrancy;
 
-    let _ = apply_vibrancy(window, window_vibrancy::NSVisualEffectMaterial::HudWindow);
+    result = apply_vibrancy(window, window_vibrancy::NSVisualEffectMaterial::HudWindow);
   }
   #[cfg(target_os = "windows")]
   {
-    use window_vibrancy::{apply_acrylic, apply_blur, apply_mica};
+    use window_vibrancy::apply_mica;
 
-    let mut result = apply_mica(window);
-    if ConfigManager::get_config().await.backend.window.main_window.use_acrylic_effect {
-      if result.is_ok() { return; }
-      result = apply_acrylic(window, Some((18, 18, 18, 125)));
-    }
-    if result.is_ok() { return; }
-    let _ = apply_blur(window, Some((18, 18, 18, 125)));
+    result = apply_mica(window);
   }
+
+  if result.is_ok() {
+    *VIBRANCY_APPLIED.write().await = true;
+  }
+}
+
+#[command]
+async fn is_vibrancy_applied() -> bool {
+  *VIBRANCY_APPLIED.read().await
 }
 
 #[allow(unused)]
