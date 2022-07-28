@@ -4,6 +4,7 @@
  */
 
 use std::sync::{Mutex, RwLock};
+use serde::Serialize;
 
 use crate::libs::config::config::backend_config::BackendConfig;
 use crate::libs::config::config::frontend_config::FrontendConfig;
@@ -49,7 +50,7 @@ fn frontend_skip_if(value: &FrontendConfig) -> bool {
 }
 //endregion
 
-pub fn serialize_config(config: &Config, use_skip_if: bool) -> String {
+pub fn serialize_config<T: Serialize>(config: &T, use_skip_if: bool) -> String {
   let _ = &*ALLOW_CONFIG_SKIP_IF_LOCK.lock().unwrap();
   { *ALLOW_CONFIG_SKIP_IF.write().unwrap() = use_skip_if; }
   serde_json::to_string(config).unwrap_or("{}".to_string())
@@ -59,7 +60,7 @@ pub fn serialize_config(config: &Config, use_skip_if: bool) -> String {
 mod test {
   use serde_json::{json, Value};
 
-  use crate::libs::config::config::{INTERNAL_VIEWER_UUID, serialize_config};
+  use crate::libs::config::config::{Config, INTERNAL_VIEWER_UUID, serialize_config};
 
   #[test]
   fn write_default_uuids() {
@@ -76,7 +77,7 @@ mod test {
   #[test]
   fn write_default_config() {
     let default_config: String = serialize_config(
-      &serde_json::from_str("{}").unwrap(),
+      &serde_json::from_str::<Config>("{}").unwrap(),
       false,
     );
 

@@ -13,13 +13,13 @@ static DANMU_SERVER_INFO_API_URL: &str =
 pub struct DanmuServerInfoGetter {}
 
 impl DanmuServerInfoGetter {
-  pub async fn get(actual_room_id: i32) -> Option<BiliBiliResponse<DanmuServerInfoResponse>> {
+  pub async fn get(actual_room_id: u32) -> Option<BiliBiliResponse<DanmuServerInfoResponse>> {
     let url = format!("{}?id={}", DANMU_SERVER_INFO_API_URL, actual_room_id);
 
     execute_request(url.as_str()).await
   }
 
-  pub async fn get_token_and_url(actual_room_id: i32) -> Option<DanmuServerAndToken> {
+  pub async fn get_token_and_url(actual_room_id: u32) -> Option<DanmuServerAndToken> {
     let data =
       DanmuServerInfoGetter::get(actual_room_id).await;
 

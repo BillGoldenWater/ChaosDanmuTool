@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-use std::{path::PathBuf, sync::Mutex};
+use std::{path::PathBuf};
 
 use tauri::{Assets, Context};
+use tokio::sync::Mutex;
 use crate::error;
 
 use crate::libs::command::command_history_storage::CommandHistoryStorage;
@@ -39,8 +40,8 @@ impl CommandHistoryManager {
     }
   }
 
-  pub fn init<A: Assets>(context: &Context<A>) {
-    let this = &mut *COMMAND_HISTORY_MANAGER_STATIC_INSTANCE.lock().unwrap();
+  pub async fn init<A: Assets>(context: &Context<A>) {
+    let this = &mut *COMMAND_HISTORY_MANAGER_STATIC_INSTANCE.lock().await;
     this.init_(context)
   }
 
@@ -51,8 +52,8 @@ impl CommandHistoryManager {
     self.inited = true;
   }
 
-  pub fn new_file() {
-    let this = &mut *COMMAND_HISTORY_MANAGER_STATIC_INSTANCE.lock().unwrap();
+  pub async fn new_file() {
+    let this = &mut *COMMAND_HISTORY_MANAGER_STATIC_INSTANCE.lock().await;
     this.new_file_()
   }
 
@@ -62,7 +63,7 @@ impl CommandHistoryManager {
   }
 
   pub async fn write(command: &CommandPacket) {
-    let this = &mut *COMMAND_HISTORY_MANAGER_STATIC_INSTANCE.lock().unwrap();
+    let this = &mut *COMMAND_HISTORY_MANAGER_STATIC_INSTANCE.lock().await;
     this.write_(command).await
   }
 
@@ -78,7 +79,7 @@ impl CommandHistoryManager {
   }
 
   pub async fn read(storage_id: &str, start_index: u64, end_index: u64) -> Vec<CommandPacket> {
-    let this = &*COMMAND_HISTORY_MANAGER_STATIC_INSTANCE.lock().unwrap();
+    let this = &*COMMAND_HISTORY_MANAGER_STATIC_INSTANCE.lock().await;
     this.read_(storage_id, start_index, end_index).await
   }
 
@@ -90,8 +91,8 @@ impl CommandHistoryManager {
       .collect()
   }
 
-  pub fn history_storages() -> Vec<String> {
-    let this = &*COMMAND_HISTORY_MANAGER_STATIC_INSTANCE.lock().unwrap();
+  pub async fn history_storages() -> Vec<String> {
+    let this = &*COMMAND_HISTORY_MANAGER_STATIC_INSTANCE.lock().await;
     this.history_storages_()
   }
 
@@ -105,7 +106,7 @@ impl CommandHistoryManager {
   }
 
   pub async fn get_len(storage_id: &str) -> u64 {
-    let this = &*COMMAND_HISTORY_MANAGER_STATIC_INSTANCE.lock().unwrap();
+    let this = &*COMMAND_HISTORY_MANAGER_STATIC_INSTANCE.lock().await;
     this.get_len_(storage_id).await
   }
 

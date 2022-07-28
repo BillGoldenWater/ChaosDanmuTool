@@ -81,7 +81,7 @@ async fn main() {
 
 async fn on_init<A: Assets>(context: &Context<A>) {
   ConfigManager::init(context).await;
-  CommandHistoryManager::init(context);
+  CommandHistoryManager::init(context).await;
 
   start_ticking();
 }

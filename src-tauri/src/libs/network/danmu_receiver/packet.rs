@@ -115,7 +115,7 @@ impl Packet {
 
 #[derive(Debug, serde::Serialize)]
 pub struct JoinPacketInfo {
-  pub roomid: i32,
+  pub roomid: u32,
   pub protover: i32,
   pub platform: String,
   pub key: String,

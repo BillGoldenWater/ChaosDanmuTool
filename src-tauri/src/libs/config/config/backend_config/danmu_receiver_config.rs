@@ -11,28 +11,28 @@ use crate::libs::config::config::ALLOW_CONFIG_SKIP_IF;
 pub struct DanmuReceiverConfig {
   #[serde(default = "roomid_default")]
   #[serde(skip_serializing_if = "roomid_skip_if")]
-  pub roomid: i32,
+  pub roomid: u32,
   #[serde(default = "actual_roomid_default")]
   #[serde(skip_serializing_if = "actual_roomid_skip_if")]
-  pub actual_roomid: i32,
+  pub actual_roomid: String,
   #[serde(default = "heartbeat_interval_default")]
   #[serde(skip_serializing_if = "heartbeat_interval_skip_if")]
   pub heartbeat_interval: u8,
 }
 
-fn roomid_default() -> i32 {
+fn roomid_default() -> u32 {
   0
 }
 
-fn roomid_skip_if(value: &i32) -> bool {
+fn roomid_skip_if(value: &u32) -> bool {
   *value == roomid_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 
-fn actual_roomid_default() -> i32 {
-  0
+fn actual_roomid_default() -> String {
+  "0|0".to_string()
 }
 
-fn actual_roomid_skip_if(value: &i32) -> bool {
+fn actual_roomid_skip_if(value: &String) -> bool {
   *value == actual_roomid_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 

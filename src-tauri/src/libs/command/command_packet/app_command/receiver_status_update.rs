@@ -26,6 +26,6 @@ pub enum ReceiverStatus {
   Connecting,
   Connected,
 
-  Error,
+  Interrupted,
   Reconnecting,
 }
