@@ -99,6 +99,9 @@ impl DanmuReceiver {
           key: token_and_url.token,
         }).pack().to_vec()
       )).await;
+      // region init heartbeat
+      self.heartbeat_received = true;
+      // endregion
     }
     // endregion
 
@@ -149,7 +152,12 @@ impl DanmuReceiver {
       self.on_message(msg).await;
     }
 
-    self.tick_heartbeat_().await;
+    if self.status == ReceiverStatus::Connected {
+      self.tick_heartbeat_().await;
+    }
+    if !self.is_connected_() && self.status != ReceiverStatus::Close {
+      self.on_disconnect().await;
+    }
   }
 
   async fn tick_heartbeat_(&mut self) {
