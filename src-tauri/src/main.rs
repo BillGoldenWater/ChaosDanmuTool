@@ -95,7 +95,7 @@ async fn on_setup(app: &mut App<Wry>) {
 }
 
 async fn on_ready(app_handle: &AppHandle<Wry>) {
-  show_main_window(app_handle);
+  show_main_window(app_handle).await;
 }
 
 async fn on_exit(_app_handle: &AppHandle<Wry>) {
@@ -118,17 +118,17 @@ fn start_ticking() {
   });
 }
 
-fn show_main_window(app_handle: &AppHandle<Wry>) {
+async fn show_main_window(app_handle: &AppHandle<Wry>) {
   let main_window = app_handle.get_window("main");
 
   if let Some(main_window) = main_window {
     main_window.show().expect("Failed to show main_window");
   } else {
-    create_main_window(&app_handle)
+    create_main_window(&app_handle).await;
   }
 }
 
-fn create_main_window(app_handle: &AppHandle<Wry>) {
+async fn create_main_window(app_handle: &AppHandle<Wry>) {
   let main_window = tauri::WindowBuilder::new(
     app_handle,
     "main",
@@ -150,13 +150,13 @@ fn create_main_window(app_handle: &AppHandle<Wry>) {
     main_window.open_devtools()
   }
 
-  apply_vibrancy_effect(&main_window);
+  apply_vibrancy_effect(&main_window).await;
 
   #[cfg(target_os = "macos")]
   set_visible_on_all_workspaces(&main_window, true, true, false);
 }
 
-fn apply_vibrancy_effect(window: &Window<Wry>) {
+async fn apply_vibrancy_effect(window: &Window<Wry>) {
   #[cfg(target_os = "macos")]
   {
     use window_vibrancy::apply_vibrancy;
@@ -168,7 +168,7 @@ fn apply_vibrancy_effect(window: &Window<Wry>) {
     use window_vibrancy::{apply_acrylic, apply_blur, apply_mica};
 
     let mut result = apply_mica(window);
-    if ConfigManager::get_config().backend.window.main_window.use_acrylic_effect {
+    if ConfigManager::get_config().await.backend.window.main_window.use_acrylic_effect {
       if result.is_ok() { return; }
       result = apply_acrylic(window, Some((18, 18, 18, 125)));
     }
