@@ -16,6 +16,6 @@ impl GiftConfigGetter {
   pub async fn get(room_id: i32) -> Option<BiliBiliResponse<Value>> {
     let url = format!("{}?platform=pc&room_id={}", GIFT_CONFIG_API_URL, room_id);
 
-    execute_request(url.as_str()).await
+    execute_request(&url).await
   }
 }

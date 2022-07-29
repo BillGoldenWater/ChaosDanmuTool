@@ -16,33 +16,25 @@ impl DanmuServerInfoGetter {
   pub async fn get(actual_room_id: u32) -> Option<BiliBiliResponse<DanmuServerInfoResponse>> {
     let url = format!("{}?id={}", DANMU_SERVER_INFO_API_URL, actual_room_id);
 
-    execute_request(url.as_str()).await
+    execute_request(&url).await
   }
 
   pub async fn get_token_and_url(actual_room_id: u32) -> Option<DanmuServerAndToken> {
     let data =
-      DanmuServerInfoGetter::get(actual_room_id).await;
+      DanmuServerInfoGetter::get(actual_room_id).await?.data?;
 
-    if data.is_none() {
-      return None;
+    if !data.host_list.is_empty() {
+      let host = &data.host_list[0];
+      Some(DanmuServerAndToken {
+        token: data.token,
+        url: format!("wss://{}:{}/sub", host.host, host.wss_port).to_string(),
+      })
+    } else {
+      Some(DanmuServerAndToken {
+        token: data.token,
+        url: "wss://broadcastlv.chat.bilibili.com/sub".to_string(),
+      })
     }
-
-    if let Some(data) = data.unwrap().data {
-      return if !data.host_list.is_empty() {
-        let host = data.host_list.get(0).unwrap();
-        Some(DanmuServerAndToken {
-          token: data.token,
-          url: format!("wss://{}:{}/sub", host.host, host.wss_port).to_string(),
-        })
-      } else {
-        Some(DanmuServerAndToken {
-          token: data.token,
-          url: "wss://broadcastlv.chat.bilibili.com/sub".to_string(),
-        })
-      };
-    }
-
-    None
   }
 }
 

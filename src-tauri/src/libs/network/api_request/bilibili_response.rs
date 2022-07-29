@@ -6,7 +6,7 @@
 use serde::de::DeserializeOwned;
 use serde::Deserialize;
 
-use crate::{error, info};
+use crate::error;
 
 #[derive(Debug, Deserialize)]
 pub struct BiliBiliResponse<Data> {
@@ -18,22 +18,14 @@ pub struct BiliBiliResponse<Data> {
 }
 
 pub async fn execute_request<T: DeserializeOwned>(uri: &str) -> Option<BiliBiliResponse<T>> {
-  let result = reqwest::get(uri).await;
-  if result.is_err() {
-    return None;
-  }
+  let result = reqwest::get(uri).await.ok()?;
 
-  let text_result = result.unwrap().text().await;
-  if text_result.is_err() {
-    return None;
-  }
-
-  let text = text_result.unwrap();
+  let text = result.text().await.ok()?;
 
   let serde_result = serde_json::from_str(&text);
 
   if serde_result.is_err() {
-    error!("failed parsing: {}", text);
+    error!("failed parsing: \n{}", text);
   }
 
   Some(serde_result.unwrap())
