@@ -6,3 +6,4 @@
 pub mod bilibili_response;
 pub mod danmu_server_info_getter;
 pub mod gift_config_getter;
+pub mod room_info_getter;
