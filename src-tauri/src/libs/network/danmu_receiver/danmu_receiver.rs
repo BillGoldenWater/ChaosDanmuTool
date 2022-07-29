@@ -4,6 +4,7 @@
  */
 
 use std::borrow::Cow;
+use std::str::FromStr;
 use std::time::Instant;
 
 use bytes::{Buf, BytesMut};
@@ -23,8 +24,9 @@ use crate::libs::command::command_packet::bilibili_command::danmu_message::Danmu
 use crate::libs::config::config::backend_config::danmu_receiver_config::DanmuReceiverConfig;
 use crate::libs::config::config_manager::ConfigManager;
 use crate::libs::network::api_request::danmu_server_info_getter::DanmuServerInfoGetter;
+use crate::libs::network::api_request::room_info_getter::RoomInfoGetter;
 use crate::libs::network::command_broadcast_server::CommandBroadcastServer;
-use crate::libs::network::danmu_receiver::danmu_receiver::DanmuReceiverConnectError::{FailedToConnect, GettingServerInfoFailed};
+use crate::libs::network::danmu_receiver::danmu_receiver::DanmuReceiverConnectError::{FailedToConnect, GettingActualRoomidFailed, GettingServerInfoFailed};
 use crate::libs::network::danmu_receiver::data_type::DataType;
 use crate::libs::network::danmu_receiver::op_code::OpCode;
 use crate::libs::network::danmu_receiver::packet::{JoinPacketInfo, Packet};
@@ -65,15 +67,32 @@ impl DanmuReceiver {
   async fn connect_(&mut self) -> Result<(), DanmuReceiverConnectError> {
     self.set_status(ReceiverStatus::Connecting).await;
     let cfg = self.fetch_config().await;
-    let room_id = cfg.roomid;
 
-    // region get actual room id todo
+    // region get actual room id
+    let roomid = cfg.roomid;
+    let cache_prefix = &format!("{}|", roomid);
+    let actual_roomid = if let Ok(actual_roomid) = u32::from_str(
+      cfg.actual_roomid_cache.trim_start_matches(cache_prefix)
+    ) { // try get from cache
+      actual_roomid
+    } else if let Some(actual_roomid) = RoomInfoGetter::get_actual_room_id(roomid)
+      .await { // get online
+      let mut cfg = ConfigManager::get_config().await;
+      cfg.backend.danmu_receiver.actual_roomid_cache = format!("{}|{}", roomid, actual_roomid);
+      ConfigManager::set_config(cfg, true).await;
+
+      actual_roomid
+    } else { // err
+      self.set_status(ReceiverStatus::Close).await;
+      return Err(GettingActualRoomidFailed);
+    };
+
     // endregion
     self.check_interrupt()?;
 
     // region get server info
     let token_and_url_result =
-      DanmuServerInfoGetter::get_token_and_url(room_id).await;
+      DanmuServerInfoGetter::get_token_and_url(actual_roomid).await;
 
     if token_and_url_result.is_none() {
       self.set_status(ReceiverStatus::Close).await;
@@ -93,7 +112,7 @@ impl DanmuReceiver {
     } else { // on open
       self.websocket_connection.send(Message::Binary(
         Packet::join(JoinPacketInfo {
-          roomid: room_id,
+          roomid: actual_roomid,
           protover: 3,
           platform: "web".to_string(),
           key: token_and_url.token,
@@ -106,7 +125,7 @@ impl DanmuReceiver {
     // endregion
 
     self.set_status(ReceiverStatus::Connected).await;
-    info!("room {} connected",room_id);
+    info!("room {} connected",actual_roomid);
     Ok(())
   }
 
@@ -316,6 +335,7 @@ impl DanmuReceiver {
 
 #[derive(Debug)]
 pub enum DanmuReceiverConnectError {
+  GettingActualRoomidFailed,
   GettingServerInfoFailed,
   FailedToConnect(WebSocketConnectError),
   ConnectionInterrupted,
