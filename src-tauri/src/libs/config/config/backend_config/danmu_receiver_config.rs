@@ -14,7 +14,7 @@ pub struct DanmuReceiverConfig {
   pub roomid: u32,
   #[serde(default = "actual_roomid_default")]
   #[serde(skip_serializing_if = "actual_roomid_skip_if")]
-  pub actual_roomid: String,
+  pub actual_roomid_cache: String, // "{roomid}|{actual_roomid}"
   #[serde(default = "heartbeat_interval_default")]
   #[serde(skip_serializing_if = "heartbeat_interval_skip_if")]
   pub heartbeat_interval: u8,
