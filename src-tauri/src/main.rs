@@ -8,15 +8,16 @@ all(not(debug_assertions), target_os = "windows"),
 windows_subsystem = "windows"
 )]
 
-#[allow(unused_imports)]
 use tauri::{App, AppHandle, command, Manager, Wry};
-use tauri::{Assets, Context, Window};
+use tauri::{Assets, Context, Window, WindowEvent};
 use tauri::async_runtime::block_on;
 use tokio::sync::RwLock;
 use tokio::task;
 
 use chaosdanmutool::info;
 use chaosdanmutool::libs::command::command_history_manager::CommandHistoryManager;
+use chaosdanmutool::libs::command::command_packet::app_command::AppCommand;
+use chaosdanmutool::libs::command::command_packet::app_command::viewer_status_update::{ViewerStatus, ViewerStatusUpdate};
 use chaosdanmutool::libs::config::config_manager::ConfigManager;
 use chaosdanmutool::libs::network::command_broadcast_server::CommandBroadcastServer;
 use chaosdanmutool::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver;
@@ -28,6 +29,7 @@ static VIBRANCY_APPLIED: RwLock<bool> = RwLock::const_new(false);
 
 #[tokio::main]
 async fn main() {
+  // region build info
   info!(
     "build info: {}-{} {}-{} ({} build)",
     env!("CARGO_PKG_NAME"),
@@ -36,6 +38,7 @@ async fn main() {
     std::env::consts::ARCH,
     if cfg!(debug_assertions) {"debug"} else {"release"}
   );
+  // endregion
 
   tauri::async_runtime::set(tokio::runtime::Handle::current());
 
@@ -49,7 +52,11 @@ async fn main() {
       task::block_in_place(|| block_on(on_setup(app)));
       Ok(())
     })
-    .invoke_handler(tauri::generate_handler![is_vibrancy_applied])
+    .invoke_handler(tauri::generate_handler![
+      is_vibrancy_applied,
+      show_viewer_window,
+      close_viewer_window
+    ])
     .menu(if cfg!(target_os = "macos") {
       tauri::Menu::os_default("Chaos Danmu Tool")
     } else {
@@ -68,7 +75,6 @@ async fn main() {
     }
     tauri::RunEvent::ExitRequested { api, .. } => {
       // exit requested event
-      info!("exit requested");
       api.prevent_exit();
       info!("exit prevented");
     }
@@ -126,7 +132,7 @@ async fn show_main_window(app_handle: &AppHandle<Wry>) {
   let main_window = app_handle.get_window("main");
 
   if let Some(main_window) = main_window {
-    main_window.show().expect("Failed to show main_window");
+    main_window.show().expect("failed to show main_window");
   } else {
     create_main_window(&app_handle).await;
   }
@@ -144,20 +150,98 @@ async fn create_main_window(app_handle: &AppHandle<Wry>) {
 
   main_window
     .set_title("Chaos Danmu Tool")
-    .expect("Failed to set title of main_window");
+    .expect("failed to set title of main_window");
 
   #[cfg(debug_assertions)]
   {
     main_window
       .set_always_on_top(true)
-      .expect("Failed to set always on top of main_window");
+      .expect("failed to set always on top of main_window");
     main_window.open_devtools()
   }
 
   apply_vibrancy_effect(&main_window).await;
+}
+
+#[command]
+fn show_viewer_window(app_handle: AppHandle<Wry>) {
+  let viewer_window = app_handle.get_window("viewer");
+
+  if let Some(viewer_window) = viewer_window {
+    viewer_window.show().expect("failed to show viewer_window");
+  } else {
+    task::block_in_place(|| block_on(create_viewer_window(&app_handle)));
+  }
+
+  task::block_in_place(|| block_on(CommandBroadcastServer::broadcast_app_command(
+    AppCommand::from_viewer_status_update(
+      ViewerStatusUpdate::new(ViewerStatus::Open)
+    )
+  )))
+}
+
+#[command]
+fn close_viewer_window(app_handle: AppHandle<Wry>) {
+  let viewer_window = app_handle.get_window("viewer");
+  if let Some(viewer_window) = viewer_window {
+    viewer_window.close().expect("failed to close viewer_window")
+  }
+}
+
+async fn create_viewer_window(app_handle: &AppHandle<Wry>) {
+  let cfg = ConfigManager::get_config().await.backend.window.viewer_window;
+
+  let viewer_window = tauri::WindowBuilder::new(
+    app_handle,
+    "viewer",
+    tauri::WindowUrl::App("viewer/index.html".into()),
+  )
+    .transparent(true)
+    .decorations(false)
+    .position(cfg.x as f64, cfg.y as f64)
+    .inner_size(cfg.width as f64, cfg.height as f64)
+    .build()
+    .unwrap();
+
+  viewer_window
+    .set_title("Chaos Danmu Tool - Viewer")
+    .expect("failed to set title of viewer_window");
+
+  viewer_window.on_window_event(|event| match event {
+    WindowEvent::Resized(size) => {
+      task::block_in_place(|| block_on(async {
+        let mut cfg = ConfigManager::get_config().await;
+        cfg.backend.window.viewer_window.height = size.height;
+        cfg.backend.window.viewer_window.width = size.width;
+        ConfigManager::set_config(cfg, true).await;
+      }));
+    }
+    WindowEvent::Moved(pos) => {
+      task::block_in_place(|| block_on(async {
+        let mut cfg = ConfigManager::get_config().await;
+        cfg.backend.window.viewer_window.x = pos.x;
+        cfg.backend.window.viewer_window.y = pos.y;
+        ConfigManager::set_config(cfg, true).await;
+      }));
+    }
+    WindowEvent::Destroyed => {
+      task::block_in_place(|| block_on(CommandBroadcastServer::broadcast_app_command(
+        AppCommand::from_viewer_status_update(
+          ViewerStatusUpdate::new(ViewerStatus::Close)
+        )
+      )));
+    }
+    _ => {}
+  });
+
+  viewer_window
+    .set_always_on_top(true)
+    .expect("failed to set always on top of viewer_window");
 
   #[cfg(target_os = "macos")]
-  set_visible_on_all_workspaces(&main_window, true, true, false);
+  set_visible_on_all_workspaces(&viewer_window, true, true, false);
+
+  let _ = window_shadows::set_shadow(viewer_window, false);
 }
 
 async fn apply_vibrancy_effect(window: &Window<Wry>) {

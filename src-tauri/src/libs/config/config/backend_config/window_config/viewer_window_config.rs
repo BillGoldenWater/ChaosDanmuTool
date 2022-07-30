@@ -17,10 +17,10 @@ pub struct ViewerWindowConfig {
   pub y: i32,
   #[serde(default = "width_default")]
   #[serde(skip_serializing_if = "width_skip_if")]
-  pub width: i32,
+  pub width: u32,
   #[serde(default = "height_default")]
   #[serde(skip_serializing_if = "height_skip_if")]
-  pub height: i32,
+  pub height: u32,
 }
 
 fn x_default() -> i32 {
@@ -39,19 +39,19 @@ fn y_skip_if(value: &i32) -> bool {
   *value == y_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 
-fn width_default() -> i32 {
+fn width_default() -> u32 {
   400
 }
 
-fn width_skip_if(value: &i32) -> bool {
+fn width_skip_if(value: &u32) -> bool {
   *value == width_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 
-fn height_default() -> i32 {
+fn height_default() -> u32 {
   600
 }
 
-fn height_skip_if(value: &i32) -> bool {
+fn height_skip_if(value: &u32) -> bool {
   *value == height_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 

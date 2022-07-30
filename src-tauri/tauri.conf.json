@@ -14,7 +14,11 @@
   "tauri": {
     "macOSPrivateApi": true,
     "allowlist": {
-      "all": false
+      "all": false,
+      "window": {
+        "all": false,
+        "startDragging": true
+      }
     },
     "bundle": {
       "active": true,
