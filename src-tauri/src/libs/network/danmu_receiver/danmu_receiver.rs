@@ -237,6 +237,15 @@ impl DanmuReceiver {
     self.websocket_connection.is_connected()
   }
 
+  pub async fn get_status() -> ReceiverStatus {
+    let this = &*DANMU_RECEIVER_STATIC_INSTANCE.lock().await;
+    this.get_status_()
+  }
+
+  fn get_status_(&self) -> ReceiverStatus {
+    self.status.clone()
+  }
+
   async fn fetch_config(&mut self) -> DanmuReceiverConfig {
     let cfg = ConfigManager::get_config().await.backend.danmu_receiver;
     self.heartbeat_interval = cfg.heartbeat_interval as u32;

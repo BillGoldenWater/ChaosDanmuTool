@@ -12,8 +12,14 @@ use tokio_tungstenite::tungstenite::protocol::CloseFrame;
 use crate::{error, info};
 use crate::libs::command::command_history_manager::CommandHistoryManager;
 use crate::libs::command::command_packet::app_command::AppCommand;
+use crate::libs::command::command_packet::app_command::config_update::ConfigUpdate;
+use crate::libs::command::command_packet::app_command::gift_config_update::GiftConfigUpdate;
+use crate::libs::command::command_packet::app_command::receiver_status_update::ReceiverStatusUpdate;
 use crate::libs::command::command_packet::bilibili_command::BiliBiliCommand;
 use crate::libs::command::command_packet::CommandPacket;
+use crate::libs::config::config_manager::ConfigManager;
+use crate::libs::network::api_request::gift_config_getter::GiftConfigGetter;
+use crate::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver;
 use crate::libs::network::websocket::websocket_connection::WebSocketConnection;
 
 lazy_static! {
@@ -54,22 +60,22 @@ impl CommandBroadcastServer {
     Self::broadcast_command(CommandPacket::from_bilibili_command(bilibili_command)).await
   }
 
-  pub async fn send_command(connection_id: String, command: CommandPacket) {
+  pub async fn send_command(&mut self, connection_id: String, command: CommandPacket) {
     let command_str_result = command.to_string();
 
     if let Ok(str) = command_str_result {
-      Self::send(connection_id, Message::Text(str)).await
+      self.send_(connection_id, Message::Text(str)).await
     } else {
       error!("failed to serialize command {:?}", command_str_result)
     }
   }
 
-  pub async fn send_app_command(connection_id: String, app_command: AppCommand) {
-    Self::send_command(connection_id, CommandPacket::from_app_command(app_command)).await
+  pub async fn send_app_command(&mut self, connection_id: String, app_command: AppCommand) {
+    self.send_command(connection_id, CommandPacket::from_app_command(app_command)).await
   }
 
-  pub async fn send_bilibili_command(connection_id: String, bilibili_command: BiliBiliCommand) {
-    Self::send_command(
+  pub async fn send_bilibili_command(&mut self, connection_id: String, bilibili_command: BiliBiliCommand) {
+    self.send_command(
       connection_id,
       CommandPacket::from_bilibili_command(bilibili_command),
     )
@@ -88,7 +94,7 @@ impl CommandBroadcastServer {
     }
   }
 
-  async fn send(connection_id: String, message: Message) {
+  pub async fn send(connection_id: String, message: Message) {
     let this = &mut *COMMAND_BROADCAST_SERVER_STATIC_INSTANCE.lock().await;
 
     this.send_(connection_id, message).await;
@@ -170,8 +176,31 @@ impl CommandBroadcastServer {
   async fn on_connection(&mut self, connection_id: String) {
     info!("new connection, id: {} ", connection_id);
 
-    self.send_(connection_id.clone(), Message::Text(connection_id))
-      .await;
+    self.send_app_command(
+      connection_id.clone(),
+      AppCommand::from_config_update(
+        ConfigUpdate::new(ConfigManager::get_config().await)
+      ),
+    ).await;
+    self.send_app_command(
+      connection_id.clone(),
+      AppCommand::from_receiver_status_update(
+        ReceiverStatusUpdate::new(DanmuReceiver::get_status().await)
+      ),
+    ).await;
+
+    let roomid = ConfigManager::get_config().await.backend.danmu_receiver.roomid;
+    let gift_config = GiftConfigGetter::get(roomid).await;
+    if let Some(gift_config) = gift_config {
+      if let Some(gift_config) = gift_config.data {
+        self.send_app_command(
+          connection_id.clone(),
+          AppCommand::from_gift_config_update(
+            GiftConfigUpdate::new(gift_config)
+          ),
+        ).await;
+      }
+    }
   }
 
   async fn on_message(&mut self, message: Message, connection_id: String) {

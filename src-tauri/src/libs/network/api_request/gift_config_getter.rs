@@ -13,7 +13,7 @@ static GIFT_CONFIG_API_URL: &str =
 pub struct GiftConfigGetter {}
 
 impl GiftConfigGetter {
-  pub async fn get(room_id: i32) -> Option<BiliBiliResponse<Value>> {
+  pub async fn get(room_id: u32) -> Option<BiliBiliResponse<Value>> {
     let url = format!("{}?platform=pc&room_id={}", GIFT_CONFIG_API_URL, room_id);
 
     execute_request(&url).await
