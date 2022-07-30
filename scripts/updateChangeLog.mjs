@@ -22,7 +22,7 @@ async function main() {
     content: (await fs.readFile("currentChangeLog.md")).toString().trim("\n"),
   };
 
-  await fs.writeFile("changeLog.json", JSON.stringify(data));
+  await fs.writeFile("changeLog.json", JSON.stringify(data, null, 2));
 }
 
 main().then();
