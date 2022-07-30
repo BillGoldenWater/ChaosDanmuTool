@@ -5,6 +5,7 @@
 
 use serde::Deserialize;
 
+use crate::error;
 use crate::libs::network::api_request::bilibili_response::{BiliBiliResponse, execute_request};
 
 static DANMU_SERVER_INFO_API_URL: &str =
@@ -20,8 +21,13 @@ impl DanmuServerInfoGetter {
   }
 
   pub async fn get_token_and_url(actual_room_id: u32) -> Option<DanmuServerAndToken> {
-    let data =
-      DanmuServerInfoGetter::get(actual_room_id).await?.data?;
+    let data_result = DanmuServerInfoGetter::get(actual_room_id).await?;
+
+    if data_result.data.is_none() {
+      error!("error when get server info: {:?}",data_result);
+    }
+
+    let data = data_result.data?;
 
     if !data.host_list.is_empty() {
       let host = &data.host_list[0];
