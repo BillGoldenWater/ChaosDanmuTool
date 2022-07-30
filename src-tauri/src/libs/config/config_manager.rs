@@ -5,6 +5,7 @@
 
 use std::fs;
 use std::path::PathBuf;
+use std::time::Instant;
 
 use rfd::{MessageButtons, MessageLevel};
 use tauri::{Assets, Context};
@@ -27,6 +28,8 @@ pub struct ConfigManager {
   app_dir: Option<PathBuf>,
   config_file_path: Option<PathBuf>,
   config: Config,
+  last_save_ts: Instant,
+  changed: bool,
 }
 
 impl ConfigManager {
@@ -35,6 +38,8 @@ impl ConfigManager {
       app_dir: None,
       config_file_path: None,
       config: serde_json::from_str("{}").unwrap(),
+      last_save_ts: Instant::now(),
+      changed: false,
     }
   }
 
@@ -52,6 +57,7 @@ impl ConfigManager {
 
   pub async fn load() {
     let this = &mut *CONFIG_MANAGER_STATIC_INSTANCE.lock().await;
+    info!("load manually");
     this.load_().await;
   }
 
@@ -99,6 +105,7 @@ impl ConfigManager {
 
   pub async fn save() {
     let this = &mut *CONFIG_MANAGER_STATIC_INSTANCE.lock().await;
+    info!("save manually");
     this.save_();
   }
 
@@ -119,6 +126,8 @@ impl ConfigManager {
           info!("failed to write config file\n{:#?}",err);
           return;
         }
+        self.changed = false;
+        self.last_save_ts = Instant::now();
         info!("config successfully saved");
       }
     }
@@ -173,16 +182,28 @@ impl ConfigManager {
     self.on_change_(broadcast).await;
   }
 
-  async fn on_change_(&mut self, broadcast: bool) {
+  pub async fn tick() {
+    let this = &mut *CONFIG_MANAGER_STATIC_INSTANCE.lock().await;
+    this.tick_().await
+  }
+
+  async fn tick_(&mut self) {
     if self.config.backend.config_manager.save_on_change {
-      self.save_();
-      if broadcast {
-        CommandBroadcastServer::broadcast_app_command(
-          AppCommand::from_config_update(
-            ConfigUpdate::new(self.config.clone())
-          )
-        ).await;
+      if self.changed && self.last_save_ts.elapsed().as_secs() >= 5 {
+        info!("save on change");
+        self.save_();
       }
+    }
+  }
+
+  async fn on_change_(&mut self, broadcast: bool) {
+    self.changed = true;
+    if broadcast {
+      CommandBroadcastServer::broadcast_app_command(
+        AppCommand::from_config_update(
+          ConfigUpdate::new(self.config.clone())
+        )
+      ).await;
     }
   }
 
@@ -193,6 +214,7 @@ impl ConfigManager {
 
   fn on_exit_(&mut self) {
     if self.config.backend.config_manager.save_on_exit {
+      info!("save on exit");
       self.save_();
     }
   }

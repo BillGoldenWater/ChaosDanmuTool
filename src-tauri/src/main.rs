@@ -116,6 +116,7 @@ fn start_ticking() {
     loop {
       DanmuReceiver::tick().await;
       CommandBroadcastServer::tick().await;
+      ConfigManager::tick().await;
       tokio::time::sleep(tokio::time::Duration::from_millis(200)).await;
     }
   });
