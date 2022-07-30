@@ -67,7 +67,7 @@ impl ConfigManager {
         rfd::MessageDialog::new()
           .set_title("错误")
           .set_level(MessageLevel::Error)
-          .set_buttons(MessageButtons::Ok)
+          .set_buttons(MessageButtons::OkCustom("确定".to_string()))
           .set_description(format!("无法读取配置文件.\n{}", location_info!()).as_str())
           .show();
         std::process::exit(0);

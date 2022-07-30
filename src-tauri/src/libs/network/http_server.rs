@@ -113,7 +113,7 @@ impl HttpServer {
     rfd::MessageDialog::new()
       .set_title("错误")
       .set_level(rfd::MessageLevel::Error)
-      .set_buttons(rfd::MessageButtons::Ok)
+      .set_buttons(rfd::MessageButtons::OkCustom("确定".to_string()))
       .set_description(&format!("无法恢复的http服务器启动错误, 请检查日志或联系开发者.\n{}", location_info!()))
       .show();
   }
