@@ -39,9 +39,12 @@ lazy_static! {
 
 pub struct DanmuReceiver {
   websocket_connection: WebSocketConnection,
+  status: ReceiverStatus,
+
   last_heartbeat_ts: Instant,
   heartbeat_received: bool,
-  status: ReceiverStatus,
+
+  reconnect_count: u32,
 
   heartbeat_interval: u32,
   heartbeat_timeout: u32,
@@ -51,9 +54,13 @@ impl DanmuReceiver {
   fn new() -> DanmuReceiver {
     DanmuReceiver {
       websocket_connection: WebSocketConnection::new(),
+      status: ReceiverStatus::Close,
+
       last_heartbeat_ts: Instant::now(),
       heartbeat_received: true,
-      status: ReceiverStatus::Close,
+
+      reconnect_count: 0,
+
       heartbeat_interval: 30,
       heartbeat_timeout: 2,
     }
@@ -121,6 +128,7 @@ impl DanmuReceiver {
       // region init heartbeat
       self.heartbeat_received = true;
       // endregion
+      self.reconnect_count = 0;
     }
     // endregion
 
@@ -165,15 +173,34 @@ impl DanmuReceiver {
   }
 
   async fn tick_(&mut self) {
+    // region recv message
     let messages = self.websocket_connection.tick().await;
 
     for msg in messages {
       self.on_message(msg).await;
     }
+    // endregion
 
+    // region tick heartbeat
     if self.status == ReceiverStatus::Connected {
       self.tick_heartbeat_().await;
     }
+    // endregion
+
+    // region tick reconnect
+    if self.status == ReceiverStatus::Reconnecting {
+      let cfg = ConfigManager::get_config().await.backend.danmu_receiver;
+      if cfg.auto_reconnect {
+        info!("reconnecting");
+        let result = self.connect_().await;
+        if let Err(err) = result {
+          error!("unable to reconnect: {:?}",err);
+        }
+        self.reconnect_count += 1;
+      }
+    }
+    // endregion
+
     if !self.is_connected_() && self.status != ReceiverStatus::Close {
       self.on_disconnect().await;
     }
@@ -240,8 +267,10 @@ impl DanmuReceiver {
           reason: Cow::Owned("".to_string()),
         });
 
-        if close_frame.code == CloseCode::Abnormal {} // TODO: auto reconnect
         self.on_disconnect().await;
+        if close_frame.code == CloseCode::Abnormal {
+          self.set_status(ReceiverStatus::Reconnecting).await;
+        }
       }
       Message::Ping(..) | Message::Pong(..) | Message::Frame(..) => {}
       _ => {

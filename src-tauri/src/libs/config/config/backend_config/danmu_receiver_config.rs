@@ -18,8 +18,12 @@ pub struct DanmuReceiverConfig {
   #[serde(default = "heartbeat_interval_default")]
   #[serde(skip_serializing_if = "heartbeat_interval_skip_if")]
   pub heartbeat_interval: u8,
+  #[serde(default = "auto_reconnect_default")]
+  #[serde(skip_serializing_if = "auto_reconnect_skip_if")]
+  pub auto_reconnect: bool,
 }
 
+// region roomid
 fn roomid_default() -> u32 {
   0
 }
@@ -27,7 +31,9 @@ fn roomid_default() -> u32 {
 fn roomid_skip_if(value: &u32) -> bool {
   *value == roomid_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
+// endregion
 
+// region actual_roomid
 fn actual_roomid_default() -> String {
   "0|0".to_string()
 }
@@ -35,8 +41,9 @@ fn actual_roomid_default() -> String {
 fn actual_roomid_skip_if(value: &String) -> bool {
   *value == actual_roomid_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
+// endregion
 
-
+// region heartbeat_interval
 fn heartbeat_interval_default() -> u8 {
   30
 }
@@ -44,3 +51,15 @@ fn heartbeat_interval_default() -> u8 {
 fn heartbeat_interval_skip_if(value: &u8) -> bool {
   *value == heartbeat_interval_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
+// endregion
+
+// region auto_reconnect
+fn auto_reconnect_default() -> bool {
+  true
+}
+
+fn auto_reconnect_skip_if(value: &bool) -> bool {
+  *value == auto_reconnect_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
+}
+// endregion
+
