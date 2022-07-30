@@ -4,12 +4,16 @@
  */
 
 use std::convert::Infallible;
+use std::error::Error;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 
+use get_port::{Ops, tcp::TcpPort};
 use hyper::{Body, Method, Request as HyperRequest, Response, Server, StatusCode, Version};
 use hyper::server::conn::AddrStream;
 use hyper::service::{make_service_fn, service_fn};
+use netstat2::{get_sockets_info, ProtocolSocketInfo, TcpState};
 use oneshot::Sender;
+use sysinfo::{Pid, PidExt, ProcessExt, ProcessRefreshKind, RefreshKind, SystemExt};
 use tauri::{AssetResolver, Wry};
 use tauri::async_runtime::JoinHandle;
 use tokio::sync::Mutex;
@@ -17,7 +21,8 @@ use tokio_tungstenite::{MaybeTlsStream, WebSocketStream};
 use tokio_tungstenite::tungstenite::handshake::derive_accept_key;
 use tokio_tungstenite::tungstenite::protocol::Role;
 
-use crate::{error, info};
+use crate::{error, info, location_info};
+use crate::libs::config::config_manager::ConfigManager;
 use crate::libs::network::command_broadcast_server::CommandBroadcastServer;
 
 lazy_static! {
@@ -42,12 +47,18 @@ impl HttpServer {
 
   pub async fn start(asset_resolver: AssetResolver<Wry>, port: u16) {
     let this = &mut *HTTP_SERVER_STATIC_INSTANCE.lock().await;
-    this.start_(asset_resolver, port)
+    this.start_(asset_resolver, port).await
   }
 
-  fn start_(&mut self, asset_resolver: AssetResolver<Wry>, port: u16) {
+  async fn start_(&mut self, asset_resolver: AssetResolver<Wry>, port: u16) {
     self.asset_resolver = Some(asset_resolver);
 
+    self.listen(port).await;
+  }
+
+  #[async_recursion::async_recursion(? Send)]
+  async fn listen(&mut self, port: u16) {
+    // region init
     let addr = SocketAddr::new(
       IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)),
       port,
@@ -57,18 +68,22 @@ impl HttpServer {
       make_service_fn(|_| {
         async { Ok::<_, Infallible>(service_fn(Self::on_request)) }
       });
+    // endregion
 
-
+    // region bind
     let server = Server::try_bind(&addr);
     let server = if let Err(err) = server {
-      error!("Failed to start server: {:?}",err);
+      error!("failed to start server: {:?}",err);
+      self.try_recover_from_listen_fail(err, port).await;
       return;
     } else {
       server.unwrap().serve(make_service)
     };
 
     info!("server start at: {:?}", server.local_addr());
+    // endregion
 
+    // region run
     let (tx, rx) = oneshot::channel::<()>();
     self.tx = Some(Some(tx));
 
@@ -83,6 +98,89 @@ impl HttpServer {
       }
     });
     self.server_join_handle = Some(join_handle)
+    // endregion
+  }
+
+  #[async_recursion::async_recursion(? Send)]
+  async fn try_recover_from_listen_fail(&mut self, err: hyper::Error, port: u16) {
+    if let Some(err) = err.source() {
+      let is_addr_in_use = format!("{:?}", err).find("AddrInUse").is_some();
+      if is_addr_in_use {
+        self.try_recover_from_addr_in_use(port).await;
+        return;
+      }
+    }
+    rfd::MessageDialog::new()
+      .set_title("错误")
+      .set_level(rfd::MessageLevel::Error)
+      .set_buttons(rfd::MessageButtons::Ok)
+      .set_description(&format!("无法恢复的http服务器启动错误, 请检查日志或联系开发者.\n{}", location_info!()))
+      .show();
+  }
+
+  #[async_recursion::async_recursion(? Send)]
+  async fn try_recover_from_addr_in_use(&mut self, port: u16) {
+    // region init message
+    let process_names = get_process_names_using(port);
+    let process_names_message = if process_names.is_empty() {
+      "获取失败".to_string()
+    } else {
+      process_names.join(",\n")
+    };
+    let message = format!(
+      "无法启动http服务器, 请关闭以下进程后重启应用或更改一个新的端口:\n{}\n警告: 更改新端口将会导致所有外置弹幕查看器链接需要重新复制\n\n开发信息:\n{}",
+      process_names_message,
+      location_info!(),
+    );
+    // endregion
+
+    // region show dialog
+    let is_auto_select = rfd::MessageDialog::new()
+      .set_title("错误")
+      .set_level(rfd::MessageLevel::Error)
+      .set_buttons(rfd::MessageButtons::OkCancelCustom(
+        "更改".to_string(),
+        "退出".to_string(),
+      ))
+      .set_description(&message)
+      .show();
+    // endregion
+
+    // region process
+    if !is_auto_select {
+      std::process::exit(0);
+    }
+
+    let port_result = TcpPort::in_range(
+      "0.0.0.0",
+      get_port::Range { min: 25000, max: 25555 },
+    );
+    if let Some(port) = port_result {
+      // start on new port
+      self.listen(port).await;
+
+      // save config
+      info!("saving changed port config");
+      let mut cfg = ConfigManager::get_config().await;
+      cfg.backend.http_server.port = port;
+      ConfigManager::set_config(cfg, false).await;
+
+      rfd::MessageDialog::new()
+        .set_title("成功")
+        .set_level(rfd::MessageLevel::Info)
+        .set_buttons(rfd::MessageButtons::OkCustom("确定".to_string()))
+        .set_description(&format!("成功更改端口为: {}\n{}", port, location_info!()))
+        .show();
+    } else {
+      rfd::MessageDialog::new()
+        .set_title("错误")
+        .set_level(rfd::MessageLevel::Error)
+        .set_buttons(rfd::MessageButtons::OkCustom("确定".to_string()))
+        .set_description(&format!("无法获取可用端口, 请联系开发者. \n{}", location_info!()))
+        .show();
+      std::process::exit(0);
+    }
+    // endregion
   }
 
   pub async fn stop() {
@@ -256,4 +354,55 @@ fn create_empty_response(code: StatusCode) -> Response<Body> {
   let mut res = Response::new(Body::empty());
   *res.status_mut() = code;
   res
+}
+
+fn get_process_names_using(port: u16) -> Vec<String> {
+  // region get pids
+  let af_flags =
+    netstat2::AddressFamilyFlags::IPV4 | netstat2::AddressFamilyFlags::IPV6;
+  let proto_flags = netstat2::ProtocolFlags::TCP;
+  let sockets_info_result = get_sockets_info(af_flags, proto_flags);
+
+  let sockets_info =
+    if let Ok(socket_info) = sockets_info_result {
+      socket_info
+    } else {
+      return vec![];
+    };
+
+  let mut pids: Vec<u32> = vec![];
+
+  for socket_info in sockets_info {
+    match socket_info.protocol_socket_info {
+      ProtocolSocketInfo::Tcp(tcp_info) => {
+        if tcp_info.state == TcpState::Listen
+          && tcp_info.local_addr == IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0))
+          && tcp_info.local_port == port
+        {
+          pids.append(&mut socket_info.associated_pids.clone())
+        }
+      }
+      _ => {}
+    }
+  }
+  // endregion
+
+  let mut result: Vec<String> = vec![];
+
+  // region get process name
+  let mut sys = sysinfo::System::new_with_specifics(
+    RefreshKind::new().with_processes(ProcessRefreshKind::new())
+  );
+  sys.refresh_processes();
+
+  let processes = sys.processes();
+  for pid in pids {
+    let process = processes.get(&Pid::from_u32(pid));
+    if let Some(process) = process {
+      result.push(process.name().to_string());
+    }
+  }
+  // endregion
+
+  result
 }

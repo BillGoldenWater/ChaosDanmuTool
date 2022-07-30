@@ -46,8 +46,12 @@ bytes = "1.2.0"
 brotli = "3.3.4"
 uuid = { version = "1.1.2", features = ["v4", "fast-rng", "macro-diagnostics"] }
 lazy_static = "1.4.0"
-rfd = "0.9.1"
+rfd = { version = "0.10.0", features = ["common-controls-v6"] }
 chrono = "0.4.19"
+netstat2 = "0.9.1"
+get-port = "4.0.0"
+sysinfo = "0.25.0"
+async-recursion = "1.0.0"
 ts-rs = "6.2.0"
 # live template: tss
 # #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
