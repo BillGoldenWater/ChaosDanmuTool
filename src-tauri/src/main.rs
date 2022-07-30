@@ -55,7 +55,8 @@ async fn main() {
     .invoke_handler(tauri::generate_handler![
       is_vibrancy_applied,
       show_viewer_window,
-      close_viewer_window
+      close_viewer_window,
+      is_viewer_window_open
     ])
     .menu(if cfg!(target_os = "macos") {
       tauri::Menu::os_default("Chaos Danmu Tool")
@@ -185,6 +186,15 @@ fn close_viewer_window(app_handle: AppHandle<Wry>) {
   let viewer_window = app_handle.get_window("viewer");
   if let Some(viewer_window) = viewer_window {
     viewer_window.close().expect("failed to close viewer_window")
+  }
+}
+
+#[command]
+fn is_viewer_window_open(app_handle: AppHandle<Wry>) -> bool {
+  if let Some(window) = app_handle.get_window("viewer") {
+    window.is_visible().unwrap_or(false)
+  } else {
+    false
   }
 }
 
