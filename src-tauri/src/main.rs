@@ -161,6 +161,7 @@ async fn create_main_window(app_handle: &AppHandle<Wry>) {
     main_window.open_devtools()
   }
 
+  #[cfg(any(target_os = "windows", target_os = "macos"))]
   apply_vibrancy_effect(&main_window).await;
 }
 
@@ -254,6 +255,7 @@ async fn create_viewer_window(app_handle: &AppHandle<Wry>) {
   let _ = window_shadows::set_shadow(viewer_window, false);
 }
 
+#[cfg(any(target_os = "windows", target_os = "macos"))]
 async fn apply_vibrancy_effect(window: &Window<Wry>) {
   let result;
 
