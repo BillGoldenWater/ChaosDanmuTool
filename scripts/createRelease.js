@@ -19,6 +19,7 @@ module.exports = async ({github, context}) => {
     const version = JSON.parse((await fs.readFile("./package.json")).toString()).version
     const changeLog = JSON.parse((await fs.readFile("./changeLog.json")).toString())[version]
 
+    highlightLog("create draft release")
     // noinspection JSUnresolvedFunction,JSUnresolvedVariable
     const {data: {id: release_id}} = await github.rest.repos.createRelease({
         owner: context.repo.owner,
@@ -34,20 +35,20 @@ module.exports = async ({github, context}) => {
         .filter(name => !name.endsWith(".json"))
     files.push("updater.json")
 
-    files = files.map(name => path.join("out", name))
-
-    for (let file of files) {
+    for (let name of files) {
+        let file = path.join("out", name)
         highlightLog(`uploading ${file}`)
         // noinspection JSUnresolvedFunction,JSUnresolvedVariable
         await github.rest.repos.uploadReleaseAsset({
             owner: context.repo.owner,
             repo: context.repo.repo,
             release_id,
-            name: file,
+            name,
             data: await fs.readFile(file),
         });
     }
 
+    highlightLog("unmark draft")
     // noinspection JSUnresolvedFunction,JSUnresolvedVariable
     await github.rest.repos.updateRelease({
         owner: context.repo.owner,
@@ -55,4 +56,5 @@ module.exports = async ({github, context}) => {
         release_id,
         draft: false
     })
+    highlightLog("done")
 }
