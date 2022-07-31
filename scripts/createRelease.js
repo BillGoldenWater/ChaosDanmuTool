@@ -39,7 +39,7 @@ module.exports = async ({github, context}) => {
     for (let file of files) {
         highlightLog(`uploading ${file}`)
         // noinspection JSUnresolvedFunction,JSUnresolvedVariable
-        github.rest.repos.uploadReleaseAsset({
+        await github.rest.repos.uploadReleaseAsset({
             owner: context.repo.owner,
             repo: context.repo.repo,
             release_id,
@@ -49,7 +49,7 @@ module.exports = async ({github, context}) => {
     }
 
     // noinspection JSUnresolvedFunction,JSUnresolvedVariable
-    github.rest.repos.updateRelease({
+    await github.rest.repos.updateRelease({
         owner: context.repo.owner,
         repo: context.repo.repo,
         release_id,
