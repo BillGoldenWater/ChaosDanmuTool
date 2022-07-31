@@ -20,7 +20,7 @@ module.exports = async ({github, context}) => {
     const changeLog = JSON.parse((await fs.readFile("./changeLog.json")).toString())[version]
 
     // noinspection JSUnresolvedFunction,JSUnresolvedVariable
-    const {data: release_id} = await github.rest.repos.createRelease({
+    const {data: {id: release_id}} = await github.rest.repos.createRelease({
         owner: context.repo.owner,
         repo: context.repo.repo,
         tag_name: version,
