@@ -88,6 +88,12 @@ jobs:
         with:
           path: out
 
+      - name: move artifacts folder
+        run: |
+          mv out/artifact out_
+          rm -rf out
+          mv out_ out
+
       - name: generate update info
         run: node scripts/genUpdateInfo.mjs
 
