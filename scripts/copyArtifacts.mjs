@@ -32,7 +32,7 @@ async function copy(target, updateInfo, pkgFolder, updatePkgFolder, pkgFileName,
     for (let platform of updateInfo.platforms) {
         info[platform] = {
             "signature": sig,
-            "url": `https://github.com/BiliGoldenWater/ChaosDanmuToo/releases/download/${updateInfo.version}/${updatePkgFileName}`
+            "url": `https://github.com/BiliGoldenWater/ChaosDanmuTool/releases/download/${updateInfo.version}/${updatePkgFileName}`
         }
     }
     await fs.writeFile(`out/${target}.json`, JSON.stringify(info));
