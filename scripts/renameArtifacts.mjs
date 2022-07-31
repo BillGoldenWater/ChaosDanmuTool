@@ -11,6 +11,9 @@ async function main() {
 
     await fs.rm("out", {recursive: true, force: true})
     await fs.mkdir("out")
+    await fs.mkdir("out/macos")
+    await fs.mkdir("out/linux")
+    await fs.mkdir("out/windows")
 
     switch (process.platform) {
         case "darwin": {
