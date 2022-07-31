@@ -5,7 +5,15 @@
 
 import fs from "fs/promises";
 
-async function copy(target, pkgFolder, updatePkgFolder, pkgFileName, updatePkgFileName) {
+/**
+ * @param {string} target
+ * @param {{version: string, platforms: string[]}} updateInfo
+ * @param {string} pkgFolder
+ * @param {string} updatePkgFolder
+ * @param {string} pkgFileName
+ * @param {string} updatePkgFileName
+ */
+async function copy(target, updateInfo, pkgFolder, updatePkgFolder, pkgFileName, updatePkgFileName) {
     const pkgPath =
         `src-tauri/target/${target}/release/bundle/${pkgFolder}/${pkgFileName}`
     const updatePkgPath =
@@ -13,13 +21,28 @@ async function copy(target, pkgFolder, updatePkgFolder, pkgFileName, updatePkgFi
     const sigPath =
         `src-tauri/target/${target}/release/bundle/${updatePkgFolder}/${updatePkgFileName}.sig`
 
-    await fs.copyFile(pkgPath, `out/${pkgFileName}`)
-    await fs.copyFile(updatePkgPath, `out/${updatePkgFileName}`)
-    await fs.copyFile(sigPath, `out/${updatePkgFileName}.sig`)
+    const outPkgPath = `out/${pkgFileName}`;
+    const outUpdatePkgPath = `out/${updatePkgFileName}`;
+    const sig = (await fs.readFile(sigPath)).toString()
+
+    await fs.copyFile(pkgPath, outPkgPath)
+    await fs.copyFile(updatePkgPath, outUpdatePkgPath)
+
+    let info = {};
+    for (let platform of platforms) {
+        info[platform] = {
+            "signature": sig,
+            "url": `https://github.com/BiliGoldenWater/ChaosDanmuToo/releases/download/${updateInfo.version}/${pkgFileName}`
+        }
+    }
+    await fs.writeFile(`out/${target}.json`, JSON.stringify(info));
 }
 
 async function main() {
-    // noinspection JSFileReferences
+    /**
+     * @type string
+     */
+        // noinspection JSFileReferences
     const version = JSON.parse((await fs.readFile("./package.json")).toString()).version
 
     await fs.rm("out", {recursive: true, force: true})
@@ -32,6 +55,7 @@ async function main() {
         case "darwin": {
             await copy(
                 "universal-apple-darwin",
+                {platforms: ["darwin-x86_64", "darwin-aarch64"], version},
                 "dmg",
                 "macos",
                 `ChaosDanmuTool_${version}_universal.dmg`,
@@ -42,6 +66,7 @@ async function main() {
         case "linux": {
             await copy(
                 "x86_64-unknown-linux-gnu",
+                {platforms: ["linux-x86_64"], version},
                 "deb",
                 "appimage",
                 `chaos-danmu-tool_${version}_amd64.deb`,
@@ -56,6 +81,7 @@ async function main() {
 
             await copy(
                 "x86_64-pc-windows-msvc",
+                {platforms: ["windows-x86_64"], version},
                 "msi",
                 "msi",
                 `ChaosDanmuTool_${version}_x64_${wL}.msi`,

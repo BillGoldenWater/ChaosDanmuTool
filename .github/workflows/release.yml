@@ -69,3 +69,25 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           path: out/*
+
+  release:
+    needs: [ build ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: install Node.js 18.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      - name: yarn install
+        run: yarn install
+
+      - uses: actions/download-artifact@v3
+        with:
+          path: out
+
+      - name: Display structure of downloaded files
+        run: ls -R
+        working-directory: out
