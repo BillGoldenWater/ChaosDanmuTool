@@ -23,6 +23,18 @@ async function main() {
     if (process.platform === "darwin") {
         execCommand("rustup", ["target", "add", "x86_64-apple-darwin", "aarch64-apple-darwin"])
     }
+
+    const bundleDirs = [
+        "./src-tauri/target/universal-apple-darwin/release/bundle/",
+        "./src-tauri/target/x86_64-unknown-linux-gnu/release/bundle/",
+        "./src-tauri/target/x86_64-pc-windows-msvc/release/bundle/",
+    ];
+    for (const dir of bundleDirs) {
+        try {
+            await fs.rm(dir, {recursive: true, force: true})
+        } catch (e) {
+        }
+    }
 }
 
 main().then()
