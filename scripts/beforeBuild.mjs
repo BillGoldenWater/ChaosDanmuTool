@@ -5,6 +5,7 @@
 
 import {execSync} from "child_process";
 import fs from "fs/promises";
+import path from "path";
 
 /**
  * @param command {string}
@@ -41,11 +42,8 @@ async function main() {
     // region rm last bundle output
     highlightLog("rm last bundle output")
 
-    const bundleDirs = [
-        "./src-tauri/target/universal-apple-darwin/release/bundle/",
-        "./src-tauri/target/x86_64-unknown-linux-gnu/release/bundle/",
-        "./src-tauri/target/x86_64-pc-windows-msvc/release/bundle/",
-    ];
+    const bundleDirs = (await fs.readdir("src-tauri/target"))
+        .map(name => path.join("src-tauri", "target", name, "release", "bundle"))
     for (const dir of bundleDirs) {
         try {
             await fs.rm(dir, {recursive: true, force: true})
