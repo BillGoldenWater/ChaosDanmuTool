@@ -62,10 +62,10 @@ jobs:
 
       - name: renameArtifacts.mjs
         if: success()
-        run: node scripts/renameArtifacts.mjs
+        run: node scripts/copyArtifacts.mjs
 
       - name: upload artifacts
         if: success()
         uses: actions/upload-artifact@v3
         with:
-          path: out/**/*
+          path: out/*
