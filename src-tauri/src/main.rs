@@ -9,7 +9,7 @@ windows_subsystem = "windows"
 )]
 
 use tauri::{App, AppHandle, command, Manager, Wry};
-use tauri::{Assets, Context, Window, WindowEvent};
+use tauri::{Assets, Context, WindowEvent};
 use tauri::async_runtime::block_on;
 use tokio::sync::RwLock;
 use tokio::task;
@@ -256,7 +256,7 @@ async fn create_viewer_window(app_handle: &AppHandle<Wry>) {
 }
 
 #[cfg(any(target_os = "windows", target_os = "macos"))]
-async fn apply_vibrancy_effect(window: &Window<Wry>) {
+async fn apply_vibrancy_effect(window: &tauri::Window<Wry>) {
   let result;
 
   #[cfg(target_os = "macos")]
