@@ -3,17 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import {spawnSync} from "child_process";
+import {execSync} from "child_process";
 import fs from "fs/promises";
 
 /**
  * @param command {string}
- * @param args {string[]}
  * @param cwd {string}
  */
-function execCommand(command, args, cwd = undefined,) {
-    console.log(`running ${command}`, args)
-    return spawnSync(command, args, {cwd, stdio: 'inherit',})
+function execCommand(command, cwd = undefined,) {
+    console.log(`running ${command}`)
+    return execSync(command, {cwd, stdio: 'inherit',})
 }
 
 /**
@@ -28,14 +27,14 @@ async function main() {
     highlightLog("cargo test")
 
     await fs.rm("src/share/type/rust", {recursive: true, force: true})
-    execCommand("cargo", ["test"], "src-tauri")
+    execCommand("cargo test", "src-tauri")
     // endregion
 
     // region add macOS targets
     highlightLog("add targets")
 
     if (process.platform === "darwin") {
-        execCommand("rustup", ["target", "add", "x86_64-apple-darwin", "aarch64-apple-darwin"])
+        execCommand("rustup target add x86_64-apple-darwin aarch64-apple-darwin")
     }
     // endregion
 

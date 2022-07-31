@@ -3,30 +3,29 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import {spawnSync} from "child_process";
+import {execSync} from "child_process";
 
 /**
  * @param command {string}
- * @param args {string[]}
  * @param cwd {string}
  */
-function execCommand(command, args, cwd = undefined,) {
-    console.log(`running ${command}`, args)
-    return spawnSync(command, args, {cwd, stdio: 'inherit',})
+function execCommand(command, cwd = undefined,) {
+    console.log(`running ${command}`)
+    return execSync(command, {cwd, stdio: 'inherit',})
 }
 
 async function main() {
     switch (process.platform) {
         case "darwin": {
-            execCommand("yarn", ["tauri", "build", "-t", "universal-apple-darwin"])
+            execCommand("yarn tauri build -t universal-apple-darwin")
             break
         }
         case "linux": {
-            execCommand("yarn", ["tauri", "build", "-t", "x86_64-unknown-linux-gnu"])
+            execCommand("yarn tauri build -t x86_64-unknown-linux-gnu")
             break
         }
         case "win32": {
-            execCommand("yarn", ["tauri", "build", "-t", "x86_64-pc-windows-msvc"])
+            execCommand("yarn tauri build -t x86_64-pc-windows-msvc")
             break
         }
     }

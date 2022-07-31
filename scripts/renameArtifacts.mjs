@@ -3,19 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import {spawnSync} from "child_process";
 import fs from "fs/promises";
 import path from "path";
-
-/**
- * @param {string} command
- * @param {string[]} args
- * @param {string} cwd
- */
-function execCommand(command, args, cwd = undefined,) {
-    console.log(`running ${command}`, args)
-    return spawnSync(command, args, {cwd, stdio: 'inherit',})
-}
 
 /**
  * @param {string} dir
