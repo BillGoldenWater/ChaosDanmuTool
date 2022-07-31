@@ -29,7 +29,7 @@ async function copy(target, updateInfo, pkgFolder, updatePkgFolder, pkgFileName,
     await fs.copyFile(updatePkgPath, outUpdatePkgPath)
 
     let info = {};
-    for (let platform of platforms) {
+    for (let platform of updateInfo.platforms) {
         info[platform] = {
             "signature": sig,
             "url": `https://github.com/BiliGoldenWater/ChaosDanmuToo/releases/download/${updateInfo.version}/${pkgFileName}`
