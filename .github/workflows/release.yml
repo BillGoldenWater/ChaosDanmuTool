@@ -1,11 +1,6 @@
 name: Build and Release
 
-# Controls when the workflow will run
-on:
-  push:
-    # Pattern matched against refs/tags
-    tags:
-      - "*"
+on: workflow_dispatch
 
 
 jobs:
