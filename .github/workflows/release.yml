@@ -88,6 +88,12 @@ jobs:
         with:
           path: out
 
-      - name: Display structure of downloaded files
-        run: ls -R
-        working-directory: out
+      - name: generate update info
+        run: node scripts/genUpdateInfo.mjs
+
+      - name: create release
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const script = require('./scripts/createRelease.js')
+            return await script({github, context})
