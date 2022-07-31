@@ -55,7 +55,7 @@ async function main() {
             const pkgPath =
                 `src-tauri/target/${target}/release/bundle/msi/ChaosDanmuTool_${version}_x64_${wL}.msi`
             const updatePkgPath =
-                `src-tauri/target/${target}/release/bundle/msi/ChaosDanmuTool_${version}_x64_${wL}.update.zip`
+                `src-tauri/target/${target}/release/bundle/msi/ChaosDanmuTool_${version}_x64_${wL}.msi.zip`
             const sigPath =
                 `src-tauri/target/${target}/release/bundle/msi/ChaosDanmuTool_${version}_x64_${wL}.msi.zip.sig`
 
