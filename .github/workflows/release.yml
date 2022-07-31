@@ -36,8 +36,6 @@ jobs:
             ~/.cargo
             ./src-tauri/target
           key: ${{ runner.os }}
-          restore-keys: |
-            ${{ runner.os }}
 
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-latest'
