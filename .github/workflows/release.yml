@@ -1,6 +1,11 @@
 name: Build and Release
 
-on: workflow_dispatch
+on:
+  push:
+    tags:
+      - "test_action"
+
+  workflow_dispatch:
 
 
 jobs:
