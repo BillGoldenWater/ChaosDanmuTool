@@ -249,15 +249,24 @@ impl HttpServer {
           res_builder = res_builder.header("Content-Security-Policy", csp)
         }
 
-        #[allow(unused_mut)]
-          let mut data = asset.bytes;
+        let data = {
+          #[cfg(target_os = "linux")]
+          { // linux only
+            if let Some(csp) = asset.csp_header.clone() {
+              let html = String::from_utf8_lossy(&asset.bytes);
+              let body = html
+                .replacen(tauri::utils::html::CSP_TOKEN, csp.as_str(), 1);
+              body.as_bytes().to_vec()
+            } else {
+              asset.bytes
+            }
+          }
 
-        #[cfg(target_os = "linux")]
-        if let Some(csp) = asset.csp_header.clone() {
-          let html = String::from_utf8_lossy(&asset.bytes);
-          let body = html.replacen(tauri::utils::html::CSP_TOKEN, csp.as_str(), 1);
-          data = body.as_bytes().to_vec();
-        }
+          #[cfg(not(target_os = "linux"))]
+          { // other platform
+            asset.bytes
+          }
+        };
 
         let res_result = res_builder.body(Body::from(data));
 
