@@ -5,8 +5,9 @@
   "description": "A tool for process/view Danmu on bilibili",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build --emptyOutDir",
+    "build": "vite build --emptyOutDir",
     "preview": "vite preview",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
     "tauri": "tauri"
   },
   "author": {
@@ -15,20 +16,21 @@
   },
   "license": "AGPL-3.0-only",
   "dependencies": {
-    "@tauri-apps/api": "^1.0.2",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "@tauri-apps/api": "^1.0.2"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.0.3",
     "@types/node": "^18.6.2",
-    "@types/react": "^18.0.15",
-    "@types/react-dom": "^18.0.6",
     "@types/semver": "^7.3.10",
-    "@vitejs/plugin-react": "^1.3.2",
     "semver": "^7.3.7",
     "toml-patch": "^0.2.3",
-    "typescript": "^4.5.4",
-    "vite": "^2.9.9"
+    "@sveltejs/vite-plugin-svelte": "^1.0.1",
+    "@tsconfig/svelte": "^3.0.0",
+    "svelte": "^3.49.0",
+    "svelte-check": "^2.8.0",
+    "svelte-preprocess": "^4.10.7",
+    "tslib": "^2.4.0",
+    "typescript": "^4.6.4",
+    "vite": "^3.0.2"
   }
 }

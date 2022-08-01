@@ -278,7 +278,7 @@ impl HttpServer {
         };
       }
       #[cfg(debug_assertions)]{
-        let target_uri = format!("http://localhost:3000{}", req.uri().to_string());
+        let target_uri = format!("http://localhost:5173{}", req.uri().to_string());
         info!("redirecting to {}",target_uri);
 
         let res = Response::builder()
