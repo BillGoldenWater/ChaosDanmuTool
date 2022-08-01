@@ -1,1 +1,0 @@
-yarn tauri build -t universal-apple-darwin
