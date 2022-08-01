@@ -1,5 +1,6 @@
-import {defineConfig} from "vite";
-import {svelte} from '@sveltejs/vite-plugin-svelte'
+import { defineConfig } from "vite";
+import { svelte } from "@sveltejs/vite-plugin-svelte";
+import { sveltePreprocess } from "svelte-preprocess/dist/autoProcess";
 
 // https://vitejs.dev/config/
 // noinspection JSUnusedGlobalSymbols
@@ -8,11 +9,12 @@ export default defineConfig({
   build: {
     outDir: "../dist",
     rollupOptions: {
-      input: [
-        "src/main/index.html",
-        "src/viewer/index.html"
-      ],
+      input: ["src/main/index.html", "src/viewer/index.html"],
     },
   },
-  plugins: [svelte()],
+  plugins: [
+    svelte({
+      preprocess: sveltePreprocess(),
+    }),
+  ],
 });
