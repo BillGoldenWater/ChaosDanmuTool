@@ -4,6 +4,8 @@
  */
 
 import "./index.css";
+import "../share/style/ThemeUtils.ts";
+import "../share/style/variable.less";
 import App from "./App.svelte";
 
 const app = new App({

@@ -6,14 +6,45 @@
 import { writable } from "svelte/store";
 import Color from "color";
 
+const root = document.documentElement;
+
+function s(key: string, value: string) {
+  root.style.setProperty(key, value);
+}
+
+function g(key: string): string {
+  return root.style.getPropertyValue(key);
+}
+
+function updateVariables(colorPlates: ColorPlates) {
+  console.log(colorPlates);
+  Object.keys(colorPlates).forEach((key) => {
+    s(`--${key}`, colorPlates[key]);
+  });
+}
+
+type ThemeSettings = {
+  themeColor: Color;
+  dark: boolean;
+};
+
 type ColorPlates = {
   text: string;
 
   background: string;
+
+  up: string;
+  down: string;
 };
 
-const defaultThemeColor: Color = new Color("hsl(200, 100%, 50%)");
-const genColorPlates = (themeColor: Color): ColorPlates => {
+const defaultThemeSettings: ThemeSettings = {
+  themeColor: new Color("hsl(200, 100%, 50%)"),
+  dark: true,
+};
+
+const genColorPlates = (themeSettings: ThemeSettings): ColorPlates => {
+  let tc = themeSettings.themeColor;
+
   function down(percent: number) {
     return new Color([0, 0, 0, percent], "hsl");
   }
@@ -24,28 +55,23 @@ const genColorPlates = (themeColor: Color): ColorPlates => {
 
   function theme(percent: number) {
     return new Color(
-      [
-        themeColor.hue(),
-        themeColor.saturationl(),
-        themeColor.lightness(),
-        percent,
-      ],
+      [tc.hue(), tc.saturationl(), tc.lightness(), percent],
       "hsl"
     );
   }
 
-  console.log(theme(0.01).toString());
   return {
     text: up(0.9).toString(),
 
-    background: theme(0.01).desaturate(0.85).darken(0.8).alpha(0.3).toString(),
+    background: theme(1).desaturate(0.9).darken(0.9).alpha(0.8).toString(),
+
+    up: theme(1).desaturate(0.9).lighten(0.9).alpha(0.1).toString(),
+    down: theme(1).desaturate(0.9).darken(0.9).alpha(0.1).toString(),
   };
 };
 
-const themeColor = writable(defaultThemeColor);
+const themeSettings = writable(defaultThemeSettings);
 
-export const colorPlates = writable(genColorPlates(defaultThemeColor));
-
-themeColor.subscribe((tc) => {
-  colorPlates.set(genColorPlates(tc));
+themeSettings.subscribe((themeSettings) => {
+  updateVariables(genColorPlates(themeSettings));
 });
