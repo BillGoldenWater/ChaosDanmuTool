@@ -76,12 +76,19 @@ async fn main() {
     }
     tauri::RunEvent::ExitRequested { api, .. } => {
       // exit requested event
-      api.prevent_exit();
-      info!("exit prevented");
+      #[cfg(target_os = "macos")]{
+        api.prevent_exit();
+        info!("exit prevented");
+      }
     }
     tauri::RunEvent::Exit => {
       info!("exiting");
       task::block_in_place(|| block_on(on_exit(app_handle)));
+    }
+    tauri::RunEvent::ApplicationShouldHandleReopen { has_visible_windows: _, api } => {
+      info!("handling reopen");
+      task::block_in_place(|| block_on(on_activate(app_handle)));
+      api.prevent_default();
     }
 
     _ => {}
@@ -105,6 +112,10 @@ async fn on_setup(app: &mut App<Wry>) {
 }
 
 async fn on_ready(app_handle: &AppHandle<Wry>) {
+  show_main_window(app_handle).await;
+}
+
+async fn on_activate(app_handle: &AppHandle<Wry>) {
   show_main_window(app_handle).await;
 }
 
