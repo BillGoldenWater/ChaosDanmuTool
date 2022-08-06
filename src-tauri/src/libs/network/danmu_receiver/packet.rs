@@ -5,11 +5,11 @@
 
 use bytes::{Buf, BufMut, BytesMut};
 
+use crate::info;
 use crate::libs::network::danmu_receiver::data_type::DataType;
 use crate::libs::network::danmu_receiver::op_code::OpCode;
 use crate::libs::utils::brotli_utils::brotli_decompress;
 use crate::libs::utils::mut_bytes_utils::get_bytes;
-use crate::info;
 
 #[derive(Debug)]
 pub struct Packet {
@@ -60,7 +60,8 @@ impl Packet {
     let body_len = packet_len - (header_len as u32);
 
     match DataType::from_u16(data_type) {
-      DataType::CompressedBrotli => { // brotli
+      DataType::CompressedBrotli => {
+        // brotli
         let body = get_bytes(data, body_len as usize);
 
         let decompress_result = brotli_decompress(&body.to_vec());
@@ -77,7 +78,8 @@ impl Packet {
         info!("unsupported compress format");
         vec![]
       }
-      _ => { // other
+      _ => {
+        // other
         let body = get_bytes(data, body_len as usize);
 
         let mut result = vec![Packet {
@@ -120,4 +122,3 @@ pub struct JoinPacketInfo {
   pub platform: String,
   pub key: String,
 }
-

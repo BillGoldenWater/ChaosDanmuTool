@@ -10,7 +10,10 @@ pub mod status_bar_component_config;
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, export_to = "../src/share/type/rust/config/frontendConfig/viewerViewConfig/")]
+#[ts(
+  export,
+  export_to = "../src/share/type/rust/config/frontendConfig/viewerViewConfig/"
+)]
 pub struct StatusBarConfig {
   #[serde(default = "enable_default")]
   #[serde(skip_serializing_if = "enable_skip_if")]

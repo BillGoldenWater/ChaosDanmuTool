@@ -19,23 +19,36 @@ pub fn get_app_bundle_path() -> Option<PathBuf> {
   let exec_path = std::env::current_exe().unwrap();
 
   let mac_os_dir = exec_path.parent();
-  if !mac_os_dir.map(|dir|
-    dir.file_name()
-      .map(|name| { name.eq_ignore_ascii_case("MacOS") })
-      .unwrap_or(false)
-  ).unwrap_or(false) { return None; } // check is in "MacOS"
+  if !mac_os_dir
+    .map(|dir| {
+      dir
+        .file_name()
+        .map(|name| name.eq_ignore_ascii_case("MacOS"))
+        .unwrap_or(false)
+    })
+    .unwrap_or(false)
+  {
+    return None;
+  } // check is in "MacOS"
 
   let content_dir = mac_os_dir.unwrap().parent();
-  if !content_dir.map(|dir|
-    dir.file_name()
-      .map(|name| name.eq_ignore_ascii_case("Contents"))
-      .unwrap_or(false)
-  ).unwrap_or(false) { return None; } // check is in "Contents"
+  if !content_dir
+    .map(|dir| {
+      dir
+        .file_name()
+        .map(|name| name.eq_ignore_ascii_case("Contents"))
+        .unwrap_or(false)
+    })
+    .unwrap_or(false)
+  {
+    return None;
+  } // check is in "Contents"
 
   let app_bundle_dir = content_dir.unwrap().parent();
   if let Some(app_bundle_dir) = app_bundle_dir {
     if let Some(dir_name) = app_bundle_dir.file_name() {
-      if dir_name.to_str().unwrap_or("").ends_with(".app") { // check is xxxx.app
+      if dir_name.to_str().unwrap_or("").ends_with(".app") {
+        // check is xxxx.app
         return Some(app_bundle_dir.to_path_buf());
       }
     }
@@ -44,7 +57,10 @@ pub fn get_app_bundle_path() -> Option<PathBuf> {
   None
 }
 
-pub fn get_dir_children_names(dir: &PathBuf, ignore_hidden: bool) -> Result<Vec<String>, std::io::Error> {
+pub fn get_dir_children_names(
+  dir: &PathBuf,
+  ignore_hidden: bool,
+) -> Result<Vec<String>, std::io::Error> {
   let dir_info = std::fs::read_dir(dir)?;
 
   let file_names: Vec<String> = dir_info

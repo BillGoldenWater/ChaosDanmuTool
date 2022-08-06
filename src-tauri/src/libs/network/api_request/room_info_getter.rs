@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-use crate::libs::network::api_request::bilibili_response::{BiliBiliResponse, execute_request};
+use crate::libs::network::api_request::bilibili_response::{execute_request, BiliBiliResponse};
 
 static ROOM_INFO_API_URL: &str = "https://api.live.bilibili.com/room/v1/Room/room_init";
 
@@ -27,7 +27,6 @@ impl RoomInfoGetter {
 pub struct RoomInfoResponse {
   pub room_id: u32,
   pub short_id: u32,
-
   // unused
 
   // pub uid: u64,

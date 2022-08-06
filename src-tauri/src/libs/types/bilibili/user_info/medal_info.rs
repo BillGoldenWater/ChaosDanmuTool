@@ -36,7 +36,6 @@ pub struct MedalInfo {
   medal_level: u16,
   #[serde(alias = "medal_name")]
   medal_name: String,
-
   // unknown
   // icon_id: i32,
   // score: i32,
@@ -67,7 +66,9 @@ impl MedalInfo {
   pub fn from_raw(raw: &Value) -> MedalInfo {
     let raw_medal_info = match raw {
       Value::Array(arr) => arr,
-      _ => { return MedalInfo::empty(); }
+      _ => {
+        return MedalInfo::empty();
+      }
     };
 
     if raw_medal_info.len() == 0 {
@@ -76,7 +77,7 @@ impl MedalInfo {
 
     let result = Self::from_raw_(raw_medal_info.clone());
     if result.is_none() {
-      error!("failed when parsing {:?}",raw_medal_info);
+      error!("failed when parsing {:?}", raw_medal_info);
       return MedalInfo::empty();
     }
 

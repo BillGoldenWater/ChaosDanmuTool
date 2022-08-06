@@ -7,7 +7,10 @@ use crate::libs::config::config::ALLOW_CONFIG_SKIP_IF;
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, export_to = "../src/share/type/rust/config/backendConfig/windowConfig/")]
+#[ts(
+  export,
+  export_to = "../src/share/type/rust/config/backendConfig/windowConfig/"
+)]
 pub struct ViewerWindowConfig {
   #[serde(default = "x_default")]
   #[serde(skip_serializing_if = "x_skip_if")]
@@ -54,5 +57,3 @@ fn height_default() -> u32 {
 fn height_skip_if(value: &u32) -> bool {
   *value == height_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
-
-

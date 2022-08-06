@@ -7,7 +7,10 @@ use crate::libs::config::config::ALLOW_CONFIG_SKIP_IF;
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, export_to = "../src/share/type/rust/config/backendConfig/windowConfig/")]
+#[ts(
+  export,
+  export_to = "../src/share/type/rust/config/backendConfig/windowConfig/"
+)]
 pub struct MainWindowConfig {
   #[serde(default = "placeholder_default")]
   #[serde(skip_serializing_if = "placeholder_skip_if")]
@@ -23,5 +26,3 @@ fn placeholder_skip_if(value: &bool) -> bool {
   *value == placeholder_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 //endregion
-
-

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-pub mod danmu_receiver; 
-pub mod packet;
+pub mod danmu_receiver;
 pub mod data_type;
 pub mod op_code;
+pub mod packet;

@@ -29,13 +29,11 @@ impl CommandPacket {
 
   pub fn to_string(&self) -> Result<String, serde_json::Error> {
     match self {
-      CommandPacket::AppCommand { data: app_command } => {
-        match app_command {
-          AppCommand::ConfigUpdate { .. } => { Ok(serialize_config(self, false)) }
-          _ => Ok(serde_json::to_string(self)?)
-        }
-      }
-      _ => Ok(serde_json::to_string(self)?)
+      CommandPacket::AppCommand { data: app_command } => match app_command {
+        AppCommand::ConfigUpdate { .. } => Ok(serialize_config(self, false)),
+        _ => Ok(serde_json::to_string(self)?),
+      },
+      _ => Ok(serde_json::to_string(self)?),
     }
   }
 }

@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-use std::sync::{Mutex, RwLock};
 use serde::Serialize;
+use std::sync::{Mutex, RwLock};
 
 use crate::libs::config::config::backend_config::BackendConfig;
 use crate::libs::config::config::frontend_config::FrontendConfig;
@@ -52,7 +52,9 @@ fn frontend_skip_if(value: &FrontendConfig) -> bool {
 
 pub fn serialize_config<T: Serialize>(config: &T, use_skip_if: bool) -> String {
   let _ = &*ALLOW_CONFIG_SKIP_IF_LOCK.lock().unwrap();
-  { *ALLOW_CONFIG_SKIP_IF.write().unwrap() = use_skip_if; }
+  {
+    *ALLOW_CONFIG_SKIP_IF.write().unwrap() = use_skip_if;
+  }
   serde_json::to_string(config).unwrap_or("{}".to_string())
 }
 
@@ -60,31 +62,28 @@ pub fn serialize_config<T: Serialize>(config: &T, use_skip_if: bool) -> String {
 mod test {
   use serde_json::{json, Value};
 
-  use crate::libs::config::config::{Config, INTERNAL_VIEWER_UUID, serialize_config};
+  use crate::libs::config::config::{serialize_config, Config, INTERNAL_VIEWER_UUID};
 
   #[test]
   fn write_default_uuids() {
-    let default_uuids: Value = json!({
-      "internalViewerUUID": INTERNAL_VIEWER_UUID
-    });
+    let default_uuids: Value = json!({ "internalViewerUUID": INTERNAL_VIEWER_UUID });
 
     std::fs::write(
       "../src/share/type/rust/config/viewerDefaultUuids.json",
       serde_json::to_string(&default_uuids).unwrap(),
-    ).expect("Failed write default uuids.");
+    )
+    .expect("Failed write default uuids.");
   }
 
   #[test]
   fn write_default_config() {
-    let default_config: String = serialize_config(
-      &serde_json::from_str::<Config>("{}").unwrap(),
-      false,
-    );
+    let default_config: String =
+      serialize_config(&serde_json::from_str::<Config>("{}").unwrap(), false);
 
     std::fs::write(
       "../src/share/type/rust/config/defaultConfig.json",
       default_config,
-    ).expect("Failed write default config.");
+    )
+    .expect("Failed write default config.");
   }
 }
-

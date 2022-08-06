@@ -7,27 +7,26 @@ use std::convert::Infallible;
 use std::error::Error;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 
-use get_port::{Ops, tcp::TcpPort};
-use hyper::{Body, Method, Request as HyperRequest, Response, Server, StatusCode, Version};
+use get_port::{tcp::TcpPort, Ops};
 use hyper::server::conn::AddrStream;
 use hyper::service::{make_service_fn, service_fn};
+use hyper::{Body, Method, Request as HyperRequest, Response, Server, StatusCode, Version};
 use netstat2::{get_sockets_info, ProtocolSocketInfo, TcpState};
 use oneshot::Sender;
 use sysinfo::{Pid, PidExt, ProcessExt, ProcessRefreshKind, RefreshKind, SystemExt};
-use tauri::{AssetResolver, Wry};
 use tauri::async_runtime::JoinHandle;
+use tauri::{AssetResolver, Wry};
 use tokio::sync::Mutex;
-use tokio_tungstenite::{MaybeTlsStream, WebSocketStream};
 use tokio_tungstenite::tungstenite::handshake::derive_accept_key;
 use tokio_tungstenite::tungstenite::protocol::Role;
+use tokio_tungstenite::{MaybeTlsStream, WebSocketStream};
 
-use crate::{error, info, location_info};
 use crate::libs::config::config_manager::ConfigManager;
 use crate::libs::network::command_broadcast_server::CommandBroadcastServer;
+use crate::{error, info, location_info};
 
 lazy_static! {
-    pub static ref HTTP_SERVER_STATIC_INSTANCE: Mutex<HttpServer> =
-        Mutex::new(HttpServer::new());
+  pub static ref HTTP_SERVER_STATIC_INSTANCE: Mutex<HttpServer> = Mutex::new(HttpServer::new());
 }
 
 pub struct HttpServer {
@@ -59,21 +58,16 @@ impl HttpServer {
   #[async_recursion::async_recursion(? Send)]
   async fn listen(&mut self, port: u16) {
     // region init
-    let addr = SocketAddr::new(
-      IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)),
-      port,
-    );
+    let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), port);
 
     let make_service =
-      make_service_fn(|_| {
-        async { Ok::<_, Infallible>(service_fn(Self::on_request)) }
-      });
+      make_service_fn(|_| async { Ok::<_, Infallible>(service_fn(Self::on_request)) });
     // endregion
 
     // region bind
     let server = Server::try_bind(&addr);
     let server = if let Err(err) = server {
-      error!("failed to start server: {:?}",err);
+      error!("failed to start server: {:?}", err);
       self.try_recover_from_listen_fail(err, port).await;
       return;
     } else {
@@ -114,7 +108,10 @@ impl HttpServer {
       .set_title("错误")
       .set_level(rfd::MessageLevel::Error)
       .set_buttons(rfd::MessageButtons::OkCustom("确定".to_string()))
-      .set_description(&format!("无法恢复的http服务器启动错误, 请检查日志或联系开发者.\n{}", location_info!()))
+      .set_description(&format!(
+        "无法恢复的http服务器启动错误, 请检查日志或联系开发者.\n{}",
+        location_info!()
+      ))
       .show();
   }
 
@@ -153,7 +150,10 @@ impl HttpServer {
 
     let port_result = TcpPort::in_range(
       "0.0.0.0",
-      get_port::Range { min: 25000, max: 25555 },
+      get_port::Range {
+        min: 25000,
+        max: 25555,
+      },
     );
     if let Some(port) = port_result {
       // start on new port
@@ -176,7 +176,10 @@ impl HttpServer {
         .set_title("错误")
         .set_level(rfd::MessageLevel::Error)
         .set_buttons(rfd::MessageButtons::OkCustom("确定".to_string()))
-        .set_description(&format!("无法获取可用端口, 请联系开发者. \n{}", location_info!()))
+        .set_description(&format!(
+          "无法获取可用端口, 请联系开发者. \n{}",
+          location_info!()
+        ))
         .show();
       std::process::exit(0);
     }
@@ -218,12 +221,12 @@ impl HttpServer {
 
             let tcp_stream = upgraded_parts.unwrap().io.into_inner();
 
-            let websocket_stream =
-              WebSocketStream::from_raw_socket(
-                MaybeTlsStream::Plain(tcp_stream),
-                Role::Server,
-                None,
-              ).await;
+            let websocket_stream = WebSocketStream::from_raw_socket(
+              MaybeTlsStream::Plain(tcp_stream),
+              Role::Server,
+              None,
+            )
+            .await;
 
             CommandBroadcastServer::accept(websocket_stream).await;
             info!("upgraded");
@@ -242,8 +245,7 @@ impl HttpServer {
     let this = &*HTTP_SERVER_STATIC_INSTANCE.lock().await;
     if let Some(asset_resolver) = &this.asset_resolver {
       if let Some(asset) = asset_resolver.get(req.uri().to_string()) {
-        let mut res_builder = Response::builder()
-          .header("Content-Type", asset.mime_type);
+        let mut res_builder = Response::builder().header("Content-Type", asset.mime_type);
 
         if let Some(csp) = asset.csp_header.clone() {
           res_builder = res_builder.header("Content-Security-Policy", csp)
@@ -251,11 +253,11 @@ impl HttpServer {
 
         let data = {
           #[cfg(target_os = "linux")]
-          { // linux only
+          {
+            // linux only
             if let Some(csp) = asset.csp_header.clone() {
               let html = String::from_utf8_lossy(&asset.bytes);
-              let body = html
-                .replacen(tauri::utils::html::CSP_TOKEN, csp.as_str(), 1);
+              let body = html.replacen(tauri::utils::html::CSP_TOKEN, csp.as_str(), 1);
               body.as_bytes().to_vec()
             } else {
               asset.bytes
@@ -263,7 +265,8 @@ impl HttpServer {
           }
 
           #[cfg(not(target_os = "linux"))]
-          { // other platform
+          {
+            // other platform
             asset.bytes
           }
         };
@@ -277,17 +280,18 @@ impl HttpServer {
           Ok(res_result.unwrap())
         };
       }
-      #[cfg(debug_assertions)]{
+      #[cfg(debug_assertions)]
+      {
         let target_uri = format!("http://localhost:5173{}", req.uri().to_string());
-        info!("redirecting to {}",target_uri);
+        info!("redirecting to {}", target_uri);
 
         let res = Response::builder()
           .status(StatusCode::TEMPORARY_REDIRECT)
           .header("Location", target_uri)
           .body(Body::empty())
-          .unwrap_or(
-            Response::new(Body::from("failed when build redirect response"))
-          );
+          .unwrap_or(Response::new(Body::from(
+            "failed when build redirect response",
+          )));
         return Ok(res);
       }
     } else {
@@ -300,9 +304,12 @@ impl HttpServer {
 }
 
 fn create_websocket_upgrade_response(request: &HyperRequest<Body>) -> Option<Response<Body>> {
-  if *request.method() != Method::GET { return None; } // method check
+  if *request.method() != Method::GET {
+    return None;
+  } // method check
 
-  if request.version() < Version::HTTP_11 { // version check
+  if request.version() < Version::HTTP_11 {
+    // version check
     return None;
   }
 
@@ -311,7 +318,9 @@ fn create_websocket_upgrade_response(request: &HyperRequest<Body>) -> Option<Res
     .get("Connection")
     .and_then(|h| h.to_str().ok())
     .map(|h| h.eq_ignore_ascii_case("Upgrade"))
-    .unwrap_or(false) { // upgrade check
+    .unwrap_or(false)
+  {
+    // upgrade check
     return None;
   }
 
@@ -320,23 +329,28 @@ fn create_websocket_upgrade_response(request: &HyperRequest<Body>) -> Option<Res
     .get("Upgrade")
     .and_then(|h| h.to_str().ok())
     .map(|h| h.eq_ignore_ascii_case("websocket"))
-    .unwrap_or(false) { // upgrade target check
+    .unwrap_or(false)
+  {
+    // upgrade target check
     return None;
   }
 
-  if !request.headers()
+  if !request
+    .headers()
     .get("Sec-WebSocket-Version")
     .and_then(|value| value.to_str().ok())
-    .map(|value| value.split(|c| c == ' ' || c == ',')
-      .any(|value| value.eq_ignore_ascii_case("13")))
-    .unwrap_or(false) { // websocket version check
+    .map(|value| {
+      value
+        .split(|c| c == ' ' || c == ',')
+        .any(|value| value.eq_ignore_ascii_case("13"))
+    })
+    .unwrap_or(false)
+  {
+    // websocket version check
     return None;
   }
 
-
-  let req_key = request
-    .headers()
-    .get("Sec-WebSocket-Key");
+  let req_key = request.headers().get("Sec-WebSocket-Key");
   let res_key = if let Some(key) = req_key {
     derive_accept_key(key.as_bytes())
   } else {
@@ -367,17 +381,15 @@ fn create_empty_response(code: StatusCode) -> Response<Body> {
 
 fn get_process_names_using(port: u16) -> Vec<String> {
   // region get pids
-  let af_flags =
-    netstat2::AddressFamilyFlags::IPV4 | netstat2::AddressFamilyFlags::IPV6;
+  let af_flags = netstat2::AddressFamilyFlags::IPV4 | netstat2::AddressFamilyFlags::IPV6;
   let proto_flags = netstat2::ProtocolFlags::TCP;
   let sockets_info_result = get_sockets_info(af_flags, proto_flags);
 
-  let sockets_info =
-    if let Ok(socket_info) = sockets_info_result {
-      socket_info
-    } else {
-      return vec![];
-    };
+  let sockets_info = if let Ok(socket_info) = sockets_info_result {
+    socket_info
+  } else {
+    return vec![];
+  };
 
   let mut pids: Vec<u32> = vec![];
 
@@ -400,7 +412,7 @@ fn get_process_names_using(port: u16) -> Vec<String> {
 
   // region get process name
   let mut sys = sysinfo::System::new_with_specifics(
-    RefreshKind::new().with_processes(ProcessRefreshKind::new())
+    RefreshKind::new().with_processes(ProcessRefreshKind::new()),
   );
   sys.refresh_processes();
 

@@ -37,8 +37,8 @@ pub struct UserInfo {
 }
 
 impl UserInfo {
-  pub fn empty() -> UserInfo{
-    UserInfo{
+  pub fn empty() -> UserInfo {
+    UserInfo {
       name: "".to_string(),
       user_level: 0,
       face: "".to_string(),
@@ -50,7 +50,7 @@ impl UserInfo {
       guard_level: 0,
       level_color: "".to_string(),
       name_color: "".to_string(),
-      title: "".to_string()
+      title: "".to_string(),
     }
   }
 

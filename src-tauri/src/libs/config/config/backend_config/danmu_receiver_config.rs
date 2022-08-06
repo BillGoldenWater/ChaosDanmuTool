@@ -62,4 +62,3 @@ fn auto_reconnect_skip_if(value: &bool) -> bool {
   *value == auto_reconnect_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 // endregion
-

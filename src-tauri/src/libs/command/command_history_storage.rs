@@ -32,7 +32,6 @@ impl CommandHistoryStorage {
     let uuid = uuid::Uuid::new_v4().to_string();
     let ts = Utc::now();
 
-
     CommandHistoryStorage {
       data_dir: data_dir.join(gen_data_dir_name(&ts, &uuid)),
       max_record_per_file: MAX_RECORD_PER_FILE,
@@ -43,7 +42,11 @@ impl CommandHistoryStorage {
   }
 
   pub async fn from_folder(folder: PathBuf) -> CommandHistoryStorage {
-    let info: Vec<&str> = folder.file_name().unwrap().to_str().unwrap()
+    let info: Vec<&str> = folder
+      .file_name()
+      .unwrap()
+      .to_str()
+      .unwrap()
       .split("_")
       .collect();
 
@@ -62,7 +65,7 @@ impl CommandHistoryStorage {
     // region get latest file id
     let file_names_result = get_dir_children_names(&self.data_dir, true);
     if let Err(err) = &file_names_result {
-      error!("unable to read history storage info {:?}",err);
+      error!("unable to read history storage info {:?}", err);
       return;
     }
 
@@ -121,7 +124,7 @@ impl CommandHistoryStorage {
     let compress_result = brotli_compress(&data.to_vec());
 
     if let Err(err) = compress_result {
-      error!("unable to compress data, {:?}",err);
+      error!("unable to compress data, {:?}", err);
       return;
     }
 
@@ -131,12 +134,12 @@ impl CommandHistoryStorage {
     // region write
     let write_result = file.write_u64(compressed.len() as u64).await;
     if let Err(err) = write_result {
-      error!("unable to write data length, {:?}",err);
+      error!("unable to write data length, {:?}", err);
       return;
     }
     let write_result = file.write(compressed.as_slice()).await;
     if let Err(err) = write_result {
-      error!("unable to write data, {:?}",err);
+      error!("unable to write data, {:?}", err);
       return;
     }
     // endregion
@@ -219,9 +222,13 @@ impl CommandHistoryStorage {
     let mut result = vec![];
 
     loop {
-      if !data.has_remaining() { break; }
+      if !data.has_remaining() {
+        break;
+      }
       let length = data.get_u64();
-      if length > data.remaining() as u64 { break; }
+      if length > data.remaining() as u64 {
+        break;
+      }
 
       result.push(get_bytes(&mut data, length as usize).to_vec());
     }
@@ -234,13 +241,9 @@ impl CommandHistoryStorage {
   }
 
   fn get_file_path(&self, index: u64) -> PathBuf {
-    self.data_dir.join(
-      format!(
-        "{}{}",
-        self.get_file_id(index),
-        RECORD_FILE_EXT
-      )
-    )
+    self
+      .data_dir
+      .join(format!("{}{}", self.get_file_id(index), RECORD_FILE_EXT))
   }
 
   pub fn len(&self) -> u64 {

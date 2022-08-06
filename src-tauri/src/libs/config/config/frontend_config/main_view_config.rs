@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-use crate::libs::config::config::ALLOW_CONFIG_SKIP_IF;
 use crate::libs::config::config::frontend_config::main_view_config::functions_config::FunctionsConfig;
+use crate::libs::config::config::ALLOW_CONFIG_SKIP_IF;
 
 pub mod functions_config;
 
@@ -27,7 +27,6 @@ fn path_default() -> String {
 fn path_skip_if(value: &String) -> bool {
   *value == path_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
-
 
 fn functions_default() -> FunctionsConfig {
   serde_json::from_str("{}").unwrap()

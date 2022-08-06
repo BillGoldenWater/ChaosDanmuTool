@@ -3,18 +3,19 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-use std::{path::PathBuf};
+use std::path::PathBuf;
 
+use crate::error;
 use tauri::{Assets, Context};
 use tokio::sync::Mutex;
-use crate::error;
 
 use crate::libs::command::command_history_storage::CommandHistoryStorage;
 use crate::libs::command::command_packet::CommandPacket;
 use crate::libs::utils::fs_utils::{get_app_data_dir, get_dir_children_names};
 
 lazy_static! {
-  pub static ref COMMAND_HISTORY_MANAGER_STATIC_INSTANCE: Mutex<CommandHistoryManager> = Mutex::new(CommandHistoryManager::new());
+  pub static ref COMMAND_HISTORY_MANAGER_STATIC_INSTANCE: Mutex<CommandHistoryManager> =
+    Mutex::new(CommandHistoryManager::new());
 }
 
 pub struct CommandHistoryManager {
@@ -86,7 +87,10 @@ impl CommandHistoryManager {
   async fn read_(&self, storage_id: &str, start_index: u64, end_index: u64) -> Vec<CommandPacket> {
     let chs = self.get_storage(storage_id).await;
 
-    chs.read(start_index, end_index).await.iter()
+    chs
+      .read(start_index, end_index)
+      .await
+      .iter()
       .filter_map(|v| serde_json::from_str(v).ok())
       .collect()
   }
@@ -115,8 +119,6 @@ impl CommandHistoryManager {
   }
 
   async fn get_storage(&self, storage_id: &str) -> CommandHistoryStorage {
-    CommandHistoryStorage::from_folder(
-      self.data_dir.join(storage_id)
-    ).await
+    CommandHistoryStorage::from_folder(self.data_dir.join(storage_id)).await
   }
 }

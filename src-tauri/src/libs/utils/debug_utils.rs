@@ -8,14 +8,14 @@
 macro_rules! location_info {
   () => {
     format!(
-      "[{}, {}:{}, {:?}]", 
+      "[{}, {}:{}, {:?}]",
       file!()
         .trim_start_matches("src/")
         .trim_start_matches("libs/")
         .trim_end_matches(".rs")
-        .replace("/","."),
-      line!(), 
-      column!(), 
+        .replace("/", "."),
+      line!(),
+      column!(),
       std::thread::current().id()
     )
   };

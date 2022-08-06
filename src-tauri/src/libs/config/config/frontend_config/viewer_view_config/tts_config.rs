@@ -8,13 +8,16 @@ use crate::libs::config::config::frontend_config::viewer_view_config::tts_config
 use crate::libs::config::config::frontend_config::viewer_view_config::tts_config::tts_danmu_config::TTSDanmuConfig;
 use crate::libs::config::config::frontend_config::viewer_view_config::tts_config::tts_text_replacer::TTSTextReplacer;
 
-pub mod tts_danmu_config;
 pub mod tts_blacklist_config;
+pub mod tts_danmu_config;
 pub mod tts_text_replacer;
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, export_to = "../src/share/type/rust/config/frontendConfig/viewerViewConfig/")]
+#[ts(
+  export,
+  export_to = "../src/share/type/rust/config/frontendConfig/viewerViewConfig/"
+)]
 pub struct TTSConfig {
   #[serde(default = "enable_default")]
   #[serde(skip_serializing_if = "enable_skip_if")]

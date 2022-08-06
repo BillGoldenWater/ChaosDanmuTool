@@ -17,7 +17,6 @@ pub struct EmojiData {
   height: i32,
   #[serde(default)]
   width: i32,
-
   // unknown
   // perm: i32,
   // emoticon_unique: String,

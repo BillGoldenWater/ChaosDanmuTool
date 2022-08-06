@@ -5,22 +5,26 @@
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, export_to = "../src/share/type/rust/command/commandPacket/appCommand/")]
+#[ts(
+  export,
+  export_to = "../src/share/type/rust/command/commandPacket/appCommand/"
+)]
 pub struct ReceiverStatusUpdate {
   status: ReceiverStatus,
 }
 
 impl ReceiverStatusUpdate {
   pub fn new(status: ReceiverStatus) -> ReceiverStatusUpdate {
-    ReceiverStatusUpdate {
-      status
-    }
+    ReceiverStatusUpdate { status }
   }
 }
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, export_to = "../src/share/type/rust/command/commandPacket/appCommand/receiverStatusUpdate/")]
+#[ts(
+  export,
+  export_to = "../src/share/type/rust/command/commandPacket/appCommand/receiverStatusUpdate/"
+)]
 pub enum ReceiverStatus {
   Close,
   Connecting,

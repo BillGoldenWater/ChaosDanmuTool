@@ -6,7 +6,7 @@
 use serde::Deserialize;
 
 use crate::error;
-use crate::libs::network::api_request::bilibili_response::{BiliBiliResponse, execute_request};
+use crate::libs::network::api_request::bilibili_response::{execute_request, BiliBiliResponse};
 
 static DANMU_SERVER_INFO_API_URL: &str =
   "https://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo";
@@ -24,7 +24,7 @@ impl DanmuServerInfoGetter {
     let data_result = DanmuServerInfoGetter::get(actual_room_id).await?;
 
     if data_result.data.is_none() {
-      error!("error when get server info: {:?}",data_result);
+      error!("error when get server info: {:?}", data_result);
     }
 
     let data = data_result.data?;

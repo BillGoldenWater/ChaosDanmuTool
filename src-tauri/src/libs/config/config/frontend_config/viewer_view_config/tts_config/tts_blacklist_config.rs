@@ -7,7 +7,10 @@ use crate::libs::config::config::ALLOW_CONFIG_SKIP_IF;
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, export_to = "../src/share/type/rust/config/frontendConfig/viewerViewConfig/ttsConfig/")]
+#[ts(
+  export,
+  export_to = "../src/share/type/rust/config/frontendConfig/viewerViewConfig/ttsConfig/"
+)]
 pub struct TTSBlacklistConfig {
   #[serde(default = "uuid_default")]
   #[serde(skip_serializing_if = "uuid_skip_if")]

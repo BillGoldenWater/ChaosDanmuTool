@@ -14,7 +14,10 @@ pub mod gift_display_config;
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, export_to = "../src/share/type/rust/config/frontendConfig/viewerViewConfig/")]
+#[ts(
+  export,
+  export_to = "../src/share/type/rust/config/frontendConfig/viewerViewConfig/"
+)]
 pub struct DanmuViewerCustomConfig {
   #[serde(default = "danmu_filter_default")]
   #[serde(skip_serializing_if = "danmu_filter_skip_if")]
@@ -73,5 +76,3 @@ fn show_avatar_default() -> bool {
 fn show_avatar_skip_if(value: &bool) -> bool {
   *value == show_avatar_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
-
-

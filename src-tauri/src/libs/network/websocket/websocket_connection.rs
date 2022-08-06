@@ -3,15 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-use std::borrow::Cow;
-use futures_util::{SinkExt, StreamExt};
 use futures_util::stream::{SplitSink, SplitStream};
-use tokio::{net::TcpStream, sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender}};
-use tokio_tungstenite::{connect_async, MaybeTlsStream, tungstenite::Message, WebSocketStream};
-use tokio_tungstenite::tungstenite::Error;
+use futures_util::{SinkExt, StreamExt};
+use std::borrow::Cow;
+use tokio::{
+  net::TcpStream,
+  sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender},
+};
 use tokio_tungstenite::tungstenite::error::ProtocolError;
-use tokio_tungstenite::tungstenite::protocol::CloseFrame;
 use tokio_tungstenite::tungstenite::protocol::frame::coding::CloseCode;
+use tokio_tungstenite::tungstenite::protocol::CloseFrame;
+use tokio_tungstenite::tungstenite::Error;
+use tokio_tungstenite::{connect_async, tungstenite::Message, MaybeTlsStream, WebSocketStream};
 
 use crate::{error, info};
 
@@ -96,17 +99,22 @@ impl WebSocketConnection {
   }
 
   pub async fn tick(&mut self) -> Vec<Message> {
-    if !self.connected { return vec![]; }
+    if !self.connected {
+      return vec![];
+    }
 
     let mut result = vec![];
 
     loop {
       if let Some(rx) = &mut self.rx {
         let rx_result = rx.try_recv(); // try_recv
-        if let Ok(msg) = rx_result { // when message
+        if let Ok(msg) = rx_result {
+          // when message
           result.push(msg);
-        } else if let Err(err) = rx_result { // when failed recv
-          if err == tokio::sync::mpsc::error::TryRecvError::Disconnected { // when disconnected
+        } else if let Err(err) = rx_result {
+          // when failed recv
+          if err == tokio::sync::mpsc::error::TryRecvError::Disconnected {
+            // when disconnected
             self.on_disconnect();
           }
           break;
@@ -130,38 +138,42 @@ impl WebSocketConnection {
 
   fn recv_loop(read: WebSocketReader, tx: UnboundedSender<Message>) {
     tauri::async_runtime::spawn(async move {
-      read.for_each(move |item| { // reading
-        let tx = tx.clone();
-        async move { // each message
-          let item = if let Err(err) = item { // err
-          error!("had an error: {:?}", err);
-            match err {
-              Error::Protocol(err) => {
-                match err {
+      read
+        .for_each(move |item| {
+          // reading
+          let tx = tx.clone();
+          async move {
+            // each message
+            let item = if let Err(err) = item {
+              // err
+              error!("had an error: {:?}", err);
+              match err {
+                Error::Protocol(err) => match err {
                   ProtocolError::ResetWithoutClosingHandshake => {
                     Some(Message::Close(Some(CloseFrame {
                       code: CloseCode::Abnormal,
-                      reason: Cow::Owned("unknown (ResetWithoutClosingHandshake)".to_string())
+                      reason: Cow::Owned("unknown (ResetWithoutClosingHandshake)".to_string()),
                     })))
                   }
-                  _ => {None}
-                }
+                  _ => None,
+                },
+                _ => None,
               }
-              _ => {None}
-            }
-          } else { // ok
-            Some(item.unwrap())
-          };
+            } else {
+              // ok
+              Some(item.unwrap())
+            };
 
-          // forward
-          if let Some(message) = item {
-            let send_result = tx.clone().send(message);
-            if send_result.is_err() {
-              error!("failed to send message back")
+            // forward
+            if let Some(message) = item {
+              let send_result = tx.clone().send(message);
+              if send_result.is_err() {
+                error!("failed to send message back")
+              }
             }
           }
-        }
-      }).await
+        })
+        .await
     });
   }
 

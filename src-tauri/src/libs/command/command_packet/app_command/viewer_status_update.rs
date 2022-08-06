@@ -5,22 +5,26 @@
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, export_to = "../src/share/type/rust/command/commandPacket/appCommand/")]
+#[ts(
+  export,
+  export_to = "../src/share/type/rust/command/commandPacket/appCommand/"
+)]
 pub struct ViewerStatusUpdate {
   status: ViewerStatus,
 }
 
 impl ViewerStatusUpdate {
   pub fn new(status: ViewerStatus) -> ViewerStatusUpdate {
-    ViewerStatusUpdate {
-      status
-    }
+    ViewerStatusUpdate { status }
   }
 }
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, export_to = "../src/share/type/rust/command/commandPacket/appCommand/viewerStatusUpdate/")]
+#[ts(
+  export,
+  export_to = "../src/share/type/rust/command/commandPacket/appCommand/viewerStatusUpdate/"
+)]
 pub enum ViewerStatus {
   Open,
   Close,

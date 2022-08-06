@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-use crate::libs::config::config::ALLOW_CONFIG_SKIP_IF;
 use crate::libs::config::config::backend_config::window_config::main_window_config::MainWindowConfig;
 use crate::libs::config::config::backend_config::window_config::viewer_window_config::ViewerWindowConfig;
+use crate::libs::config::config::ALLOW_CONFIG_SKIP_IF;
 
 pub mod main_window_config;
 pub mod viewer_window_config;
@@ -22,7 +22,6 @@ pub struct WindowConfig {
   pub viewer_window: ViewerWindowConfig,
 }
 
-
 fn main_window_default() -> MainWindowConfig {
   serde_json::from_str("{}").unwrap()
 }
@@ -31,7 +30,6 @@ fn main_window_skip_if(value: &MainWindowConfig) -> bool {
   *value == main_window_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 
-
 fn viewer_window_default() -> ViewerWindowConfig {
   serde_json::from_str("{}").unwrap()
 }
@@ -39,5 +37,3 @@ fn viewer_window_default() -> ViewerWindowConfig {
 fn viewer_window_skip_if(value: &ViewerWindowConfig) -> bool {
   *value == viewer_window_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
-
-

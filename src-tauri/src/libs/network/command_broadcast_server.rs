@@ -5,26 +5,26 @@
 
 use tokio::net::TcpStream;
 use tokio::sync::Mutex;
-use tokio_tungstenite::{MaybeTlsStream, WebSocketStream};
-use tokio_tungstenite::tungstenite::Message;
 use tokio_tungstenite::tungstenite::protocol::CloseFrame;
+use tokio_tungstenite::tungstenite::Message;
+use tokio_tungstenite::{MaybeTlsStream, WebSocketStream};
 
-use crate::{error, info};
 use crate::libs::command::command_history_manager::CommandHistoryManager;
-use crate::libs::command::command_packet::app_command::AppCommand;
 use crate::libs::command::command_packet::app_command::config_update::ConfigUpdate;
 use crate::libs::command::command_packet::app_command::gift_config_update::GiftConfigUpdate;
 use crate::libs::command::command_packet::app_command::receiver_status_update::ReceiverStatusUpdate;
+use crate::libs::command::command_packet::app_command::AppCommand;
 use crate::libs::command::command_packet::bilibili_command::BiliBiliCommand;
 use crate::libs::command::command_packet::CommandPacket;
 use crate::libs::config::config_manager::ConfigManager;
 use crate::libs::network::api_request::gift_config_getter::GiftConfigGetter;
 use crate::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver;
 use crate::libs::network::websocket::websocket_connection::WebSocketConnection;
+use crate::{error, info};
 
 lazy_static! {
-    pub static ref COMMAND_BROADCAST_SERVER_STATIC_INSTANCE: Mutex<CommandBroadcastServer> =
-        Mutex::new(CommandBroadcastServer::new());
+  pub static ref COMMAND_BROADCAST_SERVER_STATIC_INSTANCE: Mutex<CommandBroadcastServer> =
+    Mutex::new(CommandBroadcastServer::new());
 }
 
 type WebSocket = WebSocketStream<MaybeTlsStream<TcpStream>>;
@@ -71,14 +71,21 @@ impl CommandBroadcastServer {
   }
 
   pub async fn send_app_command(&mut self, connection_id: String, app_command: AppCommand) {
-    self.send_command(connection_id, CommandPacket::from_app_command(app_command)).await
+    self
+      .send_command(connection_id, CommandPacket::from_app_command(app_command))
+      .await
   }
 
-  pub async fn send_bilibili_command(&mut self, connection_id: String, bilibili_command: BiliBiliCommand) {
-    self.send_command(
-      connection_id,
-      CommandPacket::from_bilibili_command(bilibili_command),
-    )
+  pub async fn send_bilibili_command(
+    &mut self,
+    connection_id: String,
+    bilibili_command: BiliBiliCommand,
+  ) {
+    self
+      .send_command(
+        connection_id,
+        CommandPacket::from_bilibili_command(bilibili_command),
+      )
       .await
   }
   // endregion
@@ -138,7 +145,8 @@ impl CommandBroadcastServer {
   pub async fn tick() {
     let this = &mut *COMMAND_BROADCAST_SERVER_STATIC_INSTANCE.lock().await;
 
-    this.connections
+    this
+      .connections
       .retain(|connection| connection.is_connected());
 
     // region tick connections
@@ -176,29 +184,35 @@ impl CommandBroadcastServer {
   async fn on_connection(&mut self, connection_id: String) {
     info!("new connection, id: {} ", connection_id);
 
-    self.send_app_command(
-      connection_id.clone(),
-      AppCommand::from_config_update(
-        ConfigUpdate::new(ConfigManager::get_config().await)
-      ),
-    ).await;
-    self.send_app_command(
-      connection_id.clone(),
-      AppCommand::from_receiver_status_update(
-        ReceiverStatusUpdate::new(DanmuReceiver::get_status().await)
-      ),
-    ).await;
+    self
+      .send_app_command(
+        connection_id.clone(),
+        AppCommand::from_config_update(ConfigUpdate::new(ConfigManager::get_config().await)),
+      )
+      .await;
+    self
+      .send_app_command(
+        connection_id.clone(),
+        AppCommand::from_receiver_status_update(ReceiverStatusUpdate::new(
+          DanmuReceiver::get_status().await,
+        )),
+      )
+      .await;
 
-    let roomid = ConfigManager::get_config().await.backend.danmu_receiver.roomid;
+    let roomid = ConfigManager::get_config()
+      .await
+      .backend
+      .danmu_receiver
+      .roomid;
     let gift_config = GiftConfigGetter::get(roomid).await;
     if let Some(gift_config) = gift_config {
       if let Some(gift_config) = gift_config.data {
-        self.send_app_command(
-          connection_id.clone(),
-          AppCommand::from_gift_config_update(
-            GiftConfigUpdate::new(gift_config)
-          ),
-        ).await;
+        self
+          .send_app_command(
+            connection_id.clone(),
+            AppCommand::from_gift_config_update(GiftConfigUpdate::new(gift_config)),
+          )
+          .await;
       }
     }
   }

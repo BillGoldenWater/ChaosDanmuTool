@@ -10,7 +10,10 @@ pub mod join_by_config;
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, export_to = "../src/share/type/rust/config/frontendConfig/mainViewConfig/functionsConfig/")]
+#[ts(
+  export,
+  export_to = "../src/share/type/rust/config/frontendConfig/mainViewConfig/functionsConfig/"
+)]
 pub struct DanmuGachaConfig {
   #[serde(default = "join_by_default")]
   #[serde(skip_serializing_if = "join_by_skip_if")]
@@ -30,7 +33,9 @@ pub struct DanmuGachaConfig {
 }
 
 fn join_by_default() -> JoinByConfig {
-  JoinByConfig::Danmu { content: "".to_string() }
+  JoinByConfig::Danmu {
+    content: "".to_string(),
+  }
 }
 
 fn join_by_skip_if(value: &JoinByConfig) -> bool {
@@ -68,4 +73,3 @@ fn reward_item_default() -> String {
 fn reward_item_skip_if(value: &String) -> bool {
   *value == reward_item_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
-

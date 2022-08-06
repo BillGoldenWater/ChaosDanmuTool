@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-use crate::libs::config::config::ALLOW_CONFIG_SKIP_IF;
 use crate::libs::config::config::frontend_config::viewer_view_config::danmu_viewer_custom_config::DanmuViewerCustomConfig;
 use crate::libs::config::config::frontend_config::viewer_view_config::status_bar_config::StatusBarConfig;
 use crate::libs::config::config::frontend_config::viewer_view_config::tts_config::TTSConfig;
+use crate::libs::config::config::ALLOW_CONFIG_SKIP_IF;
 
 pub mod danmu_viewer_custom_config;
-pub mod tts_config;
 pub mod status_bar_config;
+pub mod tts_config;
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]

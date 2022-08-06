@@ -8,20 +8,20 @@ use std::path::PathBuf;
 use std::time::Instant;
 
 use rfd::{MessageButtons, MessageLevel};
-use tauri::{Assets, Context};
 use tauri::api::file::read_string;
+use tauri::{Assets, Context};
 use tokio::sync::Mutex;
 
-use crate::{info, location_info};
-use crate::libs::command::command_packet::app_command::AppCommand;
 use crate::libs::command::command_packet::app_command::config_update::ConfigUpdate;
-use crate::libs::config::config::{Config, serialize_config};
+use crate::libs::command::command_packet::app_command::AppCommand;
+use crate::libs::config::config::{serialize_config, Config};
 use crate::libs::network::command_broadcast_server::CommandBroadcastServer;
 use crate::libs::utils::fs_utils::get_app_data_dir;
+use crate::{info, location_info};
 
 lazy_static! {
-    pub static ref CONFIG_MANAGER_STATIC_INSTANCE: Mutex<ConfigManager> =
-        Mutex::new(ConfigManager::new());
+  pub static ref CONFIG_MANAGER_STATIC_INSTANCE: Mutex<ConfigManager> =
+    Mutex::new(ConfigManager::new());
 }
 
 pub struct ConfigManager {
@@ -89,8 +89,17 @@ impl ConfigManager {
       let reset = rfd::MessageDialog::new()
         .set_title("错误")
         .set_level(MessageLevel::Error)
-        .set_buttons(MessageButtons::OkCancelCustom("重置".to_string(), "退出".to_string()))
-        .set_description(format!("无法解析配置文件.\n重置配置文件或退出?\n{}", location_info!()).as_str())
+        .set_buttons(MessageButtons::OkCancelCustom(
+          "重置".to_string(),
+          "退出".to_string(),
+        ))
+        .set_description(
+          format!(
+            "无法解析配置文件.\n重置配置文件或退出?\n{}",
+            location_info!()
+          )
+          .as_str(),
+        )
         .show();
       if reset {
         self.reset_(true).await;
@@ -115,15 +124,12 @@ impl ConfigManager {
         info!("save config");
         let result = fs::create_dir_all(app_dir);
         if let Err(err) = result {
-          info!("failed to create data folder\n{:#?}",err);
+          info!("failed to create data folder\n{:#?}", err);
           return;
         }
-        let result = fs::write(
-          path.as_path(),
-          serialize_config(&self.config, true),
-        );
+        let result = fs::write(path.as_path(), serialize_config(&self.config, true));
         if let Err(err) = result {
-          info!("failed to write config file\n{:#?}",err);
+          info!("failed to write config file\n{:#?}", err);
           return;
         }
         self.changed = false;
@@ -141,14 +147,24 @@ impl ConfigManager {
   async fn reset_(&mut self, force: bool) {
     let button = MessageButtons::OkCancelCustom(
       "重置".to_string(),
-      if force { "退出".to_string() } else { "取消".to_string() },
+      if force {
+        "退出".to_string()
+      } else {
+        "取消".to_string()
+      },
     );
 
     let reset = rfd::MessageDialog::new()
       .set_title("警告")
       .set_level(MessageLevel::Warning)
       .set_buttons(button)
-      .set_description(format!("重置配置文件将会丢失所有的自定义设置!\n{}", location_info!()).as_str())
+      .set_description(
+        format!(
+          "重置配置文件将会丢失所有的自定义设置!\n{}",
+          location_info!()
+        )
+        .as_str(),
+      )
       .show();
     if !reset {
       if force {
@@ -159,7 +175,9 @@ impl ConfigManager {
     }
 
     info!("reset config");
-    self.set_config_(serde_json::from_str("{}").unwrap(), true).await;
+    self
+      .set_config_(serde_json::from_str("{}").unwrap(), true)
+      .await;
     self.save_();
   }
 
@@ -199,11 +217,10 @@ impl ConfigManager {
   async fn on_change_(&mut self, broadcast: bool) {
     self.changed = true;
     if broadcast {
-      CommandBroadcastServer::broadcast_app_command(
-        AppCommand::from_config_update(
-          ConfigUpdate::new(self.config.clone())
-        )
-      ).await;
+      CommandBroadcastServer::broadcast_app_command(AppCommand::from_config_update(
+        ConfigUpdate::new(self.config.clone()),
+      ))
+      .await;
     }
   }
 

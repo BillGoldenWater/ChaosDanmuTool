@@ -7,7 +7,10 @@ use serde_json::Value;
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, export_to = "../src/share/type/rust/command/commandPacket/appCommand/")]
+#[ts(
+  export,
+  export_to = "../src/share/type/rust/command/commandPacket/appCommand/"
+)]
 pub struct GiftConfigUpdate {
   #[ts(type = "unknown")]
   gift_config_response: Value,
@@ -16,7 +19,7 @@ pub struct GiftConfigUpdate {
 impl GiftConfigUpdate {
   pub fn new(gift_config_response: Value) -> GiftConfigUpdate {
     GiftConfigUpdate {
-      gift_config_response
+      gift_config_response,
     }
   }
 }

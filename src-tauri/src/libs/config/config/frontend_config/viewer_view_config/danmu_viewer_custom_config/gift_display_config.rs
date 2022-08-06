@@ -7,7 +7,10 @@ use crate::libs::config::config::ALLOW_CONFIG_SKIP_IF;
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, export_to = "../src/share/type/rust/config/frontendConfig/viewerViewConfig/danmuViewerStyleConfig/")]
+#[ts(
+  export,
+  export_to = "../src/share/type/rust/config/frontendConfig/viewerViewConfig/danmuViewerStyleConfig/"
+)]
 pub struct GiftDisplayConfig {
   #[serde(default = "merge_interval_default")]
   #[serde(skip_serializing_if = "merge_interval_skip_if")]
@@ -32,4 +35,3 @@ fn show_price_default() -> bool {
 fn show_price_skip_if(value: &bool) -> bool {
   *value == show_price_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
-

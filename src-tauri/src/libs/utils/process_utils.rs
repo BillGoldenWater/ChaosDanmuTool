@@ -13,5 +13,8 @@ pub fn get_psn_ptr() -> *mut ProcessSerialNumber {
 
 #[cfg(target_os = "macos")]
 pub fn get_psn() -> ProcessSerialNumber {
-  ProcessSerialNumber { highLongOfPSN: 0, lowLongOfPSN: 2 }
+  ProcessSerialNumber {
+    highLongOfPSN: 0,
+    lowLongOfPSN: 2,
+  }
 }

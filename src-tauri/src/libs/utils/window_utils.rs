@@ -4,26 +4,28 @@
  */
 
 #[cfg(target_os = "macos")]
-use MacTypes_sys::{OSStatus, ProcessSerialNumber};
-#[cfg(target_os = "macos")]
 use raw_window_handle::HasRawWindowHandle;
 #[cfg(target_os = "macos")]
 use tauri::{Window, Wry};
+#[cfg(target_os = "macos")]
+use MacTypes_sys::{OSStatus, ProcessSerialNumber};
 
 #[cfg(target_os = "macos")]
 use crate::libs::utils::process_utils::get_psn_ptr;
 
 #[cfg(target_os = "macos")]
 #[link(name = "ApplicationServices", kind = "framework")]
-extern {
+extern "C" {
   fn TransformProcessType(psn: *mut ProcessSerialNumber, transform_state: u32) -> OSStatus;
 }
 
 #[cfg(target_os = "macos")]
-pub fn set_visible_on_all_workspaces(window: &Window<Wry>,
-                                            visible: bool,
-                                            visible_on_full_screen: bool,
-                                            skip_transform_process_type: bool) {
+pub fn set_visible_on_all_workspaces(
+  window: &Window<Wry>,
+  visible: bool,
+  visible_on_full_screen: bool,
+  skip_transform_process_type: bool,
+) {
   unsafe {
     use cocoa::appkit::{NSWindow, NSWindowCollectionBehavior};
 
@@ -49,19 +51,25 @@ pub fn set_visible_on_all_workspaces(window: &Window<Wry>,
       }
     }
 
-    set_collection_behavior(ns_window,
-                            visible,
-                            NSWindowCollectionBehavior::NSWindowCollectionBehaviorCanJoinAllSpaces);
-    set_collection_behavior(ns_window,
-                            visible_on_full_screen,
-                            NSWindowCollectionBehavior::NSWindowCollectionBehaviorFullScreenAuxiliary);
+    set_collection_behavior(
+      ns_window,
+      visible,
+      NSWindowCollectionBehavior::NSWindowCollectionBehaviorCanJoinAllSpaces,
+    );
+    set_collection_behavior(
+      ns_window,
+      visible_on_full_screen,
+      NSWindowCollectionBehavior::NSWindowCollectionBehaviorFullScreenAuxiliary,
+    );
   }
 }
 
 #[cfg(target_os = "macos")]
-pub unsafe fn set_collection_behavior(ns_window: cocoa::base::id,
-                                      enable: bool,
-                                      collection_behavior: cocoa::appkit::NSWindowCollectionBehavior) {
+pub unsafe fn set_collection_behavior(
+  ns_window: cocoa::base::id,
+  enable: bool,
+  collection_behavior: cocoa::appkit::NSWindowCollectionBehavior,
+) {
   use cocoa::appkit::NSWindow;
 
   if enable {

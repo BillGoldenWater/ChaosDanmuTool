@@ -31,11 +31,8 @@ pub fn brotli_compress(data: &Vec<u8>) -> Result<Vec<u8>, std::io::Error> {
 
 pub fn brotli_decompress(data: &Vec<u8>) -> Result<Vec<u8>, std::io::Error> {
   let mut decompressed = vec![];
-  
-  let _ = brotli::BrotliDecompress(
-    &mut Cursor::new(data),
-    &mut Cursor::new(&mut decompressed),
-  )?;
+
+  let _ = brotli::BrotliDecompress(&mut Cursor::new(data), &mut Cursor::new(&mut decompressed))?;
 
   Ok(decompressed)
 }

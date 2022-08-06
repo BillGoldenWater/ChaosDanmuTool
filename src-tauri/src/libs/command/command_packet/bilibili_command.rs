@@ -15,21 +15,29 @@ pub mod danmu_message;
 #[serde(rename_all = "camelCase", tag = "cmd")]
 #[ts(export, export_to = "../src/share/type/rust/command/commandPacket/")]
 pub enum BiliBiliCommand {
-  ActivityUpdate { data: ActivityUpdate },
-  DanmuMessage { data: DanmuMessage },
+  ActivityUpdate {
+    data: ActivityUpdate,
+  },
+  DanmuMessage {
+    data: DanmuMessage,
+  },
   Raw {
     #[ts(type = "unknown")]
-    data: Value
+    data: Value,
   },
 }
 
 impl BiliBiliCommand {
   pub fn from_activity_update(activity_update: ActivityUpdate) -> BiliBiliCommand {
-    BiliBiliCommand::ActivityUpdate { data: activity_update }
+    BiliBiliCommand::ActivityUpdate {
+      data: activity_update,
+    }
   }
 
   pub fn from_danmu_message(danmu_message: DanmuMessage) -> BiliBiliCommand {
-    BiliBiliCommand::DanmuMessage { data: danmu_message }
+    BiliBiliCommand::DanmuMessage {
+      data: danmu_message,
+    }
   }
 
   pub fn from_raw(raw: Value) -> BiliBiliCommand {

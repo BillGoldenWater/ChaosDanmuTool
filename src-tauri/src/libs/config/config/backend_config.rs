@@ -3,18 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-use crate::libs::config::config::ALLOW_CONFIG_SKIP_IF;
 use crate::libs::config::config::backend_config::config_manager_config::ConfigManagerConfig;
 use crate::libs::config::config::backend_config::danmu_receiver_config::DanmuReceiverConfig;
 use crate::libs::config::config::backend_config::http_server_config::HttpServerConfig;
 use crate::libs::config::config::backend_config::updater_config::UpdaterConfig;
 use crate::libs::config::config::backend_config::window_config::WindowConfig;
+use crate::libs::config::config::ALLOW_CONFIG_SKIP_IF;
 
-pub mod window_config;
-pub mod http_server_config;
-pub mod danmu_receiver_config;
 pub mod config_manager_config;
+pub mod danmu_receiver_config;
+pub mod http_server_config;
 pub mod updater_config;
+pub mod window_config;
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]

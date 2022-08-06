@@ -5,15 +5,16 @@
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, export_to = "../src/share/type/rust/command/commandPacket/appCommand/")]
+#[ts(
+  export,
+  export_to = "../src/share/type/rust/command/commandPacket/appCommand/"
+)]
 pub struct BiliBiliPacketParseError {
   message: String,
 }
 
 impl BiliBiliPacketParseError {
   pub fn new(message: String) -> BiliBiliPacketParseError {
-    BiliBiliPacketParseError {
-      message
-    }
+    BiliBiliPacketParseError { message }
   }
 }

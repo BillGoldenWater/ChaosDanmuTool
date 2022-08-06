@@ -10,31 +10,38 @@ use std::time::Instant;
 use bytes::{Buf, BytesMut};
 use serde_json::{Map, Value};
 use tokio::sync::Mutex;
-use tokio_tungstenite::tungstenite::Message;
-use tokio_tungstenite::tungstenite::protocol::CloseFrame;
 use tokio_tungstenite::tungstenite::protocol::frame::coding::CloseCode;
+use tokio_tungstenite::tungstenite::protocol::CloseFrame;
+use tokio_tungstenite::tungstenite::Message;
 
-use crate::{error, info, warn};
-use crate::libs::command::command_packet::app_command::AppCommand;
 use crate::libs::command::command_packet::app_command::bilibili_packet_parse_error::BiliBiliPacketParseError;
-use crate::libs::command::command_packet::app_command::receiver_status_update::{ReceiverStatus, ReceiverStatusUpdate};
+use crate::libs::command::command_packet::app_command::receiver_status_update::{
+  ReceiverStatus, ReceiverStatusUpdate,
+};
+use crate::libs::command::command_packet::app_command::AppCommand;
 use crate::libs::command::command_packet::bilibili_command::activity_update::ActivityUpdate;
-use crate::libs::command::command_packet::bilibili_command::BiliBiliCommand;
 use crate::libs::command::command_packet::bilibili_command::danmu_message::DanmuMessage;
+use crate::libs::command::command_packet::bilibili_command::BiliBiliCommand;
 use crate::libs::config::config::backend_config::danmu_receiver_config::DanmuReceiverConfig;
 use crate::libs::config::config_manager::ConfigManager;
 use crate::libs::network::api_request::danmu_server_info_getter::DanmuServerInfoGetter;
 use crate::libs::network::api_request::room_info_getter::RoomInfoGetter;
 use crate::libs::network::command_broadcast_server::CommandBroadcastServer;
-use crate::libs::network::danmu_receiver::danmu_receiver::DanmuReceiverConnectError::{FailedToConnect, GettingActualRoomidFailed, GettingServerInfoFailed};
+use crate::libs::network::danmu_receiver::danmu_receiver::DanmuReceiverConnectError::{
+  FailedToConnect, GettingActualRoomidFailed, GettingServerInfoFailed,
+};
 use crate::libs::network::danmu_receiver::data_type::DataType;
 use crate::libs::network::danmu_receiver::op_code::OpCode;
 use crate::libs::network::danmu_receiver::packet::{JoinPacketInfo, Packet};
-use crate::libs::network::websocket::websocket_connection::{WebSocketConnectError, WebSocketConnection};
+use crate::libs::network::websocket::websocket_connection::{
+  WebSocketConnectError, WebSocketConnection,
+};
 use crate::libs::utils::mut_bytes_utils::bytes_to_hex;
+use crate::{error, info, warn};
 
 lazy_static! {
-  pub static ref DANMU_RECEIVER_STATIC_INSTANCE: Mutex<DanmuReceiver> = Mutex::new(DanmuReceiver::new());
+  pub static ref DANMU_RECEIVER_STATIC_INSTANCE: Mutex<DanmuReceiver> =
+    Mutex::new(DanmuReceiver::new());
 }
 
 pub struct DanmuReceiver {
@@ -78,18 +85,20 @@ impl DanmuReceiver {
     // region get actual room id
     let roomid = cfg.roomid;
     let cache_prefix = &format!("{}|", roomid);
-    let actual_roomid = if let Ok(actual_roomid) = u32::from_str(
-      cfg.actual_roomid_cache.trim_start_matches(cache_prefix)
-    ) { // try get from cache
+    let actual_roomid = if let Ok(actual_roomid) =
+      u32::from_str(cfg.actual_roomid_cache.trim_start_matches(cache_prefix))
+    {
+      // try get from cache
       actual_roomid
-    } else if let Some(actual_roomid) = RoomInfoGetter::get_actual_room_id(roomid)
-      .await { // get online
+    } else if let Some(actual_roomid) = RoomInfoGetter::get_actual_room_id(roomid).await {
+      // get online
       let mut cfg = ConfigManager::get_config().await;
       cfg.backend.danmu_receiver.actual_roomid_cache = format!("{}|{}", roomid, actual_roomid);
       ConfigManager::set_config(cfg, true).await;
 
       actual_roomid
-    } else { // err
+    } else {
+      // err
       self.set_status(ReceiverStatus::Close).await;
       return Err(GettingActualRoomidFailed);
     };
@@ -98,8 +107,7 @@ impl DanmuReceiver {
     self.check_interrupt()?;
 
     // region get server info
-    let token_and_url_result =
-      DanmuServerInfoGetter::get_token_and_url(actual_roomid).await;
+    let token_and_url_result = DanmuServerInfoGetter::get_token_and_url(actual_roomid).await;
 
     if token_and_url_result.is_none() {
       self.set_status(ReceiverStatus::Close).await;
@@ -110,21 +118,29 @@ impl DanmuReceiver {
     self.check_interrupt()?;
 
     // region connect
-    let connect_result =
-      self.websocket_connection.connect(token_and_url.url.as_str()).await;
+    let connect_result = self
+      .websocket_connection
+      .connect(token_and_url.url.as_str())
+      .await;
 
     if let Err(err) = connect_result {
       self.set_status(ReceiverStatus::Close).await;
       return Err(FailedToConnect(err));
-    } else { // on open
-      self.websocket_connection.send(Message::Binary(
-        Packet::join(JoinPacketInfo {
-          roomid: actual_roomid,
-          protover: 3,
-          platform: "web".to_string(),
-          key: token_and_url.token,
-        }).pack().to_vec()
-      )).await;
+    } else {
+      // on open
+      self
+        .websocket_connection
+        .send(Message::Binary(
+          Packet::join(JoinPacketInfo {
+            roomid: actual_roomid,
+            protover: 3,
+            platform: "web".to_string(),
+            key: token_and_url.token,
+          })
+          .pack()
+          .to_vec(),
+        ))
+        .await;
       // region init heartbeat
       self.heartbeat_received = true;
       // endregion
@@ -133,7 +149,7 @@ impl DanmuReceiver {
     // endregion
 
     self.set_status(ReceiverStatus::Connected).await;
-    info!("room {} connected",actual_roomid);
+    info!("room {} connected", actual_roomid);
     Ok(())
   }
 
@@ -194,7 +210,7 @@ impl DanmuReceiver {
         info!("reconnecting");
         let result = self.connect_().await;
         if let Err(err) = result {
-          error!("unable to reconnect: {:?}",err);
+          error!("unable to reconnect: {:?}", err);
         }
         self.reconnect_count += 1;
       }
@@ -211,17 +227,20 @@ impl DanmuReceiver {
 
     if !self.heartbeat_received && elapsed > self.heartbeat_timeout as u64 {
       error!("heartbeat timeout");
-      self.disconnect_(Some(CloseFrame {
-        code: CloseCode::Abnormal,
-        reason: Cow::Owned("".to_string()),
-      })).await;
+      self
+        .disconnect_(Some(CloseFrame {
+          code: CloseCode::Abnormal,
+          reason: Cow::Owned("".to_string()),
+        }))
+        .await;
       return;
     }
 
     if elapsed > self.heartbeat_interval as u64 {
-      self.websocket_connection.send(Message::Binary(
-        Packet::heartbeat().pack().to_vec()
-      )).await;
+      self
+        .websocket_connection
+        .send(Message::Binary(Packet::heartbeat().pack().to_vec()))
+        .await;
 
       self.last_heartbeat_ts = Instant::now();
       self.heartbeat_received = false;
@@ -254,11 +273,10 @@ impl DanmuReceiver {
 
   async fn set_status(&mut self, status: ReceiverStatus) {
     self.status = status.clone();
-    CommandBroadcastServer::broadcast_app_command(
-      AppCommand::from_receiver_status_update(
-        ReceiverStatusUpdate::new(status)
-      )
-    ).await;
+    CommandBroadcastServer::broadcast_app_command(AppCommand::from_receiver_status_update(
+      ReceiverStatusUpdate::new(status),
+    ))
+    .await;
   }
 
   async fn on_message(&mut self, message: Message) {
@@ -297,8 +315,10 @@ impl DanmuReceiver {
       OpCode::JoinResponse => {}
       OpCode::HeartbeatResponse => {
         if packet.data_type != DataType::HeartbeatOrJoin {
-          let message =
-            format!("unexpect data_type when OpCode::HeartbeatResponse, {:?}", packet.data_type);
+          let message = format!(
+            "unexpect data_type when OpCode::HeartbeatResponse, {:?}",
+            packet.data_type
+          );
           Self::on_parse_error(message).await;
           return;
         }
@@ -306,16 +326,17 @@ impl DanmuReceiver {
         self.heartbeat_received = true;
 
         let activity = packet.body.get_u32();
-        CommandBroadcastServer::broadcast_bilibili_command(
-          BiliBiliCommand::from_activity_update(
-            ActivityUpdate::new(activity)
-          )
-        ).await;
+        CommandBroadcastServer::broadcast_bilibili_command(BiliBiliCommand::from_activity_update(
+          ActivityUpdate::new(activity),
+        ))
+        .await;
       }
       OpCode::Message => {
         if packet.data_type != DataType::Json {
-          let message =
-            format!("unexpect data_type when OpCode::Message, {:?}", packet.data_type);
+          let message = format!(
+            "unexpect data_type when OpCode::Message, {:?}",
+            packet.data_type
+          );
           Self::on_parse_error(message).await;
           return;
         }
@@ -326,13 +347,15 @@ impl DanmuReceiver {
           if let Ok(raw) = json_parse_result {
             let map = Map::new();
             let cmd = raw
-              .as_object().unwrap_or(&map)
-              .get("cmd").unwrap_or(&Value::Null)
-              .as_str().unwrap_or("");
+              .as_object()
+              .unwrap_or(&map)
+              .get("cmd")
+              .unwrap_or(&Value::Null)
+              .as_str()
+              .unwrap_or("");
 
             let command = if cmd.starts_with("DANMU_MSG") {
-              let dm_parse_result =
-                DanmuMessage::from_raw(raw);
+              let dm_parse_result = DanmuMessage::from_raw(raw);
 
               if let Ok(dm) = dm_parse_result {
                 BiliBiliCommand::from_danmu_message(dm)
@@ -344,14 +367,15 @@ impl DanmuReceiver {
               BiliBiliCommand::from_raw(raw)
             };
 
-            CommandBroadcastServer::broadcast_bilibili_command(
-              command
-            ).await;
+            CommandBroadcastServer::broadcast_bilibili_command(command).await;
           } else {
-            error!("unable to parse message\n{}",str)
+            error!("unable to parse message\n{}", str)
           }
         } else {
-          error!("unable to decode message to utf8\n{}", bytes_to_hex(&packet.body));
+          error!(
+            "unable to decode message to utf8\n{}",
+            bytes_to_hex(&packet.body)
+          );
         }
       }
       _ => {
@@ -363,11 +387,10 @@ impl DanmuReceiver {
 
   async fn on_parse_error(message: String) {
     error!("{}", message);
-    CommandBroadcastServer::broadcast_app_command(
-      AppCommand::from_bilibili_packet_parse_error(
-        BiliBiliPacketParseError::new(message)
-      )
-    ).await
+    CommandBroadcastServer::broadcast_app_command(AppCommand::from_bilibili_packet_parse_error(
+      BiliBiliPacketParseError::new(message),
+    ))
+    .await
   }
 }
 
@@ -378,5 +401,3 @@ pub enum DanmuReceiverConnectError {
   FailedToConnect(WebSocketConnectError),
   ConnectionInterrupted,
 }
-
-

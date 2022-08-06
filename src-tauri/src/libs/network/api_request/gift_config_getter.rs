@@ -5,7 +5,7 @@
 
 use serde_json::Value;
 
-use crate::libs::network::api_request::bilibili_response::{BiliBiliResponse, execute_request};
+use crate::libs::network::api_request::bilibili_response::{execute_request, BiliBiliResponse};
 
 static GIFT_CONFIG_API_URL: &str =
   "https://api.live.bilibili.com/xlive/web-room/v1/giftPanel/giftConfig";

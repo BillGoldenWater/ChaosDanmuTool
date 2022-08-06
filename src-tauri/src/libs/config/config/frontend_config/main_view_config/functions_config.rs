@@ -7,12 +7,15 @@ use crate::libs::config::config::ALLOW_CONFIG_SKIP_IF;
 use crate::libs::config::config::frontend_config::main_view_config::functions_config::danmu_gacha_config::DanmuGachaConfig;
 use crate::libs::config::config::frontend_config::main_view_config::functions_config::room_connection_config::RoomConnectionConfig;
 
-pub mod room_connection_config;
 pub mod danmu_gacha_config;
+pub mod room_connection_config;
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, export_to = "../src/share/type/rust/config/frontendConfig/mainViewConfig/")]
+#[ts(
+  export,
+  export_to = "../src/share/type/rust/config/frontendConfig/mainViewConfig/"
+)]
 pub struct FunctionsConfig {
   #[serde(default = "room_connection_default")]
   #[serde(skip_serializing_if = "room_connection_skip_if")]
@@ -37,4 +40,3 @@ fn danmu_gacha_default() -> DanmuGachaConfig {
 fn danmu_gacha_skip_if(value: &DanmuGachaConfig) -> bool {
   *value == danmu_gacha_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
-

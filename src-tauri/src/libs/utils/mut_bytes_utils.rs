@@ -28,9 +28,13 @@ pub fn bytes_to_hex(data: &BytesMut) -> String {
   result
 }
 
-static HEX_CHARS: [char; 16] =
-  ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
+static HEX_CHARS: [char; 16] = [
+  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
+];
 
 pub fn byte_to_hex(byte: u8) -> [char; 2] {
-  [HEX_CHARS[(byte >> 4) as usize], HEX_CHARS[(byte & 0xF) as usize]]
+  [
+    HEX_CHARS[(byte >> 4) as usize],
+    HEX_CHARS[(byte & 0xF) as usize],
+  ]
 }

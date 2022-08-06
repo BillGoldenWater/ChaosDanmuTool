@@ -19,7 +19,7 @@ impl DataType {
       1 => DataType::HeartbeatOrJoin,
       2 => DataType::CompressedZlib,
       3 => DataType::CompressedBrotli,
-      _ => DataType::Other
+      _ => DataType::Other,
     }
   }
 }

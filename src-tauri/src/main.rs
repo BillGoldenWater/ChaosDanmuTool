@@ -4,20 +4,22 @@
  */
 
 #![cfg_attr(
-all(not(debug_assertions), target_os = "windows"),
-windows_subsystem = "windows"
+  all(not(debug_assertions), target_os = "windows"),
+  windows_subsystem = "windows"
 )]
 
-use tauri::{App, AppHandle, command, Manager, Wry};
-use tauri::{Assets, Context, WindowEvent};
 use tauri::async_runtime::block_on;
+use tauri::{command, App, AppHandle, Manager, Wry};
+use tauri::{Assets, Context, WindowEvent};
 use tokio::sync::RwLock;
 use tokio::task;
 
 use chaosdanmutool::info;
 use chaosdanmutool::libs::command::command_history_manager::CommandHistoryManager;
+use chaosdanmutool::libs::command::command_packet::app_command::viewer_status_update::{
+  ViewerStatus, ViewerStatusUpdate,
+};
 use chaosdanmutool::libs::command::command_packet::app_command::AppCommand;
-use chaosdanmutool::libs::command::command_packet::app_command::viewer_status_update::{ViewerStatus, ViewerStatusUpdate};
 use chaosdanmutool::libs::config::config_manager::ConfigManager;
 use chaosdanmutool::libs::network::command_broadcast_server::CommandBroadcastServer;
 use chaosdanmutool::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver;
@@ -36,7 +38,11 @@ async fn main() {
     env!("CARGO_PKG_VERSION"),
     std::env::consts::OS,
     std::env::consts::ARCH,
-    if cfg!(debug_assertions) {"debug"} else {"release"}
+    if cfg!(debug_assertions) {
+      "debug"
+    } else {
+      "release"
+    }
   );
   // endregion
 
@@ -76,7 +82,8 @@ async fn main() {
     }
     tauri::RunEvent::ExitRequested { api, .. } => {
       // exit requested event
-      #[cfg(target_os = "macos")]{
+      #[cfg(target_os = "macos")]
+      {
         api.prevent_exit();
         info!("exit prevented");
       }
@@ -85,7 +92,10 @@ async fn main() {
       info!("exiting");
       task::block_in_place(|| block_on(on_exit(app_handle)));
     }
-    tauri::RunEvent::ApplicationShouldHandleReopen { has_visible_windows: _, api } => {
+    tauri::RunEvent::ApplicationShouldHandleReopen {
+      has_visible_windows: _,
+      api,
+    } => {
       info!("handling reopen");
       task::block_in_place(|| block_on(on_activate(app_handle)));
       api.prevent_default();
@@ -106,8 +116,12 @@ async fn on_init<A: Assets>(context: &Context<A>) {
 async fn on_setup(app: &mut App<Wry>) {
   let asset_resolver = app.asset_resolver();
 
-  let port = ConfigManager::get_config().await
-    .backend.http_server.port.clone();
+  let port = ConfigManager::get_config()
+    .await
+    .backend
+    .http_server
+    .port
+    .clone();
   HttpServer::start(asset_resolver, port).await;
 }
 
@@ -156,9 +170,9 @@ async fn create_main_window(app_handle: &AppHandle<Wry>) {
     "main",
     tauri::WindowUrl::App("main/index.html".into()),
   )
-    .transparent(true)
-    .build()
-    .unwrap();
+  .transparent(true)
+  .build()
+  .unwrap();
 
   main_window
     .set_title("Chaos Danmu Tool")
@@ -186,18 +200,20 @@ fn show_viewer_window(app_handle: AppHandle<Wry>) {
     task::block_in_place(|| block_on(create_viewer_window(&app_handle)));
   }
 
-  task::block_in_place(|| block_on(CommandBroadcastServer::broadcast_app_command(
-    AppCommand::from_viewer_status_update(
-      ViewerStatusUpdate::new(ViewerStatus::Open)
-    )
-  )))
+  task::block_in_place(|| {
+    block_on(CommandBroadcastServer::broadcast_app_command(
+      AppCommand::from_viewer_status_update(ViewerStatusUpdate::new(ViewerStatus::Open)),
+    ))
+  })
 }
 
 #[command]
 fn close_viewer_window(app_handle: AppHandle<Wry>) {
   let viewer_window = app_handle.get_window("viewer");
   if let Some(viewer_window) = viewer_window {
-    viewer_window.close().expect("failed to close viewer_window")
+    viewer_window
+      .close()
+      .expect("failed to close viewer_window")
   }
 }
 
@@ -211,19 +227,23 @@ fn is_viewer_window_open(app_handle: AppHandle<Wry>) -> bool {
 }
 
 async fn create_viewer_window(app_handle: &AppHandle<Wry>) {
-  let cfg = ConfigManager::get_config().await.backend.window.viewer_window;
+  let cfg = ConfigManager::get_config()
+    .await
+    .backend
+    .window
+    .viewer_window;
 
   let viewer_window = tauri::WindowBuilder::new(
     app_handle,
     "viewer",
     tauri::WindowUrl::App("viewer/index.html".into()),
   )
-    .transparent(true)
-    .decorations(false)
-    .position(cfg.x as f64, cfg.y as f64)
-    .inner_size(cfg.width as f64, cfg.height as f64)
-    .build()
-    .unwrap();
+  .transparent(true)
+  .decorations(false)
+  .position(cfg.x as f64, cfg.y as f64)
+  .inner_size(cfg.width as f64, cfg.height as f64)
+  .build()
+  .unwrap();
 
   viewer_window
     .set_title("Chaos Danmu Tool - Viewer")
@@ -231,27 +251,31 @@ async fn create_viewer_window(app_handle: &AppHandle<Wry>) {
 
   viewer_window.on_window_event(|event| match event {
     WindowEvent::Resized(size) => {
-      task::block_in_place(|| block_on(async {
-        let mut cfg = ConfigManager::get_config().await;
-        cfg.backend.window.viewer_window.height = size.height;
-        cfg.backend.window.viewer_window.width = size.width;
-        ConfigManager::set_config(cfg, true).await;
-      }));
+      task::block_in_place(|| {
+        block_on(async {
+          let mut cfg = ConfigManager::get_config().await;
+          cfg.backend.window.viewer_window.height = size.height;
+          cfg.backend.window.viewer_window.width = size.width;
+          ConfigManager::set_config(cfg, true).await;
+        })
+      });
     }
     WindowEvent::Moved(pos) => {
-      task::block_in_place(|| block_on(async {
-        let mut cfg = ConfigManager::get_config().await;
-        cfg.backend.window.viewer_window.x = pos.x;
-        cfg.backend.window.viewer_window.y = pos.y;
-        ConfigManager::set_config(cfg, true).await;
-      }));
+      task::block_in_place(|| {
+        block_on(async {
+          let mut cfg = ConfigManager::get_config().await;
+          cfg.backend.window.viewer_window.x = pos.x;
+          cfg.backend.window.viewer_window.y = pos.y;
+          ConfigManager::set_config(cfg, true).await;
+        })
+      });
     }
     WindowEvent::Destroyed => {
-      task::block_in_place(|| block_on(CommandBroadcastServer::broadcast_app_command(
-        AppCommand::from_viewer_status_update(
-          ViewerStatusUpdate::new(ViewerStatus::Close)
-        )
-      )));
+      task::block_in_place(|| {
+        block_on(CommandBroadcastServer::broadcast_app_command(
+          AppCommand::from_viewer_status_update(ViewerStatusUpdate::new(ViewerStatus::Close)),
+        ))
+      });
     }
     _ => {}
   });
