@@ -80,13 +80,11 @@ async fn main() {
       info!("ready");
       task::block_in_place(|| block_on(on_ready(app_handle)));
     }
+    #[cfg(target_os = "macos")]
     tauri::RunEvent::ExitRequested { api, .. } => {
       // exit requested event
-      #[cfg(target_os = "macos")]
-      {
-        api.prevent_exit();
-        info!("exit prevented");
-      }
+      api.prevent_exit();
+      info!("exit prevented");
     }
     tauri::RunEvent::Exit => {
       info!("exiting");
