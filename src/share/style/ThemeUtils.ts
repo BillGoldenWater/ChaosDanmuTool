@@ -5,6 +5,7 @@
 
 import { writable } from "svelte/store";
 import Color from "color";
+import { listen } from "@tauri-apps/api/event";
 
 const root = document.documentElement;
 
@@ -127,7 +128,15 @@ themeSettings.subscribe((themeSettings) => {
 });
 
 // @ts-ignore
-window.toggleTheme = function () {
-  currentSettings && (currentSettings.dark = !currentSettings.dark);
+window.toggleTheme = function (dark?: boolean) {
+  currentSettings &&
+    (dark !== undefined && dark !== null
+      ? (currentSettings.dark = dark)
+      : (currentSettings.dark = !currentSettings.dark));
   themeSettings.set(currentSettings);
 };
+
+listen("chaos://themeChanged", (event) => {
+  // @ts-ignore
+  window.toggleTheme(event.payload);
+}).then();
