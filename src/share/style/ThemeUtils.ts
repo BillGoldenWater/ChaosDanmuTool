@@ -37,6 +37,8 @@ type ColorPlates = {
   upDouble: string;
   down: string;
   downDouble: string;
+
+  themeSolid: string;
 };
 
 const defaultThemeSettings: ThemeSettings = {
@@ -71,6 +73,8 @@ const genColorPlates = (themeSettings: ThemeSettings): ColorPlates => {
     upDouble: theme(1).desaturate(0.9).lighten(0.9).alpha(0.2).toString(),
     down: theme(1).desaturate(0.9).darken(0.9).alpha(0.1).toString(),
     downDouble: theme(1).desaturate(0.9).darken(0.9).alpha(0.2).toString(),
+
+    themeSolid: theme(1).toString(),
   };
 };
 
