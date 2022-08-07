@@ -12,6 +12,7 @@
   import VscSettingsGear from "svelte-icons-pack/vsc/VscSettingsGear";
   import VscInfo from "svelte-icons-pack/vsc/VscInfo";
   import type { TSiderItem } from "../share/component/sider/TSiderItem";
+  import ThemeAnimate from "../share/component/ThemeAnimate.svelte";
 
   let siderItems: TSiderItem[] = [
     { key: "overview", icon: VscDashboard },
@@ -23,6 +24,7 @@
 </script>
 
 <div class="app">
+  <ThemeAnimate />
   <Layout>
     <div slot="sider">
       <Sider items={siderItems} />

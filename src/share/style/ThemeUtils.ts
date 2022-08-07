@@ -4,8 +4,9 @@
  */
 
 import { writable } from "svelte/store";
+import type { Writable } from "svelte/store";
 import Color from "color";
-import { listen } from "@tauri-apps/api/event";
+import html2canvas from "html2canvas";
 
 const root = document.documentElement;
 
@@ -18,10 +19,17 @@ function g(key: string): string {
 }
 
 function updateVariables(colorPlates: ColorPlates) {
-  console.log(colorPlates);
   Object.keys(colorPlates).forEach((key) => {
     s(`--${key}`, colorPlates[key].toString());
   });
+}
+
+export function isDark() {
+  return (
+    (window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)")?.matches) ||
+    false
+  );
 }
 
 type ThemeSettings = {
@@ -49,7 +57,7 @@ type ColorPlates = {
 
 const defaultThemeSettings: ThemeSettings = {
   themeColor: new Color("hsl(200, 100%, 50%)"),
-  dark: true,
+  dark: isDark(),
 };
 
 const genColorPlates = (themeSettings: ThemeSettings): ColorPlates => {
@@ -127,16 +135,41 @@ themeSettings.subscribe((themeSettings) => {
   currentSettings = themeSettings;
 });
 
+// region theme animate
+interface LastSnapshot {
+  dark: boolean;
+  snapshot: HTMLCanvasElement;
+}
+
+export const lastSnapshot: Writable<LastSnapshot | null> = writable(null);
+// endregion
+
 // @ts-ignore
-window.toggleTheme = function (dark?: boolean) {
+window.toggleTheme = async function (dark?: boolean) {
+  const previousTheme = currentSettings.dark;
   currentSettings &&
     (dark !== undefined && dark !== null
       ? (currentSettings.dark = dark)
       : (currentSettings.dark = !currentSettings.dark));
+
+  if (currentSettings && currentSettings.dark !== previousTheme) {
+    let canvas = await html2canvas(document.getElementById("app"), {
+      logging: false,
+    });
+    lastSnapshot.set({
+      dark: previousTheme,
+      snapshot: canvas,
+    });
+  }
+
   themeSettings.set(currentSettings);
 };
 
-listen("chaos://themeChanged", (event) => {
-  // @ts-ignore
-  window.toggleTheme(event.payload);
-}).then();
+if (window.matchMedia) {
+  window
+    ?.matchMedia("(prefers-color-scheme: dark)")
+    ?.addEventListener("change", (event) => {
+      // @ts-ignore
+      window.toggleTheme(event?.matches || false);
+    });
+}

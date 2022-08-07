@@ -18,6 +18,7 @@
   "dependencies": {
     "@tauri-apps/api": "^1.0.2",
     "color": "^4.2.3",
+    "html2canvas": "^1.4.1",
     "svelte-icons-pack": "^2.0.0"
   },
   "devDependencies": {

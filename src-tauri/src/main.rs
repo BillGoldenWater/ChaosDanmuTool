@@ -8,9 +8,8 @@
   windows_subsystem = "windows"
 )]
 
-use serde_json::Value;
 use tauri::async_runtime::block_on;
-use tauri::{command, App, AppHandle, Manager, Theme, Wry};
+use tauri::{command, App, AppHandle, Manager, Wry};
 use tauri::{Assets, Context, WindowEvent};
 use tokio::sync::RwLock;
 use tokio::task;
@@ -101,14 +100,6 @@ async fn main() {
       task::block_in_place(|| block_on(on_activate(app_handle)));
       api.prevent_default();
     }
-    tauri::RunEvent::WindowEvent {
-      label: _, event, ..
-    } => match event {
-      WindowEvent::ThemeChanged(theme) => {
-        let _ = app_handle.emit_all("chaos://themeChanged", Value::Bool(theme == Theme::Dark));
-      }
-      _ => {}
-    },
 
     _ => {}
   });
