@@ -17,7 +17,8 @@
   "license": "AGPL-3.0-only",
   "dependencies": {
     "@tauri-apps/api": "^1.0.2",
-    "color": "^4.2.3"
+    "color": "^4.2.3",
+    "svelte-icons-pack": "^2.0.0"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^1.0.1",
