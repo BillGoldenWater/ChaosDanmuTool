@@ -38,7 +38,7 @@ pub struct ViewerViewConfig {
 
 //region uuid
 fn uuid_default() -> String {
-  uuid::Uuid::new_v4().to_string()
+  uuid::Uuid::from_u64_pair(0, 0).to_string()
 }
 
 fn uuid_skip_if(value: &String) -> bool {
