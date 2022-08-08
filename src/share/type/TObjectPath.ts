@@ -5,10 +5,8 @@
 
 export type AObjectKey = string | number;
 
-export type AObject = Record<AObjectKey, unknown>;
-
-export type ObjectPath<T extends AObject> = {
-  [K in keyof T]: T[K] extends AObject
+export type ObjectPath<T extends object> = {
+  [K in keyof T]: T[K] extends object
     ? K extends AObjectKey
       ? ObjectPath<T[K]> extends AObjectKey
         ? `${K}.${ObjectPath<T[K]>}`
