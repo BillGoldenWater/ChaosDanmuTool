@@ -17,9 +17,12 @@
   "license": "AGPL-3.0-only",
   "dependencies": {
     "@tauri-apps/api": "^1.0.2",
+    "@types/uuid": "^8.3.4",
     "color": "^4.2.3",
+    "dot-prop": "^7.2.0",
     "html2canvas": "^1.4.1",
-    "svelte-icons-pack": "^2.0.0"
+    "svelte-icons-pack": "^2.0.0",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^1.0.1",
