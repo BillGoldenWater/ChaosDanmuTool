@@ -12,7 +12,6 @@ use crate::libs::config::config::frontend_config::FrontendConfig;
 pub mod backend_config;
 pub mod frontend_config;
 
-pub static INTERNAL_VIEWER_UUID: &str = "93113675-999d-469c-a280-47ed2c5a09e4";
 lazy_static! {
   pub static ref ALLOW_CONFIG_SKIP_IF: RwLock<bool> = RwLock::new(false);
   pub static ref ALLOW_CONFIG_SKIP_IF_LOCK: Mutex<bool> = Mutex::new(false);
@@ -60,21 +59,8 @@ pub fn serialize_config<T: Serialize>(config: &T, use_skip_if: bool) -> String {
 
 #[cfg(test)]
 mod test {
-  use serde_json::{json, Value};
-
   use crate::libs::config::config::frontend_config::viewer_view_config::ViewerViewConfig;
-  use crate::libs::config::config::{serialize_config, Config, INTERNAL_VIEWER_UUID};
-
-  #[test]
-  fn write_default_uuids() {
-    let default_uuids: Value = json!({ "internalViewerUUID": INTERNAL_VIEWER_UUID });
-
-    std::fs::write(
-      "../src/share/type/rust/config/viewerDefaultUuids.json",
-      serde_json::to_string(&default_uuids).unwrap(),
-    )
-    .expect("Failed write default uuids.");
-  }
+  use crate::libs::config::config::{serialize_config, Config};
 
   #[test]
   fn write_default_config() {

@@ -19,6 +19,9 @@ pub struct ViewerViewConfig {
   #[serde(default = "uuid_default")]
   #[serde(skip_serializing_if = "uuid_skip_if")]
   pub uuid: String,
+  #[serde(default = "default_default")]
+  #[serde(skip_serializing_if = "default_skip_if")]
+  pub default: bool,
   #[serde(default = "name_default")]
   #[serde(skip_serializing_if = "name_skip_if")]
   pub name: String,
@@ -42,6 +45,16 @@ fn uuid_skip_if(value: &String) -> bool {
   *value == uuid_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 //endregion
+
+// region default
+fn default_default() -> bool {
+  false
+}
+
+fn default_skip_if(value: &bool) -> bool {
+  *value == default_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
+}
+// endregion
 
 //region name
 fn name_default() -> String {

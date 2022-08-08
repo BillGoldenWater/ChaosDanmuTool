@@ -5,7 +5,7 @@
 
 use crate::libs::config::config::frontend_config::main_view_config::MainViewConfig;
 use crate::libs::config::config::frontend_config::viewer_view_config::ViewerViewConfig;
-use crate::libs::config::config::{ALLOW_CONFIG_SKIP_IF, INTERNAL_VIEWER_UUID};
+use crate::libs::config::config::ALLOW_CONFIG_SKIP_IF;
 
 pub mod main_view_config;
 pub mod viewer_view_config;
@@ -34,10 +34,11 @@ fn main_view_skip_if(value: &MainViewConfig) -> bool {
 
 //region viewer_view
 fn viewer_view_default() -> Vec<ViewerViewConfig> {
-  let mut default_internal: ViewerViewConfig = serde_json::from_str("{}").unwrap();
-  default_internal.uuid = INTERNAL_VIEWER_UUID.to_string().clone();
-  default_internal.name = "内部查看器".to_string();
-  vec![default_internal]
+  let mut default: ViewerViewConfig = serde_json::from_str("{}").unwrap();
+  default.uuid = uuid::Uuid::new_v4().to_string();
+  default.default = true;
+  default.name = "默认".to_string();
+  vec![default]
 }
 
 fn viewer_view_skip_if(value: &Vec<ViewerViewConfig>) -> bool {
