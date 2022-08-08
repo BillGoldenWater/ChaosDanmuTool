@@ -4,33 +4,35 @@
   -->
 <script lang="ts">
   import Layout from "../share/component/Layout.svelte";
-  import Content from "../share/component/Content.svelte";
   import Sider from "../share/component/sider/Sider.svelte";
-  import VscDashboard from "svelte-icons-pack/vsc/VscDashboard";
-  import VscMenu from "svelte-icons-pack/vsc/VscMenu";
-  import VscHistory from "svelte-icons-pack/vsc/VscHistory";
-  import VscSettingsGear from "svelte-icons-pack/vsc/VscSettingsGear";
-  import VscInfo from "svelte-icons-pack/vsc/VscInfo";
   import type { TSiderItem } from "../share/component/sider/TSiderItem";
   import ThemeAnimate from "../share/component/ThemeAnimate.svelte";
+  import { pages } from "./page/Pages";
+  import Content from "../share/component/Content.svelte";
 
-  let siderItems: TSiderItem[] = [
-    { key: "overview", icon: VscDashboard },
-    { key: "function", icon: VscMenu },
-    { key: "history", icon: VscHistory },
-    { key: "setting", icon: VscSettingsGear },
-    { key: "about", icon: VscInfo },
-  ];
+  let siderItems: TSiderItem[] = pages.getPages().map((it) => ({
+    key: it.id,
+    icon: it.icon,
+  }));
+
+  let currentPageId: string = pages.getPages()[0]?.id || "";
+  $: currentPage = pages.getPage(currentPageId);
 </script>
 
 <div class="app">
   <ThemeAnimate />
   <Layout>
     <div slot="sider">
-      <Sider items={siderItems} />
+      <Sider items={siderItems} bind:selected={currentPageId} />
     </div>
     <div slot="content">
-      <Content>Content</Content>
+      {#if currentPage == null}
+        <Content>Unknown page: {currentPageId}</Content>
+      {:else if currentPage.component == null}
+        <Content>Unfinished page: {currentPageId}</Content>
+      {:else}
+        <svelte:component this={currentPage.component} />
+      {/if}
     </div>
   </Layout>
 </div>
