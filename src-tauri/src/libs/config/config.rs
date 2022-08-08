@@ -62,6 +62,7 @@ pub fn serialize_config<T: Serialize>(config: &T, use_skip_if: bool) -> String {
 mod test {
   use serde_json::{json, Value};
 
+  use crate::libs::config::config::frontend_config::viewer_view_config::ViewerViewConfig;
   use crate::libs::config::config::{serialize_config, Config, INTERNAL_VIEWER_UUID};
 
   #[test]
@@ -85,5 +86,19 @@ mod test {
       default_config,
     )
     .expect("Failed write default config.");
+  }
+
+  #[test]
+  fn write_default_viewer_config() {
+    let default_viewer_config: String = serialize_config(
+      &serde_json::from_str::<ViewerViewConfig>("{}").unwrap(),
+      false,
+    );
+
+    std::fs::write(
+      "../src/share/type/rust/config/defaultViewerConfig.json",
+      default_viewer_config,
+    )
+    .expect("Failed write viewer default config.");
   }
 }
