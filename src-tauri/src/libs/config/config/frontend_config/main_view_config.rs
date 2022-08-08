@@ -21,7 +21,7 @@ pub struct MainViewConfig {
 }
 
 fn path_default() -> String {
-  "".to_string()
+  "chaos://app".to_string()
 }
 
 fn path_skip_if(value: &String) -> bool {
