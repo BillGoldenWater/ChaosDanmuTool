@@ -32,7 +32,11 @@
 
 <div class="sider">
   {#each items as item}
-    <SiderItem bind:item on:click={() => (selected = item.key)} selected={item.key === selected}/>
+    <SiderItem
+      bind:item
+      on:click={() => (selected = item.key)}
+      selected={item.key === selected}
+    />
   {/each}
   <!--suppress CheckEmptyScriptTag -->
   <div

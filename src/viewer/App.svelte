@@ -3,6 +3,4 @@
   - SPDX-License-Identifier: AGPL-3.0-only
   -->
 
-<div>
-  viewer_window
-</div>
+<div>viewer_window</div>
