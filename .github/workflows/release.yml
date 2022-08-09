@@ -49,6 +49,10 @@ jobs:
       - name: mkdir dist
         run: mkdir dist
 
+      - name: clone dev upstream
+        if: success()
+        run: node scripts/cloneDevUpstream.mjs
+
       - name: before build
         if: success()
         run: node scripts/beforeBuild.mjs
