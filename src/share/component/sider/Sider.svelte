@@ -63,10 +63,10 @@
   .pointer {
     position: absolute;
 
-    height: 1.25em;
-    width: 0.3em;
+    height: 1.25rem;
+    width: 0.3rem;
 
-    border-radius: 0.15em;
+    border-radius: 0.15rem;
 
     background-color: var(--themeSolid);
   }

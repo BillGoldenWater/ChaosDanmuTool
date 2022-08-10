@@ -9,13 +9,17 @@
   import ThemeAnimate from "../share/component/ThemeAnimate.svelte";
   import { pages } from "./page/Pages";
   import Content from "../share/component/Content.svelte";
+  import { appEnv, getPathOption, setPathOption } from "../share/appEnv/AppEnv";
 
   let siderItems: TSiderItem[] = pages.getPages().map((it) => ({
     key: it.id,
     icon: it.icon,
   }));
 
-  let currentPageId: string = pages.getPages()[0]?.id || "";
+  let currentPageId;
+  $: currentPageId =
+    getPathOption($appEnv, "pageId") || pages.getPages()[0]?.id || "";
+  $: setPathOption("pageId", currentPageId);
   $: currentPage = pages.getPage(currentPageId);
 </script>
 

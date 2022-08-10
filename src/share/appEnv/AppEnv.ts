@@ -129,8 +129,8 @@ export function setPathOption(key: string, value: string) {
   });
 }
 
-export function getPathOption(key: string): string | null {
-  return get(appEnv)?.path?.searchParams?.get(key);
+export function getPathOption(appEnv: AppEnv, key: string): string | null {
+  return appEnv.path?.searchParams?.get(key);
 }
 
 export function pathJump(target: string) {

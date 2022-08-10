@@ -6,6 +6,8 @@
 export interface PageInfo<C> {
   id: string;
   icon: unknown;
+  name: string;
+  description?: string;
   component?: C;
 }
 
