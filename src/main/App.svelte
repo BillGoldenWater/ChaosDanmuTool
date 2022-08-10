@@ -19,6 +19,8 @@
   $: currentPageId =
     getPathOption($appEnv, "pageId") || pages.getPages()[0]?.id || "";
   $: currentPage = pages.getPage(currentPageId);
+
+  let pageInstance: { ret: () => void };
 </script>
 
 <div class="app">
@@ -29,6 +31,10 @@
         items={siderItems}
         selected={currentPageId}
         on:change={(event) => {
+          let key = event.detail;
+          if (key === currentPageId) {
+            pageInstance?.ret && pageInstance.ret();
+          }
           setPathOption("pageId", event.detail);
         }}
       />
@@ -39,7 +45,10 @@
       {:else if currentPage.component == null}
         <Content>Unfinished page: {currentPageId}</Content>
       {:else}
-        <svelte:component this={currentPage.component} />
+        <svelte:component
+          this={currentPage.component}
+          bind:this={pageInstance}
+        />
       {/if}
     </div>
   </Layout>
