@@ -16,10 +16,8 @@
     icon: it.icon,
   }));
 
-  let currentPageId;
   $: currentPageId =
     getPathOption($appEnv, "pageId") || pages.getPages()[0]?.id || "";
-  $: setPathOption("pageId", currentPageId);
   $: currentPage = pages.getPage(currentPageId);
 </script>
 
@@ -27,7 +25,13 @@
   <ThemeAnimate />
   <Layout>
     <div slot="sider">
-      <Sider items={siderItems} bind:selected={currentPageId} />
+      <Sider
+        items={siderItems}
+        selected={currentPageId}
+        on:change={(event) => {
+          setPathOption("pageId", event.detail);
+        }}
+      />
     </div>
     <div slot="content">
       {#if currentPage == null}

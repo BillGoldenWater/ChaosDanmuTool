@@ -7,6 +7,7 @@
   import SiderItem from "./SiderItem.svelte";
   import { spring } from "svelte/motion";
   import type { Spring } from "svelte/motion";
+  import { createEventDispatcher } from "svelte";
 
   export let items: TSiderItem[] = [];
   export let selected: string = items[0]?.key ?? "";
@@ -28,13 +29,22 @@
       pointerLeft = element.offsetLeft - pointer.clientWidth / 2;
     }
   }
+
+  // region event
+  const dispatch = createEventDispatcher();
+
+  function onChange(key) {
+    selected = key
+    dispatch("change", key);
+  }
+  // endregion
 </script>
 
 <div class="sider">
   {#each items as item}
     <SiderItem
       bind:item
-      on:click={() => (selected = item.key)}
+      on:click={() => onChange(item.key)}
       selected={item.key === selected}
     />
   {/each}
