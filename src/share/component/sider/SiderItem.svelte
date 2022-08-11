@@ -57,10 +57,10 @@
 
   .itemSelected {
     color: var(--themeText);
-    background-color: var(--theme);
+    background-color: var(--themeUp);
 
     &:hover {
-      background-color: var(--themeDouble);
+      background-color: var(--themeUpDouble);
     }
 
     &:active {

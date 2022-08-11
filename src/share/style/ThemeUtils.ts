@@ -47,9 +47,13 @@ type ColorPlates = {
   down: Color;
   downDouble: Color;
 
-  theme: Color;
-  themeDouble: Color;
+  themeUp: Color;
+  themeUpDouble: Color;
   themeDown: Color;
+
+  themePrimary: Color;
+  themePrimaryUp: Color;
+  themePrimaryDown: Color;
 
   themeSolid: Color;
   themeText: Color;
@@ -91,6 +95,10 @@ const genColorPlates = (themeSettings: ThemeSettings): ColorPlates => {
   let themeDouble = getTheme(0.2);
   let themeDown = getTheme(0.1).mix(down);
 
+  let themePrimary = getTheme(0.7);
+  let themePrimaryUp = getTheme(0.8);
+  let themePrimaryDown = getTheme(0.6);
+
   let themeSolid = getTheme(1);
   let themeText = getTheme(0.9);
 
@@ -119,9 +127,12 @@ const genColorPlates = (themeSettings: ThemeSettings): ColorPlates => {
     upDouble: upDouble,
     down: down,
     downDouble: downDouble,
-    theme: theme,
-    themeDouble: themeDouble,
+    themeUp: theme,
+    themeUpDouble: themeDouble,
     themeDown: themeDown,
+    themePrimary: themePrimary,
+    themePrimaryUp: themePrimaryUp,
+    themePrimaryDown: themePrimaryDown,
     themeSolid: themeSolid,
     themeText: themeText,
   };

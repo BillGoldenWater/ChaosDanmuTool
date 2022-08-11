@@ -7,6 +7,7 @@ import { PageManager } from "../../../share/manager/PageManager";
 import VscDashboard from "svelte-icons-pack/vsc/VscServer";
 import VscPreview from "svelte-icons-pack/vsc/VscPreview";
 import VscSymbolMisc from "svelte-icons-pack/vsc/VscSymbolMisc";
+import ConnectRoom from "./ConnectRoom.svelte";
 
 export const functionPages = new PageManager([
   {
@@ -14,6 +15,7 @@ export const functionPages = new PageManager([
     icon: VscDashboard,
     name: "连接直播间",
     description: "管理与直播间的连接",
+    component: ConnectRoom,
   },
   {
     id: "viewerManager",
