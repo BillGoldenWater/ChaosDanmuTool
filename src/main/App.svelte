@@ -10,6 +10,21 @@
   import { pages } from "./page/Pages";
   import Content from "../share/component/Content.svelte";
   import { appEnv, getPathOption, setPathOption } from "../share/appEnv/AppEnv";
+  import { CommandReceiver } from "../share/network/CommandReceiver";
+
+  // region commandReceiver
+  let commandReceiver = new CommandReceiver({
+    location: "Main.App.commandReceiver",
+    eventTarget: $appEnv.eventTarget,
+    debug: true,
+  });
+
+  $: commandReceiver.updateOption({
+    port: $appEnv.config.backend.httpServer.port,
+  });
+
+  commandReceiver.open();
+  // endregion
 
   let siderItems: TSiderItem[] = pages.getPages().map((it) => ({
     key: it.id,

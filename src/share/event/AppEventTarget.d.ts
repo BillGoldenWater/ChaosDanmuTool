@@ -13,7 +13,7 @@ import type { DanmuMessage } from "../type/rust/command/commandPacket/bilibiliCo
 declare class BiliBiliPackParseErrorEvent extends Event {
   message: string;
 
-  constructor(data: string);
+  constructor(message: string);
 }
 
 declare class ConfigUpdateEvent extends Event {

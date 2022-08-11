@@ -34,7 +34,13 @@ export const appEnv: Writable<AppEnv> = writable({
 
   eventTarget: new AppEventTarget(),
 });
+
+// region init
 applyConfigUpdateToAppEnv(defaultConfig as Config); // TODO detect backend api and fetch config
+get(appEnv).eventTarget.addEventListener("configUpdate", (event) => {
+  applyConfigUpdateToAppEnv(event.config);
+});
+// endregion
 
 // region config
 function getViewerUuid(): string | null {

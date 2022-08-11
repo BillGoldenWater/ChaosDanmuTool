@@ -5,11 +5,11 @@
 
 //region appCommand
 export class BiliBiliPackParseErrorEvent extends Event {
-  data;
+  message;
 
-  constructor(data) {
+  constructor(message) {
     super("biliBiliPackParseError");
-    this.data = data;
+    this.message = message;
   }
 }
 

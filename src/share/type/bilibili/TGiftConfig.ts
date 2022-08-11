@@ -10,4 +10,7 @@ export interface TGiftConfig {
 }
 
 // TODO gift config parse
-export function parseGiftConfigResponse(response: unknown) {}
+export function parseGiftConfigResponse(response: unknown): TGiftConfigMap {
+  console.error("unimplemented");
+  return null;
+}
