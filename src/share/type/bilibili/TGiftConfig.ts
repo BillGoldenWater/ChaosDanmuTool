@@ -89,6 +89,5 @@ export function parseGiftConfigResponse(response: unknown): TGiftConfigMap {
     result.set(item.id, item);
   }
 
-  console.log(result);
   return result;
 }
