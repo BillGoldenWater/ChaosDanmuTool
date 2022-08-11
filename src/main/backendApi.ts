@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { invoke } from "@tauri-apps/api";
+import {invoke} from "@tauri-apps/api";
+import type {Config} from "../share/type/rust/config/Config";
 
 export class BackendApi {
   async isVibrancyApplied() {
@@ -21,6 +22,18 @@ export class BackendApi {
   async isViewerWindowOpen() {
     return (await invoke("is_viewer_window_open")) as boolean;
   }
+
+  async getConfig() {
+    return JSON.parse(await invoke("get_config")) as Config;
+  }
+
+  async updateConfig(config: Config) {
+    await invoke("update_config", {
+      config: JSON.stringify(config)
+    })
+  }
 }
 
-window.backend = new BackendApi();
+if (window.__TAURI_METADATA__) {
+  window.backend = new BackendApi();
+}

@@ -35,7 +35,7 @@ fn main_view_skip_if(value: &MainViewConfig) -> bool {
 //region viewer_view
 fn viewer_view_default() -> Vec<ViewerViewConfig> {
   let mut default: ViewerViewConfig = serde_json::from_str("{}").unwrap();
-  default.uuid = uuid::Uuid::new_v4().to_string();
+  default.uuid = "93113675-999d-469c-a280-47ed2c5a09e4".to_string();
   default.default = true;
   default.name = "默认".to_string();
   vec![default]

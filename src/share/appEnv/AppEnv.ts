@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { get, writable } from "svelte/store";
 import type { Writable } from "svelte/store";
+import { get, writable } from "svelte/store";
 import type { Config } from "../type/rust/config/Config";
 import type { ViewerViewConfig } from "../type/rust/config/frontendConfig/ViewerViewConfig";
 import type { ReceiverStatus } from "../type/rust/command/commandPacket/appCommand/receiverStatusUpdate/ReceiverStatus";
@@ -36,7 +36,9 @@ export const appEnv: Writable<AppEnv> = writable({
 });
 
 // region init
-applyConfigUpdateToAppEnv(defaultConfig as Config); // TODO detect backend api and fetch config
+applyConfigUpdateToAppEnv(
+  window.backend ? await window.backend.getConfig() : (defaultConfig as Config)
+);
 get(appEnv).eventTarget.addEventListener("configUpdate", (event) => {
   applyConfigUpdateToAppEnv(event.config);
 });

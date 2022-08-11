@@ -20,6 +20,7 @@ use chaosdanmutool::libs::command::command_packet::app_command::viewer_status_up
   ViewerStatus, ViewerStatusUpdate,
 };
 use chaosdanmutool::libs::command::command_packet::app_command::AppCommand;
+use chaosdanmutool::libs::config::config::serialize_config;
 use chaosdanmutool::libs::config::config_manager::ConfigManager;
 use chaosdanmutool::libs::network::command_broadcast_server::CommandBroadcastServer;
 use chaosdanmutool::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver;
@@ -62,7 +63,9 @@ async fn main() {
       is_vibrancy_applied,
       show_viewer_window,
       close_viewer_window,
-      is_viewer_window_open
+      is_viewer_window_open,
+      get_config,
+      update_config
     ])
     .menu(if cfg!(target_os = "macos") {
       tauri::Menu::os_default("Chaos Danmu Tool")
@@ -313,6 +316,16 @@ async fn apply_vibrancy_effect(window: &tauri::Window<Wry>) {
 #[command]
 async fn is_vibrancy_applied() -> bool {
   *VIBRANCY_APPLIED.read().await
+}
+
+#[command]
+async fn get_config() -> String {
+  serialize_config(&ConfigManager::get_config().await, false)
+}
+
+#[command]
+async fn update_config(config: String) {
+  ConfigManager::set_config(serde_json::from_str(&config).unwrap(), true).await
 }
 
 #[allow(unused)]
