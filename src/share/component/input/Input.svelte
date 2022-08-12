@@ -10,23 +10,22 @@
   export let props: TInput = {
     type: "text",
   };
-  $: p = props;
 </script>
 
-{#if p.type === "text"}
-  <TextInput bind:props={p} />
-{:else if p.type === "number"}
-  <NumberInput bind:props={p} />
-{:else if p.type === "switch"}
+{#if props.type === "text"}
+  <TextInput bind:props />
+{:else if props.type === "number"}
+  <NumberInput bind:props />
+{:else if props.type === "switch"}
   <div>SwitchInput</div>
-{:else if p.type === "select"}
+{:else if props.type === "select"}
   <div>SelectInput</div>
-{:else if p.type === "slider"}
+{:else if props.type === "slider"}
   <div>SliderInput</div>
-{:else if p.type === "checkbox"}
+{:else if props.type === "checkbox"}
   <div>CheckboxInput</div>
-{:else if p.type === "radio"}
+{:else if props.type === "radio"}
   <div>RadioInput</div>
 {:else}
-  <div>Unknown type: {p.type}</div>
+  <div>Unknown type: {props.type}</div>
 {/if}
