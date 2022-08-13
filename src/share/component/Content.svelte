@@ -3,11 +3,16 @@
   - SPDX-License-Identifier: AGPL-3.0-only
   -->
 <script lang="ts">
-  export let disablePadding: boolean = false;
+  export let paddingType: "double" | "normal" | "none" = "double";
   export let disableRound: boolean = false;
 </script>
 
-<div class="content" class:disablePadding class:disableRound>
+<div
+  class="content"
+  class:doublePadding={paddingType === "double"}
+  class:disablePadding={paddingType === "none"}
+  class:disableRound
+>
   <slot />
 </div>
 
@@ -20,6 +25,10 @@
     border-radius: var(--contentBorderRadius);
 
     background-color: var(--up);
+  }
+
+  .doublePadding {
+    padding: var(--spacerWidth);
   }
 
   .disablePadding {

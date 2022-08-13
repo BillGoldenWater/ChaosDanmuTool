@@ -28,7 +28,7 @@
 </script>
 
 {#if pageId === ""}
-  <Content>
+  <Content paddingType="normal">
     <div class="functions">
       {#each pages as page}
         <FunctionItem
