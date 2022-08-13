@@ -4,12 +4,14 @@
  */
 
 import { randomUUID } from "crypto";
+import type Color from "color";
 
 export type TInput =
   | TTextInput
   | TNumberInput
   | TSwitchInput
   | TSelectInput
+  | TColorInput
   | TSliderInput
   | TCheckboxInput
   | TRadioInput;
@@ -49,6 +51,13 @@ export type TSelectInput = {
   type: "select";
   options: TSelectInputItem[];
 } & TInputBase<string>;
+// endregion
+
+// region color
+export type TColorInput = {
+  type: "color";
+  withAlpha?: boolean;
+} & TInputBase<Color>;
 // endregion
 
 // region slider
