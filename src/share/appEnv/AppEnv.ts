@@ -87,7 +87,7 @@ function setConfig_(
   value: unknown
 ): AppEnv {
   let newConfig = setProperty(appEnv.config, key, value);
-  // TODO send config update to backend
+  window.backend && window.backend.updateConfig(newConfig);
 
   return getConfigAppliedAppEnv(appEnv, newConfig);
 }
