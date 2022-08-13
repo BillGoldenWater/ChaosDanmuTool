@@ -45,6 +45,7 @@ export type TSwitchInput = {
 export type TSelectInputItem = {
   key: string;
   name?: string;
+  element?: HTMLDivElement;
 };
 
 export type TSelectInput = {

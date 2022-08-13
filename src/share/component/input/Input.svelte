@@ -7,6 +7,7 @@
   import TextInput from "./TextInput.svelte";
   import NumberInput from "./NumberInput.svelte";
   import SwitchInput from "./SwitchInput.svelte";
+  import SelectInput from "./SelectInput.svelte";
 
   export let props: TInput = {
     type: "text",
@@ -20,7 +21,7 @@
 {:else if props.type === "switch"}
   <SwitchInput bind:props />
 {:else if props.type === "select"}
-  <div>SelectInput</div>
+  <SelectInput bind:props />
 {:else if props.type === "slider"}
   <div>SliderInput</div>
 {:else if props.type === "checkbox"}
