@@ -11,6 +11,7 @@ export default defineConfig({
     rollupOptions: {
       input: ["src/main/index.html", "src/viewer/index.html"],
     },
+    target: ["edge90", "chrome90", "firefox90", "safari15"],
   },
   plugins: [
     svelte({
