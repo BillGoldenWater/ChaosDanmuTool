@@ -74,7 +74,7 @@
     height: 100vh;
     width: 100vw;
 
-    overflow: auto;
+    overflow: hidden;
 
     background-color: var(--background);
     color: var(--text);
