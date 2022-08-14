@@ -35,7 +35,7 @@
 
   $: {
     if (props.value !== previousValue) {
-      props.onChange(props.value);
+      props.onChange && props.onChange(props.value);
       previousValue = props.value;
     }
   }
