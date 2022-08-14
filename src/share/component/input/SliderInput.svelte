@@ -56,6 +56,14 @@
     }
   }
 
+  let dragging: boolean = false;
+
+  function onMouseMove(event: MouseEvent) {
+    if (dragging) {
+      onClick(event);
+    }
+  }
+
   let lastValue = props.value;
   $: {
     if (lastValue !== props.value) {
@@ -84,7 +92,7 @@
       : props.value.toString(),
     disabled: props.disabled,
   };
-  // end region
+  // endregion
 </script>
 
 <div class="sliderInput">
@@ -94,6 +102,10 @@
     class:disabled={props.disabled}
     bind:this={self}
     on:click={onClick}
+    on:mousemove={onMouseMove}
+    on:mousedown={() => (dragging = true)}
+    on:mouseup={() => (dragging = false)}
+    on:mouseleave={() => (dragging = false)}
     style={props.sliderLen ? `width: ${props.sliderLen}` : ""}
   >
     <!--suppress CheckEmptyScriptTag -->
