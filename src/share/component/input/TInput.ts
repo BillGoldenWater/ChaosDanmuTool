@@ -62,18 +62,16 @@ export type TColorInput = {
 // endregion
 
 // region slider
-export type TSliderInputNormal = {
+export type TSliderInput = {
   type: "slider";
-};
-
-export type TSliderInputWithInputBox = TSliderInputNormal & {
-  withInputBox: boolean;
+  min: number;
+  max: number;
+  step: number;
+  sliderLen?: string;
+  withInputBox?: boolean;
   stringifier?: (value: number) => string;
   parser?: (value: string) => number;
-};
-
-export type TSliderInput = (TSliderInputNormal | TSliderInputWithInputBox) &
-  TInputBase<number>;
+} & TInputBase<number>;
 // endregion
 
 // region checkbox

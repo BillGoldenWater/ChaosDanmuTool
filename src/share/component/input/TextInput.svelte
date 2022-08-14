@@ -44,6 +44,9 @@
     border-radius: var(--itemBorderRadius);
 
     font-size: 14px;
+
+    user-select: text;
+    -webkit-user-select: text;
   }
 
   .enabled {

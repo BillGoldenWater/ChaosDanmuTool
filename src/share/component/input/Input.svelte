@@ -8,6 +8,8 @@
   import NumberInput from "./NumberInput.svelte";
   import SwitchInput from "./SwitchInput.svelte";
   import SelectInput from "./SelectInput.svelte";
+  import ColorInput from "./ColorInput.svelte";
+  import SliderInput from "./SliderInput.svelte";
 
   export let props: TInput = {
     type: "text",
@@ -22,8 +24,10 @@
   <SwitchInput bind:props />
 {:else if props.type === "select"}
   <SelectInput bind:props />
+{:else if props.type === "color"}
+  <ColorInput bind:props />
 {:else if props.type === "slider"}
-  <div>SliderInput</div>
+  <SliderInput bind:props />
 {:else if props.type === "checkbox"}
   <div>CheckboxInput</div>
 {:else if props.type === "radio"}
