@@ -120,6 +120,8 @@
 
     padding: var(--Padding);
 
+    width: 10em;
+
     border-radius: var(--itemBorderRadius);
 
     user-select: none;
