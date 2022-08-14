@@ -90,5 +90,5 @@ opt-level = "s" # Optimize for binary size
 strip = true  # Automatically strip symbols from the binary.
 
 [patch.crates-io]
-tauri = { path = "../../tauri/core/tauri" }
-tao = { path = "../../tao" }
+tauri = { git = "https://github.com/BiliGoldenWater/tauri.git" }
+tao = { git = "https://github.com/BiliGoldenWater/tao.git" }
