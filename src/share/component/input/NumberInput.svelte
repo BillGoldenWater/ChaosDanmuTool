@@ -4,7 +4,7 @@
   -->
 <script lang="ts">
   import type { TNumberInput, TTextInput } from "./TInput";
-  import TextInput from "./TextInput.svelte";
+  import Input from "./Input.svelte";
 
   export let props: TNumberInput = { type: "number" };
 
@@ -44,4 +44,4 @@
   }
 </script>
 
-<TextInput bind:props={p} />
+<Input bind:props={p} />
