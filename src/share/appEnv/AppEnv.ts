@@ -14,6 +14,7 @@ import defaultViewerConfig from "../type/rust/config/defaultViewerConfig.json";
 import type { ObjectPath } from "../type/TObjectPath";
 import { setProperty } from "dot-prop";
 import * as uuid from "uuid";
+import { backend } from "../../main/backendApi";
 
 export interface AppEnv {
   config: Config;
@@ -37,7 +38,7 @@ export const appEnv: Writable<AppEnv> = writable({
 
 // region init
 applyConfigUpdateToAppEnv(
-  window.backend ? await window.backend.getConfig() : (defaultConfig as Config)
+  backend ? await backend.getConfig() : (defaultConfig as Config)
 );
 get(appEnv).eventTarget.addEventListener("configUpdate", (event) => {
   applyConfigUpdateToAppEnv(event.config);
@@ -87,7 +88,7 @@ function setConfig_(
   value: unknown
 ): AppEnv {
   let newConfig = setProperty(appEnv.config, key, value);
-  window.backend && window.backend.updateConfig(newConfig);
+  backend && backend.updateConfig(newConfig);
 
   return getConfigAppliedAppEnv(appEnv, newConfig);
 }

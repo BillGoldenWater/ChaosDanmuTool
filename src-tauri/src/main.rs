@@ -65,7 +65,8 @@ async fn main() {
       close_viewer_window,
       is_viewer_window_open,
       get_config,
-      update_config
+      update_config,
+      is_debug
     ])
     .menu(if cfg!(target_os = "macos") {
       tauri::Menu::os_default("Chaos Danmu Tool")
@@ -326,6 +327,11 @@ async fn get_config() -> String {
 #[command]
 async fn update_config(config: String) {
   ConfigManager::set_config(serde_json::from_str(&config).unwrap(), true).await
+}
+
+#[command]
+async fn is_debug() -> bool {
+  cfg!(debug_assertions)
 }
 
 #[allow(unused)]
