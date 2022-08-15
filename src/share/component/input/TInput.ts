@@ -17,9 +17,17 @@ export type TInput =
   | TRadioInput;
 
 export type TInputBase<T> = {
+  defaultValue?: T;
   value?: T;
   onChange?: (value: T) => void;
+  ignoreFocus?: boolean;
   disabled?: boolean;
+};
+
+export type TInputWithManualProcess<V, D> = {
+  stringifier?: (value: V) => D;
+  parser?: (value: D) => V;
+  shouldTake?: (value: D) => boolean;
 };
 
 // region text
@@ -32,7 +40,8 @@ export type TTextInput = {
 export type TNumberInput = {
   type: "number";
   acceptFloat?: boolean;
-} & TInputBase<number>;
+} & TInputBase<number> &
+  TInputWithManualProcess<number, string>;
 // endregion
 
 // region switch
@@ -69,9 +78,8 @@ export type TSliderInput = {
   step: number;
   sliderLen?: string;
   withInputBox?: boolean;
-  stringifier?: (value: number) => string;
-  parser?: (value: string) => number;
-} & TInputBase<number>;
+} & TInputBase<number> &
+  TInputWithManualProcess<number, string>;
 // endregion
 
 // region checkbox

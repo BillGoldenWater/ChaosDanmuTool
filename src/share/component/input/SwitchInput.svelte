@@ -5,12 +5,18 @@
 <script lang="ts">
   import type { TSwitchInput } from "./TInput";
   import { spring } from "svelte/motion";
+  import { takeNotNull } from "../../utils/ObjectUtils";
 
   export let props: TSwitchInput = { type: "switch" };
 
+  let value = takeNotNull(props.defaultValue, props.value);
+
+  $: {
+    if (props.value != null) value = props.value;
+  }
+
   let self: HTMLDivElement;
   let slider: HTMLDivElement;
-  let previousValue = props.value;
 
   let transX = spring(0, {
     stiffness: 0.2,
@@ -20,7 +26,7 @@
   $: sliderStyle = `transform: translateX(calc(${$transX}px));`;
 
   $: {
-    if (props.value) {
+    if (value) {
       if (self && slider) {
         let padding = parseInt(
           window.getComputedStyle(self).paddingLeft.replace("px", "")
@@ -33,23 +39,19 @@
     }
   }
 
-  $: {
-    if (props.value !== previousValue) {
-      props.onChange && props.onChange(props.value);
-      previousValue = props.value;
-    }
+  function onChange(newValue: boolean) {
+    value = newValue;
+    props.onChange(newValue);
   }
 </script>
 
 <div
   class="switch"
-  class:enabled={!props.disabled && !props.value}
-  class:checked={!props.disabled && props.value}
+  class:enabled={!props.disabled && !value}
+  class:checked={!props.disabled && value}
   class:disabled={props.disabled}
   bind:this={self}
-  on:click={() => {
-    props.value = !props.value;
-  }}
+  on:click={() => onChange(!value)}
 >
   <!--suppress CheckEmptyScriptTag -->
   <div class="slider" style={sliderStyle} bind:this={slider} />

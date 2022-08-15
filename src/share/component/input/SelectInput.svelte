@@ -2,23 +2,20 @@
   - Copyright 2021-2022 Golden_Water
   - SPDX-License-Identifier: AGPL-3.0-only
   -->
-<script lang="ts" context="module">
-  function pxStrToNum(str: string) {
-    return parseFloat(str.replace("px", ""));
-  }
-</script>
-
 <script lang="ts">
-  import type { TSelectInput } from "./TInput";
-  import { spring } from "svelte/motion";
+  import type {TSelectInput} from "./TInput";
+  import {spring} from "svelte/motion";
+  import {takeNotNull} from "../../utils/ObjectUtils";
 
-  export let props: TSelectInput = { type: "select", options: [] };
+  export let props: TSelectInput = {type: "select", options: []};
 
-  $: current =
-    props.options.find((v) => v.key === props.value)?.name || props.value;
+  let selected = takeNotNull(props.defaultValue, props.value);
+  $: if (props.value != null) selected = props.value;
+  $: current = props.options.find((v) => v.key === selected)?.name || selected;
 
   // region measure things
   let contentElement: HTMLDivElement;
+  let listElement: HTMLDivElement;
 
   let maxWidth: number = 0;
   let maxHeight: number = 0;
@@ -42,8 +39,14 @@
           maxHeight = Math.max(maxHeight, ce.clientHeight);
 
           let style = window.getComputedStyle(opt.element);
-          totalHeight += pxStrToNum(style.height) + pxStrToNum(style.marginTop);
+          totalHeight += parseFloat(style.height) + parseFloat(style.marginTop);
         }
+      }
+
+      if (listElement) {
+        totalHeight += parseFloat(
+          window.getComputedStyle(listElement).paddingBottom
+        );
       }
 
       ce.innerHTML = current;
@@ -66,12 +69,9 @@
   });
   $: listHeight.set(expanded ? totalHeight : 0);
 
-  let lastValue = props.value;
-  $: {
-    if (props.value !== lastValue) {
-      props.onChange && props.onChange(props.value);
-      lastValue = props.value;
-    }
+  function onChange(key) {
+    props.onChange && props.onChange(key);
+    expanded = false;
   }
 </script>
 
@@ -99,17 +99,15 @@
       $listHeight,
       listHeightLimit
     )}px;`}
+    bind:this={listElement}
   >
     <div>
       {#each props.options as opt}
-        {#if opt.key !== props.value}
+        {#if opt.key !== selected}
           <div
             class="selectItem"
             bind:this={opt.element}
-            on:click={() => {
-              props.value = opt.key;
-              expanded = false;
-            }}
+            on:click={() => onChange(opt.key)}
           >
             {opt.name || opt.key}
           </div>
@@ -145,7 +143,6 @@
 
     border-radius: var(--itemBorderRadius);
 
-    //noinspection CssInvalidPropertyValue
     overflow: scroll;
 
     z-index: 100;
@@ -160,6 +157,9 @@
     padding: var(--spacerWidthQuarter) var(--spacerWidthHalf);
 
     border-radius: var(--itemBorderRadius);
+
+    -webkit-backdrop-filter: blur(1em);
+    backdrop-filter: blur(1em);
 
     background-color: var(--up);
 

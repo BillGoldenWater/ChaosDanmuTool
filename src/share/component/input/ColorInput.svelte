@@ -7,20 +7,29 @@
   import Input from "./Input.svelte";
   import Color from "color";
   import Spacer from "../Spacer.svelte";
-  import { writable } from "svelte/store";
+  import { takeNotNull } from "../../utils/ObjectUtils";
+  import { createEventDispatcher } from "svelte";
 
   export let props: TColorInput = {} as TColorInput;
 
-  let color = writable(props.value);
-  $: props.value = $color;
+  let value = takeNotNull(props.value, props.defaultValue);
+  let focused = false;
+  $: if (props.value != null && (!focused || props.ignoreFocus))
+    value = props.value;
 
-  $: value = props.value.hex();
+  $: hexValue = value.hex();
 
-  function onChange(event) {
-    props.value = new Color(event.target.value).alpha(props.value.alpha());
+  function onChange(newValue: Color) {
+    newValue = props.withAlpha ? newValue : newValue.alpha(1);
+    value = newValue;
+    props.onChange && props.onChange(newValue);
   }
 
-  $: alpha = { a: props.value.alpha(), c: props.value };
+  function onInputChange(event) {
+    onChange(new Color(event.target.value).alpha(value.alpha()));
+  }
+
+  $: alpha = { a: value.alpha(), c: value };
 
   let p: TSliderInput = {
     type: "slider",
@@ -30,17 +39,28 @@
     step: 0.0075,
     sliderLen: "5em",
     withInputBox: true,
-    stringifier(value: number): string {
-      return props.value.alpha(value).hexa();
+    stringifier: (alpha: number) => {
+      return value.alpha(alpha).hexa();
     },
-    parser(value: string): number {
-      let newColor = new Color(value.padEnd(9, "0"));
-      color.set(newColor);
-      return newColor.alpha();
+    parser: (colorStr: string) => {
+      try {
+        let newColor = new Color(colorStr);
+        return newColor.alpha();
+      } catch (e) {
+        return value.alpha();
+      }
+    },
+    shouldTake: (colorStr: string) => {
+      try {
+        value = new Color(colorStr);
+        return true;
+      } catch (e) {
+        return false;
+      }
     },
     disabled: props.disabled,
-    onChange(value: number) {
-      color.set(new Color(props.value.toString()).alpha(value));
+    onChange(alpha: number) {
+      onChange(new Color(value.toString()).alpha(alpha));
     },
   };
 
@@ -49,13 +69,25 @@
     value: alpha.a,
   };
 
-  let lastValue = props.value;
-  $: {
-    if (props.value !== lastValue) {
-      props.onChange && props.onChange(props.value);
-      lastValue = props.value;
+  // region event
+  let dispatch = createEventDispatcher();
+
+  function onFocus() {
+    dispatch("focus");
+
+    focused = true;
+  }
+
+  function onBlur() {
+    dispatch("blur");
+
+    focused = false;
+    if (props.value != null && props.value.toString() !== value.toString()) {
+      onChange(value);
     }
   }
+
+  // endregion
 </script>
 
 <div
@@ -65,14 +97,14 @@
   class:disabled={props.withAlpha && props.disabled}
 >
   {#if !props.disabled}
-    <input type="color" {value} on:change={onChange} />
+    <input type="color" {hexValue} on:change={onInputChange} />
   {:else}
-    <input type="color" {value} disabled="disabled" />
+    <input type="color" {hexValue} disabled="disabled" />
   {/if}
   {#if props.withAlpha}
     <div class="alphaSlider">
       <Spacer size="quarter" />
-      <Input props={p} />
+      <Input props={p} on:focus={onFocus} on:blur={onBlur} />
     </div>
   {/if}
 </div>

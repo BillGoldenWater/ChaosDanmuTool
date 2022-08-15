@@ -3,19 +3,19 @@
   - SPDX-License-Identifier: AGPL-3.0-only
   -->
 <script lang="ts">
-  import type { TSliderInput, TTextInput } from "./TInput";
+  import type { TNumberInput, TSliderInput } from "./TInput";
   import { spring } from "svelte/motion";
   import Input from "./Input.svelte";
   import Spacer from "../Spacer.svelte";
+  import { takeNotNull } from "../../utils/ObjectUtils";
+  import { createEventDispatcher } from "svelte";
 
-  export let props: TSliderInput = {
-    type: "slider",
-    value: 0,
-    min: 0,
-    max: 0,
-    step: 0,
-    withInputBox: false,
-  };
+  export let props: TSliderInput = {} as TSliderInput;
+
+  let focused = false;
+  let value = takeNotNull(props.value, props.defaultValue);
+  $: if (props.value != null && (!focused || props.ignoreFocus))
+    value = props.value;
 
   // region slider
   let self: HTMLDivElement;
@@ -24,7 +24,7 @@
     stiffness: 0.2,
     damping: 1,
   });
-  $: percent.set((props.value - props.min) / (props.max - props.min));
+  $: percent.set((value - props.min) / (props.max - props.min));
 
   let dotTop = 0;
   let dotLeft = 0;
@@ -40,6 +40,10 @@
     }
   }
 
+  function onChange(value: number) {
+    props.onChange && props.onChange(value);
+  }
+
   function onClick(event: MouseEvent) {
     if (!props.disabled && self) {
       let p = Math.min(
@@ -52,7 +56,9 @@
 
       let roundedPercent = Math.round(p / stepP) * stepP;
       percent.set(roundedPercent);
-      props.value = roundedPercent * vLen;
+
+      value = roundedPercent * vLen;
+      onChange(value);
     }
   }
 
@@ -64,35 +70,52 @@
     }
   }
 
-  let lastValue = props.value;
-  $: {
-    if (lastValue !== props.value) {
-      props.onChange && props.onChange(props.value);
-      lastValue = props.value;
-    }
-  }
   // endregion
 
   // region direct input
-  let p: TTextInput = {
-    type: "text",
-    onChange(value: string): void {
-      let v = props.parser ? props.parser(value) : parseFloat(value);
-      if (isNaN(v) || !isFinite(v)) {
-        v = props.value;
-      }
-      props.value = Math.max(Math.min(v, props.max), props.min);
+  function parse(value: string) {
+    return props.parser ? props.parser(value) : parseFloat(value);
+  }
+
+  function limited(value: number) {
+    return Math.max(Math.min(value, props.max), props.min);
+  }
+
+  let p: TNumberInput = {
+    type: "number",
+    ignoreFocus: props.ignoreFocus,
+    parser: (value: string) => {
+      return limited(parse(value));
+    },
+    stringifier: props.stringifier,
+    shouldTake: (value: string) => {
+      return props.shouldTake ? props.shouldTake(value) : true;
+    },
+    onChange: (newValue: number) => {
+      value = limited(newValue);
     },
   };
 
   $: p = {
     ...p,
-    value: props.stringifier
-      ? props.stringifier(props.value)
-      : props.value.toString(),
+    value,
     disabled: props.disabled,
   };
   // endregion
+
+  let dispatch = createEventDispatcher();
+
+  function onFocus() {
+    dispatch("focus");
+
+    focused = true;
+  }
+
+  function onBlur() {
+    dispatch("blur");
+
+    focused = false;
+  }
 </script>
 
 <div class="sliderInput">
@@ -115,7 +138,7 @@
   </div>
   {#if props.withInputBox}
     <Spacer size="half" />
-    <Input props={p} />
+    <Input props={p} on:focus={onFocus} on:blur={onBlur} />
   {/if}
 </div>
 

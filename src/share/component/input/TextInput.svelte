@@ -4,25 +4,46 @@
   -->
 <script lang="ts">
   import type { TTextInput } from "./TInput";
+  import { createEventDispatcher } from "svelte";
+  import { takeNotNull } from "../../utils/ObjectUtils";
 
   export let props: TTextInput = { type: "text" };
-  let lastValue = props.value;
+
+  let value = takeNotNull(props.defaultValue, props.value);
+  let focused = false;
   $: {
-    if (props.disabled) {
-      props.value = lastValue;
-    } else {
-      lastValue = props.value;
+    if (props.value != null && (!focused || props.ignoreFocus)) {
+      value = props.value.toString();
     }
+  }
+  $: {
+    props.onChange && props.onChange(value);
+  }
+
+  let dispatch = createEventDispatcher();
+
+  function onBlur() {
+    dispatch("blur");
+
+    focused = false;
+    value = props.value;
+  }
+
+  function onFocus() {
+    dispatch("focus");
+
+    focused = true;
   }
 </script>
 
 <!--suppress CheckEmptyScriptTag -->
 <div
   contenteditable
-  bind:innerHTML={props.value}
+  bind:innerHTML={value}
   class:enabled={!props.disabled}
   class:disabled={props.disabled}
-  on:input={() => props.onChange && props.onChange(props.value)}
+  on:blur={onBlur}
+  on:focus={onFocus}
 />
 
 <style lang="less">
