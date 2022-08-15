@@ -25,6 +25,9 @@ pub struct ViewerViewConfig {
   #[serde(default = "name_default")]
   #[serde(skip_serializing_if = "name_skip_if")]
   pub name: String,
+  #[serde(default = "background_color_default")]
+  #[serde(skip_serializing_if = "background_color_skip_if")]
+  pub background_color: String,
   #[serde(default = "danmu_viewer_default")]
   #[serde(skip_serializing_if = "danmu_viewer_skip_if")]
   pub danmu_viewer: DanmuViewerCustomConfig,
@@ -65,6 +68,16 @@ fn name_skip_if(value: &String) -> bool {
   *value == name_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
 //endregion
+
+// region background_color
+fn background_color_default() -> String {
+  "#3B3B3B44".to_string()
+}
+
+fn background_color_skip_if(value: &String) -> bool {
+  *value == background_color_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
+}
+// endregion
 
 //region danmu_viewer
 fn danmu_viewer_default() -> DanmuViewerCustomConfig {
