@@ -11,12 +11,17 @@
 
   let value = takeNotNull(props.defaultValue, props.value);
   let focused = false;
+
   $: {
     if (props.value != null && (!focused || props.ignoreFocus)) {
       value = props.value.toString();
     }
+
+    if (props.value !== value) {
+      props.value = value;
+      props.onChange && props.onChange(value);
+    }
   }
-  $: if (props.value !== value) props.onChange && props.onChange(value);
 
   let dispatch = createEventDispatcher();
 
