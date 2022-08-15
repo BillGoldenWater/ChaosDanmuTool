@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+use std::time::Duration;
 use tokio::net::TcpStream;
 use tokio::sync::Mutex;
+use tokio::time::timeout;
 use tokio_tungstenite::tungstenite::protocol::CloseFrame;
 use tokio_tungstenite::tungstenite::Message;
 use tokio_tungstenite::{MaybeTlsStream, WebSocketStream};
@@ -20,7 +22,7 @@ use crate::libs::config::config_manager::ConfigManager;
 use crate::libs::network::api_request::gift_config_getter::GiftConfigGetter;
 use crate::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver;
 use crate::libs::network::websocket::websocket_connection::WebSocketConnection;
-use crate::{error, info};
+use crate::{error, info, warn};
 
 lazy_static! {
   pub static ref COMMAND_BROADCAST_SERVER_STATIC_INSTANCE: Mutex<CommandBroadcastServer> =
@@ -97,7 +99,14 @@ impl CommandBroadcastServer {
 
   async fn broadcast_(&mut self, message: Message) {
     for connection in self.connections.as_mut_slice() {
-      connection.send(message.clone()).await;
+      let timeout_result = timeout(Duration::from_secs(5), connection.send(message.clone())).await;
+      if let Err(_) = timeout_result {
+        warn!(
+          "connection {} send timeout, disconnecting.",
+          connection.get_id()
+        );
+        connection.disconnect(None).await;
+      }
     }
   }
 
