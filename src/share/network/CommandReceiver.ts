@@ -56,6 +56,7 @@ export class CommandReceiver {
 
   open() {
     this.close();
+    this.log("client.open", `ws://localhost:${this.option.port} Connecting`);
     this.client = new WebSocket(`ws://localhost:${this.option.port}`);
     this.client.onopen = () => {
       this.log("client.onopen", `ws://localhost:${this.option.port} Opened`);
