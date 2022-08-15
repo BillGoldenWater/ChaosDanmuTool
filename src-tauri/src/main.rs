@@ -66,7 +66,9 @@ async fn main() {
       is_viewer_window_open,
       get_config,
       update_config,
-      is_debug
+      is_debug,
+      connect_room,
+      disconnect_room
     ])
     .menu(if cfg!(target_os = "macos") {
       tauri::Menu::os_default("Chaos Danmu Tool")
@@ -332,6 +334,24 @@ async fn update_config(config: String) {
 #[command]
 async fn is_debug() -> bool {
   cfg!(debug_assertions)
+}
+
+#[command]
+async fn connect_room() {
+  let result = DanmuReceiver::connect().await;
+  if let Err(err) = result {
+    rfd::MessageDialog::new()
+      .set_title("错误")
+      .set_level(rfd::MessageLevel::Error)
+      .set_buttons(rfd::MessageButtons::Ok)
+      .set_description(&format!("无法连接直播间.\n{:?}\n{}", err, location_info!()))
+      .show();
+  }
+}
+
+#[command]
+async fn disconnect_room() {
+  DanmuReceiver::disconnect().await;
 }
 
 #[allow(unused)]
