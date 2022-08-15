@@ -36,6 +36,14 @@ export class BackendApi {
   async isDebug() {
     return (await invoke("is_debug")) as boolean;
   }
+
+  async connectRoom() {
+    await invoke("connect_room");
+  }
+
+  async disconnectRoom() {
+    await invoke("disconnect_room");
+  }
 }
 
 export const backend = window.__TAURI_METADATA__ ? new BackendApi() : null;
