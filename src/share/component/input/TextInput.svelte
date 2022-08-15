@@ -16,9 +16,7 @@
       value = props.value.toString();
     }
   }
-  $: {
-    props.onChange && props.onChange(value);
-  }
+  $: if (props.value !== value) props.onChange && props.onChange(value);
 
   let dispatch = createEventDispatcher();
 
