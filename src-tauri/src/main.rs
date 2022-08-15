@@ -14,7 +14,6 @@ use tauri::{Assets, Context, WindowEvent};
 use tokio::sync::RwLock;
 use tokio::task;
 
-use chaosdanmutool::info;
 use chaosdanmutool::libs::command::command_history_manager::CommandHistoryManager;
 use chaosdanmutool::libs::command::command_packet::app_command::viewer_status_update::{
   ViewerStatus, ViewerStatusUpdate,
@@ -27,6 +26,7 @@ use chaosdanmutool::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver
 use chaosdanmutool::libs::network::http_server::HttpServer;
 #[cfg(target_os = "macos")]
 use chaosdanmutool::libs::utils::window_utils::set_visible_on_all_workspaces;
+use chaosdanmutool::{info, location_info};
 
 static VIBRANCY_APPLIED: RwLock<bool> = RwLock::const_new(false);
 
