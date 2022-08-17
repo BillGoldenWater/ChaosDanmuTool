@@ -56,17 +56,17 @@
   // region event
   let dispatch = createEventDispatcher();
 
+  function onFocus() {
+    dispatch("focus");
+
+    focused = true;
+  }
+
   function onBlur() {
     dispatch("blur");
 
     focused = false;
     p.value = toString(props.value);
-  }
-
-  function onFocus() {
-    dispatch("focus");
-
-    focused = true;
   }
 
   // endregion

@@ -6,47 +6,57 @@
   import type { TTextInput } from "./TInput";
   import { createEventDispatcher } from "svelte";
   import { takeNotNull } from "../../utils/ObjectUtils";
+  import { writable } from "svelte/store";
+  import type { Writable } from "svelte/store";
+  import { doUpdate } from "./TInput";
 
   export let props: TTextInput = { type: "text" };
+  let p: Writable<TTextInput> = writable(props);
+  $: p.set(props);
 
-  let value = takeNotNull(props.defaultValue, props.value);
+  let displayValue = writable(takeNotNull(props.defaultValue, props.value, ""));
   let focused = false;
 
-  $: {
-    if (props.value != null && (!focused || props.ignoreFocus)) {
-      value = props.value.toString();
-    }
-
-    if (props.value !== value) {
-      props.value = value;
-      props.onChange && props.onChange(value);
-    }
+  function update(value: string) {
+    displayValue.set(value);
   }
 
+  p.subscribe((props) => {
+    doUpdate(props, $displayValue, focused, update);
+  });
+
+  displayValue.subscribe((value) => {
+    $p.onChange && $p.onChange(value);
+    doUpdate($p, $displayValue, focused, update);
+  });
+
+  // region event
   let dispatch = createEventDispatcher();
-
-  function onBlur() {
-    dispatch("blur");
-
-    focused = false;
-    value = props.value;
-  }
 
   function onFocus() {
     dispatch("focus");
 
     focused = true;
   }
+
+  function onBlur() {
+    dispatch("blur");
+
+    focused = false;
+    doUpdate($p, $displayValue, focused, update);
+  }
+
+  // endregion
 </script>
 
 <!--suppress CheckEmptyScriptTag -->
 <div
   contenteditable
-  bind:innerHTML={value}
+  bind:innerHTML={$displayValue}
   class:enabled={!props.disabled}
   class:disabled={props.disabled}
-  on:blur={onBlur}
   on:focus={onFocus}
+  on:blur={onBlur}
 />
 
 <style lang="less">

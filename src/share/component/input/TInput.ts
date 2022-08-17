@@ -3,8 +3,22 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { randomUUID } from "crypto";
 import type Color from "color";
+
+export function doUpdate<T extends TInput>(
+  props: T,
+  currentValue: T["value"],
+  focused: boolean,
+  update: (value: T["value"]) => void
+) {
+  if (
+    props.value != null &&
+    props.value !== currentValue &&
+    (!focused || props.ignoreFocus)
+  ) {
+    update(props.value);
+  }
+}
 
 export type TInput =
   | TTextInput
@@ -95,7 +109,7 @@ export class RadioInputContext {
   manager: Map<string, typeof this._cb> = new Map();
 
   addListener(callback: typeof this._cb): string {
-    let id = randomUUID();
+    let id = Math.random().toString();
     this.manager.set(id, callback);
     return id;
   }
