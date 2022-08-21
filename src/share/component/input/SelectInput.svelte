@@ -3,11 +3,11 @@
   - SPDX-License-Identifier: AGPL-3.0-only
   -->
 <script lang="ts">
-  import type {TSelectInput} from "./TInput";
-  import {spring} from "svelte/motion";
-  import {takeNotNull} from "../../utils/ObjectUtils";
+  import type { TSelectInput } from "./TInput";
+  import { spring } from "svelte/motion";
+  import { takeNotNull } from "../../utils/ObjectUtils";
 
-  export let props: TSelectInput = {type: "select", options: []};
+  export let props: TSelectInput = { type: "select", options: [] };
 
   let selected = takeNotNull(props.defaultValue, props.value);
   $: if (props.value != null) selected = props.value;
@@ -145,7 +145,7 @@
 
     overflow: scroll;
 
-    z-index: 100;
+    z-index: var(--tooltipIndex);
   }
 
   .selectList::-webkit-scrollbar {
