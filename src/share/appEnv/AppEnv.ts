@@ -15,13 +15,17 @@ import type { ObjectPath } from "../type/TObjectPath";
 import { getProperty, setProperty } from "dot-prop";
 import * as uuid from "uuid";
 import { backend } from "../../main/backendApi";
+import type { ViewerStatus } from "../type/rust/command/commandPacket/appCommand/viewerStatusUpdate/ViewerStatus";
+import type { TGiftConfigMap } from "../type/bilibili/TGiftConfig";
 
 export interface AppEnv {
   config: Config;
   viewerConfig: ViewerViewConfig;
 
   path: URL;
+  giftConfig: TGiftConfigMap;
   receiverStatus: ReceiverStatus;
+  viewerStatus: ViewerStatus;
 
   eventTarget: AppEventTarget;
 }
@@ -31,7 +35,9 @@ export const appEnv: Writable<AppEnv> = writable({
   viewerConfig: null,
 
   path: null,
+  giftConfig: new Map(),
   receiverStatus: "close",
+  viewerStatus: "close",
 
   eventTarget: new AppEventTarget(),
 });
@@ -40,8 +46,21 @@ export const appEnv: Writable<AppEnv> = writable({
 applyConfigUpdateToAppEnv(
   backend ? await backend.getConfig() : (defaultConfig as Config)
 );
-get(appEnv).eventTarget.addEventListener("configUpdate", (event) => {
+let eventTarget = get(appEnv).eventTarget;
+eventTarget.addEventListener("configUpdate", (event) => {
   applyConfigUpdateToAppEnv(event.config);
+});
+eventTarget.addEventListener("giftConfigUpdate", (event) => {
+  appEnv.update((previous) => ({
+    ...previous,
+    giftConfig: event.giftConfig,
+  }));
+});
+eventTarget.addEventListener("receiverStatusUpdate", (event) => {
+  appEnv.update((previous) => ({ ...previous, receiverStatus: event.status }));
+});
+eventTarget.addEventListener("viewerStatusUpdate", (event) => {
+  appEnv.update((previous) => ({ ...previous, viewerStatus: event.status }));
 });
 // endregion
 
