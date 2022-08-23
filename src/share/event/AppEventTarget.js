@@ -87,7 +87,7 @@ export class AppEventTarget extends EventTarget {
   }
 
   removeEventListener(type, listener) {
-    super.addEventListener(type, listener);
+    super.removeEventListener(type, listener);
   }
 
   dispatchEvent(event) {
