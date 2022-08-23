@@ -30,6 +30,8 @@ pub enum ReceiverStatus {
   Connecting,
   Connected,
 
-  Interrupted,
+  Error,
   Reconnecting,
+
+  Interrupted,
 }
