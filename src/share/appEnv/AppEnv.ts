@@ -12,7 +12,7 @@ import { AppEventTarget } from "../event/AppEventTarget";
 import defaultConfig from "../type/rust/config/defaultConfig.json";
 import defaultViewerConfig from "../type/rust/config/defaultViewerConfig.json";
 import type { ObjectPath } from "../type/TObjectPath";
-import { setProperty } from "dot-prop";
+import { getProperty, setProperty } from "dot-prop";
 import * as uuid from "uuid";
 import { backend } from "../../main/backendApi";
 
@@ -97,6 +97,10 @@ export function setConfig(key: ObjectPath<Config>, value: unknown) {
   appEnv.update((previous) => {
     return setConfig_(previous, key, value);
   });
+}
+
+export function getConfig<T>(key: ObjectPath<Config>, defaultValue?: T): T {
+  return getProperty(get(appEnv).config, key, defaultValue);
 }
 
 export function setViewerConfig(
