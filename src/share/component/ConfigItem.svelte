@@ -7,7 +7,7 @@
   import type { Config } from "../type/rust/config/Config";
   import type { TInput } from "./input/TInput";
   import Input from "./input/Input.svelte";
-  import { getConfig } from "../appEnv/AppEnv";
+  import { getConfig, setConfig } from "../appEnv/AppEnv";
   import Spacer from "./Spacer.svelte";
 
   export let key: ObjectPath<Config>;
@@ -22,6 +22,10 @@
   export let useTooltip: boolean = false;
 
   export let block: boolean = false;
+
+  let onChange = (value: unknown) => {
+    setConfig(key, value);
+  };
 </script>
 
 <div class="configItem" class:block>
@@ -36,6 +40,7 @@
           ...props,
           type,
           disabled,
+          onChange,
           value: getConfig(key, defaultValue),
         }}
       />
