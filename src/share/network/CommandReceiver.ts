@@ -84,7 +84,9 @@ export class CommandReceiver {
   }
 
   onMessage(event: MessageEvent) {
-    const de = this.option.eventTarget.dispatchEvent;
+    const de = this.option.eventTarget.dispatchEvent.bind(
+      this.option.eventTarget
+    );
     const commandPack: CommandPacket = JSON.parse(event.data);
     if (this.option.debug) {
       console.log(commandPack.data);
