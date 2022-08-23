@@ -11,8 +11,9 @@
   import Spacer from "./Spacer.svelte";
 
   export let key: ObjectPath<Config>;
+  export let type: TInput["type"];
 
-  export let props: TInput = { type: "number", min: 0 };
+  export let props: TInput = undefined;
   export let defaultValue: unknown = undefined;
   export let disabled: boolean = false;
 
@@ -31,12 +32,19 @@
         <Spacer size="half" />
       {/if}
       <Input
-        props={{ ...props, disabled, value: getConfig(key, defaultValue) }}
+        props={{
+          ...props,
+          type,
+          disabled,
+          value: getConfig(key, defaultValue),
+        }}
       />
     </div>
     {#if !useTooltip && description && description.length > 0}
       <div class="description">{description}</div>
     {/if}
+  {:else}
+    <div>Props error</div>
   {/if}
 </div>
 
