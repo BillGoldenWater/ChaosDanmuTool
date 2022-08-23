@@ -25,7 +25,7 @@
 </script>
 
 <div class="configItem" class:block>
-  {#if key}
+  {#if key && type}
     <div class="input">
       {#if name && name.length > 0}
         <div>{name}:</div>
