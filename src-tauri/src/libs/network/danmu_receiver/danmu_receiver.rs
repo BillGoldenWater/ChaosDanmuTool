@@ -168,7 +168,7 @@ impl DanmuReceiver {
 
   async fn disconnect_(&mut self, close_frame: Option<CloseFrame<'static>>) {
     match self.status {
-      ReceiverStatus::Close | ReceiverStatus::Interrupted => {
+      ReceiverStatus::Close | ReceiverStatus::Interrupted | ReceiverStatus::Error => {
         warn!("already closed");
       }
       ReceiverStatus::Connected => {
@@ -178,7 +178,7 @@ impl DanmuReceiver {
       }
       ReceiverStatus::Connecting | ReceiverStatus::Reconnecting => {
         info!("interrupting");
-        self.status = ReceiverStatus::Interrupted;
+        self.set_status(ReceiverStatus::Interrupted).await;
       }
     }
   }
@@ -204,16 +204,19 @@ impl DanmuReceiver {
     // endregion
 
     // region tick reconnect
-    if self.status == ReceiverStatus::Reconnecting {
+    if self.status == ReceiverStatus::Error {
       let cfg = ConfigManager::get_config().await.backend.danmu_receiver;
       if cfg.auto_reconnect {
-        info!("reconnecting");
-        let result = self.connect_().await;
-        if let Err(err) = result {
-          error!("unable to reconnect: {:?}", err);
-        }
-        self.reconnect_count += 1;
+        self.set_status(ReceiverStatus::Reconnecting).await;
       }
+    }
+    if self.status == ReceiverStatus::Reconnecting {
+      info!("reconnecting (count: {})", self.reconnect_count);
+      let result = self.connect_().await;
+      if let Err(err) = result {
+        error!("unable to reconnect: {:?}", err);
+      }
+      self.reconnect_count += 1;
     }
     // endregion
 
@@ -294,9 +297,10 @@ impl DanmuReceiver {
           reason: Cow::Owned("".to_string()),
         });
 
-        self.on_disconnect().await;
         if close_frame.code == CloseCode::Abnormal {
-          self.set_status(ReceiverStatus::Reconnecting).await;
+          self.set_status(ReceiverStatus::Error).await;
+        } else {
+          self.on_disconnect().await;
         }
       }
       Message::Ping(..) | Message::Pong(..) | Message::Frame(..) => {}
