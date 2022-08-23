@@ -208,6 +208,8 @@ impl DanmuReceiver {
       let cfg = ConfigManager::get_config().await.backend.danmu_receiver;
       if cfg.auto_reconnect {
         self.set_status(ReceiverStatus::Reconnecting).await;
+      } else {
+        self.set_status(ReceiverStatus::Close).await;
       }
     }
     if self.status == ReceiverStatus::Reconnecting {
@@ -221,7 +223,7 @@ impl DanmuReceiver {
     // endregion
 
     if !self.is_connected_() && self.status != ReceiverStatus::Close {
-      self.on_disconnect().await;
+      self.on_disconnect(true).await;
     }
   }
 
@@ -298,9 +300,9 @@ impl DanmuReceiver {
         });
 
         if close_frame.code == CloseCode::Abnormal {
-          self.set_status(ReceiverStatus::Error).await;
+          self.on_disconnect(true).await;
         } else {
-          self.on_disconnect().await;
+          self.on_disconnect(false).await;
         }
       }
       Message::Ping(..) | Message::Pong(..) | Message::Frame(..) => {}
@@ -310,8 +312,14 @@ impl DanmuReceiver {
     }
   }
 
-  async fn on_disconnect(&mut self) {
-    self.set_status(ReceiverStatus::Close).await
+  async fn on_disconnect(&mut self, error: bool) {
+    self
+      .set_status(if error {
+        ReceiverStatus::Error
+      } else {
+        ReceiverStatus::Close
+      })
+      .await
   }
 
   async fn parse_packet(&mut self, mut packet: Packet) {
