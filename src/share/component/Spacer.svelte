@@ -30,10 +30,18 @@
 </script>
 
 <!--suppress CheckEmptyScriptTag -->
-<div class="spacer" style={`${attrName}: ${attrValue};`} />
+<div
+  class="spacer"
+  class:vertical={direction === "vertical"}
+  style={`${attrName}: ${attrValue};`}
+/>
 
 <style>
   .spacer {
     display: inline-block;
+  }
+
+  .vertical {
+    display: block;
   }
 </style>
