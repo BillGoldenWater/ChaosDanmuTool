@@ -28,8 +28,10 @@ pub fn is_running_under_rosetta() -> std::io::Result<bool> {
 
     let error = libc::sysctlbyname(
       attr_name.as_ptr(),
-      &mut ret as *mut std::os::raw::c_int as *mut std::ffi::c_void, &mut 8,
-      std::ptr::null_mut(), 0,
+      &mut ret as *mut std::os::raw::c_int as *mut std::ffi::c_void,
+      &mut 8,
+      std::ptr::null_mut(),
+      0,
     );
 
     if error < std::os::raw::c_int::default() {
