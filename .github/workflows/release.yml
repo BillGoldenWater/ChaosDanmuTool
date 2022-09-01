@@ -1,17 +1,13 @@
 name: Build and Release
 
 on:
-  push:
-    tags:
-      - "*"
-
   workflow_dispatch:
 
 
 jobs:
   build:
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         platform: [ macos-latest, ubuntu-latest, windows-latest ]
 
