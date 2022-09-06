@@ -5,19 +5,14 @@
 
 use std::path::PathBuf;
 
-use crate::error;
 use tauri::{Assets, Context};
-use tokio::sync::Mutex;
 
+use crate::error;
 use crate::libs::command::command_history_storage::CommandHistoryStorage;
 use crate::libs::command::command_packet::CommandPacket;
 use crate::libs::utils::fs_utils::{get_app_data_dir, get_dir_children_names};
 
-lazy_static! {
-  pub static ref COMMAND_HISTORY_MANAGER_STATIC_INSTANCE: Mutex<CommandHistoryManager> =
-    Mutex::new(CommandHistoryManager::new());
-}
-
+#[derive(static_object::StaticObject)]
 pub struct CommandHistoryManager {
   inited: bool,
 
@@ -26,8 +21,9 @@ pub struct CommandHistoryManager {
 }
 
 impl CommandHistoryManager {
-  fn new() -> CommandHistoryManager {
-    CommandHistoryManager {
+  fn new() -> Self {
+    todo!("thread safe");
+    Self {
       inited: false,
 
       data_dir: PathBuf::new(),
@@ -41,34 +37,19 @@ impl CommandHistoryManager {
     }
   }
 
-  pub async fn init<A: Assets>(context: &Context<A>) {
-    let this = &mut *COMMAND_HISTORY_MANAGER_STATIC_INSTANCE.lock().await;
-    this.init_(context)
-  }
-
-  fn init_<A: Assets>(&mut self, context: &Context<A>) {
+  pub fn init<A: Assets>(&mut self, context: &Context<A>) {
     self.data_dir = get_app_data_dir(context).join(".commandHistory");
 
     self.current_storage = CommandHistoryStorage::new(self.data_dir.clone());
     self.inited = true;
   }
 
-  pub async fn new_file() {
-    let this = &mut *COMMAND_HISTORY_MANAGER_STATIC_INSTANCE.lock().await;
-    this.new_file_()
-  }
-
-  fn new_file_(&mut self) {
+  pub fn new_file(&mut self) {
     self.check_init();
     self.current_storage = CommandHistoryStorage::new(self.data_dir.clone());
   }
 
-  pub async fn write(command: &CommandPacket) {
-    let this = &mut *COMMAND_HISTORY_MANAGER_STATIC_INSTANCE.lock().await;
-    this.write_(command).await
-  }
-
-  async fn write_(&mut self, command: &CommandPacket) {
+  pub async fn write(&mut self, command: &CommandPacket) {
     self.check_init();
     let command_str_result = serde_json::to_string(&command);
 
@@ -79,12 +60,12 @@ impl CommandHistoryManager {
     }
   }
 
-  pub async fn read(storage_id: &str, start_index: u64, end_index: u64) -> Vec<CommandPacket> {
-    let this = &*COMMAND_HISTORY_MANAGER_STATIC_INSTANCE.lock().await;
-    this.read_(storage_id, start_index, end_index).await
-  }
-
-  async fn read_(&self, storage_id: &str, start_index: u64, end_index: u64) -> Vec<CommandPacket> {
+  pub async fn read(
+    &self,
+    storage_id: &str,
+    start_index: u64,
+    end_index: u64,
+  ) -> Vec<CommandPacket> {
     let chs = self.get_storage(storage_id).await;
 
     chs
@@ -95,12 +76,7 @@ impl CommandHistoryManager {
       .collect()
   }
 
-  pub async fn history_storages() -> Vec<String> {
-    let this = &*COMMAND_HISTORY_MANAGER_STATIC_INSTANCE.lock().await;
-    this.history_storages_()
-  }
-
-  fn history_storages_(&self) -> Vec<String> {
+  pub fn history_storages(&self) -> Vec<String> {
     self.check_init();
     if let Ok(files) = get_dir_children_names(&self.data_dir, true) {
       files
@@ -109,12 +85,7 @@ impl CommandHistoryManager {
     }
   }
 
-  pub async fn get_len(storage_id: &str) -> u64 {
-    let this = &*COMMAND_HISTORY_MANAGER_STATIC_INSTANCE.lock().await;
-    this.get_len_(storage_id).await
-  }
-
-  async fn get_len_(&self, storage_id: &str) -> u64 {
+  pub async fn get_len(&self, storage_id: &str) -> u64 {
     self.get_storage(storage_id).await.len()
   }
 

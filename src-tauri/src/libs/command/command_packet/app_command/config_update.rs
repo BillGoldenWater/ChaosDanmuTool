@@ -16,7 +16,9 @@ pub struct ConfigUpdate {
 }
 
 impl ConfigUpdate {
-  pub fn new(config: Config) -> ConfigUpdate {
-    ConfigUpdate { config }
+  pub fn new(config: &Config) -> ConfigUpdate {
+    ConfigUpdate {
+      config: config.clone(),
+    }
   }
 }

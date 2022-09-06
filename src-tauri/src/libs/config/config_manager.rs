@@ -5,63 +5,56 @@
 
 use std::fs;
 use std::path::PathBuf;
+use std::sync::Arc;
 use std::time::Instant;
 
 use rfd::{MessageButtons, MessageLevel};
+use static_object::StaticObject;
 use tauri::api::file::read_string;
 use tauri::{Assets, Context};
-use tokio::sync::Mutex;
+use tokio::sync::{Mutex, MutexGuard};
 
 use crate::libs::command::command_packet::app_command::config_update::ConfigUpdate;
 use crate::libs::command::command_packet::app_command::AppCommand;
 use crate::libs::config::config::{serialize_config, Config};
 use crate::libs::network::command_broadcast_server::CommandBroadcastServer;
 use crate::libs::utils::fs_utils::get_app_data_dir;
+use crate::libs::utils::immutable_utils::Immutable;
+use crate::libs::utils::mutex_utils::{a_lock, lock};
 use crate::{info, location_info};
 
-lazy_static! {
-  pub static ref CONFIG_MANAGER_STATIC_INSTANCE: Mutex<ConfigManager> =
-    Mutex::new(ConfigManager::new());
-}
-
+#[derive(StaticObject)]
 pub struct ConfigManager {
   app_dir: Option<PathBuf>,
   config_file_path: Option<PathBuf>,
-  config: Config,
-  last_save_ts: Instant,
-  changed: bool,
+
+  config: Arc<Mutex<Config>>,
+  last_save_ts: Mutex<Instant>,
+  changed: Mutex<bool>,
 }
 
 impl ConfigManager {
-  fn new() -> ConfigManager {
+  pub fn new() -> ConfigManager {
     ConfigManager {
       app_dir: None,
       config_file_path: None,
-      config: serde_json::from_str("{}").unwrap(),
-      last_save_ts: Instant::now(),
-      changed: false,
+      config: wrap_cfg(serde_json::from_str("{}").unwrap()),
+      last_save_ts: Mutex::new(Instant::now()),
+      changed: Mutex::new(false),
     }
   }
 
-  pub async fn init<A: Assets>(context: &Context<A>) {
-    let this = &mut *CONFIG_MANAGER_STATIC_INSTANCE.lock().await;
-
-    this.app_dir = Some(get_app_data_dir(context));
+  pub async fn init<A: Assets>(&mut self, context: &Context<A>) {
+    self.app_dir = Some(get_app_data_dir(context));
 
     let mut config_file_path = get_app_data_dir(context);
     config_file_path.push("config.json");
-    this.config_file_path = Some(config_file_path);
+    self.config_file_path = Some(config_file_path);
 
-    this.load_().await;
+    self.load().await;
   }
 
-  pub async fn load() {
-    let this = &mut *CONFIG_MANAGER_STATIC_INSTANCE.lock().await;
-    info!("load manually");
-    this.load_().await;
-  }
-
-  async fn load_(&mut self) {
+  pub async fn load(&mut self) {
     if self.config_file_path.is_none() {
       return;
     }
@@ -102,49 +95,42 @@ impl ConfigManager {
         )
         .show();
       if reset {
-        self.reset_(true).await;
+        self.reset(true).await;
         return;
       } else {
         std::process::exit(0);
       }
     }
 
-    self.config = parse_result.unwrap();
+    *a_lock(&self.config).await = parse_result.unwrap()
   }
 
-  pub async fn save() {
-    let this = &mut *CONFIG_MANAGER_STATIC_INSTANCE.lock().await;
-    info!("save manually");
-    this.save_();
-  }
-
-  fn save_(&mut self) {
+  pub fn save(&mut self) {
     if let Some(app_dir) = &self.app_dir {
       if let Some(path) = &self.config_file_path {
+        let mut changed = lock(&self.changed);
+
         info!("save config");
         let result = fs::create_dir_all(app_dir);
         if let Err(err) = result {
           info!("failed to create data folder\n{:#?}", err);
           return;
         }
-        let result = fs::write(path.as_path(), serialize_config(&self.config, true));
+        let result = fs::write(path.as_path(), serialize_config(&*lock(&self.config), true));
         if let Err(err) = result {
           info!("failed to write config file\n{:#?}", err);
           return;
         }
-        self.changed = false;
-        self.last_save_ts = Instant::now();
+        *changed = false;
+        *lock(&self.last_save_ts) = Instant::now();
         info!("config successfully saved");
+
+        drop(changed);
       }
     }
   }
 
-  pub async fn reset(force: bool) {
-    let this = &mut *CONFIG_MANAGER_STATIC_INSTANCE.lock().await;
-    this.reset_(force).await
-  }
-
-  async fn reset_(&mut self, force: bool) {
+  pub async fn reset(&mut self, force: bool) {
     let button = MessageButtons::OkCancelCustom(
       "重置".to_string(),
       if force {
@@ -175,64 +161,48 @@ impl ConfigManager {
     }
 
     info!("reset config");
-    self
-      .set_config_(serde_json::from_str("{}").unwrap(), true)
-      .await;
-    self.save_();
+    *a_lock(&self.config).await = serde_json::from_str("{}").unwrap();
+    self.on_change(true).await;
+    self.save();
   }
 
-  pub async fn get_config() -> Config {
-    let this = &mut *CONFIG_MANAGER_STATIC_INSTANCE.lock().await;
-    this.get_config_()
+  fn get_config(&self) -> Arc<Mutex<Config>> {
+    Arc::clone(&self.config)
   }
 
-  fn get_config_(&mut self) -> Config {
-    self.config.clone()
+  pub fn get_readonly_config(&self) -> Immutable<Config> {
+    Immutable::new(lock(&self.config).clone())
   }
 
-  pub async fn set_config(config: Config, broadcast: bool) {
-    let this = &mut *CONFIG_MANAGER_STATIC_INSTANCE.lock().await;
-    this.set_config_(config, broadcast).await
+  async fn on_change(&mut self, broadcast: bool) {
+    *a_lock(&self.changed).await = true;
+    if broadcast {
+      CommandBroadcastServer::i()
+        .broadcast_app_command(AppCommand::from_config_update(ConfigUpdate::new(
+          &*a_lock(&self.config).await,
+        )))
+        .await;
+    }
   }
 
-  async fn set_config_(&mut self, config: Config, broadcast: bool) {
-    self.config = config;
-    self.on_change_(broadcast).await;
-  }
-
-  pub async fn tick() {
-    let this = &mut *CONFIG_MANAGER_STATIC_INSTANCE.lock().await;
-    this.tick_().await
-  }
-
-  async fn tick_(&mut self) {
-    if self.config.backend.config_manager.save_on_change {
-      if self.changed && self.last_save_ts.elapsed().as_secs() >= 5 {
+  pub async fn tick(&mut self) {
+    if a_lock(&self.config)
+      .await
+      .backend
+      .config_manager
+      .save_on_change
+    {
+      if *a_lock(&self.changed).await && a_lock(&self.last_save_ts).await.elapsed().as_secs() >= 5 {
         info!("save on change");
-        self.save_();
+        self.save();
       }
     }
   }
 
-  async fn on_change_(&mut self, broadcast: bool) {
-    self.changed = true;
-    if broadcast {
-      CommandBroadcastServer::broadcast_app_command(AppCommand::from_config_update(
-        ConfigUpdate::new(self.config.clone()),
-      ))
-      .await;
-    }
-  }
-
-  pub async fn on_exit() {
-    let this = &mut *CONFIG_MANAGER_STATIC_INSTANCE.lock().await;
-    this.on_exit_()
-  }
-
-  fn on_exit_(&mut self) {
-    if self.config.backend.config_manager.save_on_exit {
+  pub fn on_exit(&mut self) {
+    if lock(&self.config).backend.config_manager.save_on_exit {
       info!("save on exit");
-      self.save_();
+      self.save();
     }
   }
 }
@@ -244,4 +214,29 @@ fn is_not_found(err: &tauri::api::Error) -> bool {
     }
   }
   false
+}
+
+fn wrap_cfg(config: Config) -> Arc<Mutex<Config>> {
+  Arc::new(Mutex::new(config))
+}
+
+#[macro_export]
+#[allow(unused_macros)]
+macro_rules! get_cfg {
+  () => {
+    ConfigManager::i().get_readonly_config()
+  };
+}
+
+pub async fn modify_cfg<F>(do_modify: F, broadcast: bool)
+where
+  F: FnOnce(&mut MutexGuard<'_, Config>),
+{
+  let cfg_m = ConfigManager::i();
+  let config = cfg_m.get_config();
+  let mut cfg = lock(&config);
+  do_modify(&mut cfg);
+  drop(cfg);
+  drop(config);
+  cfg_m.on_change(broadcast).await;
 }

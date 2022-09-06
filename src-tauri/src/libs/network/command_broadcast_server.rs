@@ -4,12 +4,14 @@
  */
 
 use std::time::Duration;
+
 use tokio::net::TcpStream;
-use tokio::sync::Mutex;
 use tokio::time::timeout;
 use tokio_tungstenite::tungstenite::protocol::CloseFrame;
 use tokio_tungstenite::tungstenite::Message;
 use tokio_tungstenite::{MaybeTlsStream, WebSocketStream};
+
+use static_object::StaticObject;
 
 use crate::libs::command::command_history_manager::CommandHistoryManager;
 use crate::libs::command::command_packet::app_command::config_update::ConfigUpdate;
@@ -22,51 +24,52 @@ use crate::libs::config::config_manager::ConfigManager;
 use crate::libs::network::api_request::gift_config_getter::GiftConfigGetter;
 use crate::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver;
 use crate::libs::network::websocket::websocket_connection::WebSocketConnection;
-use crate::{error, info, warn};
-
-lazy_static! {
-  pub static ref COMMAND_BROADCAST_SERVER_STATIC_INSTANCE: Mutex<CommandBroadcastServer> =
-    Mutex::new(CommandBroadcastServer::new());
-}
+use crate::{error, get_cfg, info, warn};
 
 type WebSocket = WebSocketStream<MaybeTlsStream<TcpStream>>;
 
+#[derive(StaticObject)]
 pub struct CommandBroadcastServer {
   connections: Vec<WebSocketConnection>,
 }
 
 impl CommandBroadcastServer {
   fn new() -> CommandBroadcastServer {
+    todo!("thread safe");
     CommandBroadcastServer {
       connections: vec![],
     }
   }
 
   // region send api
-  pub async fn broadcast_command(command: CommandPacket) {
+  pub async fn broadcast_command(&mut self, command: CommandPacket) {
     let command_str_result = command.to_string();
 
     if let Ok(str) = command_str_result {
-      Self::broadcast(Message::Text(str)).await;
-      CommandHistoryManager::write(&command).await;
+      self.broadcast(Message::Text(str)).await;
+      CommandHistoryManager::i().write(&command).await;
     } else {
       error!("failed to serialize command {:?}", command_str_result)
     }
   }
 
-  pub async fn broadcast_app_command(app_command: AppCommand) {
-    Self::broadcast_command(CommandPacket::from_app_command(app_command)).await
+  pub async fn broadcast_app_command(&mut self, app_command: AppCommand) {
+    self
+      .broadcast_command(CommandPacket::from_app_command(app_command))
+      .await
   }
 
-  pub async fn broadcast_bilibili_command(bilibili_command: BiliBiliCommand) {
-    Self::broadcast_command(CommandPacket::from_bilibili_command(bilibili_command)).await
+  pub async fn broadcast_bilibili_command(&mut self, bilibili_command: BiliBiliCommand) {
+    self
+      .broadcast_command(CommandPacket::from_bilibili_command(bilibili_command))
+      .await
   }
 
   pub async fn send_command(&mut self, connection_id: String, command: CommandPacket) {
     let command_str_result = command.to_string();
 
     if let Ok(str) = command_str_result {
-      self.send_(connection_id, Message::Text(str)).await
+      self.send(connection_id, Message::Text(str)).await
     } else {
       error!("failed to serialize command {:?}", command_str_result)
     }
@@ -92,12 +95,7 @@ impl CommandBroadcastServer {
   }
   // endregion
 
-  async fn broadcast(message: Message) {
-    let this = &mut *COMMAND_BROADCAST_SERVER_STATIC_INSTANCE.lock().await;
-    this.broadcast_(message).await
-  }
-
-  async fn broadcast_(&mut self, message: Message) {
+  pub async fn broadcast(&mut self, message: Message) {
     for connection in self.connections.as_mut_slice() {
       let timeout_result = timeout(Duration::from_secs(5), connection.send(message.clone())).await;
       if let Err(_) = timeout_result {
@@ -110,13 +108,7 @@ impl CommandBroadcastServer {
     }
   }
 
-  pub async fn send(connection_id: String, message: Message) {
-    let this = &mut *COMMAND_BROADCAST_SERVER_STATIC_INSTANCE.lock().await;
-
-    this.send_(connection_id, message).await;
-  }
-
-  async fn send_(&mut self, connection_id: String, message: Message) {
+  pub async fn send(&mut self, connection_id: String, message: Message) {
     for connection in self.connections.as_mut_slice() {
       if connection.get_id().eq(&connection_id) {
         connection.send(message).await;
@@ -125,10 +117,12 @@ impl CommandBroadcastServer {
     }
   }
 
-  pub async fn disconnect(connection_id: String, close_frame: Option<CloseFrame<'static>>) {
-    let this = &mut *COMMAND_BROADCAST_SERVER_STATIC_INSTANCE.lock().await;
-
-    for connection in this.connections.as_mut_slice() {
+  pub async fn disconnect(
+    &mut self,
+    connection_id: String,
+    close_frame: Option<CloseFrame<'static>>,
+  ) {
+    for connection in self.connections.as_mut_slice() {
       if connection.get_id().eq(&connection_id) {
         connection.disconnect(close_frame).await;
         break;
@@ -136,13 +130,7 @@ impl CommandBroadcastServer {
     }
   }
 
-  pub async fn close_all() {
-    let this = &mut *COMMAND_BROADCAST_SERVER_STATIC_INSTANCE.lock().await;
-
-    this.close_all_().await
-  }
-
-  async fn close_all_(&mut self) {
+  pub async fn close_all(&mut self) {
     info!("closing all connection");
     for connection in self.connections.as_mut_slice() {
       connection.disconnect(None).await;
@@ -151,34 +139,26 @@ impl CommandBroadcastServer {
     info!("all connection closed");
   }
 
-  pub async fn tick() {
-    let this = &mut *COMMAND_BROADCAST_SERVER_STATIC_INSTANCE.lock().await;
-
-    this
+  pub async fn tick(&mut self) {
+    self
       .connections
       .retain(|connection| connection.is_connected());
 
     // region tick connections
     let mut incoming_messages: Vec<(String, Message)> = vec![];
-    for connection in this.connections.as_mut_slice() {
+    for connection in self.connections.as_mut_slice() {
       let messages = connection.tick().await;
       for msg in messages {
         incoming_messages.push((connection.get_id(), msg));
       }
     }
     for (id, msg) in incoming_messages {
-      this.on_message(msg, id).await;
+      self.on_message(msg, id).await;
     }
     // endregion
   }
 
-  pub async fn accept(websocket_stream: WebSocket) {
-    let this = &mut *COMMAND_BROADCAST_SERVER_STATIC_INSTANCE.lock().await;
-
-    this.accept_(websocket_stream).await
-  }
-
-  async fn accept_(&mut self, websocket_stream: WebSocket) {
+  pub async fn accept(&mut self, websocket_stream: WebSocket) {
     let mut connection = WebSocketConnection::new();
 
     let accept_result = connection.accept(websocket_stream).await;
@@ -196,23 +176,20 @@ impl CommandBroadcastServer {
     self
       .send_app_command(
         connection_id.clone(),
-        AppCommand::from_config_update(ConfigUpdate::new(ConfigManager::get_config().await)),
+        AppCommand::from_config_update(ConfigUpdate::new(&get_cfg!())),
       )
       .await;
+
     self
       .send_app_command(
         connection_id.clone(),
         AppCommand::from_receiver_status_update(ReceiverStatusUpdate::new(
-          DanmuReceiver::get_status().await,
+          DanmuReceiver::i().get_status(),
         )),
       )
       .await;
 
-    let roomid = ConfigManager::get_config()
-      .await
-      .backend
-      .danmu_receiver
-      .roomid;
+    let roomid = get_cfg!().backend.danmu_receiver.roomid;
     let gift_config = GiftConfigGetter::get(roomid).await;
     if let Some(gift_config) = gift_config {
       if let Some(gift_config) = gift_config.data {
@@ -229,6 +206,6 @@ impl CommandBroadcastServer {
   async fn on_message(&mut self, message: Message, connection_id: String) {
     info!("{}: {:?} ", connection_id, message);
 
-    self.send_(connection_id, message).await;
+    self.send(connection_id, message).await;
   }
 }

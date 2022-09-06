@@ -13,6 +13,7 @@ use hyper::service::{make_service_fn, service_fn};
 use hyper::{Body, Method, Request as HyperRequest, Response, Server, StatusCode, Version};
 use netstat2::{get_sockets_info, ProtocolSocketInfo, TcpState};
 use oneshot::Sender;
+use static_object::StaticObject;
 use sysinfo::{Pid, PidExt, ProcessExt, ProcessRefreshKind, RefreshKind, SystemExt};
 use tauri::async_runtime::JoinHandle;
 use tauri::{AssetResolver, Wry};
@@ -21,7 +22,7 @@ use tokio_tungstenite::tungstenite::handshake::derive_accept_key;
 use tokio_tungstenite::tungstenite::protocol::Role;
 use tokio_tungstenite::{MaybeTlsStream, WebSocketStream};
 
-use crate::libs::config::config_manager::ConfigManager;
+use crate::libs::config::config_manager::modify_cfg;
 use crate::libs::network::command_broadcast_server::CommandBroadcastServer;
 use crate::{error, info, location_info};
 
@@ -161,9 +162,13 @@ impl HttpServer {
 
       // save config
       info!("saving changed port config");
-      let mut cfg = ConfigManager::get_config().await;
-      cfg.backend.http_server.port = port;
-      ConfigManager::set_config(cfg, false).await;
+      modify_cfg(
+        |cfg| {
+          (*cfg).backend.http_server.port = port;
+        },
+        false,
+      )
+      .await;
 
       rfd::MessageDialog::new()
         .set_title("成功")
@@ -228,7 +233,8 @@ impl HttpServer {
             )
             .await;
 
-            CommandBroadcastServer::accept(websocket_stream).await;
+            info!("upgrading");
+            CommandBroadcastServer::i().accept(websocket_stream).await;
             info!("upgraded");
           }
           Err(err) => {

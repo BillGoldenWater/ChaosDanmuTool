@@ -16,6 +16,7 @@ tauri-build = { version = "1.0.4", features = [] }
 embed-resource = "1.7.3"
 
 [dependencies]
+static_object = { path = "static_object" }
 serde_json = "1.0.82"
 serde = { version = "1.0.140", features = ["derive"] }
 # live template: sddfc (serde default define & function - config)
@@ -54,6 +55,8 @@ netstat2 = "0.9.1"
 get-port = "4.0.0"
 sysinfo = "0.25.0"
 async-recursion = "1.0.0"
+rand = "0.8.5"
+backtrace = "0.3"
 ts-rs = "6.2.0"
 # live template: tss
 # #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]

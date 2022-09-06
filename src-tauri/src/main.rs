@@ -8,9 +8,11 @@
   windows_subsystem = "windows"
 )]
 
-use tauri::async_runtime::block_on;
+use chaosdanmutool::libs::utils::immutable_utils::Immutable;
+use tauri::async_runtime::{block_on, Mutex};
 use tauri::{command, App, AppHandle, Manager, Wry};
 use tauri::{Assets, Context, WindowEvent};
+use tokio::sync::mpsc::error::TryRecvError;
 use tokio::sync::RwLock;
 use tokio::task;
 
@@ -20,13 +22,14 @@ use chaosdanmutool::libs::command::command_packet::app_command::viewer_status_up
 };
 use chaosdanmutool::libs::command::command_packet::app_command::AppCommand;
 use chaosdanmutool::libs::config::config::serialize_config;
-use chaosdanmutool::libs::config::config_manager::ConfigManager;
+use chaosdanmutool::libs::config::config_manager::{modify_cfg, ConfigManager};
 use chaosdanmutool::libs::network::command_broadcast_server::CommandBroadcastServer;
 use chaosdanmutool::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver;
 use chaosdanmutool::libs::network::http_server::HttpServer;
 #[cfg(target_os = "macos")]
 use chaosdanmutool::libs::utils::window_utils::set_visible_on_all_workspaces;
-use chaosdanmutool::{info, location_info};
+use chaosdanmutool::{error, get_cfg, info, location_info};
+use static_object::StaticObject;
 
 static VIBRANCY_APPLIED: RwLock<bool> = RwLock::const_new(false);
 
@@ -80,7 +83,7 @@ async fn main() {
   // endregion
 
   //region run
-  app.run(|app_handle, event| match event {
+  app.run(move |app_handle, event| match event {
     tauri::RunEvent::Ready {} => {
       // ready event
       info!("ready");
@@ -111,21 +114,16 @@ async fn main() {
 }
 
 async fn on_init<A: Assets>(context: &Context<A>) {
-  ConfigManager::init(context).await;
-  CommandHistoryManager::init(context).await;
+  ConfigManager::i().init(context).await;
+  CommandHistoryManager::i().init(context);
 
-  start_ticking();
+  start_ticking().await;
 }
 
 async fn on_setup(app: &mut App<Wry>) {
   let asset_resolver = app.asset_resolver();
 
-  let port = ConfigManager::get_config()
-    .await
-    .backend
-    .http_server
-    .port
-    .clone();
+  let port = get_cfg!().backend.http_server.port.clone();
   HttpServer::start(asset_resolver, port).await;
 }
 
@@ -137,25 +135,71 @@ async fn on_activate(app_handle: &AppHandle<Wry>) {
   show_main_window(app_handle).await;
 }
 
-async fn on_exit(_app_handle: &AppHandle<Wry>) {
-  if DanmuReceiver::is_connected().await {
-    DanmuReceiver::disconnect().await;
+pub async fn on_exit(_app_handle: &AppHandle<Wry>) {
+  stop_ticking().await;
+
+  if DanmuReceiver::i().is_connected() {
+    DanmuReceiver::i().disconnect(None).await;
   }
 
   HttpServer::stop().await;
-  CommandBroadcastServer::close_all().await;
-  ConfigManager::on_exit().await;
+  CommandBroadcastServer::i().close_all().await;
+  ConfigManager::i().on_exit();
 }
 
-fn start_ticking() {
-  tauri::async_runtime::spawn(async {
+static TICK_LOOP_STOP_TX: Mutex<Option<tokio::sync::mpsc::UnboundedSender<()>>> =
+  Mutex::const_new(None);
+static TICK_LOOP_STOP_RX: Mutex<Option<Option<tokio::sync::oneshot::Receiver<()>>>> =
+  Mutex::const_new(None);
+async fn start_ticking() {
+  let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel::<()>();
+  let (tx2, rx2) = tokio::sync::oneshot::channel::<()>();
+  *TICK_LOOP_STOP_TX.lock().await = Some(tx);
+  *TICK_LOOP_STOP_RX.lock().await = Some(Some(rx2));
+
+  tauri::async_runtime::spawn(async move {
     loop {
-      DanmuReceiver::tick().await;
-      CommandBroadcastServer::tick().await;
-      ConfigManager::tick().await;
+      let recv = rx.try_recv();
+      if recv.is_ok() {
+        break;
+      } else if let Err(err) = recv {
+        if err == TryRecvError::Disconnected {
+          break;
+        }
+      }
+
+      DanmuReceiver::i().tick().await;
+      CommandBroadcastServer::i().tick().await;
+      ConfigManager::i().tick().await;
       tokio::time::sleep(tokio::time::Duration::from_millis(200)).await;
     }
+
+    let result = tx2.send(());
+    if let Err(err) = result {
+      error!("failed to send ticking stopped reply {:?}", err);
+    }
   });
+}
+
+async fn stop_ticking() {
+  if let Some(tx) = &*TICK_LOOP_STOP_TX.lock().await {
+    let result = tx.send(());
+    if let Err(err) = result {
+      error!("failed to send stop ticking signal {:?}", err);
+    }
+  } else {
+    error!("failed to send stop ticking singal, empty tx");
+  }
+
+  let rx = TICK_LOOP_STOP_RX.lock().await.replace(None);
+  if let Some(Some(rx)) = rx {
+    let result = task::block_in_place(|| rx.blocking_recv());
+    if let Err(err) = result {
+      error!("failed to recv ticking stopped reply {:?}", err);
+    }
+  } else {
+    error!("failed to recv ticking stopped reply, empty rx");
+  }
 }
 
 async fn show_main_window(app_handle: &AppHandle<Wry>) {
@@ -195,7 +239,7 @@ async fn create_main_window(app_handle: &AppHandle<Wry>) {
 }
 
 #[command]
-fn show_viewer_window(app_handle: AppHandle<Wry>) {
+async fn show_viewer_window(app_handle: AppHandle<Wry>) {
   let viewer_window = app_handle.get_window("viewer");
 
   if let Some(viewer_window) = viewer_window {
@@ -205,7 +249,7 @@ fn show_viewer_window(app_handle: AppHandle<Wry>) {
   }
 
   task::block_in_place(|| {
-    block_on(CommandBroadcastServer::broadcast_app_command(
+    block_on(CommandBroadcastServer::i().broadcast_app_command(
       AppCommand::from_viewer_status_update(ViewerStatusUpdate::new(ViewerStatus::Open)),
     ))
   })
@@ -231,11 +275,7 @@ fn is_viewer_window_open(app_handle: AppHandle<Wry>) -> bool {
 }
 
 async fn create_viewer_window(app_handle: &AppHandle<Wry>) {
-  let cfg = ConfigManager::get_config()
-    .await
-    .backend
-    .window
-    .viewer_window;
+  let cfg = Immutable::new(get_cfg!().backend.window.viewer_window.clone());
 
   let viewer_window = tauri::WindowBuilder::new(
     app_handle,
@@ -257,26 +297,34 @@ async fn create_viewer_window(app_handle: &AppHandle<Wry>) {
     WindowEvent::Resized(size) => {
       task::block_in_place(|| {
         block_on(async {
-          let mut cfg = ConfigManager::get_config().await;
-          cfg.backend.window.viewer_window.height = size.height;
-          cfg.backend.window.viewer_window.width = size.width;
-          ConfigManager::set_config(cfg, true).await;
+          modify_cfg(
+            |cfg| {
+              cfg.backend.window.viewer_window.height = size.height;
+              cfg.backend.window.viewer_window.width = size.width;
+            },
+            true,
+          )
+          .await;
         })
       });
     }
     WindowEvent::Moved(pos) => {
       task::block_in_place(|| {
         block_on(async {
-          let mut cfg = ConfigManager::get_config().await;
-          cfg.backend.window.viewer_window.x = pos.x;
-          cfg.backend.window.viewer_window.y = pos.y;
-          ConfigManager::set_config(cfg, true).await;
+          modify_cfg(
+            |cfg| {
+              cfg.backend.window.viewer_window.x = pos.x;
+              cfg.backend.window.viewer_window.y = pos.y;
+            },
+            true,
+          )
+          .await;
         })
       });
     }
     WindowEvent::Destroyed => {
       task::block_in_place(|| {
-        block_on(CommandBroadcastServer::broadcast_app_command(
+        block_on(CommandBroadcastServer::i().broadcast_app_command(
           AppCommand::from_viewer_status_update(ViewerStatusUpdate::new(ViewerStatus::Close)),
         ))
       });
@@ -323,12 +371,12 @@ async fn is_vibrancy_applied() -> bool {
 
 #[command]
 async fn get_config() -> String {
-  serialize_config(&ConfigManager::get_config().await, false)
+  serialize_config(&*get_cfg!(), false)
 }
 
 #[command]
 async fn update_config(config: String) {
-  ConfigManager::set_config(serde_json::from_str(&config).unwrap(), true).await
+  modify_cfg(|cfg| **cfg = serde_json::from_str(&config).unwrap(), true).await
 }
 
 #[command]
@@ -338,7 +386,7 @@ async fn is_debug() -> bool {
 
 #[command]
 async fn connect_room() {
-  let result = DanmuReceiver::connect().await;
+  let result = DanmuReceiver::i().connect().await;
   if let Err(err) = result {
     rfd::MessageDialog::new()
       .set_title("错误")
@@ -351,7 +399,7 @@ async fn connect_room() {
 
 #[command]
 async fn disconnect_room() {
-  DanmuReceiver::disconnect().await;
+  DanmuReceiver::i().disconnect(None).await;
 }
 
 #[allow(unused)]
