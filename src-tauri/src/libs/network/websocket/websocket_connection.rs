@@ -168,7 +168,7 @@ impl WebSocketConnection {
             if let Some(message) = item {
               let send_result = tx.clone().send(message);
               if send_result.is_err() {
-                error!("failed to send message back")
+                error!("failed to forward message in recv_loop {:?}", send_result)
               }
             }
           }
