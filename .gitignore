@@ -12,6 +12,14 @@ dist
 dist-ssr
 *.local
 
+# cargo output
+src-tauri/target
+src-tauri/static_object/target
+src-tauri/static_object/static_object_derive/target
+
+# generated code
+src/share/type/rust
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
