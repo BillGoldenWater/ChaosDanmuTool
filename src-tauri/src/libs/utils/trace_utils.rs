@@ -5,7 +5,7 @@ pub fn print_trace() {
   let bt_str = format!("{bt:?}")
     .split("\n")
     .into_iter()
-    .filter(|it| it.contains("rust_demo"))
+    .filter(|it| it.contains(env!("CARGO_PKG_NAME")))
     .collect::<Vec<&str>>()
     .join("\n");
 
