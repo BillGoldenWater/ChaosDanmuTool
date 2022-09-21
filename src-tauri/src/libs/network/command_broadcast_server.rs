@@ -159,15 +159,11 @@ impl CommandBroadcastServer {
   }
 
   pub async fn accept(&mut self, websocket_stream: WebSocket) {
-    let mut connection = WebSocketConnection::new();
+    let connection = WebSocketConnection::from_ws_stream(websocket_stream);
 
-    let accept_result = connection.accept(websocket_stream).await;
-
-    if accept_result.is_ok() {
-      let connection_id = connection.get_id();
-      self.connections.push(connection);
-      self.on_connection(connection_id).await;
-    }
+    let connection_id = connection.get_id();
+    self.connections.push(connection);
+    self.on_connection(connection_id).await;
   }
 
   async fn on_connection(&mut self, connection_id: String) {
@@ -190,16 +186,21 @@ impl CommandBroadcastServer {
       .await;
 
     let roomid = get_cfg!().backend.danmu_receiver.roomid;
-    let gift_config = GiftConfigGetter::get(roomid).await;
-    if let Some(gift_config) = gift_config {
-      if let Some(gift_config) = gift_config.data {
-        self
-          .send_app_command(
-            connection_id.clone(),
-            AppCommand::from_gift_config_update(GiftConfigUpdate::new(gift_config)),
-          )
-          .await;
-      }
+    let gift_config_result = GiftConfigGetter::get(roomid).await;
+    match gift_config_result {
+        Ok(gift_config) => {
+          if let Some(gift_config) = gift_config.data {
+            self
+              .send_app_command(
+                connection_id.clone(),
+                AppCommand::from_gift_config_update(GiftConfigUpdate::new(gift_config)),
+              )
+              .await;
+          }
+        },
+        Err(err) => {
+          error!("failed to get gift config: {:}", err)
+        },
     }
   }
 

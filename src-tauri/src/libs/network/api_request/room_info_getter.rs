@@ -5,21 +5,27 @@
 
 use crate::libs::network::api_request::bilibili_response::{execute_request, BiliBiliResponse};
 
+use super::bilibili_response;
+
 static ROOM_INFO_API_URL: &str = "https://api.live.bilibili.com/room/v1/Room/room_init";
 
 pub struct RoomInfoGetter {}
 
 impl RoomInfoGetter {
-  pub async fn get(room_id: u32) -> Option<BiliBiliResponse<RoomInfoResponse>> {
+  pub async fn get(room_id: u32) -> bilibili_response::Result<BiliBiliResponse<RoomInfoResponse>> {
     let url = format!("{}?id={}", ROOM_INFO_API_URL, room_id);
 
     execute_request(&url).await
   }
 
-  pub async fn get_actual_room_id(room_id: u32) -> Option<u32> {
-    let data = Self::get(room_id).await?;
+  pub async fn get_actual_room_id(room_id: u32) -> Result<u32, Error> {
+    let res = Self::get(room_id).await?;
 
-    Some(data.data?.room_id)
+    if let Some(data) = res.data {
+      Ok(data.room_id)
+    } else {
+      Err(Error::EmptyData(res))
+    }
   }
 }
 
@@ -43,4 +49,12 @@ pub struct RoomInfoResponse {
   // pub room_shield: i64,
   // pub is_sp: u8,
   // pub special_type: u8,
+}
+
+#[derive(thiserror::Error, Debug)]
+pub enum Error {
+  #[error("{0}")]
+  Request(#[from] bilibili_response::Error),
+  #[error("unexpected response {0:?}")]
+  EmptyData(BiliBiliResponse<RoomInfoResponse>),
 }

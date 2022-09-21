@@ -17,16 +17,20 @@ pub struct BiliBiliResponse<Data> {
   pub data: Option<Data>,
 }
 
-pub async fn execute_request<T: DeserializeOwned>(uri: &str) -> Option<BiliBiliResponse<T>> {
-  let result = reqwest::get(uri).await.ok()?;
+pub async fn execute_request<T: DeserializeOwned>(uri: &str) -> Result<BiliBiliResponse<T>> {
+  let result = reqwest::get(uri).await?;
 
-  let text = result.text().await.ok()?;
+  let text = result.text().await?;
 
-  let serde_result = serde_json::from_str(&text);
+  Ok(serde_json::from_str(&text)?)
+}
 
-  if serde_result.is_err() {
-    error!("failed parsing: \n{}", text);
-  }
+pub type Result<T> = std::result::Result<T, Error>;
 
-  Some(serde_result.unwrap())
+#[derive(thiserror::Error, Debug)]
+pub enum Error {
+  #[error("failed to make request: {0}")]
+  Reqwest(#[from] reqwest::Error),
+  #[error("failed to parse response")]
+  SerdeJson(#[from] serde_json::Error)
 }

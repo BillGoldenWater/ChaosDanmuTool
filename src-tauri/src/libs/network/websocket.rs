@@ -4,3 +4,4 @@
  */
 
 pub mod websocket_connection;
+pub mod websocket_connection_reusable;

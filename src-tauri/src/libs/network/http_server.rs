@@ -233,12 +233,10 @@ impl HttpServer {
             )
             .await;
 
-            info!("upgrading");
             CommandBroadcastServer::i().accept(websocket_stream).await;
-            info!("upgraded");
           }
           Err(err) => {
-            error!("Upgrade error: {}", err);
+            error!("upgrade error: {}", err);
           }
         }
       });

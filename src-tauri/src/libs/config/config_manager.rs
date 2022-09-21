@@ -233,10 +233,12 @@ where
   F: FnOnce(&mut MutexGuard<'_, Config>),
 {
   let cfg_m = ConfigManager::i();
+
   let config = cfg_m.get_config();
-  let mut cfg = lock(&config);
+  let mut cfg = a_lock(&config).await;
   do_modify(&mut cfg);
   drop(cfg);
   drop(config);
+  
   cfg_m.on_change(broadcast).await;
 }

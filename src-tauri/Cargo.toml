@@ -57,6 +57,7 @@ sysinfo = "0.25.0"
 async-recursion = "1.0.0"
 rand = "0.8.5"
 backtrace = "0.3"
+thiserror = "1.0.35"
 ts-rs = "6.2.0"
 # live template: tss
 # #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]

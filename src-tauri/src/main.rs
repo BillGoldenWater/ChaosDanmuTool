@@ -139,7 +139,7 @@ pub async fn on_exit(_app_handle: &AppHandle<Wry>) {
   stop_ticking().await;
 
   if DanmuReceiver::i().is_connected() {
-    DanmuReceiver::i().disconnect(None).await;
+    DanmuReceiver::i().disconnect().await;
   }
 
   HttpServer::stop().await;
@@ -399,7 +399,7 @@ async fn connect_room() {
 
 #[command]
 async fn disconnect_room() {
-  DanmuReceiver::i().disconnect(None).await;
+  DanmuReceiver::i().disconnect().await;
 }
 
 #[allow(unused)]
