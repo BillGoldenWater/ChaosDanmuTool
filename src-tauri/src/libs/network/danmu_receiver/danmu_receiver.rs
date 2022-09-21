@@ -56,7 +56,6 @@ pub struct DanmuReceiver {
 
 impl DanmuReceiver {
   fn new() -> DanmuReceiver {
-    // todo!("thread safe");
     DanmuReceiver {
       ws: WebSocketConnectionReusable::new(),
       status: ReceiverStatus::Close,
