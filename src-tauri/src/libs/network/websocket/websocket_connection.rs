@@ -25,7 +25,7 @@ use crate::{error, info};
 type WebSocket = WebSocketStream<MaybeTlsStream<TcpStream>>;
 type WebSocketWriter = SplitSink<WebSocket, Message>;
 type WebSocketReader = SplitStream<WebSocket>;
-type ConnectionId = String;
+pub type ConnectionId = String;
 
 pub struct WebSocketConnection {
   connection_id: ConnectionId, // const
@@ -82,6 +82,26 @@ impl WebSocketConnection {
 
     if *connected {
       let _ = self.writer.send(message).await;
+    }
+
+    drop(connected)
+  }
+
+  pub async fn feed(&mut self, message: Message) {
+    let connected = a_lock(&self.connected).await;
+
+    if *connected {
+      let _ = self.writer.feed(message).await;
+    }
+
+    drop(connected)
+  }
+
+  pub async fn flush(&mut self) {
+    let connected = a_lock(&self.connected).await;
+
+    if *connected {
+      let _ = self.writer.flush().await;
     }
 
     drop(connected)

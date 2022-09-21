@@ -28,6 +28,18 @@ impl WebSocketConnectionReusable {
     }
   }
 
+  pub async fn feed(&mut self, message: Message) {
+    if let Some(ws) = &mut self.inner {
+      ws.feed(message).await
+    }
+  }
+
+  pub async fn flush(&mut self) {
+    if let Some(ws) = &mut self.inner {
+      ws.flush().await
+    }
+  }
+
   pub async fn tick(&mut self) -> Vec<Message> {
     if let Some(ws) = &mut self.inner {
       ws.tick().await

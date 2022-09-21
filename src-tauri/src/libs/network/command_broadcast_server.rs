@@ -3,10 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+use std::collections::HashMap;
 use std::time::Duration;
 
 use tokio::net::TcpStream;
+use tokio::sync::Mutex;
 use tokio::time::timeout;
+use tokio_tungstenite::tungstenite::protocol::frame::coding::CloseCode;
 use tokio_tungstenite::tungstenite::protocol::CloseFrame;
 use tokio_tungstenite::tungstenite::Message;
 use tokio_tungstenite::{MaybeTlsStream, WebSocketStream};
@@ -24,20 +27,23 @@ use crate::libs::config::config_manager::ConfigManager;
 use crate::libs::network::api_request::gift_config_getter::GiftConfigGetter;
 use crate::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver;
 use crate::libs::network::websocket::websocket_connection::WebSocketConnection;
+use crate::libs::utils::mutex_utils::a_lock;
+use crate::libs::utils::ws_utils::close_frame;
 use crate::{error, get_cfg, info, warn};
+
+use super::websocket::websocket_connection::ConnectionId;
 
 type WebSocket = WebSocketStream<MaybeTlsStream<TcpStream>>;
 
 #[derive(StaticObject)]
 pub struct CommandBroadcastServer {
-  connections: Vec<WebSocketConnection>,
+  connections: Mutex<HashMap<ConnectionId, WebSocketConnection>>,
 }
 
 impl CommandBroadcastServer {
   fn new() -> CommandBroadcastServer {
-    todo!("thread safe");
     CommandBroadcastServer {
-      connections: vec![],
+      connections: Mutex::new(HashMap::new()),
     }
   }
 
@@ -96,24 +102,18 @@ impl CommandBroadcastServer {
   // endregion
 
   pub async fn broadcast(&mut self, message: Message) {
-    for connection in self.connections.as_mut_slice() {
-      let timeout_result = timeout(Duration::from_secs(5), connection.send(message.clone())).await;
+    for (id, conn) in &mut *a_lock(&self.connections).await {
+      let timeout_result = timeout(Duration::from_secs(5), conn.send(message.clone())).await;
       if let Err(_) = timeout_result {
-        warn!(
-          "connection {} send timeout, disconnecting.",
-          connection.get_id()
-        );
-        connection.disconnect(None).await;
+        warn!("connection {} send timeout, disconnecting.", id);
+        conn.disconnect(None).await;
       }
     }
   }
 
   pub async fn send(&mut self, connection_id: String, message: Message) {
-    for connection in self.connections.as_mut_slice() {
-      if connection.get_id().eq(&connection_id) {
-        connection.send(message).await;
-        break;
-      }
+    if let Some(conn) = a_lock(&self.connections).await.get_mut(&connection_id) {
+      conn.send(message).await;
     }
   }
 
@@ -122,36 +122,41 @@ impl CommandBroadcastServer {
     connection_id: String,
     close_frame: Option<CloseFrame<'static>>,
   ) {
-    for connection in self.connections.as_mut_slice() {
-      if connection.get_id().eq(&connection_id) {
-        connection.disconnect(close_frame).await;
-        break;
-      }
+    if let Some(conn) = a_lock(&self.connections).await.get_mut(&connection_id) {
+      conn.disconnect(close_frame).await;
     }
   }
 
   pub async fn close_all(&mut self) {
     info!("closing all connection");
-    for connection in self.connections.as_mut_slice() {
-      connection.disconnect(None).await;
+
+    let mut connections = a_lock(&self.connections).await;
+
+    for (_, conn) in &mut *connections {
+      conn.disconnect(close_frame(CloseCode::Normal, "")).await;
     }
-    self.connections.clear();
+    connections.clear();
+
     info!("all connection closed");
   }
 
   pub async fn tick(&mut self) {
-    self
-      .connections
-      .retain(|connection| connection.is_connected());
+    let mut connections = a_lock(&self.connections).await;
+
+    connections.retain(|_, connection| connection.is_connected());
 
     // region tick connections
-    let mut incoming_messages: Vec<(String, Message)> = vec![];
-    for connection in self.connections.as_mut_slice() {
-      let messages = connection.tick().await;
+    let mut incoming_messages = vec![];
+
+    for (id, conn) in &mut *connections {
+      let messages = conn.tick().await;
       for msg in messages {
-        incoming_messages.push((connection.get_id(), msg));
+        incoming_messages.push((id.clone(), msg))
       }
     }
+
+    drop(connections);
+
     for (id, msg) in incoming_messages {
       self.on_message(msg, id).await;
     }
@@ -162,7 +167,7 @@ impl CommandBroadcastServer {
     let connection = WebSocketConnection::from_ws_stream(websocket_stream);
 
     let connection_id = connection.get_id();
-    self.connections.push(connection);
+    a_lock(&self.connections).await.insert(connection_id.clone(), connection);
     self.on_connection(connection_id).await;
   }
 
@@ -188,19 +193,19 @@ impl CommandBroadcastServer {
     let roomid = get_cfg!().backend.danmu_receiver.roomid;
     let gift_config_result = GiftConfigGetter::get(roomid).await;
     match gift_config_result {
-        Ok(gift_config) => {
-          if let Some(gift_config) = gift_config.data {
-            self
-              .send_app_command(
-                connection_id.clone(),
-                AppCommand::from_gift_config_update(GiftConfigUpdate::new(gift_config)),
-              )
-              .await;
-          }
-        },
-        Err(err) => {
-          error!("failed to get gift config: {:}", err)
-        },
+      Ok(gift_config) => {
+        if let Some(gift_config) = gift_config.data {
+          self
+            .send_app_command(
+              connection_id.clone(),
+              AppCommand::from_gift_config_update(GiftConfigUpdate::new(gift_config)),
+            )
+            .await;
+        }
+      }
+      Err(err) => {
+        error!("failed to get gift config: {:}", err)
+      }
     }
   }
 
