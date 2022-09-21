@@ -6,6 +6,7 @@
 use serde::Serialize;
 use std::sync::{Mutex, RwLock};
 
+use crate::error;
 use crate::libs::config::config::backend_config::BackendConfig;
 use crate::libs::config::config::frontend_config::FrontendConfig;
 
@@ -50,11 +51,22 @@ fn frontend_skip_if(value: &FrontendConfig) -> bool {
 //endregion
 
 pub fn serialize_config<T: Serialize>(config: &T, use_skip_if: bool) -> String {
-  let _ = &*ALLOW_CONFIG_SKIP_IF_LOCK.lock().unwrap();
-  {
-    *ALLOW_CONFIG_SKIP_IF.write().unwrap() = use_skip_if;
+  let lock = ALLOW_CONFIG_SKIP_IF_LOCK.lock().unwrap();
+
+  let result = {
+    {
+      *ALLOW_CONFIG_SKIP_IF.write().unwrap() = use_skip_if
+    }
+    serde_json::to_string(config)
+  };
+
+  drop(lock);
+
+  if let Err(err) = &result {
+    error!("error when serialize config {}", err);
   }
-  serde_json::to_string(config).unwrap_or("{}".to_string())
+
+  result.unwrap_or("{}".to_string())
 }
 
 #[cfg(test)]
