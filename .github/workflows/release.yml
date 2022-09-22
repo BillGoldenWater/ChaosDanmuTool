@@ -68,36 +68,36 @@ jobs:
         with:
           path: out/*
 
-#  release:
-#    needs: [ build ]
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v2
-#
-#      - name: install Node.js 18.x
-#        uses: actions/setup-node@v3
-#        with:
-#          node-version: 18.x
-#
-#      - name: yarn install
-#        run: yarn install
-#
-#      - uses: actions/download-artifact@v3
-#        with:
-#          path: out
-#
-#      - name: move artifacts folder
-#        run: |
-#          mv out/artifact out_
-#          rm -rf out
-#          mv out_ out
-#
-#      - name: generate update info
-#        run: node scripts/genUpdateInfo.mjs
-#
-#      - name: create release
-#        uses: actions/github-script@v6
-#        with:
-#          script: |
-#            const script = require('./scripts/createRelease.js')
-#            return await script({github, context})
+  release:
+    needs: [ build ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: install Node.js 18.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      - name: yarn install
+        run: yarn install
+
+      - uses: actions/download-artifact@v3
+        with:
+          path: out
+
+      - name: move artifacts folder
+        run: |
+          mv out/artifact out_
+          rm -rf out
+          mv out_ out
+
+      - name: generate update info
+        run: node scripts/genUpdateInfo.mjs
+
+      - name: create release
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const script = require('./scripts/createRelease.js')
+            return await script({github, context})
