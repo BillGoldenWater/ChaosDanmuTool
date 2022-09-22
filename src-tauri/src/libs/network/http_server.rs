@@ -12,12 +12,11 @@ use hyper::server::conn::AddrStream;
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{Body, Method, Request as HyperRequest, Response, Server, StatusCode, Version};
 use netstat2::{get_sockets_info, ProtocolSocketInfo, TcpState};
-use oneshot::Sender;
 use static_object::StaticObject;
 use sysinfo::{Pid, PidExt, ProcessExt, ProcessRefreshKind, RefreshKind, SystemExt};
 use tauri::async_runtime::JoinHandle;
 use tauri::{AssetResolver, Wry};
-use tokio::sync::Mutex;
+use tokio::sync::oneshot::Sender;
 use tokio_tungstenite::tungstenite::handshake::derive_accept_key;
 use tokio_tungstenite::tungstenite::protocol::Role;
 use tokio_tungstenite::{MaybeTlsStream, WebSocketStream};
@@ -26,10 +25,7 @@ use crate::libs::config::config_manager::modify_cfg;
 use crate::libs::network::command_broadcast_server::CommandBroadcastServer;
 use crate::{error, info, location_info};
 
-lazy_static! {
-  pub static ref HTTP_SERVER_STATIC_INSTANCE: Mutex<HttpServer> = Mutex::new(HttpServer::new());
-}
-
+#[derive(StaticObject)]
 pub struct HttpServer {
   tx: Option<Option<Sender<()>>>,
   asset_resolver: Option<AssetResolver<Wry>>,
@@ -45,12 +41,7 @@ impl HttpServer {
     }
   }
 
-  pub async fn start(asset_resolver: AssetResolver<Wry>, port: u16) {
-    let this = &mut *HTTP_SERVER_STATIC_INSTANCE.lock().await;
-    this.start_(asset_resolver, port).await
-  }
-
-  async fn start_(&mut self, asset_resolver: AssetResolver<Wry>, port: u16) {
+  pub async fn start(&mut self, asset_resolver: AssetResolver<Wry>, port: u16) {
     self.asset_resolver = Some(asset_resolver);
 
     self.listen(port).await;
@@ -61,8 +52,9 @@ impl HttpServer {
     // region init
     let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), port);
 
-    let make_service =
-      make_service_fn(|_| async { Ok::<_, Infallible>(service_fn(Self::on_request)) });
+    let make_service = make_service_fn(|_| async {
+      Ok::<_, Infallible>(service_fn(|req| HttpServer::i().on_request(req)))
+    });
     // endregion
 
     // region bind
@@ -79,7 +71,7 @@ impl HttpServer {
     // endregion
 
     // region run
-    let (tx, rx) = oneshot::channel::<()>();
+    let (tx, rx) = tokio::sync::oneshot::channel::<()>();
     self.tx = Some(Some(tx));
 
     let server = server.with_graceful_shutdown(async move {
@@ -191,12 +183,7 @@ impl HttpServer {
     // endregion
   }
 
-  pub async fn stop() {
-    let this = &mut *HTTP_SERVER_STATIC_INSTANCE.lock().await;
-    this.stop_().await
-  }
-
-  async fn stop_(&mut self) {
+  pub async fn stop(&mut self) {
     if let Some(tx) = self.tx.replace(None) {
       if let Some(tx) = tx {
         info!("stopping server");
@@ -213,7 +200,7 @@ impl HttpServer {
     }
   }
 
-  async fn on_request(mut req: HyperRequest<Body>) -> Result<Response<Body>, Infallible> {
+  async fn on_request(&self, mut req: HyperRequest<Body>) -> Result<Response<Body>, Infallible> {
     // region try websocket
     if let Some(res) = create_websocket_upgrade_response(&req) {
       tauri::async_runtime::spawn(async move {
@@ -246,8 +233,7 @@ impl HttpServer {
     // endregion
 
     // region try asset
-    let this = &*HTTP_SERVER_STATIC_INSTANCE.lock().await;
-    if let Some(asset_resolver) = &this.asset_resolver {
+    if let Some(asset_resolver) = &self.asset_resolver {
       if let Some(asset) = asset_resolver.get(req.uri().to_string()) {
         let mut res_builder = Response::builder().header("Content-Type", asset.mime_type);
 

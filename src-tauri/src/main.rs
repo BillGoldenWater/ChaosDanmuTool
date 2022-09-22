@@ -124,7 +124,7 @@ async fn on_setup(app: &mut App<Wry>) {
   let asset_resolver = app.asset_resolver();
 
   let port = get_cfg!().backend.http_server.port.clone();
-  HttpServer::start(asset_resolver, port).await;
+  HttpServer::i().start(asset_resolver, port).await;
 }
 
 async fn on_ready(app_handle: &AppHandle<Wry>) {
@@ -142,7 +142,7 @@ pub async fn on_exit(_app_handle: &AppHandle<Wry>) {
     DanmuReceiver::i().disconnect().await;
   }
 
-  HttpServer::stop().await;
+  HttpServer::i().stop().await;
   CommandBroadcastServer::i().close_all().await;
   ConfigManager::i().on_exit();
 }
