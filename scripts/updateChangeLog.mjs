@@ -4,6 +4,7 @@
  */
 
 import fs from "fs/promises";
+import semver from "semver";
 
 async function main() {
   let pkg = JSON.parse((await fs.readFile("package.json")).toString());
@@ -15,6 +16,10 @@ async function main() {
   )
     .toString()
     .padStart(2, "0")}.${date.getDate().toString().padStart(2, "0")}`;
+
+  for (const key of Object.keys(data)) {
+    if (semver.parse(key).prerelease.length !== 0) data[key] = undefined;
+  }
 
   // noinspection JSCheckFunctionSignatures
   data[pkg.version] = {
