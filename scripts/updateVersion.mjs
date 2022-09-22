@@ -3,11 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-// noinspection ES6UnusedImports
 import fs from "fs/promises";
-// noinspection ES6UnusedImports
 import semver from "semver";
-// noinspection ES6UnusedImports
 import toml from "toml-patch";
 
 /**
@@ -16,7 +13,9 @@ import toml from "toml-patch";
 async function main(args) {
   // region process arg
   if (args.length < 1) {
-    console.log("<major|minor|patch|build|pre> [ident]");
+    console.log(
+      "<major|minor|patch|build|prerelease|premajor|preminor|prepatch|pre> [ident]"
+    );
     return;
   }
   let release = args[0];
