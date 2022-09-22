@@ -348,9 +348,14 @@ async fn apply_vibrancy_effect(window: &tauri::Window<Wry>) {
 
   #[cfg(target_os = "macos")]
   {
-    use window_vibrancy::apply_vibrancy;
+    use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial, NSVisualEffectState};
 
-    result = apply_vibrancy(window, window_vibrancy::NSVisualEffectMaterial::HudWindow);
+    result = apply_vibrancy(
+      window,
+      NSVisualEffectMaterial::HudWindow,
+      Some(NSVisualEffectState::Active),
+      None,
+    );
   }
   #[cfg(target_os = "windows")]
   {
