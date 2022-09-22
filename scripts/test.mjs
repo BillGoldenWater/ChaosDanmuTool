@@ -33,10 +33,12 @@ export async function main() {
         "cargo test --release --target x86_64-apple-darwin",
         "src-tauri"
       );
-      execCommand(
-        "cargo test --release --target aarch64-apple-darwin",
-        "src-tauri"
-      );
+      if (process.arch === "arm64") {
+        execCommand(
+          "cargo test --release --target aarch64-apple-darwin",
+          "src-tauri"
+        );
+      }
       break;
     }
     case "linux": {
