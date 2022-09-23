@@ -1,4 +1,4 @@
-use crate::error;
+use log::error;
 
 pub fn print_trace() {
   let bt = backtrace::Backtrace::new();

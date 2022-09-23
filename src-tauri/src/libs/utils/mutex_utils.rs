@@ -1,3 +1,4 @@
+use log::error;
 use std::time::Duration;
 
 use tokio::{
@@ -5,7 +6,7 @@ use tokio::{
   time::timeout,
 };
 
-use crate::{error, libs::utils::trace_utils::print_trace};
+use crate::libs::utils::trace_utils::print_trace;
 
 lazy_static! {
   static ref TIMEOUT_MILLIS: u64 =

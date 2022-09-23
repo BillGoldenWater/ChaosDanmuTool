@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+use log::error;
 use serde_json::{Map, Value};
 
-use crate::error;
 use crate::libs::types::bilibili::emoji_data::EmojiData;
 use crate::libs::types::bilibili::user_info::medal_info::MedalInfo;
 

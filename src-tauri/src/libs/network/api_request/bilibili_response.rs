@@ -6,8 +6,6 @@
 use serde::de::DeserializeOwned;
 use serde::Deserialize;
 
-use crate::error;
-
 #[derive(Debug, Deserialize)]
 pub struct BiliBiliResponse<Data> {
   pub code: Option<i32>,
@@ -32,5 +30,5 @@ pub enum Error {
   #[error("failed to make request: {0}")]
   Reqwest(#[from] reqwest::Error),
   #[error("failed to parse response")]
-  SerdeJson(#[from] serde_json::Error)
+  SerdeJson(#[from] serde_json::Error),
 }

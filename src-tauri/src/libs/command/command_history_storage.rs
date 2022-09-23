@@ -6,10 +6,9 @@
 use std::path::{Path, PathBuf};
 
 use chrono::{DateTime, Utc};
+use log::{error, LevelFilter};
 use sqlx::sqlite::SqliteConnectOptions;
-use sqlx::{Connection, Row, SqliteConnection};
-
-use crate::error;
+use sqlx::{ConnectOptions, Connection, Row, SqliteConnection};
 
 use super::command_packet::{self, CommandPacket};
 

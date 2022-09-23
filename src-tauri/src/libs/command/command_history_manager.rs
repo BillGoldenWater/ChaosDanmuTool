@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+use log::error;
 use std::path::PathBuf;
 
 use tauri::api::path::app_dir;
 use tauri::Config;
 use tokio::sync::Mutex;
 
-use crate::error;
 use crate::libs::command::command_history_storage::CommandHistoryStorage;
 use crate::libs::command::command_packet::CommandPacket;
 use crate::libs::utils::fs_utils::get_dir_children_names;
@@ -38,7 +38,7 @@ impl CommandHistoryManager {
   }
 
   pub async fn init(&mut self, config: &Config) {
-    self.data_dir = app_dir(config).unwrap().join(".commandHistory");
+    self.data_dir = app_dir(config).unwrap().join("commandHistory");
 
     *a_lock(&self.current_storage).await = Some(CommandHistoryStorage::new(&self.data_dir).await);
   }

@@ -5,6 +5,7 @@
 
 use futures_util::stream::{SplitSink, SplitStream};
 use futures_util::{SinkExt, StreamExt};
+use log::{error, info};
 use std::borrow::Cow;
 use tokio::{
   net::TcpStream,
@@ -20,7 +21,6 @@ use tokio_tungstenite::tungstenite::Error;
 use tokio_tungstenite::{connect_async, tungstenite::Message, MaybeTlsStream, WebSocketStream};
 
 use crate::libs::utils::mutex_utils::{a_lock, lock};
-use crate::{error, info};
 
 type WebSocket = WebSocketStream<MaybeTlsStream<TcpStream>>;
 type WebSocketWriter = SplitSink<WebSocket, Message>;

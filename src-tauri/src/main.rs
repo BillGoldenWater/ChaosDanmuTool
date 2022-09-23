@@ -8,6 +8,7 @@
   windows_subsystem = "windows"
 )]
 
+use log::{error, info};
 use tauri::async_runtime::{block_on, Mutex};
 use tauri::{command, App, AppHandle, Manager, Wry};
 use tauri::{Assets, Context, WindowEvent};
@@ -25,16 +26,20 @@ use chaosdanmutool::libs::config::config_manager::{modify_cfg, ConfigManager};
 use chaosdanmutool::libs::network::command_broadcast_server::CommandBroadcastServer;
 use chaosdanmutool::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver;
 use chaosdanmutool::libs::network::http_server::HttpServer;
+use chaosdanmutool::libs::utils::debug_utils::init_logger;
 use chaosdanmutool::libs::utils::immutable_utils::Immutable;
 #[cfg(target_os = "macos")]
 use chaosdanmutool::libs::utils::window_utils::set_visible_on_all_workspaces;
-use chaosdanmutool::{error, get_cfg, info, location_info};
+use chaosdanmutool::{get_cfg, location_info};
 use static_object::StaticObject;
 
 static VIBRANCY_APPLIED: RwLock<bool> = RwLock::const_new(false);
 
 #[tokio::main]
 async fn main() {
+  let context = tauri::generate_context!();
+  init_logger(context.config());
+
   // region build info
   info!(
     "build info: {}-{} {}-{} ({} build)",
@@ -49,10 +54,6 @@ async fn main() {
     }
   );
   // endregion
-
-  tauri::async_runtime::set(tokio::runtime::Handle::current());
-
-  let context = tauri::generate_context!();
 
   on_init(&context).await;
 
@@ -114,6 +115,8 @@ async fn main() {
 }
 
 async fn on_init<A: Assets>(context: &Context<A>) {
+  tauri::async_runtime::set(tokio::runtime::Handle::current());
+
   ConfigManager::i().init(context.config()).await;
   CommandHistoryManager::i().init(context.config()).await;
 

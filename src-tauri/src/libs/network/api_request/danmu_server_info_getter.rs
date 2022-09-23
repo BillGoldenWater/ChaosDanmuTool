@@ -5,7 +5,6 @@
 
 use serde::Deserialize;
 
-use crate::error;
 use crate::libs::network::api_request::bilibili_response::{execute_request, BiliBiliResponse};
 
 use super::bilibili_response;
@@ -16,7 +15,9 @@ static DANMU_SERVER_INFO_API_URL: &str =
 pub struct DanmuServerInfoGetter {}
 
 impl DanmuServerInfoGetter {
-  pub async fn get(actual_room_id: u32) -> bilibili_response::Result<BiliBiliResponse<DanmuServerInfoResponse>> {
+  pub async fn get(
+    actual_room_id: u32,
+  ) -> bilibili_response::Result<BiliBiliResponse<DanmuServerInfoResponse>> {
     let url = format!("{}?id={}&type=0", DANMU_SERVER_INFO_API_URL, actual_room_id);
 
     execute_request(&url).await
@@ -28,16 +29,15 @@ impl DanmuServerInfoGetter {
     let data = if let Some(data) = res.data {
       data
     } else {
-      return Err(Error::EmptyData(res))
+      return Err(Error::EmptyData(res));
     };
-
 
     if !data.host_list.is_empty() {
       let host = &data.host_list[0];
       return Ok(DanmuServerAndToken {
         token: data.token,
         url: format!("wss://{}:{}/sub", host.host, host.wss_port).to_string(),
-      })
+      });
     }
 
     Ok(DanmuServerAndToken {
@@ -77,5 +77,5 @@ pub enum Error {
   #[error("{0}")]
   Request(#[from] bilibili_response::Error),
   #[error("unexpected response {0:?}")]
-  EmptyData(BiliBiliResponse<DanmuServerInfoResponse>)
+  EmptyData(BiliBiliResponse<DanmuServerInfoResponse>),
 }

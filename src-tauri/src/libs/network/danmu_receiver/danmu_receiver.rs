@@ -8,12 +8,14 @@ use std::str::FromStr;
 use std::time::Instant;
 
 use bytes::{Buf, BytesMut};
+use log::{error, info, warn};
 use serde_json::{Map, Value};
 use static_object::StaticObject;
 use tokio_tungstenite::tungstenite::protocol::frame::coding::CloseCode;
 use tokio_tungstenite::tungstenite::protocol::CloseFrame;
 use tokio_tungstenite::tungstenite::Message;
 
+use crate::get_cfg;
 use crate::libs::command::command_packet::app_command::bilibili_packet_parse_error::BiliBiliPacketParseError;
 use crate::libs::command::command_packet::app_command::receiver_status_update::{
   ReceiverStatus, ReceiverStatusUpdate,
@@ -39,7 +41,6 @@ use crate::libs::utils::immutable_utils::Immutable;
 use crate::libs::utils::mut_bytes_utils::bytes_to_hex;
 use crate::libs::utils::trace_utils::print_trace;
 use crate::libs::utils::ws_utils::close_frame;
-use crate::{error, get_cfg, info, warn};
 
 type Url = String;
 type Token = String;
@@ -80,10 +81,7 @@ impl DanmuReceiver {
     // endregion
 
     // region connect
-    self
-      .ws
-      .disconnect(close_frame(CloseCode::Normal, ""))
-      .await;
+    self.ws.disconnect(close_frame(CloseCode::Normal, "")).await;
     let connect_result = self.ws.connect(url.as_str()).await;
 
     if let Err(err) = connect_result {
@@ -176,10 +174,7 @@ impl DanmuReceiver {
       }
       ReceiverStatus::Connected => {
         info!("disconnecting");
-        self
-          .ws
-          .disconnect(close_frame(CloseCode::Normal, ""))
-          .await;
+        self.ws.disconnect(close_frame(CloseCode::Normal, "")).await;
         self.set_status(ReceiverStatus::Close).await;
         info!("disconnected");
       }

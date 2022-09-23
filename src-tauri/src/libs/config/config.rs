@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+use log::error;
 use serde::Serialize;
 use std::sync::{Mutex, RwLock};
 
-use crate::error;
 use crate::libs::config::config::backend_config::BackendConfig;
 use crate::libs::config::config::frontend_config::FrontendConfig;
 

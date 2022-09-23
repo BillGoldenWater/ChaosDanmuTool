@@ -8,12 +8,14 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::Instant;
 
+use log::{error, info};
 use rfd::{MessageButtons, MessageLevel};
-use static_object::StaticObject;
 use tauri::api::file::read_string;
 use tauri::api::path::app_dir;
-use tauri::{Config as TauriConfig};
+use tauri::Config as TauriConfig;
 use tokio::sync::{Mutex, MutexGuard};
+
+use static_object::StaticObject;
 
 use crate::libs::command::command_packet::app_command::config_update::ConfigUpdate;
 use crate::libs::command::command_packet::app_command::AppCommand;
@@ -21,7 +23,7 @@ use crate::libs::config::config::{serialize_config, Config};
 use crate::libs::network::command_broadcast_server::CommandBroadcastServer;
 use crate::libs::utils::immutable_utils::Immutable;
 use crate::libs::utils::mutex_utils::{a_lock, lock};
-use crate::{info, location_info};
+use crate::location_info;
 
 #[derive(StaticObject)]
 pub struct ConfigManager {
@@ -110,12 +112,12 @@ impl ConfigManager {
         info!("save config");
         let result = fs::create_dir_all(app_dir);
         if let Err(err) = result {
-          info!("failed to create data folder\n{:#?}", err);
+          error!("failed to create data folder\n{:#?}", err);
           return;
         }
         let result = fs::write(path.as_path(), serialize_config(&*lock(&self.config), true));
         if let Err(err) = result {
-          info!("failed to write config file\n{:#?}", err);
+          error!("failed to write config file\n{:#?}", err);
           return;
         }
         *changed = false;
@@ -236,6 +238,6 @@ where
   do_modify(&mut cfg);
   drop(cfg);
   drop(config);
-  
+
   cfg_m.on_change(broadcast).await;
 }

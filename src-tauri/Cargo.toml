@@ -55,11 +55,13 @@ netstat2 = "0.9.1"
 get-port = "4.0.0"
 sysinfo = "0.26.1"
 async-recursion = "1.0.0"
-sqlx = { version = "0.6.1", features = ["runtime-tokio-native-tls", "sqlite"] }
+sqlx = { version = "0.6.2", features = ["runtime-tokio-native-tls", "sqlite"] }
 base64 = "0.13.0"
 rand = "0.8.5"
 backtrace = "0.3"
 thiserror = "1.0.35"
+log = { version = "0.4.17", features = ["max_level_debug", "release_max_level_info"] }
+fern = { version = "0.6.1", features = ["colored"] }
 ts-rs = "6.2.0"
 # live template: tss
 # #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]

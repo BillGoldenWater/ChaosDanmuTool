@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+use log::{error, info, warn};
 use std::collections::HashMap;
 use std::time::Duration;
 
@@ -16,6 +17,7 @@ use tokio_tungstenite::{MaybeTlsStream, WebSocketStream};
 
 use static_object::StaticObject;
 
+use crate::get_cfg;
 use crate::libs::command::command_history_manager::CommandHistoryManager;
 use crate::libs::command::command_packet::app_command::config_update::ConfigUpdate;
 use crate::libs::command::command_packet::app_command::gift_config_update::GiftConfigUpdate;
@@ -29,7 +31,6 @@ use crate::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver;
 use crate::libs::network::websocket::websocket_connection::WebSocketConnection;
 use crate::libs::utils::mutex_utils::a_lock;
 use crate::libs::utils::ws_utils::close_frame;
-use crate::{error, get_cfg, info, warn};
 
 use super::websocket::websocket_connection::ConnectionId;
 
@@ -170,7 +171,9 @@ impl CommandBroadcastServer {
     let connection = WebSocketConnection::from_ws_stream(websocket_stream);
 
     let connection_id = connection.get_id();
-    a_lock(&self.connections).await.insert(connection_id.clone(), connection);
+    a_lock(&self.connections)
+      .await
+      .insert(connection_id.clone(), connection);
     self.on_connection(connection_id).await;
   }
 
