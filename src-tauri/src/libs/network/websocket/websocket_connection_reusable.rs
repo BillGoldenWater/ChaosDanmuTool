@@ -60,7 +60,7 @@ impl WebSocketConnectionReusable {
     if let Some(ws) = &self.inner {
       ws.get_id()
     } else {
-      unreachable!("cannot get id of uninited connection")
+      unreachable!("cannot get id of uninitialized connection")
     }
   }
 }

@@ -189,7 +189,7 @@ async fn stop_ticking() {
       error!("failed to send stop ticking signal {:?}", err);
     }
   } else {
-    error!("failed to send stop ticking singal, empty tx");
+    error!("failed to send stop ticking signal, empty tx");
   }
 
   let rx = TICK_LOOP_STOP_RX.lock().await.replace(None);

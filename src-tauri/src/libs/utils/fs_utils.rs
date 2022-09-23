@@ -39,7 +39,7 @@ pub fn get_app_bundle_path() -> Option<PathBuf> {
   if let Some(app_bundle_dir) = app_bundle_dir {
     if let Some(dir_name) = app_bundle_dir.file_name() {
       if dir_name.to_str().unwrap_or("").ends_with(".app") {
-        // check is xxxx.app
+        // check is xxx.app
         return Some(app_bundle_dir.to_path_buf());
       }
     }
