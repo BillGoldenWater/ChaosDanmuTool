@@ -25,13 +25,14 @@ impl CommandHistoryStorage {
   }
 
   pub async fn open(file: impl AsRef<Path>) -> CommandHistoryStorage {
-    let mut options = SqliteConnectOptions::new();
-    options = options.filename(file);
-    options = options.create_if_missing(true);
+    let mut options = SqliteConnectOptions::new()
+      .filename(file)
+      .create_if_missing(true);
+    options.log_statements(LevelFilter::Debug);
 
     let mut db = SqliteConnection::connect_with(&options).await.unwrap();
 
-    // region
+    // region initialing database
     let result = sqlx::query(
       r#"
 create table if not exists command_history
@@ -56,7 +57,7 @@ create index if not exists command_history_timestamp_index
     // endregion
 
     if result.is_err() {
-      panic!("error when initialling database {result:?}")
+      panic!("error when initialing database {result:?}")
     }
 
     CommandHistoryStorage { db }
