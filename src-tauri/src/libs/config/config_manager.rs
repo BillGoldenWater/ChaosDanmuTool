@@ -11,14 +11,14 @@ use std::time::Instant;
 use rfd::{MessageButtons, MessageLevel};
 use static_object::StaticObject;
 use tauri::api::file::read_string;
-use tauri::{Assets, Context};
+use tauri::api::path::app_dir;
+use tauri::{Config as TauriConfig};
 use tokio::sync::{Mutex, MutexGuard};
 
 use crate::libs::command::command_packet::app_command::config_update::ConfigUpdate;
 use crate::libs::command::command_packet::app_command::AppCommand;
 use crate::libs::config::config::{serialize_config, Config};
 use crate::libs::network::command_broadcast_server::CommandBroadcastServer;
-use crate::libs::utils::fs_utils::get_app_data_dir;
 use crate::libs::utils::immutable_utils::Immutable;
 use crate::libs::utils::mutex_utils::{a_lock, lock};
 use crate::{info, location_info};
@@ -44,12 +44,9 @@ impl ConfigManager {
     }
   }
 
-  pub async fn init<A: Assets>(&mut self, context: &Context<A>) {
-    self.app_dir = Some(get_app_data_dir(context));
-
-    let mut config_file_path = get_app_data_dir(context);
-    config_file_path.push("config.json");
-    self.config_file_path = Some(config_file_path);
+  pub async fn init(&mut self, tauri_config: &TauriConfig) {
+    self.app_dir = Some(app_dir(tauri_config).unwrap());
+    self.config_file_path = Some(self.app_dir.as_ref().unwrap().join("config.json"));
 
     self.load().await;
   }

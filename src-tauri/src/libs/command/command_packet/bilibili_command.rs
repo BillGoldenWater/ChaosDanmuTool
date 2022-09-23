@@ -43,4 +43,22 @@ impl BiliBiliCommand {
   pub fn from_raw(raw: Value) -> BiliBiliCommand {
     BiliBiliCommand::Raw { data: raw }
   }
+
+  pub fn command(&self) -> String {
+    match self {
+      BiliBiliCommand::ActivityUpdate { .. } => "activityUpdate".to_string(),
+      BiliBiliCommand::DanmuMessage { .. } => "danmuMessage".to_string(),
+      BiliBiliCommand::Raw { data } => {
+        let cmd = match data {
+          Value::Object(map) => map
+            .get("cmd")
+            .filter(|it| it.is_string())
+            .map(|it| it.as_str().unwrap()),
+          _ => None,
+        };
+
+        format!("raw.{cmd}", cmd = cmd.unwrap_or("unknown"))
+      }
+    }
+  }
 }

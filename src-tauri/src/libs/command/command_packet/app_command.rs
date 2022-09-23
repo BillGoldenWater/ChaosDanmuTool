@@ -58,4 +58,14 @@ impl AppCommand {
       data: viewer_status_update,
     }
   }
+
+  pub fn command(&self) -> String {
+    match self {
+        AppCommand::BiliBiliPacketParseError {..} => "bilibiliPacketParseError".to_string(),
+        AppCommand::ConfigUpdate {..} => "configUpdate".to_string(),
+        AppCommand::GiftConfigUpdate {..} => "giftConfigUpdate".to_string(),
+        AppCommand::ReceiverStatusUpdate {..} => "receiverStatusUpdate".to_string(),
+        AppCommand::ViewerStatusUpdate {..} => "viewerStatusUpdate".to_string(),
+    }
+  }
 }

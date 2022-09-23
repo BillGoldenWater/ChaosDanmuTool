@@ -5,15 +5,6 @@
 
 use std::path::PathBuf;
 
-use tauri::{Assets, Context};
-
-pub fn get_app_data_dir<A: Assets>(context: &Context<A>) -> PathBuf {
-  let bundle_id = &context.config().tauri.bundle.identifier;
-  let app_data_dir = tauri::api::path::config_dir().unwrap().join(bundle_id);
-
-  app_data_dir
-}
-
 #[cfg(target_os = "macos")]
 pub fn get_app_bundle_path() -> Option<PathBuf> {
   let exec_path = std::env::current_exe().unwrap();

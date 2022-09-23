@@ -53,7 +53,10 @@ impl CommandBroadcastServer {
 
     if let Ok(str) = command_str_result {
       self.broadcast(Message::Text(str)).await;
-      CommandHistoryManager::i().write(&command).await;
+      let result = CommandHistoryManager::i().write(&command).await;
+      if let Err(err) = result {
+        error!("{err}");
+      }
     } else {
       error!("failed to serialize command {:?}", command_str_result)
     }

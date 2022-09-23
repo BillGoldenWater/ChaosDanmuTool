@@ -8,7 +8,6 @@
   windows_subsystem = "windows"
 )]
 
-use chaosdanmutool::libs::utils::immutable_utils::Immutable;
 use tauri::async_runtime::{block_on, Mutex};
 use tauri::{command, App, AppHandle, Manager, Wry};
 use tauri::{Assets, Context, WindowEvent};
@@ -26,6 +25,7 @@ use chaosdanmutool::libs::config::config_manager::{modify_cfg, ConfigManager};
 use chaosdanmutool::libs::network::command_broadcast_server::CommandBroadcastServer;
 use chaosdanmutool::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver;
 use chaosdanmutool::libs::network::http_server::HttpServer;
+use chaosdanmutool::libs::utils::immutable_utils::Immutable;
 #[cfg(target_os = "macos")]
 use chaosdanmutool::libs::utils::window_utils::set_visible_on_all_workspaces;
 use chaosdanmutool::{error, get_cfg, info, location_info};
@@ -114,8 +114,8 @@ async fn main() {
 }
 
 async fn on_init<A: Assets>(context: &Context<A>) {
-  ConfigManager::i().init(context).await;
-  CommandHistoryManager::i().init(context);
+  ConfigManager::i().init(context.config()).await;
+  CommandHistoryManager::i().init(context.config()).await;
 
   start_ticking().await;
 }
@@ -151,6 +151,7 @@ static TICK_LOOP_STOP_TX: Mutex<Option<tokio::sync::mpsc::UnboundedSender<()>>> 
   Mutex::const_new(None);
 static TICK_LOOP_STOP_RX: Mutex<Option<Option<tokio::sync::oneshot::Receiver<()>>>> =
   Mutex::const_new(None);
+
 async fn start_ticking() {
   let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel::<()>();
   let (tx2, rx2) = tokio::sync::oneshot::channel::<()>();
