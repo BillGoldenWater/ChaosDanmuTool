@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# previous version of this project
+.old_src
+ChaosDanmuToolOld
+
 # cargo output
 src-tauri/target
 src-tauri/static_object/target
