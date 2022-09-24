@@ -1,0 +1,4 @@
+src-tauri/target
+src/share/type/rust
+src-tauri/**/target
+dist

@@ -3,13 +3,12 @@ name: Build and Release
 on:
   workflow_dispatch:
 
-
 jobs:
   build:
     strategy:
       fail-fast: false
       matrix:
-        platform: [ macos-latest, ubuntu-latest, windows-latest ]
+        platform: [macos-latest, ubuntu-latest, windows-latest]
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -69,7 +68,7 @@ jobs:
           path: out/*
 
   release:
-    needs: [ build ]
+    needs: [build]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

@@ -220,7 +220,7 @@ async fn create_main_window(app_handle: &AppHandle<Wry>) {
   let main_window = tauri::WindowBuilder::new(
     app_handle,
     "main",
-    tauri::WindowUrl::App("main/index.html".into()),
+    tauri::WindowUrl::App("index.html".into()),
   )
   .transparent(true)
   .build()
@@ -284,7 +284,7 @@ async fn create_viewer_window(app_handle: &AppHandle<Wry>) {
   let viewer_window = tauri::WindowBuilder::new(
     app_handle,
     "viewer",
-    tauri::WindowUrl::App("viewer/index.html".into()),
+    tauri::WindowUrl::App("index.html?window=viewer".into()),
   )
   .transparent(true)
   .decorations(false)
