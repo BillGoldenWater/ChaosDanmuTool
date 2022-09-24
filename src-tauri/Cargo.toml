@@ -16,7 +16,7 @@ tauri-build = { version = "1.0.4", features = [] }
 embed-resource = "1.7.3"
 
 [dependencies]
-static_object = { path = "static_object" }
+static_object = { git = "https://github.com/BiliGoldenWater/StaticObject.git" }
 serde_json = "1.0.82"
 serde = { version = "1.0.140", features = ["derive"] }
 # live template: sddfc (serde default define & function - config)
