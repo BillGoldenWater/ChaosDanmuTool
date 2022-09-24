@@ -4,29 +4,14 @@
  */
 
 #[cfg(target_os = "macos")]
-use raw_window_handle::HasRawWindowHandle;
-#[cfg(target_os = "macos")]
-use tauri::{Window, Wry};
-#[cfg(target_os = "macos")]
-use MacTypes_sys::{OSStatus, ProcessSerialNumber};
-
-#[cfg(target_os = "macos")]
-use crate::libs::utils::process_utils::get_psn_ptr;
-
-#[cfg(target_os = "macos")]
-#[link(name = "ApplicationServices", kind = "framework")]
-extern "C" {
-  fn TransformProcessType(psn: *mut ProcessSerialNumber, transform_state: u32) -> OSStatus;
-}
-
-#[cfg(target_os = "macos")]
-pub fn set_visible_on_all_workspaces(
-  window: &Window<Wry>,
+pub fn set_visible_on_all_workspaces<Window: raw_window_handle::HasRawWindowHandle>(
+  window: &Window,
   visible: bool,
   visible_on_full_screen: bool,
   skip_transform_process_type: bool,
 ) {
   unsafe {
+    use crate::libs::utils::process_utils::{get_psn_ptr, TransformProcessType};
     use cocoa::appkit::{NSWindow, NSWindowCollectionBehavior};
 
     let ns_window = get_ns_window(window).unwrap();
@@ -80,7 +65,9 @@ pub unsafe fn set_collection_behavior(
 }
 
 #[cfg(target_os = "macos")]
-pub fn get_ns_window(window: &Window<Wry>) -> Option<cocoa::base::id> {
+pub fn get_ns_window<Window: raw_window_handle::HasRawWindowHandle>(
+  window: &Window,
+) -> Option<cocoa::base::id> {
   use raw_window_handle::RawWindowHandle::AppKit;
 
   if let AppKit(handle) = window.raw_window_handle() {

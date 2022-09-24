@@ -4,16 +4,24 @@
  */
 
 #[cfg(target_os = "macos")]
-use MacTypes_sys::{ProcessSerialNumber, ProcessSerialNumberPtr};
-
-#[cfg(target_os = "macos")]
-pub fn get_psn_ptr() -> *mut ProcessSerialNumber {
-  ProcessSerialNumberPtr::from(&mut get_psn() as *mut ProcessSerialNumber)
+#[link(name = "ApplicationServices", kind = "framework")]
+extern "C" {
+  pub(super) fn TransformProcessType(
+    psn: MacTypes_sys::ProcessSerialNumberPtr,
+    transform_state: u32,
+  ) -> MacTypes_sys::OSStatus;
 }
 
 #[cfg(target_os = "macos")]
-pub fn get_psn() -> ProcessSerialNumber {
-  ProcessSerialNumber {
+pub fn get_psn_ptr() -> *mut MacTypes_sys::ProcessSerialNumber {
+  MacTypes_sys::ProcessSerialNumberPtr::from(
+    &mut get_psn() as *mut MacTypes_sys::ProcessSerialNumber
+  )
+}
+
+#[cfg(target_os = "macos")]
+pub fn get_psn() -> MacTypes_sys::ProcessSerialNumber {
+  MacTypes_sys::ProcessSerialNumber {
     highLongOfPSN: 0,
     lowLongOfPSN: 2,
   }
