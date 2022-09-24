@@ -87,6 +87,7 @@ create index if not exists command_history_timestamp_index
   /// use chaosdanmutool::libs::command::command_history_storage::CommandHistoryStorage;
   /// use std::path::PathBuf;
   ///
+  /// #[tokio::main]
   /// async fn main() {
   ///   let mut chs = CommandHistoryStorage::open(&PathBuf::from("test.sqlite")).await;
   ///
