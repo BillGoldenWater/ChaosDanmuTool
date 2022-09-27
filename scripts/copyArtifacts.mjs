@@ -49,7 +49,7 @@ async function copy(platform, buildInfos) {
 
     // region normalized file names
     let pkg = `${OUTPUT_APP_NAME}_${updateTarget}_v${version}.${pkgExt}`; // Chaos-Danmu-Tool_darwin-aarch64_v0.10.0.dmg
-    let updatePkg = `~${updateTarget}_update.${updatePkgExt}`; // ~darwin-aarch64_update.tar.gz
+    let updatePkg = `${updateTarget}_update.${updatePkgExt}`; // darwin-aarch64_update.tar.gz
     // endregion
 
     // region copy to out
