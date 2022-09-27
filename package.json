@@ -1,6 +1,6 @@
 {
   "name": "chaosdanmutool",
-  "productName": "ChaosDanmuTool",
+  "productName": "Chaos Danmu Tool",
   "version": "0.10.0",
   "description": "A tool for process/view Danmu on bilibili",
   "scripts": {

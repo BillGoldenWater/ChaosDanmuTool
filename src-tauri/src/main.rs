@@ -16,21 +16,21 @@ use tokio::sync::mpsc::error::TryRecvError;
 use tokio::sync::RwLock;
 use tokio::task;
 
-use chaosdanmutool::libs::command::command_history_manager::CommandHistoryManager;
-use chaosdanmutool::libs::command::command_packet::app_command::viewer_status_update::{
+use chaos_danmu_tool::libs::command::command_history_manager::CommandHistoryManager;
+use chaos_danmu_tool::libs::command::command_packet::app_command::viewer_status_update::{
   ViewerStatus, ViewerStatusUpdate,
 };
-use chaosdanmutool::libs::command::command_packet::app_command::AppCommand;
-use chaosdanmutool::libs::config::config::serialize_config;
-use chaosdanmutool::libs::config::config_manager::{modify_cfg, ConfigManager};
-use chaosdanmutool::libs::network::command_broadcast_server::CommandBroadcastServer;
-use chaosdanmutool::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver;
-use chaosdanmutool::libs::network::http_server::HttpServer;
-use chaosdanmutool::libs::utils::debug_utils::init_logger;
-use chaosdanmutool::libs::utils::immutable_utils::Immutable;
+use chaos_danmu_tool::libs::command::command_packet::app_command::AppCommand;
+use chaos_danmu_tool::libs::config::config::serialize_config;
+use chaos_danmu_tool::libs::config::config_manager::{modify_cfg, ConfigManager};
+use chaos_danmu_tool::libs::network::command_broadcast_server::CommandBroadcastServer;
+use chaos_danmu_tool::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver;
+use chaos_danmu_tool::libs::network::http_server::HttpServer;
+use chaos_danmu_tool::libs::utils::debug_utils::init_logger;
+use chaos_danmu_tool::libs::utils::immutable_utils::Immutable;
 #[cfg(target_os = "macos")]
-use chaosdanmutool::libs::utils::window_utils::set_visible_on_all_workspaces;
-use chaosdanmutool::{get_cfg, location_info};
+use chaos_danmu_tool::libs::utils::window_utils::set_visible_on_all_workspaces;
+use chaos_danmu_tool::{get_cfg, location_info};
 use static_object::StaticObject;
 
 static VIBRANCY_APPLIED: RwLock<bool> = RwLock::const_new(false);

@@ -1,11 +1,11 @@
 [package]
-name = "chaosdanmutool"
+name = "chaos_danmu_tool"
 version = "0.10.0"
 description = "A tool for process/view Danmu on bilibili"
 authors = ["Golden_Water"]
 license = "AGPL-3.0-only"
 repository = "https://github.com/BiliGoldenWater/ChaosDanmuTool.git"
-default-run = "chaosdanmutool"
+default-run = "chaos_danmu_tool"
 edition = "2021"
 rust-version = "1.57"
 

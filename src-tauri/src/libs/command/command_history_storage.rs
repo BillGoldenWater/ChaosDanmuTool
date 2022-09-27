@@ -84,7 +84,7 @@ create index if not exists command_history_timestamp_index
   ///
   /// # Examples
   /// ```
-  /// use chaosdanmutool::libs::command::command_history_storage::CommandHistoryStorage;
+  /// use chaos_danmu_tool::libs::command::command_history_storage::CommandHistoryStorage;
   /// use std::path::PathBuf;
   ///
   /// #[tokio::main]

@@ -6,7 +6,7 @@
 import fs from "fs/promises";
 import path from "path";
 
-const APP_NAME = "ChaosDanmuTool";
+const APP_NAME = "Chaos Danmu Tool";
 
 /**
  * @typedef {Object} BuildInfo
@@ -48,8 +48,11 @@ async function copy(platform, buildInfos) {
     // endregion
 
     // region normalized file names
-    let pkg = `${APP_NAME}_${updateTarget}_v${version}.${pkgExt}`;
-    let updatePkg = `${updateTarget}_update.${updatePkgExt}`;
+    let pkg = `${APP_NAME}_${updateTarget}_v${version}.${pkgExt}`.replace(
+      " ",
+      "_"
+    );
+    let updatePkg = `${updateTarget}_update.${updatePkgExt}`.replace(" ", "_");
     // endregion
 
     // region copy to out
@@ -89,13 +92,13 @@ async function main() {
       await copy("macos", [
         {
           versionInfo: `x86_64-apple-darwin|darwin-x86_64|${version}`,
-          pkgFile: `dmg/ChaosDanmuTool_${version}_x64.dmg|dmg`,
-          updatePkgFile: "macos/ChaosDanmuTool.app.tar.gz|tar.gz",
+          pkgFile: `dmg/Chaos Danmu Tool_${version}_x64.dmg|dmg`,
+          updatePkgFile: "macos/Chaos Danmu Tool.app.tar.gz|tar.gz",
         },
         {
           versionInfo: `aarch64-apple-darwin|darwin-aarch64|${version}`,
-          pkgFile: `dmg/ChaosDanmuTool_${version}_aarch64.dmg|dmg`,
-          updatePkgFile: "macos/ChaosDanmuTool.app.tar.gz|tar.gz",
+          pkgFile: `dmg/Chaos Danmu Tool_${version}_aarch64.dmg|dmg`,
+          updatePkgFile: "macos/Chaos Danmu Tool.app.tar.gz|tar.gz",
         },
       ]);
       break;

@@ -8,7 +8,7 @@
     "withGlobalTauri": false
   },
   "package": {
-    "productName": "ChaosDanmuTool",
+    "productName": "Chaos Danmu Tool",
     "version": "../package.json"
   },
   "tauri": {
