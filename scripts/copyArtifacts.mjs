@@ -123,8 +123,8 @@ async function main() {
       await copy("windows", [
         {
           versionInfo: `x86_64-pc-windows-msvc|windows-x86_64|${version}`,
-          pkgFile: `msi/ChaosDanmuTool_${version}_x64_${wL}.msi|msi`,
-          updatePkgFile: `msi/ChaosDanmuTool_${version}_x64_${wL}.msi.zip|zip`,
+          pkgFile: `msi/Chaos Danmu Tool_${version}_x64_${wL}.msi|msi`,
+          updatePkgFile: `msi/Chaos Danmu Tool_${version}_x64_${wL}.msi.zip|zip`,
         },
       ]);
       break;
