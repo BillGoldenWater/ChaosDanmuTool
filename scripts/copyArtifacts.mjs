@@ -6,7 +6,7 @@
 import fs from "fs/promises";
 import path from "path";
 
-const APP_NAME = "Chaos Danmu Tool";
+const OUTPUT_APP_NAME = "Chaos Danmu Tool".replaceAll(" ", "-");
 
 /**
  * @typedef {Object} BuildInfo
@@ -48,11 +48,8 @@ async function copy(platform, buildInfos) {
     // endregion
 
     // region normalized file names
-    let pkg = `${APP_NAME}_${updateTarget}_v${version}.${pkgExt}`.replace(
-      " ",
-      "_"
-    );
-    let updatePkg = `${updateTarget}_update.${updatePkgExt}`.replace(" ", "_");
+    let pkg = `${OUTPUT_APP_NAME}_${updateTarget}_v${version}.${pkgExt}`; // Chaos-Danmu-Tool_darwin-aarch64_v0.10.0.dmg
+    let updatePkg = `~${updateTarget}_update.${updatePkgExt}`; // ~darwin-aarch64_update.tar.gz
     // endregion
 
     // region copy to out
