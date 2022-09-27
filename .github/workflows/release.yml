@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [macos-latest, ubuntu-latest, windows-latest]
+        platform: [ macos-latest, ubuntu-latest, windows-latest ]
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -24,13 +24,27 @@ jobs:
         with:
           toolchain: stable
 
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - uses: actions/cache@v3
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: universal-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            universal-yarn
+
       - name: cache cargo and target
         uses: actions/cache@v3
         with:
           path: |
-            ~/.cargo
-            ./src-tauri/target
-          key: ${{ runner.os }}
+            ~/.cargo/
+            ./src-tauri/target/
+          key: ${{ runner.os }}-cargo-${{ github.run_id }}
+          restore-keys: |
+            ${{ runner.os }}-cargo
 
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-latest'
@@ -68,7 +82,7 @@ jobs:
           path: out/*
 
   release:
-    needs: [build]
+    needs: [ build ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
