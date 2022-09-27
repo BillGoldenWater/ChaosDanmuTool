@@ -43,6 +43,12 @@ async function main() {
   }
   // endregion
 
+  // region install tool
+  highlightLog("install cargo tauri-cli");
+
+  execCommand("cargo install tauri-cli");
+  // endregion
+
   // region rm last bundle output
   highlightLog("rm last bundle output");
 
