@@ -76,7 +76,7 @@ impl CommandHistoryManager {
       result
     } else {
       error!(
-        "error occurred when reading history {}",
+        "error occurred when reading history {err}",
         err = result.unwrap_err()
       );
       vec![]
