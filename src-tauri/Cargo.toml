@@ -60,7 +60,7 @@ base64 = "0.13.0"
 rand = "0.8.5"
 backtrace = "0.3"
 thiserror = "1.0.35"
-log = { version = "0.4.17", features = ["max_level_debug", "release_max_level_info"] }
+log = { version = "0.4.17", features = ["max_level_debug", "release_max_level_debug"] }
 fern = { version = "0.6.1", features = ["colored"] }
 ts-rs = "6.2.0"
 # live template: tss

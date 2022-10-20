@@ -6,6 +6,7 @@
 use std::fmt::Arguments;
 use std::fs;
 use std::fs::File;
+use std::path::PathBuf;
 
 use fern::colors::ColoredLevelConfig;
 use fern::FormatCallback;
@@ -22,29 +23,49 @@ pub fn init_logger(config: &Config) {
   // region stdout dispatch
   let stdout_dispatch = fern::Dispatch::new()
     .format(|out, message, record| format_log(out, message, record, LogTarget::Stdout))
-    .chain(std::io::stdout());
+    .chain(std::io::stdout())
+    .level(if cfg!(debug_assertions) {
+      LevelFilter::Debug
+    } else {
+      LevelFilter::Info
+    });
   // endregion
 
-  // region file dispatch
-  let logger_file_result = get_logger_file(config);
-  let file_dispatch = if let Ok(file) = logger_file_result {
-    fern::Dispatch::new()
-      .format(|out, message, record| format_log(out, message, record, LogTarget::File))
-      .chain(file)
-  } else {
-    eprintln!(
-      "failed to initialize logger file: {err}",
-      err = logger_file_result.unwrap_err()
-    );
-    fern::Dispatch::new().level(LevelFilter::Off)
-  };
-  // endregion
+  let mut dispatch = fern::Dispatch::new().chain(stdout_dispatch);
 
+  for d in get_file_dispatches(config) {
+    dispatch = dispatch.chain(d)
+  }
+
+  dispatch.apply().unwrap();
+}
+
+fn get_file_dispatches(config: &Config) -> Vec<fern::Dispatch> {
+  let mut result = vec![];
+
+  let file_results = vec![
+    (get_logger_file(config), LevelFilter::Info),
+    (get_debug_logger_file(config), LevelFilter::Debug),
+  ];
+
+  file_results.into_iter().for_each(|f| {
+    if let Ok(file) = f.0 {
+      result.push(create_file_dispatch(file).level(f.1))
+    } else {
+      eprintln!(
+        "failed to initialize logger file: {err}",
+        err = f.0.unwrap_err()
+      );
+    }
+  });
+
+  result
+}
+
+fn create_file_dispatch(file: File) -> fern::Dispatch {
   fern::Dispatch::new()
-    .chain(stdout_dispatch)
-    .chain(file_dispatch)
-    .apply()
-    .unwrap();
+    .format(|out, message, record| format_log(out, message, record, LogTarget::File))
+    .chain(file)
 }
 
 lazy_static! {
@@ -65,23 +86,44 @@ fn format_log(out: FormatCallback, message: &Arguments, record: &Record, target:
   out.finish(format_args!("{prefix} {message}"))
 }
 
-fn get_logger_file(config: &Config) -> Result<File, String> {
-  let log_dir = app_dir(config).unwrap().join("logs");
-  if !log_dir.exists() {
-    let result = fs::create_dir_all(&log_dir);
-    if let Err(err) = result {
-      return Err(format!("{err}"));
-    }
+fn get_logger_file(config: &Config) -> Result<File, Error> {
+  get_logger_file_by_path(gen_logger_file_path(
+    config,
+    format!(
+      "{ts}_{uuid}",
+      ts = chrono::Local::now().format("%Y-%m-%d_%H-%M-%S_%3f"),
+      uuid = uuid::Uuid::new_v4().to_string(),
+    ),
+  )?)
+}
+
+fn get_debug_logger_file(config: &Config) -> Result<File, Error> {
+  let path = gen_logger_file_path(config, "debug".to_string())?;
+
+  if path.exists() {
+    fs::remove_file(path.clone())?;
   }
 
-  let log_file = log_dir.join(format!(
-    "{ts}_{uuid}.log",
-    ts = chrono::Local::now().format("%Y-%m-%d_%H-%M-%S_%3f"),
-    uuid = uuid::Uuid::new_v4().to_string(),
-  ));
+  get_logger_file_by_path(path)
+}
 
-  let result = fern::log_file(log_file);
-  result.map_err(|it| format!("{it}"))
+fn get_logger_file_by_path(path: PathBuf) -> Result<File, Error> {
+  Ok(fern::log_file(path)?)
+}
+
+fn gen_logger_file_path(config: &Config, name: String) -> Result<PathBuf, Error> {
+  let log_dir = app_dir(config).unwrap().join("logs");
+  if !log_dir.exists() {
+    fs::create_dir_all(&log_dir)?;
+  }
+
+  Ok(log_dir.join(format!("{name}.log")))
+}
+
+#[derive(Debug, thiserror::Error)]
+pub enum Error {
+  #[error("io error: {0}")]
+  Io(#[from] std::io::Error),
 }
 
 #[macro_export]

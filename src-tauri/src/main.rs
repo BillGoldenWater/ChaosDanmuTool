@@ -9,6 +9,8 @@
 )]
 
 use log::{error, info};
+use static_object::StaticObject;
+use tauri::api::path::app_dir;
 use tauri::async_runtime::{block_on, Mutex};
 use tauri::{command, App, AppHandle, Manager, Wry};
 use tauri::{Assets, Context, WindowEvent};
@@ -16,7 +18,7 @@ use tokio::sync::mpsc::error::TryRecvError;
 use tokio::sync::RwLock;
 use tokio::task;
 
-use chaos_danmu_tool::libs::command::command_history_manager::CommandHistoryManager;
+use chaos_danmu_tool::libs::app_context::init_tauri_config;
 use chaos_danmu_tool::libs::command::command_packet::app_command::viewer_status_update::{
   ViewerStatus, ViewerStatusUpdate,
 };
@@ -31,14 +33,19 @@ use chaos_danmu_tool::libs::utils::immutable_utils::Immutable;
 #[cfg(target_os = "macos")]
 use chaos_danmu_tool::libs::utils::window_utils::set_visible_on_all_workspaces;
 use chaos_danmu_tool::{get_cfg, location_info};
-use static_object::StaticObject;
-
-static VIBRANCY_APPLIED: RwLock<bool> = RwLock::const_new(false);
 
 #[tokio::main]
 async fn main() {
+  // region setup
   let context = tauri::generate_context!();
+
   init_logger(context.config());
+
+  init_tauri_config(context.config().clone());
+
+  std::fs::create_dir_all(app_dir(&context.config()).unwrap())
+    .expect("unable to create app data dir");
+  // endregion
 
   // region build info
   info!(
@@ -118,7 +125,6 @@ async fn on_init<A: Assets>(context: &Context<A>) {
   tauri::async_runtime::set(tokio::runtime::Handle::current());
 
   ConfigManager::i().init(context.config()).await;
-  CommandHistoryManager::i().init(context.config()).await;
 
   start_ticking().await;
 }
@@ -345,6 +351,8 @@ async fn create_viewer_window(app_handle: &AppHandle<Wry>) {
 
   let _ = window_shadows::set_shadow(viewer_window, false);
 }
+
+static VIBRANCY_APPLIED: RwLock<bool> = RwLock::const_new(false);
 
 #[cfg(any(target_os = "windows", target_os = "macos"))]
 async fn apply_vibrancy_effect(window: &tauri::Window<Wry>) {
