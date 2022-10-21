@@ -9,13 +9,14 @@ use std::time::Instant;
 
 use bytes::{Buf, BytesMut};
 use log::{error, info, warn};
-use serde_json::{Map, Value};
+use serde_json::Value;
 use static_object::StaticObject;
 use tokio_tungstenite::tungstenite::protocol::frame::coding::CloseCode;
 use tokio_tungstenite::tungstenite::protocol::CloseFrame;
 use tokio_tungstenite::tungstenite::Message;
 
 use crate::get_cfg;
+use crate::libs::command::command_history_manager::CommandHistoryManager;
 use crate::libs::command::command_packet::app_command::bilibili_packet_parse_error::BiliBiliPacketParseError;
 use crate::libs::command::command_packet::app_command::receiver_status_update::{
   ReceiverStatus, ReceiverStatusUpdate,
@@ -24,6 +25,7 @@ use crate::libs::command::command_packet::app_command::AppCommand;
 use crate::libs::command::command_packet::bilibili_command::activity_update::ActivityUpdate;
 use crate::libs::command::command_packet::bilibili_command::danmu_message::DanmuMessage;
 use crate::libs::command::command_packet::bilibili_command::BiliBiliCommand;
+use crate::libs::command::command_packet::CommandPacket;
 use crate::libs::config::config::backend_config::danmu_receiver_config::DanmuReceiverConfig;
 use crate::libs::config::config_manager::{modify_cfg, ConfigManager};
 use crate::libs::network::api_request::danmu_server_info_getter::{self, DanmuServerInfoGetter};
@@ -360,31 +362,24 @@ impl DanmuReceiver {
         if let Ok(str) = str_parse_result {
           let json_parse_result = serde_json::from_str::<Value>(str);
           if let Ok(raw) = json_parse_result {
-            let map = Map::new();
-            let cmd = raw
-              .as_object()
-              .unwrap_or(&map)
-              .get("cmd")
-              .unwrap_or(&Value::Null)
-              .as_str()
-              .unwrap_or("");
+            let command = Self::parse_raw(raw).await;
+            if let Some(command) = command {
+              CommandBroadcastServer::i()
+                .broadcast_bilibili_command(command.0)
+                .await;
 
-            let command = if cmd.starts_with("DANMU_MSG") {
-              let dm_parse_result = DanmuMessage::from_raw(raw);
+              if let Some(raw_backup) = command.1 {
+                let result = CommandHistoryManager::i()
+                  .write(&CommandPacket::from_bilibili_command(
+                    BiliBiliCommand::from_raw_backup(raw_backup),
+                  ))
+                  .await;
 
-              if let Ok(dm) = dm_parse_result {
-                BiliBiliCommand::from_danmu_message(dm)
-              } else {
-                error!("unable to parse danmu message {:?}", dm_parse_result);
-                return;
+                if let Err(err) = result {
+                  error!("unable to write raw_backup\n {err:?}")
+                }
               }
-            } else {
-              BiliBiliCommand::from_raw(raw)
-            };
-
-            CommandBroadcastServer::i()
-              .broadcast_bilibili_command(command)
-              .await;
+            }
           } else {
             error!("unable to parse message\n{}", str)
           }
@@ -400,6 +395,29 @@ impl DanmuReceiver {
         Self::on_parse_error(message).await
       }
     }
+  }
+
+  ///
+  /// returns: (BiliBiliCommand, Option<Value>) second is raw for backup if needed
+  ///
+  pub async fn parse_raw(raw: Value) -> Option<(BiliBiliCommand, Option<Value>)> {
+    let cmd = raw["cmd"].as_str().unwrap_or("");
+
+    return if cmd.starts_with("DANMU_MSG") {
+      let dm_parse_result = DanmuMessage::from_raw(&raw);
+
+      if let Ok(dm) = dm_parse_result {
+        Some((BiliBiliCommand::from_danmu_message(dm), Some(raw)))
+      } else {
+        error!(
+          "unable to parse danmu message {:?}",
+          dm_parse_result.unwrap_err()
+        );
+        return None;
+      }
+    } else {
+      Some((BiliBiliCommand::from_raw(raw), None))
+    };
   }
 
   async fn on_parse_error(message: String) {

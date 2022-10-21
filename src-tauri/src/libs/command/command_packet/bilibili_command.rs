@@ -25,6 +25,10 @@ pub enum BiliBiliCommand {
     #[ts(type = "unknown")]
     data: Value,
   },
+  RawBackup {
+    #[ts(type = "unknown")]
+    data: Value,
+  },
 }
 
 impl BiliBiliCommand {
@@ -44,20 +48,22 @@ impl BiliBiliCommand {
     BiliBiliCommand::Raw { data: raw }
   }
 
+  pub fn from_raw_backup(raw: Value) -> BiliBiliCommand {
+    BiliBiliCommand::RawBackup { data: raw }
+  }
+
   pub fn command(&self) -> String {
     match self {
       BiliBiliCommand::ActivityUpdate { .. } => "activityUpdate".to_string(),
       BiliBiliCommand::DanmuMessage { .. } => "danmuMessage".to_string(),
       BiliBiliCommand::Raw { data } => {
-        let cmd = match data {
-          Value::Object(map) => map
-            .get("cmd")
-            .filter(|it| it.is_string())
-            .map(|it| it.as_str().unwrap()),
-          _ => None,
-        };
-
-        format!("raw.{cmd}", cmd = cmd.unwrap_or("unknown"))
+        format!("raw.{cmd}", cmd = data["cmd"].as_str().unwrap_or("unknown"))
+      }
+      BiliBiliCommand::RawBackup { data } => {
+        format!(
+          "rawBackup.{cmd}",
+          cmd = data["cmd"].as_str().unwrap_or("unknown")
+        )
       }
     }
   }

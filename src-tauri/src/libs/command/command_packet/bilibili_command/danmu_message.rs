@@ -67,7 +67,7 @@ impl DanmuMessage {
     }
   }
 
-  pub fn from_raw(raw: Value) -> Result<DanmuMessage, DanmuMessageParseError> {
+  pub fn from_raw(raw: &Value) -> Result<DanmuMessage, DanmuMessageParseError> {
     let raw_dm = match raw {
       Value::Object(obj) => Ok(obj),
       _ => Err(DanmuMessageParseError::UnknownRawData),
