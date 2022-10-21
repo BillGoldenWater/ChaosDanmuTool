@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+use serde_json::Value;
+
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "../src/share/type/rust/bilibili/")]
@@ -38,5 +40,17 @@ impl EmojiData {
 
   pub fn parse(str: &str) -> Result<EmojiData, serde_json::Error> {
     serde_json::from_str(str)
+  }
+
+  pub fn from_raw(raw: &Value) -> EmojiData {
+    let mut result = EmojiData::empty();
+
+    result.id = raw["id"].as_i64().unwrap_or(0) as i32;
+    result.text = raw["text"].as_str().unwrap_or("").to_string();
+    result.url = raw["url"].as_str().unwrap_or("").to_string();
+    result.height = raw["height"].as_i64().unwrap_or(0) as i32;
+    result.width = raw["width"].as_i64().unwrap_or(0) as i32;
+
+    result
   }
 }

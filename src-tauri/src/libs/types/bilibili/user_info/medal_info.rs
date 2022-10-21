@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-use log::error;
 use serde_json::Value;
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
@@ -63,40 +62,19 @@ impl MedalInfo {
   }
 
   pub fn from_raw(raw: &Value) -> MedalInfo {
-    let raw_medal_info = match raw {
-      Value::Array(arr) => arr,
-      _ => {
-        return MedalInfo::empty();
-      }
-    };
-
-    if raw_medal_info.len() == 0 {
-      return MedalInfo::empty();
-    }
-
-    let result = Self::from_raw_(raw_medal_info.clone());
-    if result.is_none() {
-      error!("failed when parsing {:?}", raw_medal_info);
-      return MedalInfo::empty();
-    }
-
-    result.unwrap()
-  }
-
-  fn from_raw_(raw: Vec<Value>) -> Option<MedalInfo> {
     let mut result = MedalInfo::empty();
 
-    result.medal_level = raw.get(0)?.as_u64()? as u16;
-    result.medal_name = raw.get(1)?.as_str()?.to_string();
-    result.anchor_uname = raw.get(2)?.as_str()?.to_string();
-    result.anchor_roomid = raw.get(3)?.as_u64()? as u32;
-    result.medal_color = raw.get(4)?.as_i64()? as i32;
-    result.medal_color_border = raw.get(7)?.as_i64()? as i32;
-    result.medal_color_start = raw.get(8)?.as_i64()? as i32;
-    result.medal_color_end = raw.get(9)?.as_i64()? as i32;
-    result.guard_level = raw.get(10)?.as_u64()? as u8;
-    result.is_lighted = raw.get(11)?.as_u64()? as u8;
+    result.medal_level = raw[0].as_u64().unwrap_or(0) as u16;
+    result.medal_name = raw[1].as_str().unwrap_or("").to_string();
+    result.anchor_uname = raw[2].as_str().unwrap_or("").to_string();
+    result.anchor_roomid = raw[3].as_u64().unwrap_or(0) as u32;
+    result.medal_color = raw[4].as_i64().unwrap_or(0) as i32;
+    result.medal_color_border = raw[7].as_i64().unwrap_or(0) as i32;
+    result.medal_color_start = raw[8].as_i64().unwrap_or(0) as i32;
+    result.medal_color_end = raw[9].as_i64().unwrap_or(0) as i32;
+    result.guard_level = raw[10].as_u64().unwrap_or(0) as u8;
+    result.is_lighted = raw[11].as_u64().unwrap_or(0) as u8;
 
-    Some(result)
+    result
   }
 }
