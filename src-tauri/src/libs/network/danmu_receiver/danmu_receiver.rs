@@ -23,7 +23,9 @@ use crate::libs::command::command_packet::app_command::receiver_status_update::{
 };
 use crate::libs::command::command_packet::app_command::AppCommand;
 use crate::libs::command::command_packet::bilibili_command::activity_update::ActivityUpdate;
-use crate::libs::command::command_packet::bilibili_command::danmu_message::DanmuMessage;
+use crate::libs::command::command_packet::bilibili_command::danmu_message::{
+  DanmuMessage, DanmuMessageParseError,
+};
 use crate::libs::command::command_packet::bilibili_command::BiliBiliCommand;
 use crate::libs::command::command_packet::CommandPacket;
 use crate::libs::config::config::backend_config::danmu_receiver_config::DanmuReceiverConfig;
@@ -357,38 +359,73 @@ impl DanmuReceiver {
           Self::on_parse_error(message).await;
           return;
         }
-
+        // region parse to string
         let str_parse_result = std::str::from_utf8(packet.body.as_ref());
         if let Ok(str) = str_parse_result {
+          // region parse to json object
           let json_parse_result = serde_json::from_str::<Value>(str);
           if let Ok(raw) = json_parse_result {
-            let command = Self::parse_raw(raw).await;
-            if let Some(command) = command {
+            // region parse to bilibili command
+            let cmd_parse_result = Self::parse_raw(raw.clone()).await;
+            if let Ok(command) = cmd_parse_result {
               CommandBroadcastServer::i()
                 .broadcast_bilibili_command(command.0)
                 .await;
 
               if let Some(raw_backup) = command.1 {
-                let result = CommandHistoryManager::i()
-                  .write(&CommandPacket::from_bilibili_command(
-                    BiliBiliCommand::from_raw_backup(raw_backup),
-                  ))
-                  .await;
+                let result =
+                  write_bilibili_command(BiliBiliCommand::from_raw_backup(raw_backup)).await;
 
                 if let Err(err) = result {
                   error!("unable to write raw_backup\n {err:?}")
                 }
               }
+            } else {
+              // on failed
+              let msg = format!(
+                "failed when parse json object: {err}",
+                err = cmd_parse_result.unwrap_err()
+              );
+              error!("{msg}");
+
+              let result =
+                write_bilibili_command(BiliBiliCommand::parse_failed(str.to_string(), msg)).await;
+
+              if let Err(err) = result {
+                error!("unable to write json object parse failed command\n {err:?}")
+              }
             }
+            // endregion
           } else {
-            error!("unable to parse message\n{}", str)
+            let msg = format!(
+              "unable to parse json string\n {err}\n {str}",
+              err = json_parse_result.unwrap_err()
+            );
+            error!("{msg}");
+
+            let result =
+              write_bilibili_command(BiliBiliCommand::parse_failed(str.to_string(), msg)).await;
+
+            if let Err(err) = result {
+              error!("unable to write json string parse failed command\n {err:?}")
+            }
           }
+          // endregion
         } else {
-          error!(
-            "unable to decode message to utf8\n{}",
-            bytes_to_hex(&packet.body)
+          let data_str = bytes_to_hex(&packet.body);
+          let msg = format!(
+            "unable to decode message to utf8\n{err}\n{data_str}",
+            err = str_parse_result.unwrap_err()
           );
+          error!("{msg}");
+
+          let result = write_bilibili_command(BiliBiliCommand::parse_failed(data_str, msg)).await;
+
+          if let Err(err) = result {
+            error!("unable to write hex parse failed command\n {err:?}")
+          }
         }
+        // endregion
       }
       _ => {
         let message = format!("unexpected op_code: {:?}", packet.op_code);
@@ -400,23 +437,16 @@ impl DanmuReceiver {
   ///
   /// returns: (BiliBiliCommand, Option<Value>) second is raw for backup if needed
   ///
-  pub async fn parse_raw(raw: Value) -> Option<(BiliBiliCommand, Option<Value>)> {
+  pub async fn parse_raw(
+    raw: Value,
+  ) -> Result<(BiliBiliCommand, Option<Value>), DanmuMessageParseError> {
     let cmd = raw["cmd"].as_str().unwrap_or("");
 
     return if cmd.starts_with("DANMU_MSG") {
-      let dm_parse_result = DanmuMessage::from_raw(&raw);
-
-      if let Ok(dm) = dm_parse_result {
-        Some((BiliBiliCommand::from_danmu_message(dm), Some(raw)))
-      } else {
-        error!(
-          "unable to parse danmu message {:?}",
-          dm_parse_result.unwrap_err()
-        );
-        return None;
-      }
+      let dm = DanmuMessage::from_raw(&raw)?;
+      Ok((BiliBiliCommand::from_danmu_message(dm), Some(raw)))
     } else {
-      Some((BiliBiliCommand::from_raw(raw), None))
+      Ok((BiliBiliCommand::from_raw(raw), None))
     };
   }
 
@@ -428,6 +458,14 @@ impl DanmuReceiver {
       ))
       .await
   }
+}
+
+async fn write_bilibili_command(
+  command: BiliBiliCommand,
+) -> crate::libs::command::command_history_manager::Result<()> {
+  CommandHistoryManager::i()
+    .write(&CommandPacket::from_bilibili_command(command))
+    .await
 }
 
 pub type ConnectResult<T> = Result<T, ConnectError>;

@@ -117,9 +117,11 @@ impl DanmuMessage {
   }
 }
 
-#[derive(Debug)]
+#[derive(thiserror::Error, Debug)]
 pub enum DanmuMessageParseError {
+  #[error("failed to get command type(cmd field)")]
   UnableGetCommandType,
+  #[error("unexpected command type: {0}")]
   WrongCommandType(String),
 }
 

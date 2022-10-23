@@ -29,6 +29,10 @@ pub enum BiliBiliCommand {
     #[ts(type = "unknown")]
     data: Value,
   },
+  ParseFailed {
+    data: String,
+    message: String,
+  },
 }
 
 impl BiliBiliCommand {
@@ -52,6 +56,10 @@ impl BiliBiliCommand {
     BiliBiliCommand::RawBackup { data: raw }
   }
 
+  pub fn parse_failed(data: String, message: String) -> BiliBiliCommand {
+    BiliBiliCommand::ParseFailed { data, message }
+  }
+
   pub fn command(&self) -> String {
     match self {
       BiliBiliCommand::ActivityUpdate { .. } => "activityUpdate".to_string(),
@@ -65,6 +73,7 @@ impl BiliBiliCommand {
           cmd = data["cmd"].as_str().unwrap_or("unknown")
         )
       }
+      BiliBiliCommand::ParseFailed { .. } => "parseFailed".to_string(),
     }
   }
 }
