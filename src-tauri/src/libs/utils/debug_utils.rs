@@ -76,7 +76,7 @@ fn format_log(out: FormatCallback, message: &Arguments, record: &Record, target:
   let prefix = format!(
     "{ts}[{target}][{lvl}]",
     ts = chrono::Local::now().format("[%Y-%m-%d %H:%M:%S.%3f]"),
-    target = record.target(),
+    target = record.target().replace("chaos_danmu_tool::libs",""),
     lvl = match target {
       LogTarget::Stdout => format!("{}", LOG_COLORS.color(record.level())),
       LogTarget::File => format!("{}", record.level()),
