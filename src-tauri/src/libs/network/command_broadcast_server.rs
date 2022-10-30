@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-use log::{error, info, warn};
 use std::collections::HashMap;
 use std::time::Duration;
 
+use log::{error, info, warn};
+use static_object::StaticObject;
 use tokio::net::TcpStream;
 use tokio::sync::Mutex;
 use tokio::time::timeout;
@@ -14,8 +15,6 @@ use tokio_tungstenite::tungstenite::protocol::frame::coding::CloseCode;
 use tokio_tungstenite::tungstenite::protocol::CloseFrame;
 use tokio_tungstenite::tungstenite::Message;
 use tokio_tungstenite::{MaybeTlsStream, WebSocketStream};
-
-use static_object::StaticObject;
 
 use crate::get_cfg;
 use crate::libs::command::command_history_manager::CommandHistoryManager;
@@ -183,7 +182,7 @@ impl CommandBroadcastServer {
     self
       .send_app_command(
         connection_id.clone(),
-        AppCommand::from_config_update(ConfigUpdate::new(&get_cfg!())),
+        AppCommand::from_config_update(ConfigUpdate::new(&*get_cfg!())),
       )
       .await;
 

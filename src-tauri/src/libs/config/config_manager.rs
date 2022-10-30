@@ -10,13 +10,12 @@ use std::time::Instant;
 
 use log::{error, info};
 use rfd::{MessageButtons, MessageLevel};
+use static_object::StaticObject;
 use tauri::api::file::read_string;
 use tauri::api::path::app_dir;
-use tauri::Config as TauriConfig;
 use tokio::sync::{Mutex, MutexGuard};
 
-use static_object::StaticObject;
-
+use crate::libs::app_context::tauri_config;
 use crate::libs::command::command_packet::app_command::config_update::ConfigUpdate;
 use crate::libs::command::command_packet::app_command::AppCommand;
 use crate::libs::config::config::{serialize_config, Config};
@@ -27,8 +26,7 @@ use crate::location_info;
 
 #[derive(StaticObject)]
 pub struct ConfigManager {
-  app_dir: Option<PathBuf>,
-  config_file_path: Option<PathBuf>,
+  config_file_path: PathBuf,
 
   config: Arc<Mutex<Config>>,
   last_save_ts: Mutex<Instant>,
@@ -37,28 +35,23 @@ pub struct ConfigManager {
 
 impl ConfigManager {
   pub fn new() -> ConfigManager {
-    ConfigManager {
-      app_dir: None,
-      config_file_path: None,
+    let app_dir = app_dir(&tauri_config()).unwrap();
+    let config_file_path = app_dir.join("config.json");
+
+    let mut this = ConfigManager {
+      config_file_path,
       config: wrap_cfg(serde_json::from_str("{}").unwrap()),
       last_save_ts: Mutex::new(Instant::now()),
       changed: Mutex::new(false),
-    }
-  }
+    };
 
-  pub async fn init(&mut self, tauri_config: &TauriConfig) {
-    self.app_dir = Some(app_dir(tauri_config).unwrap());
-    self.config_file_path = Some(self.app_dir.as_ref().unwrap().join("config.json"));
+    tokio::task::block_in_place(|| tauri::async_runtime::block_on(this.load()));
 
-    self.load().await;
+    this
   }
 
   pub async fn load(&mut self) {
-    if self.config_file_path.is_none() {
-      return;
-    }
-
-    let result = read_string(self.config_file_path.as_ref().unwrap().as_path());
+    let result = read_string(&self.config_file_path);
     let config_str;
     if let Err(err) = result {
       if !is_not_found(&err) {
@@ -105,28 +98,22 @@ impl ConfigManager {
   }
 
   pub fn save(&mut self) {
-    if let Some(app_dir) = &self.app_dir {
-      if let Some(path) = &self.config_file_path {
-        let mut changed = lock(&self.changed);
+    let mut changed = lock(&self.changed);
 
-        info!("save config");
-        let result = fs::create_dir_all(app_dir);
-        if let Err(err) = result {
-          error!("failed to create data folder\n{:#?}", err);
-          return;
-        }
-        let result = fs::write(path.as_path(), serialize_config(&*lock(&self.config), true));
-        if let Err(err) = result {
-          error!("failed to write config file\n{:#?}", err);
-          return;
-        }
-        *changed = false;
-        *lock(&self.last_save_ts) = Instant::now();
-        info!("config successfully saved");
-
-        drop(changed);
-      }
+    info!("save config");
+    let result = fs::write(
+      self.config_file_path.as_path(),
+      serialize_config(&*lock(&self.config), true),
+    );
+    if let Err(err) = result {
+      error!("failed to write config file\n{:#?}", err);
+      return;
     }
+    *changed = false;
+    *lock(&self.last_save_ts) = Instant::now();
+    info!("config successfully saved");
+
+    drop(changed);
   }
 
   pub async fn reset(&mut self, force: bool) {
@@ -222,9 +209,10 @@ fn wrap_cfg(config: Config) -> Arc<Mutex<Config>> {
 #[macro_export]
 #[allow(unused_macros)]
 macro_rules! get_cfg {
-  () => {
+  () => {{
+    use static_object::StaticObject;
     ConfigManager::i().get_readonly_config()
-  };
+  }};
 }
 
 pub async fn modify_cfg<F>(do_modify: F, broadcast: bool)
