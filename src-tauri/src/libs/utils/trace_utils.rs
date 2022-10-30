@@ -1,6 +1,10 @@
 use log::error;
 
 pub fn print_trace() {
+  print_trace_message("trace")
+}
+
+pub fn print_trace_message(msg: &str) {
   let bt = backtrace::Backtrace::new();
   let bt_str = format!("{bt:?}")
     .split("\n")
@@ -10,8 +14,8 @@ pub fn print_trace() {
     .join("\n");
 
   if std::env::var("BACKTRACE_DETAIL").is_ok() {
-    error!("trace: \n{bt:?}");
+    error!("{msg}: \n{bt:?}");
   } else {
-    error!("trace: \n{bt_str}");
+    error!("{msg}: \n{bt_str}");
   }
 }
