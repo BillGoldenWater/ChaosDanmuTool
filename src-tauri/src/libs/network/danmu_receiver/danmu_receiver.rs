@@ -70,6 +70,17 @@ impl DanmuReceiver {
     }
   }
 
+  pub async fn connect_to(&mut self, roomid: u32) {
+    #[cfg(not(debug_assertions))]
+    {
+      warn!("this shouldn't be call in release build");
+      print_trace()
+    }
+    modify_cfg(|cfg| (*cfg).backend.danmu_receiver.roomid = roomid, false).await;
+    let result = self.connect().await;
+    info!("{result:?}");
+  }
+
   pub async fn connect(&mut self) -> ConnectResult<()> {
     self.set_status(ReceiverStatus::Connecting).await;
     info!("connecting");
