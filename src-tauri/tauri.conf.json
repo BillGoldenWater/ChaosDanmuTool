@@ -64,6 +64,7 @@
       "active": true,
       "endpoints": [
         "https://api.goldenwater.ml/chaosDanmuTool/updateCheck?target={{target}}&arch={{arch}}&version={{current_version}}",
+        "https://cdn.goldenwater.ml/gitRepo/ChaosDanmuTool/releases/latest/download/updater.json",
         "https://github.com/BiliGoldenWater/ChaosDanmuTool/releases/latest/download/updater.json"
       ],
       "dialog": false,
