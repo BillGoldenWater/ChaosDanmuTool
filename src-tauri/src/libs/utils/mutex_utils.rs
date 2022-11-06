@@ -1,11 +1,12 @@
-use log::error;
 use std::time::Duration;
 
+use log::error;
 use tokio::{
   sync::{Mutex, MutexGuard},
   time::timeout,
 };
 
+use crate::libs::utils::async_utils::run_blocking;
 use crate::libs::utils::trace_utils::print_trace;
 
 lazy_static! {
@@ -18,9 +19,7 @@ pub fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
 }
 
 pub fn lock_custom_timeout<T>(mutex: &Mutex<T>, time_millis: u64) -> MutexGuard<'_, T> {
-  tokio::task::block_in_place(|| {
-    tokio::runtime::Handle::current().block_on(a_lock_custom_timeout(mutex, time_millis))
-  })
+  run_blocking(a_lock_custom_timeout(mutex, time_millis))
 }
 
 pub async fn a_lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {

@@ -36,11 +36,11 @@ pub async fn on_tauri_setup(app: &mut App<Wry>) {
 }
 
 pub async fn on_ready(app_handle: &AppHandle<Wry>) {
-  show_main_window(app_handle.clone()).await;
+  show_main_window(app_handle.clone());
 }
 
 pub async fn on_activate(app_handle: &AppHandle<Wry>) {
-  show_main_window(app_handle.clone()).await;
+  show_main_window(app_handle.clone());
 }
 
 pub async fn on_exit(_app_handle: &AppHandle<Wry>) {

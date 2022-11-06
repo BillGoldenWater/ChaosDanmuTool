@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+pub mod async_utils;
 pub mod brotli_utils;
 pub mod debug_utils;
 pub mod fs_utils;

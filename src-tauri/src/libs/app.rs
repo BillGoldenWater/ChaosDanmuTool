@@ -4,13 +4,12 @@
  */
 
 use log::info;
-use tauri::async_runtime::block_on;
 use tauri::{App, Assets, Context};
-use tokio::task;
 
 use crate::libs::app::event::{on_activate, on_exit, on_init, on_ready, on_tauri_setup};
 use crate::libs::app::internal_api::invoke_handler;
 use crate::libs::app_context::init_tauri_config;
+use crate::libs::utils::async_utils::run_blocking;
 use crate::libs::utils::debug_utils::init_logger;
 
 pub mod app_loop;
@@ -40,7 +39,7 @@ fn do_setup<A: Assets>(context: &Context<A>) {
 fn build_tauri_app<A: Assets>(context: Context<A>) -> App {
   tauri::Builder::default()
     .setup(|app| {
-      task::block_in_place(|| block_on(on_tauri_setup(app)));
+      run_blocking(on_tauri_setup(app));
       Ok(())
     })
     .invoke_handler(invoke_handler)
@@ -58,7 +57,7 @@ fn run_tauri_app(app: App) {
   app.run(move |app_handle, event| match event {
     Ready {} => {
       info!("ready");
-      task::block_in_place(|| block_on(on_ready(app_handle)));
+      run_blocking(on_ready(app_handle))
     }
     #[cfg(target_os = "macos")]
     ExitRequested { api, .. } => {
@@ -67,11 +66,11 @@ fn run_tauri_app(app: App) {
     }
     Exit => {
       info!("exiting");
-      task::block_in_place(|| block_on(on_exit(app_handle)));
+      run_blocking(on_exit(app_handle));
     }
     ApplicationShouldHandleReopen { api, .. } => {
       info!("handling reopen");
-      task::block_in_place(|| block_on(on_activate(app_handle)));
+      run_blocking(on_activate(app_handle));
       api.prevent_default();
     }
 

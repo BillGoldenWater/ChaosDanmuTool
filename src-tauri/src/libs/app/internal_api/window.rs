@@ -4,9 +4,8 @@
  */
 
 use static_object::StaticObject;
-use tauri::{async_runtime::block_on, command, Manager, WindowEvent, Wry};
+use tauri::{command, Manager, WindowEvent, Wry};
 use tokio::sync::RwLock;
-use tokio::task;
 
 use crate::get_cfg;
 use crate::libs::command::command_packet::app_command::viewer_status_update::{
@@ -15,21 +14,22 @@ use crate::libs::command::command_packet::app_command::viewer_status_update::{
 use crate::libs::command::command_packet::app_command::AppCommand;
 use crate::libs::config::config_manager::{modify_cfg, ConfigManager};
 use crate::libs::network::command_broadcast_server::CommandBroadcastServer;
+use crate::libs::utils::async_utils::run_blocking;
 use crate::libs::utils::immutable_utils::Immutable;
 
 #[command]
-pub async fn show_main_window(app_handle: tauri::AppHandle) {
+pub fn show_main_window(app_handle: tauri::AppHandle) {
   let main_window = app_handle.get_window("main");
 
   if let Some(main_window) = main_window {
     main_window.show().expect("failed to show main_window");
   } else {
-    create_main_window(app_handle).await;
+    create_main_window(app_handle);
   }
 }
 
 #[command]
-pub async fn create_main_window(app_handle: tauri::AppHandle) {
+pub fn create_main_window(app_handle: tauri::AppHandle) {
   let main_window = tauri::WindowBuilder::new(
     &app_handle,
     "main",
@@ -52,24 +52,22 @@ pub async fn create_main_window(app_handle: tauri::AppHandle) {
   }
 
   #[cfg(any(target_os = "windows", target_os = "macos"))]
-  apply_vibrancy_effect(&main_window).await;
+  apply_vibrancy_effect(&main_window);
 }
 
 #[command]
-pub async fn show_viewer_window(app_handle: tauri::AppHandle) {
+pub fn show_viewer_window(app_handle: tauri::AppHandle) {
   let viewer_window = app_handle.get_window("viewer");
 
   if let Some(viewer_window) = viewer_window {
     viewer_window.show().expect("failed to show viewer_window");
   } else {
-    create_viewer_window(&app_handle).await
+    create_viewer_window(&app_handle)
   }
 
-  CommandBroadcastServer::i()
-    .broadcast_app_command(AppCommand::from_viewer_status_update(
-      ViewerStatusUpdate::new(ViewerStatus::Open),
-    ))
-    .await
+  run_blocking(CommandBroadcastServer::i().broadcast_app_command(
+    AppCommand::from_viewer_status_update(ViewerStatusUpdate::new(ViewerStatus::Open)),
+  ))
 }
 
 #[command]
@@ -91,7 +89,7 @@ pub fn is_viewer_window_open(app_handle: tauri::AppHandle) -> bool {
   }
 }
 
-pub async fn create_viewer_window(app_handle: &tauri::AppHandle<Wry>) {
+pub fn create_viewer_window(app_handle: &tauri::AppHandle<Wry>) {
   let cfg = Immutable::new(get_cfg!().backend.window.viewer_window.clone());
 
   let viewer_window = tauri::WindowBuilder::new(
@@ -112,40 +110,24 @@ pub async fn create_viewer_window(app_handle: &tauri::AppHandle<Wry>) {
 
   viewer_window.on_window_event(|event| match event {
     WindowEvent::Resized(size) => {
-      task::block_in_place(|| {
-        block_on(async {
-          modify_cfg(
-            |cfg| {
-              cfg.backend.window.viewer_window.height = size.height;
-              cfg.backend.window.viewer_window.width = size.width;
-            },
-            true,
-          )
-          .await;
-        })
-      });
+      run_blocking(modify_cfg(
+        |cfg| {
+          cfg.backend.window.viewer_window.height = size.height;
+          cfg.backend.window.viewer_window.width = size.width;
+        },
+        true,
+      ));
     }
-    WindowEvent::Moved(pos) => {
-      task::block_in_place(|| {
-        block_on(async {
-          modify_cfg(
-            |cfg| {
-              cfg.backend.window.viewer_window.x = pos.x;
-              cfg.backend.window.viewer_window.y = pos.y;
-            },
-            true,
-          )
-          .await;
-        })
-      });
-    }
-    WindowEvent::Destroyed => {
-      task::block_in_place(|| {
-        block_on(CommandBroadcastServer::i().broadcast_app_command(
-          AppCommand::from_viewer_status_update(ViewerStatusUpdate::new(ViewerStatus::Close)),
-        ))
-      });
-    }
+    WindowEvent::Moved(pos) => run_blocking(modify_cfg(
+      |cfg| {
+        cfg.backend.window.viewer_window.x = pos.x;
+        cfg.backend.window.viewer_window.y = pos.y;
+      },
+      true,
+    )),
+    WindowEvent::Destroyed => run_blocking(CommandBroadcastServer::i().broadcast_app_command(
+      AppCommand::from_viewer_status_update(ViewerStatusUpdate::new(ViewerStatus::Close)),
+    )),
     _ => {}
   });
 
@@ -165,7 +147,7 @@ pub async fn create_viewer_window(app_handle: &tauri::AppHandle<Wry>) {
 static VIBRANCY_APPLIED: RwLock<bool> = RwLock::const_new(false);
 
 #[cfg(any(target_os = "windows", target_os = "macos"))]
-pub async fn apply_vibrancy_effect(window: &tauri::Window<Wry>) {
+pub fn apply_vibrancy_effect(window: &tauri::Window<Wry>) {
   let result;
 
   #[cfg(target_os = "macos")]
@@ -187,7 +169,7 @@ pub async fn apply_vibrancy_effect(window: &tauri::Window<Wry>) {
   }
 
   if result.is_ok() {
-    *VIBRANCY_APPLIED.write().await = true;
+    *run_blocking(VIBRANCY_APPLIED.write()) = true;
   }
 }
 

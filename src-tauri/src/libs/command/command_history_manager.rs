@@ -13,6 +13,7 @@ use tokio::sync::Mutex;
 use crate::libs::app_context::tauri_config;
 use crate::libs::command::command_packet;
 use crate::libs::command::command_packet::CommandPacket;
+use crate::libs::utils::async_utils::run_blocking;
 use crate::libs::utils::mutex_utils::a_lock;
 
 static FILE_NAME: &str = "commandHistory.sqlite";
@@ -32,13 +33,12 @@ impl CommandHistoryManager {
       .create_if_missing(true);
     options.log_statements(LevelFilter::Debug);
 
-    let db = tokio::task::block_in_place(|| {
-      tokio::runtime::Handle::current().block_on(async {
-        let mut db = SqliteConnection::connect_with(&options).await.unwrap();
+    let db = run_blocking(async {
+      let mut db = SqliteConnection::connect_with(&options).await.unwrap();
 
-        // region initialing database
-        let result = sqlx::query(
-          r#"
+      // region initialing database
+      let result = sqlx::query(
+        r#"
 create table if not exists command_history
 (
     id        integer not null
@@ -59,17 +59,16 @@ create index if not exists command_history_sessionId_index
 create index if not exists command_history_timestamp_index
     on command_history (timestamp);
     "#,
-        )
+      )
         .execute(&mut db)
         .await;
-        // endregion
+      // endregion
 
-        if result.is_err() {
-          panic!("error when initialing database {result:?}")
-        }
+      if result.is_err() {
+        panic!("error when initialing database {result:?}")
+      }
 
-        db
-      })
+      db
     });
 
     Self {

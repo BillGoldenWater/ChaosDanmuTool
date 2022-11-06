@@ -19,6 +19,7 @@ use tokio_tungstenite::tungstenite::protocol::frame::coding::CloseCode;
 use tokio_tungstenite::tungstenite::protocol::CloseFrame;
 use tokio_tungstenite::tungstenite::Error;
 use tokio_tungstenite::{connect_async, tungstenite::Message, MaybeTlsStream, WebSocketStream};
+use crate::libs::utils::async_utils::run_blocking;
 
 use crate::libs::utils::mutex_utils::{a_lock, lock};
 
@@ -188,9 +189,7 @@ impl WebSocketConnection {
 impl Drop for WebSocketConnection {
   fn drop(&mut self) {
     if self.is_connected() {
-      tokio::task::block_in_place(|| {
-        tokio::runtime::Handle::current().block_on(self.disconnect(None))
-      });
+      run_blocking(self.disconnect(None));
       info!("{}: closed on drop", self.connection_id);
     }
   }

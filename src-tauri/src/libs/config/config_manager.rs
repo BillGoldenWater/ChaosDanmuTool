@@ -20,6 +20,7 @@ use crate::libs::command::command_packet::app_command::config_update::ConfigUpda
 use crate::libs::command::command_packet::app_command::AppCommand;
 use crate::libs::config::config::{serialize_config, Config};
 use crate::libs::network::command_broadcast_server::CommandBroadcastServer;
+use crate::libs::utils::async_utils::run_blocking;
 use crate::libs::utils::immutable_utils::Immutable;
 use crate::libs::utils::mutex_utils::{a_lock, lock};
 use crate::location_info;
@@ -45,7 +46,7 @@ impl ConfigManager {
       changed: Mutex::new(false),
     };
 
-    tokio::task::block_in_place(|| tauri::async_runtime::block_on(this.load()));
+    run_blocking(this.load());
 
     this
   }
