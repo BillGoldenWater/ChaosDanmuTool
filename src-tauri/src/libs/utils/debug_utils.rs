@@ -11,15 +11,15 @@ use std::path::PathBuf;
 use fern::colors::ColoredLevelConfig;
 use fern::FormatCallback;
 use log::{LevelFilter, Record};
-use tauri::api::path::app_dir;
-use tauri::Config;
+
+use crate::libs::app_context::AppContext;
 
 enum LogTarget {
   Stdout,
   File,
 }
 
-pub fn init_logger(config: &Config) {
+pub fn init_logger() {
   // region stdout dispatch
   let stdout_dispatch = fern::Dispatch::new()
     .format(|out, message, record| format_log(out, message, record, LogTarget::Stdout))
@@ -33,19 +33,19 @@ pub fn init_logger(config: &Config) {
 
   let mut dispatch = fern::Dispatch::new().chain(stdout_dispatch);
 
-  for d in get_file_dispatches(config) {
+  for d in get_file_dispatches() {
     dispatch = dispatch.chain(d)
   }
 
   dispatch.apply().unwrap();
 }
 
-fn get_file_dispatches(config: &Config) -> Vec<fern::Dispatch> {
+fn get_file_dispatches() -> Vec<fern::Dispatch> {
   let mut result = vec![];
 
   let file_results = vec![
-    (get_logger_file(config), LevelFilter::Info),
-    (get_debug_logger_file(config), LevelFilter::Debug),
+    (get_logger_file(), LevelFilter::Info),
+    (get_debug_logger_file(), LevelFilter::Debug),
   ];
 
   file_results.into_iter().for_each(|f| {
@@ -76,7 +76,7 @@ fn format_log(out: FormatCallback, message: &Arguments, record: &Record, target:
   let prefix = format!(
     "{ts}[{target}][{lvl}]",
     ts = chrono::Local::now().format("[%Y-%m-%d %H:%M:%S.%3f]"),
-    target = record.target().replace("chaos_danmu_tool::libs",""),
+    target = record.target().replace("chaos_danmu_tool::libs", ""),
     lvl = match target {
       LogTarget::Stdout => format!("{}", LOG_COLORS.color(record.level())),
       LogTarget::File => format!("{}", record.level()),
@@ -86,19 +86,16 @@ fn format_log(out: FormatCallback, message: &Arguments, record: &Record, target:
   out.finish(format_args!("{prefix} {message}"))
 }
 
-fn get_logger_file(config: &Config) -> Result<File, Error> {
-  get_logger_file_by_path(gen_logger_file_path(
-    config,
-    format!(
-      "{ts}_{uuid}",
-      ts = chrono::Local::now().format("%Y-%m-%d_%H-%M-%S_%3f"),
-      uuid = uuid::Uuid::new_v4().to_string(),
-    ),
-  )?)
+fn get_logger_file() -> Result<File, Error> {
+  get_logger_file_by_path(gen_logger_file_path(format!(
+    "{ts}_{uuid}",
+    ts = chrono::Local::now().format("%Y-%m-%d_%H-%M-%S_%3f"),
+    uuid = uuid::Uuid::new_v4().to_string(),
+  ))?)
 }
 
-fn get_debug_logger_file(config: &Config) -> Result<File, Error> {
-  let path = gen_logger_file_path(config, "debug".to_string())?;
+fn get_debug_logger_file() -> Result<File, Error> {
+  let path = gen_logger_file_path("debug".to_string())?;
 
   if path.exists() {
     fs::remove_file(path.clone())?;
@@ -111,8 +108,8 @@ fn get_logger_file_by_path(path: PathBuf) -> Result<File, Error> {
   Ok(fern::log_file(path)?)
 }
 
-fn gen_logger_file_path(config: &Config, name: String) -> Result<PathBuf, Error> {
-  let log_dir = app_dir(config).unwrap().join("logs");
+fn gen_logger_file_path(name: String) -> Result<PathBuf, Error> {
+  let log_dir = AppContext::i().data_dir.join("logs");
   if !log_dir.exists() {
     fs::create_dir_all(&log_dir)?;
   }

@@ -4,31 +4,34 @@
  */
 
 use static_object::StaticObject;
-use tauri::api::path::app_dir;
 use tauri::{App, AppHandle, Assets, Context, Wry};
 
 use crate::get_cfg;
 use crate::libs::app::app_loop::AppLoop;
 use crate::libs::app::internal_api::window::show_main_window;
+use crate::libs::app_context::AppContext;
 use crate::libs::config::config_manager::ConfigManager;
 use crate::libs::network::command_broadcast_server::CommandBroadcastServer;
 use crate::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver;
 use crate::libs::network::http_server::HttpServer;
+use crate::libs::utils::debug_utils::init_logger;
 
-pub async fn on_init<A: Assets>(context: &Context<A>) {
-  std::fs::create_dir_all(app_dir(&context.config()).unwrap())
-    .expect("unable to create app data dir");
+pub fn on_init<A: Assets>(context: &Context<A>) {
+  AppContext::init(context.config().clone());
+  init_logger();
+
+  tauri::async_runtime::set(tokio::runtime::Handle::current());
 
   let _ = AppLoop::i();
   let _ = CommandBroadcastServer::i();
   let _ = ConfigManager::i();
   let _ = DanmuReceiver::i();
   let _ = HttpServer::i();
-
-  AppLoop::i().start();
 }
 
-pub async fn on_tauri_setup(app: &mut App<Wry>) {
+pub async fn on_setup(app: &mut App<Wry>) {
+  AppLoop::i().start();
+
   let asset_resolver = app.asset_resolver();
 
   let port = get_cfg!().backend.http_server.port.clone();

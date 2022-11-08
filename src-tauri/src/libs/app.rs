@@ -6,11 +6,9 @@
 use log::info;
 use tauri::{App, Assets, Context};
 
-use crate::libs::app::event::{on_activate, on_exit, on_init, on_ready, on_tauri_setup};
+use crate::libs::app::event::{on_activate, on_exit, on_init, on_ready, on_setup};
 use crate::libs::app::internal_api::invoke_handler;
-use crate::libs::app_context::init_tauri_config;
 use crate::libs::utils::async_utils::run_blocking;
-use crate::libs::utils::debug_utils::init_logger;
 
 pub mod app_loop;
 pub mod event;
@@ -18,28 +16,19 @@ pub mod internal_api;
 
 pub async fn run() {
   let context = tauri::generate_context!();
-  do_setup(&context);
+  on_init(&context);
 
   print_build_info();
-
-  on_init(&context).await;
 
   let app = build_tauri_app(context);
 
   run_tauri_app(app)
 }
 
-fn do_setup<A: Assets>(context: &Context<A>) {
-  init_logger(context.config());
-  init_tauri_config(context.config().clone());
-
-  tauri::async_runtime::set(tokio::runtime::Handle::current());
-}
-
 fn build_tauri_app<A: Assets>(context: Context<A>) -> App {
   tauri::Builder::default()
     .setup(|app| {
-      run_blocking(on_tauri_setup(app));
+      run_blocking(on_setup(app));
       Ok(())
     })
     .invoke_handler(invoke_handler)

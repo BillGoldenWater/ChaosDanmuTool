@@ -3,14 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+use crate::libs::app_context::AppContext;
 use chrono::Utc;
 use log::{error, LevelFilter};
 use sqlx::sqlite::SqliteConnectOptions;
 use sqlx::{ConnectOptions, Connection, Row, SqliteConnection};
-use tauri::api::path::app_dir;
 use tokio::sync::Mutex;
 
-use crate::libs::app_context::tauri_config;
 use crate::libs::command::command_packet;
 use crate::libs::command::command_packet::CommandPacket;
 use crate::libs::utils::async_utils::run_blocking;
@@ -26,8 +25,7 @@ pub struct CommandHistoryManager {
 
 impl CommandHistoryManager {
   fn new() -> Self {
-    let tauri_config = tauri_config();
-    let db_file = app_dir(&tauri_config).unwrap().join(FILE_NAME);
+    let db_file = AppContext::i().data_dir.join(FILE_NAME);
     let mut options = SqliteConnectOptions::new()
       .filename(db_file)
       .create_if_missing(true);
@@ -60,8 +58,8 @@ create index if not exists command_history_timestamp_index
     on command_history (timestamp);
     "#,
       )
-        .execute(&mut db)
-        .await;
+      .execute(&mut db)
+      .await;
       // endregion
 
       if result.is_err() {

@@ -12,10 +12,9 @@ use log::{error, info};
 use rfd::{MessageButtons, MessageLevel};
 use static_object::StaticObject;
 use tauri::api::file::read_string;
-use tauri::api::path::app_dir;
 use tokio::sync::{Mutex, MutexGuard};
 
-use crate::libs::app_context::tauri_config;
+use crate::libs::app_context::AppContext;
 use crate::libs::command::command_packet::app_command::config_update::ConfigUpdate;
 use crate::libs::command::command_packet::app_command::AppCommand;
 use crate::libs::config::config::{serialize_config, Config};
@@ -36,8 +35,7 @@ pub struct ConfigManager {
 
 impl ConfigManager {
   pub fn new() -> ConfigManager {
-    let app_dir = app_dir(&tauri_config()).unwrap();
-    let config_file_path = app_dir.join("config.json");
+    let config_file_path = AppContext::i().data_dir.join("config.json");
 
     let mut this = ConfigManager {
       config_file_path,
