@@ -5,6 +5,7 @@
 
 pub mod async_utils;
 pub mod brotli_utils;
+pub mod console_utils;
 pub mod debug_utils;
 pub mod fs_utils;
 pub mod immutable_utils;

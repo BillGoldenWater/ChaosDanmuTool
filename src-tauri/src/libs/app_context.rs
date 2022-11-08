@@ -26,15 +26,16 @@ impl AppContext {
 
     ONCE.call_once(|| {
       // region process args
+      use crate::libs::utils::console_utils::{attach_console, detach_console};
+
+      attach_console();
       let args = Args::parse();
+      detach_console();
 
       #[cfg(target_os = "windows")]
       {
         if args.attach_console {
-          use winapi::um::wincon::{AttachConsole, ATTACH_PARENT_PROCESS};
-          unsafe {
-            AttachConsole(ATTACH_PARENT_PROCESS);
-          }
+          attach_console();
         }
       }
       // endregion
