@@ -1,4 +1,5 @@
 use log::error;
+use crate::libs::app_context::AppContext;
 
 pub fn print_trace() {
   print_trace_message("trace")
@@ -13,7 +14,7 @@ pub fn print_trace_message(msg: &str) {
     .collect::<Vec<&str>>()
     .join("\n");
 
-  if std::env::var("BACKTRACE_DETAIL").is_ok() {
+  if AppContext::i().args.backtrace_detail {
     error!("{msg}: \n{bt:?}");
   } else {
     error!("{msg}: \n{bt_str}");

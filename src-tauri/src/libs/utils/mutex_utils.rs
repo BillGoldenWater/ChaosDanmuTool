@@ -6,12 +6,12 @@ use tokio::{
   time::timeout,
 };
 
+use crate::libs::app_context::AppContext;
 use crate::libs::utils::async_utils::run_blocking;
 use crate::libs::utils::trace_utils::print_trace;
 
 lazy_static! {
-  static ref TIMEOUT_MILLIS: u64 =
-    std::env::var("LOCK_TIMEOUT_MILLIS").map_or(1000, |it| it.parse::<u64>().unwrap_or(1000));
+  static ref TIMEOUT_MILLIS: u64 = AppContext::i().args.lock_timeout_millis;
 }
 
 pub fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
