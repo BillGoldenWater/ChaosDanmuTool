@@ -15,7 +15,7 @@ pub struct HttpServerConfig {
 }
 
 fn port_default() -> u16 {
-  25525
+  25556
 }
 
 fn port_skip_if(value: &u16) -> bool {
