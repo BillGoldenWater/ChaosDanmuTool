@@ -1,5 +1,5 @@
-use log::error;
 use crate::libs::app_context::AppContext;
+use log::error;
 
 pub fn print_trace() {
   print_trace_message("trace")
