@@ -49,6 +49,7 @@ pub fn set_visible_on_all_workspaces<Window: raw_window_handle::HasRawWindowHand
   }
 }
 
+#[allow(clippy::missing_safety_doc)]
 #[cfg(target_os = "macos")]
 pub unsafe fn set_collection_behavior(
   ns_window: cocoa::base::id,

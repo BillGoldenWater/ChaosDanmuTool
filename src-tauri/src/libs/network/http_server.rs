@@ -185,18 +185,16 @@ impl HttpServer {
   }
 
   pub async fn stop(&mut self) {
-    if let Some(tx) = self.tx.replace(None) {
-      if let Some(tx) = tx {
-        info!("stopping server");
-        let send_result = tx.send(());
-        if send_result.is_ok() {
-          if let Some(join_handle) = &mut self.server_join_handle {
-            info!("waiting server to stop");
-            let _ = join_handle.await;
-          }
-        } else {
-          error!("failed to send stop signal");
+    if let Some(Some(tx)) = self.tx.replace(None) {
+      info!("stopping server");
+      let send_result = tx.send(());
+      if send_result.is_ok() {
+        if let Some(join_handle) = &mut self.server_join_handle {
+          info!("waiting server to stop");
+          let _ = join_handle.await;
         }
+      } else {
+        error!("failed to send stop signal");
       }
     }
   }
@@ -273,16 +271,14 @@ impl HttpServer {
       }
       #[cfg(debug_assertions)]
       {
-        let target_uri = format!("http://localhost:5173{}", req.uri().to_string());
+        let target_uri = format!("http://localhost:5173{}", req.uri());
         info!("redirecting to {}", target_uri);
 
         let res = Response::builder()
           .status(StatusCode::TEMPORARY_REDIRECT)
           .header("Location", target_uri)
           .body(Body::empty())
-          .unwrap_or(Response::new(Body::from(
-            "failed when build redirect response",
-          )));
+          .unwrap_or_else(|_| Response::new(Body::from("failed when build redirect response")));
         return Ok(res);
       }
     } else {
@@ -385,16 +381,13 @@ fn get_process_names_using(port: u16) -> Vec<String> {
   let mut pids: Vec<u32> = vec![];
 
   for socket_info in sockets_info {
-    match socket_info.protocol_socket_info {
-      ProtocolSocketInfo::Tcp(tcp_info) => {
-        if tcp_info.state == TcpState::Listen
-          && tcp_info.local_addr == IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0))
-          && tcp_info.local_port == port
-        {
-          pids.append(&mut socket_info.associated_pids.clone())
-        }
+    if let ProtocolSocketInfo::Tcp(tcp_info) = socket_info.protocol_socket_info {
+      if tcp_info.state == TcpState::Listen
+        && tcp_info.local_addr == IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0))
+        && tcp_info.local_port == port
+      {
+        pids.append(&mut socket_info.associated_pids.clone())
       }
-      _ => {}
     }
   }
   // endregion

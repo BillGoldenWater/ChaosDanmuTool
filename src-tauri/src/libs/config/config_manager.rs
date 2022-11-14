@@ -171,6 +171,7 @@ impl ConfigManager {
   }
 
   pub async fn tick(&mut self) {
+    #[allow(clippy::collapsible_if)]
     if a_lock(&self.config)
       .await
       .backend

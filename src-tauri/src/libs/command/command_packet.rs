@@ -49,11 +49,9 @@ impl CommandPacket {
   pub fn to_string(&self) -> Result<String> {
     match self {
       CommandPacket::AppCommand {
-        data: app_command, ..
-      } => match app_command {
-        AppCommand::ConfigUpdate { .. } => Ok(serialize_config(self, false)),
-        _ => Ok(serde_json::to_string(self)?),
-      },
+        data: AppCommand::ConfigUpdate { .. },
+        ..
+      } => Ok(serialize_config(self, false)),
       _ => Ok(serde_json::to_string(self)?),
     }
   }
@@ -76,13 +74,10 @@ impl CommandPacket {
   }
 
   pub fn timestamp(&self) -> DateTime<Utc> {
-    Utc.timestamp_millis(
-      match self {
-        CommandPacket::AppCommand { timestamp, .. } => timestamp,
-        CommandPacket::BiliBiliCommand { timestamp, .. } => timestamp,
-      }
-      .clone(),
-    )
+    Utc.timestamp_millis(*match self {
+      CommandPacket::AppCommand { timestamp, .. } => timestamp,
+      CommandPacket::BiliBiliCommand { timestamp, .. } => timestamp,
+    })
   }
 }
 

@@ -66,7 +66,7 @@ pub fn serialize_config<T: Serialize>(config: &T, use_skip_if: bool) -> String {
     error!("error when serialize config {}", err);
   }
 
-  result.unwrap_or("{}".to_string())
+  result.unwrap_or_else(|_| "{}".to_string())
 }
 
 #[cfg(test)]

@@ -107,7 +107,7 @@ impl CommandBroadcastServer {
   pub async fn broadcast(&mut self, message: Message) {
     for (id, conn) in &mut *a_lock(&self.connections).await {
       let timeout_result = timeout(Duration::from_secs(5), conn.send(message.clone())).await;
-      if let Err(_) = timeout_result {
+      if timeout_result.is_err() {
         warn!("connection {} send timeout, disconnecting.", id);
         conn.disconnect(None).await;
       }
@@ -135,7 +135,7 @@ impl CommandBroadcastServer {
 
     let mut connections = a_lock(&self.connections).await;
 
-    for (_, conn) in &mut *connections {
+    for conn in (*connections).values_mut() {
       conn.disconnect(close_frame(CloseCode::Normal, "")).await;
     }
     connections.clear();

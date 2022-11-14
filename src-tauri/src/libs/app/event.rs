@@ -34,7 +34,7 @@ pub async fn on_setup(app: &mut App<Wry>) {
 
   let asset_resolver = app.asset_resolver();
 
-  let port = get_cfg!().backend.http_server.port.clone();
+  let port = get_cfg!().backend.http_server.port;
   HttpServer::i().start(asset_resolver, port).await;
 }
 

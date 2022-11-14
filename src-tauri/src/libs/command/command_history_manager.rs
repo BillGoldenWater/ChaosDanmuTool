@@ -218,7 +218,7 @@ fn gen_session_id() -> String {
   format!(
     "{ts}_{uuid}",
     ts = Utc::now().format("%Y-%m-%d-%H-%M-%S"),
-    uuid = uuid::Uuid::new_v4().to_string(),
+    uuid = uuid::Uuid::new_v4(),
   )
 }
 

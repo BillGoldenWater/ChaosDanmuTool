@@ -20,7 +20,7 @@ pub fn bytes_to_hex(data: &BytesMut) -> String {
   let mut result: String = "".to_string();
 
   for byte in data {
-    let byte = byte_to_hex(byte.clone());
+    let byte = byte_to_hex(*byte);
     result.push(byte[0]);
     result.push(byte[1]);
   }

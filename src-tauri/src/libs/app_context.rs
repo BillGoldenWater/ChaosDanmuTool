@@ -54,7 +54,7 @@ impl AppContext {
 
   pub fn i() -> AppContext {
     unsafe {
-      if APP_CONTEXT == 0 as *const AppContext {
+      if APP_CONTEXT.is_null() {
         print_trace();
         panic!("get before init")
       }

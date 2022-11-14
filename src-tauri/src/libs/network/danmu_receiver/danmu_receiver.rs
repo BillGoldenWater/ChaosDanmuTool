@@ -154,9 +154,9 @@ impl DanmuReceiver {
 
     // err
     self.on_error("failed to get actual roomid").await;
-    return Err(ConnectError::FailedToGetActualRoomid(
+    Err(ConnectError::FailedToGetActualRoomid(
       roomid_result.unwrap_err(),
-    ));
+    ))
   }
 
   #[inline]
@@ -453,12 +453,12 @@ impl DanmuReceiver {
   ) -> Result<(BiliBiliCommand, Option<Value>), DanmuMessageParseError> {
     let cmd = raw["cmd"].as_str().unwrap_or("");
 
-    return if cmd.starts_with("DANMU_MSG") {
+    if cmd.starts_with("DANMU_MSG") {
       let dm = DanmuMessage::from_raw(&raw)?;
       Ok((BiliBiliCommand::from_danmu_message(dm), Some(raw)))
     } else {
       Ok((BiliBiliCommand::from_raw(raw), None))
-    };
+    }
   }
 
   async fn on_parse_error(message: String) {

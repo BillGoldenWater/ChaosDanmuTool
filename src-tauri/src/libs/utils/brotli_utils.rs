@@ -10,10 +10,11 @@ use brotli::enc::BrotliEncoderParams;
 
 lazy_static! {
   static ref BROTLI_PARAMS: BrotliEncoderParams = {
-    let mut encoder_params = BrotliEncoderParams::default();
-    encoder_params.quality = 6;
-    encoder_params.mode = BrotliEncoderMode::BROTLI_MODE_TEXT;
-    encoder_params
+    BrotliEncoderParams {
+      quality: 6,
+      mode: BrotliEncoderMode::BROTLI_MODE_TEXT,
+      ..Default::default()
+    }
   };
 }
 

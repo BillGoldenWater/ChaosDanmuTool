@@ -36,7 +36,7 @@ impl DanmuServerInfoGetter {
       let host = &data.host_list[0];
       return Ok(DanmuServerAndToken {
         token: data.token,
-        url: format!("wss://{}:{}/sub", host.host, host.wss_port).to_string(),
+        url: format!("wss://{}:{}/sub", host.host, host.wss_port),
       });
     }
 

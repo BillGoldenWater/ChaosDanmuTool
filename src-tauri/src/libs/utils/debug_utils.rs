@@ -90,7 +90,7 @@ fn get_logger_file() -> Result<File, Error> {
   get_logger_file_by_path(gen_logger_file_path(format!(
     "{ts}_{uuid}",
     ts = chrono::Local::now().format("%Y-%m-%d_%H-%M-%S_%3f"),
-    uuid = uuid::Uuid::new_v4().to_string(),
+    uuid = uuid::Uuid::new_v4(),
   ))?)
 }
 

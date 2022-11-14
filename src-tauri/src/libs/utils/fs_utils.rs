@@ -62,7 +62,7 @@ pub fn get_dir_children_names(
       None
     })
     .filter(|v| {
-      let is_hidden = v.starts_with(".");
+      let is_hidden = v.starts_with('.');
       let need_ignore = is_hidden && ignore_hidden;
       !need_ignore
     })
