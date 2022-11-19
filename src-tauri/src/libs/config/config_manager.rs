@@ -9,7 +9,6 @@ use std::sync::Arc;
 use std::time::Instant;
 
 use log::{error, info};
-use rfd::{MessageButtons, MessageLevel};
 use static_object::StaticObject;
 use tauri::api::file::read_string;
 use tokio::sync::{Mutex, MutexGuard};
@@ -22,7 +21,7 @@ use crate::libs::network::command_broadcast_server::CommandBroadcastServer;
 use crate::libs::utils::async_utils::run_blocking;
 use crate::libs::utils::immutable_utils::Immutable;
 use crate::libs::utils::mutex_utils::{a_lock, lock};
-use crate::location_info;
+use crate::{dialog_ask, dialog_notice};
 
 #[derive(StaticObject)]
 pub struct ConfigManager {
@@ -54,12 +53,8 @@ impl ConfigManager {
     let config_str;
     if let Err(err) = result {
       if !is_not_found(&err) {
-        rfd::MessageDialog::new()
-          .set_title("错误")
-          .set_level(MessageLevel::Error)
-          .set_buttons(MessageButtons::OkCustom("确定".to_string()))
-          .set_description(format!("无法读取配置文件.\n{}", location_info!()).as_str())
-          .show();
+        error!("unable to read config file {err:?}");
+        dialog_notice!(@error, "无法读取配置文件");
         std::process::exit(0);
       }
       config_str = "{}".to_string();
@@ -70,21 +65,7 @@ impl ConfigManager {
     let parse_result = serde_json::from_str(config_str.as_str());
 
     if let Err(_err) = parse_result {
-      let reset = rfd::MessageDialog::new()
-        .set_title("错误")
-        .set_level(MessageLevel::Error)
-        .set_buttons(MessageButtons::OkCancelCustom(
-          "重置".to_string(),
-          "退出".to_string(),
-        ))
-        .set_description(
-          format!(
-            "无法解析配置文件.\n重置配置文件或退出?\n{}",
-            location_info!()
-          )
-          .as_str(),
-        )
-        .show();
+      let reset = dialog_ask!(@error, "无法解析配置文件.\n重置配置文件或退出?", @o "重置".to_string(), @c "退出".to_string());
       if reset {
         self.reset(true).await;
         return;
@@ -116,27 +97,13 @@ impl ConfigManager {
   }
 
   pub async fn reset(&mut self, force: bool) {
-    let button = MessageButtons::OkCancelCustom(
-      "重置".to_string(),
-      if force {
-        "退出".to_string()
-      } else {
-        "取消".to_string()
-      },
-    );
+    let cancel_txt = if force {
+      "退出".to_string()
+    } else {
+      "取消".to_string()
+    };
 
-    let reset = rfd::MessageDialog::new()
-      .set_title("警告")
-      .set_level(MessageLevel::Warning)
-      .set_buttons(button)
-      .set_description(
-        format!(
-          "重置配置文件将会丢失所有的自定义设置!\n{}",
-          location_info!()
-        )
-        .as_str(),
-      )
-      .show();
+    let reset = dialog_ask!(@warn, "重置配置文件将会丢失所有的自定义设置!", @o "重置".to_string(), @c cancel_txt);
     if !reset {
       if force {
         std::process::exit(0);

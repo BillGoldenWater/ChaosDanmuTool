@@ -6,19 +6,14 @@
 use static_object::StaticObject;
 use tauri::command;
 
+use crate::dialog_notice;
 use crate::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver;
-use crate::location_info;
 
 #[command]
 pub async fn connect_room() {
   let result = DanmuReceiver::i().connect().await;
   if let Err(err) = result {
-    rfd::MessageDialog::new()
-      .set_title("错误")
-      .set_level(rfd::MessageLevel::Error)
-      .set_buttons(rfd::MessageButtons::Ok)
-      .set_description(&format!("无法连接直播间.\n{:?}\n{}", err, location_info!()))
-      .show();
+    dialog_notice!(@error raw, format!("无法连接直播间.\n{:?}", err));
   }
 }
 

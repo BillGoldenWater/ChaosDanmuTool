@@ -24,7 +24,7 @@ use tokio_tungstenite::{MaybeTlsStream, WebSocketStream};
 
 use crate::libs::config::config_manager::modify_cfg;
 use crate::libs::network::command_broadcast_server::CommandBroadcastServer;
-use crate::location_info;
+use crate::{dialog_ask, dialog_notice, location_info};
 
 #[derive(StaticObject)]
 pub struct HttpServer {
@@ -98,15 +98,8 @@ impl HttpServer {
         return;
       }
     }
-    rfd::MessageDialog::new()
-      .set_title("错误")
-      .set_level(rfd::MessageLevel::Error)
-      .set_buttons(rfd::MessageButtons::OkCustom("确定".to_string()))
-      .set_description(&format!(
-        "无法恢复的http服务器启动错误, 请检查日志或联系开发者.\n{}",
-        location_info!()
-      ))
-      .show();
+    error!("unrecoverable error when listen \n{err:?}");
+    dialog_notice!(@error, "无法恢复的http服务器启动错误");
   }
 
   #[async_recursion::async_recursion(? Send)]
@@ -125,17 +118,7 @@ impl HttpServer {
     );
     // endregion
 
-    // region show dialog
-    let is_auto_select = rfd::MessageDialog::new()
-      .set_title("错误")
-      .set_level(rfd::MessageLevel::Error)
-      .set_buttons(rfd::MessageButtons::OkCancelCustom(
-        "更改".to_string(),
-        "退出".to_string(),
-      ))
-      .set_description(&message)
-      .show();
-    // endregion
+    let is_auto_select = dialog_ask!(@error, message, @o "更改".to_string(), @c "退出".to_string());
 
     // region process
     if !is_auto_select {
@@ -163,22 +146,10 @@ impl HttpServer {
       )
       .await;
 
-      rfd::MessageDialog::new()
-        .set_title("成功")
-        .set_level(rfd::MessageLevel::Info)
-        .set_buttons(rfd::MessageButtons::OkCustom("确定".to_string()))
-        .set_description(&format!("成功更改端口为: {}\n{}", port, location_info!()))
-        .show();
+      dialog_notice!(@success, format!("成功更改端口为: {}", port))
     } else {
-      rfd::MessageDialog::new()
-        .set_title("错误")
-        .set_level(rfd::MessageLevel::Error)
-        .set_buttons(rfd::MessageButtons::OkCustom("确定".to_string()))
-        .set_description(&format!(
-          "无法获取可用端口, 请联系开发者. \n{}",
-          location_info!()
-        ))
-        .show();
+      error!("empty available port");
+      dialog_notice!(@error, "无法获取可用端口");
       std::process::exit(0);
     }
     // endregion
