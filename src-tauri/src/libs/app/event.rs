@@ -10,6 +10,7 @@ use crate::get_cfg;
 use crate::libs::app::app_loop::AppLoop;
 use crate::libs::app::internal_api::window::show_main_window;
 use crate::libs::app_context::AppContext;
+use crate::libs::command::command_history_manager::CommandHistoryManager;
 use crate::libs::config::config_manager::ConfigManager;
 use crate::libs::network::command_broadcast_server::CommandBroadcastServer;
 use crate::libs::network::danmu_receiver::danmu_receiver::DanmuReceiver;
@@ -24,6 +25,7 @@ pub fn on_init<A: Assets>(context: &Context<A>) {
 
   let _ = AppLoop::i();
   let _ = CommandBroadcastServer::i();
+  let _ = CommandHistoryManager::i();
   let _ = ConfigManager::i();
   let _ = DanmuReceiver::i();
   let _ = HttpServer::i();

@@ -4,6 +4,7 @@
  */
 
 use crate::libs::app_context::AppContext;
+use crate::{dialog_ask, dialog_notice};
 use chrono::Utc;
 use log::{error, LevelFilter};
 use sqlx::sqlite::SqliteConnectOptions;
@@ -211,6 +212,53 @@ create index if not exists command_history_timestamp_index
     }
 
     Ok(result)
+  }
+
+  pub async fn set_index_content(&mut self, enable: bool) {
+    let sql = if enable {
+      let confirm = dialog_ask!(@warn, "是否确定启用内容索引, 这将需要一些时间, 且历史记录文件大小将大幅增加(大小至少是之前的2倍)");
+      if !confirm {
+        return;
+      }
+
+      r#"
+create index if not exists command_history_content_index
+    on command_history (content);
+    "#
+    } else {
+      let confirm = dialog_ask!(@warn, "是否确定禁用内容索引, 这将需要一些时间, 且会降低搜索的速度(耗时约为之前的3倍)");
+      if !confirm {
+        return;
+      }
+
+      r#"
+drop index if exists command_history_content_index;
+vacuum;
+      "#
+    };
+
+    let mut db = a_lock(&self.db).await;
+
+    let result = sqlx::query(sql).execute(&mut *db).await;
+
+    if let Err(err) = result {
+      error!("unable to apply index change \n{err:?}");
+      dialog_notice!(@error, "应用索引修改时发生错误");
+    }
+
+    dialog_notice!(@success, "完成索引修改");
+  }
+
+  pub async fn is_content_indexed(&self) -> Result<bool> {
+    let sql = "select count(*) as count from sqlite_master where type = 'index' and name = 'command_history_content_index';";
+
+    let mut db = a_lock(&self.db).await;
+
+    let result = sqlx::query(sql).fetch_one(&mut *db).await?;
+
+    let count: u32 = result.get("count");
+
+    Ok(count > 0)
   }
 }
 
