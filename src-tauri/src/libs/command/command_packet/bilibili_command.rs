@@ -19,7 +19,7 @@ pub enum BiliBiliCommand {
     data: ActivityUpdate,
   },
   DanmuMessage {
-    data: DanmuMessage,
+    data: Box<DanmuMessage>,
   },
   Raw {
     #[ts(type = "unknown")]
@@ -44,7 +44,7 @@ impl BiliBiliCommand {
 
   pub fn from_danmu_message(danmu_message: DanmuMessage) -> BiliBiliCommand {
     BiliBiliCommand::DanmuMessage {
-      data: danmu_message,
+      data: Box::new(danmu_message),
     }
   }
 

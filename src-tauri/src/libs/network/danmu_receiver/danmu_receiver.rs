@@ -454,7 +454,7 @@ impl DanmuReceiver {
     let cmd = raw["cmd"].as_str().unwrap_or("");
 
     if cmd.starts_with("DANMU_MSG") {
-      let dm = DanmuMessage::from_raw(&raw)?;
+      let dm = DanmuMessage::from_raw(&raw).await?;
       Ok((BiliBiliCommand::from_danmu_message(dm), Some(raw)))
     } else {
       Ok((BiliBiliCommand::from_raw(raw), None))

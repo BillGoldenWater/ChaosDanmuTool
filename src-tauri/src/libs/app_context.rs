@@ -15,6 +15,7 @@ use crate::libs::utils::trace_utils::print_trace;
 pub struct AppContext {
   pub tauri_config: Config,
   pub data_dir: PathBuf,
+  pub cache_dir: PathBuf,
   pub args: Args,
 }
 
@@ -40,13 +41,18 @@ impl AppContext {
       }
       // endregion
 
+      let data_dir = app_config_dir(&config).unwrap();
+      let cache_dir = data_dir.join("cache");
+
       let ctx = AppContext {
         tauri_config: config.clone(),
-        data_dir: app_config_dir(&config).unwrap(),
+        data_dir,
+        cache_dir,
         args,
       };
 
       std::fs::create_dir_all(&ctx.data_dir).expect("unable to create app data dir");
+      std::fs::create_dir_all(&ctx.cache_dir).expect("unable to create app cache dir");
 
       unsafe { APP_CONTEXT = Box::leak(Box::new(ctx)) }
     });

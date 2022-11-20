@@ -5,7 +5,7 @@
 
 use serde_json::Value;
 
-#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, Default, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "../src/share/type/rust/bilibili/")]
 pub struct EmojiData {
@@ -28,29 +28,11 @@ pub struct EmojiData {
 }
 
 impl EmojiData {
-  pub fn empty() -> EmojiData {
-    EmojiData {
-      id: 0,
-      text: "".to_string(),
-      url: "".to_string(),
-      height: 0,
-      width: 0,
-    }
-  }
-
-  pub fn parse(str: &str) -> Result<EmojiData, serde_json::Error> {
+  pub fn parse(str: &str) -> Result<Self, serde_json::Error> {
     serde_json::from_str(str)
   }
 
-  pub fn from_raw(raw: &Value) -> EmojiData {
-    let mut result = EmojiData::empty();
-
-    result.id = raw["id"].as_i64().unwrap_or(0) as i32;
-    result.text = raw["text"].as_str().unwrap_or("").to_string();
-    result.url = raw["url"].as_str().unwrap_or("").to_string();
-    result.height = raw["height"].as_i64().unwrap_or(0) as i32;
-    result.width = raw["width"].as_i64().unwrap_or(0) as i32;
-
-    result
+  pub fn from_raw(raw: &Value) -> Result<Self, serde_json::Error> {
+    serde_json::from_value(raw.clone())
   }
 }

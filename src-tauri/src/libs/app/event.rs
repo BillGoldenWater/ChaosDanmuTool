@@ -10,6 +10,7 @@ use crate::get_cfg;
 use crate::libs::app::app_loop::AppLoop;
 use crate::libs::app::internal_api::window::show_main_window;
 use crate::libs::app_context::AppContext;
+use crate::libs::cache::user_info_cache::UserInfoCache;
 use crate::libs::command::command_history_manager::CommandHistoryManager;
 use crate::libs::config::config_manager::ConfigManager;
 use crate::libs::network::command_broadcast_server::CommandBroadcastServer;
@@ -24,6 +25,7 @@ pub fn on_init<A: Assets>(context: &Context<A>) {
   tauri::async_runtime::set(tokio::runtime::Handle::current());
 
   let _ = AppLoop::i();
+  let _ = UserInfoCache::i();
   let _ = CommandBroadcastServer::i();
   let _ = CommandHistoryManager::i();
   let _ = ConfigManager::i();
