@@ -106,7 +106,7 @@ create index if not exists command_history_timestamp_index
   /// * `paging`: (limit, offset)
   ///
   /// # Examples
-  /// ```
+  /// ```no_run
   /// use static_object::StaticObject;
   ///
   /// use chaos_danmu_tool::libs::command::command_history_manager::CommandHistoryManager;
@@ -123,7 +123,7 @@ create index if not exists command_history_timestamp_index
   ///       ("content glob ?", "*\"isVip\":true*")
   ///     ],
   ///     None
-  ///   );
+  ///   ).await;
   /// }
   /// ```
   ///
