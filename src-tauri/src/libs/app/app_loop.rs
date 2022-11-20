@@ -5,7 +5,7 @@
 
 use std::time::Duration;
 
-use log::error;
+use log::{error, warn};
 use static_object::StaticObject;
 use tokio::{
   sync::mpsc::{error::TryRecvError, unbounded_channel, UnboundedReceiver, UnboundedSender},
@@ -67,13 +67,15 @@ impl AppLoop {
 
       // run and measure time cost
       let start = Instant::now();
-      self.each_iter().await;
+      let loop_cost = self.each_iter().await;
       let elapsed = start.elapsed().as_secs_f64();
 
       // calc and sleep time for reach min interval
       let need_sleep = LOOP_MIN_INTERVAL_SECS - elapsed;
       if need_sleep > 0.0 {
         sleep(Duration::from_secs_f64(need_sleep)).await;
+      } else {
+        warn!("last tick takes {elapsed:.3}s, it's more than expected({LOOP_MIN_INTERVAL_SECS:.3})\n detail: \n{loop_cost:#?}")
       }
     }
 
@@ -84,9 +86,30 @@ impl AppLoop {
     }
   }
 
-  async fn each_iter(&self) {
+  async fn each_iter(&self) -> LoopCost {
+    let start = Instant::now();
     DanmuReceiver::i().tick().await;
+    let danmu_receiver = start.elapsed().as_millis();
+
+    let start = Instant::now();
     CommandBroadcastServer::i().tick().await;
+    let command_broadcast_server = start.elapsed().as_millis();
+
+    let start = Instant::now();
     ConfigManager::i().tick().await;
+    let config_manager = start.elapsed().as_millis();
+
+    LoopCost {
+      danmu_receiver,
+      command_broadcast_server,
+      config_manager,
+    }
   }
+}
+
+#[derive(Debug)]
+pub struct LoopCost {
+  pub danmu_receiver: u128,
+  pub command_broadcast_server: u128,
+  pub config_manager: u128,
 }
