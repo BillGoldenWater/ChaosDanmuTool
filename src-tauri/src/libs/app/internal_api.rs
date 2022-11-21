@@ -9,11 +9,13 @@ pub mod app;
 pub mod config_manager;
 pub mod danmu_receiver;
 pub mod window;
+pub mod cache;
 
 pub fn invoke_handler(invoke: tauri::Invoke<Wry>) {
   invoke_tauri_handlers(
     tauri::generate_handler![
       app::is_debug,
+      cache::get_user_info,
       config_manager::get_config,
       config_manager::update_config,
       danmu_receiver::connect_room,

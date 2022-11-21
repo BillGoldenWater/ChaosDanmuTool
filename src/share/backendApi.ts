@@ -5,6 +5,7 @@
 
 import { invoke } from "@tauri-apps/api";
 import type { Config } from "./type/rust/config/Config";
+import { UserInfo } from "./type/rust/cache/userInfo/UserInfo";
 
 export class BackendApi {
   async isVibrancyApplied() {
@@ -43,6 +44,10 @@ export class BackendApi {
 
   async disconnectRoom() {
     await invoke("disconnect_room");
+  }
+
+  async getUserInfo(uid: string): Promise<UserInfo> {
+    return await invoke("get_user_info", { uid: uid });
   }
 }
 
