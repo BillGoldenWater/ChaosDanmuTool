@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-// import "../share/style/ThemeUtils.ts";
-// import "../share/style/variable.less";
-import "./share/backendApi.ts";
+// import "../share/style/ThemeUtils.ts"; todo
+// import "../share/style/variable.less"; todo
+import "./share/app/BackendApi.ts";
 
 import "./index.css";
 import ReactDOM from "react-dom/client";

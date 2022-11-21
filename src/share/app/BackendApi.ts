@@ -4,8 +4,8 @@
  */
 
 import { invoke } from "@tauri-apps/api";
-import type { Config } from "./type/rust/config/Config";
-import { UserInfo } from "./type/rust/cache/userInfo/UserInfo";
+import type { Config } from "../type/rust/config/Config";
+import { UserInfo } from "../type/rust/cache/userInfo/UserInfo";
 
 export class BackendApi {
   async isVibrancyApplied() {
