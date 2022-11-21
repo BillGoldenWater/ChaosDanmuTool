@@ -5,6 +5,18 @@
 
 use crate::libs::cache::user_info_cache::medal_data::MedalData;
 
+#[macro_export]
+macro_rules! user_info_apply_updates {
+    ($other:expr => $self:expr, $modified:ident; $($name:ident),*) => {
+      $(
+        if $other.$name.is_some() && $self.$name != $other.$name {
+          $self.$name = $other.$name;
+          $modified = true;
+        }
+      )*
+    };
+}
+
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, Default, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "../src/share/type/rust/cache/userInfo/")]
@@ -41,55 +53,45 @@ pub struct UserInfo {
 }
 
 impl UserInfo {
-  pub fn apply_update(&mut self, other: Self) {
+  pub fn apply_update(&mut self, other: Self) -> bool {
     assert_eq!(
       self.uid, other.uid,
       "update when uid not eq {:?}\n{:?}",
       self, other
     );
+    let mut modified = false;
 
-    if other.name.is_some() {
-      self.name = other.name;
-    }
-    if other.user_level.is_some() {
-      self.user_level = other.user_level;
-    }
-    if other.face.is_some() {
-      self.face = other.face;
-    }
-    if other.face_frame.is_some() {
-      self.face_frame = other.face_frame;
-    }
-    if other.is_vip.is_some() {
-      self.is_vip = other.is_vip;
-    }
-    if other.is_svip.is_some() {
-      self.is_svip = other.is_svip;
-    }
-    if other.is_main_vip.is_some() {
-      self.is_main_vip = other.is_main_vip;
-    }
-    if other.is_manager.is_some() {
-      self.is_manager = other.is_manager;
-    }
-    if other.title.is_some() {
-      self.title = other.title;
-    }
-    if other.level_color.is_some() {
-      self.level_color = other.level_color;
-    }
-    if other.name_color.is_some() {
-      self.name_color = other.name_color;
-    }
+    user_info_apply_updates![
+      other => self, modified;
+      name,
+      user_level,
+      face,
+      face_frame,
+      is_vip,
+      is_svip,
+      is_main_vip,
+      is_manager,
+      title,
+      level_color,
+      name_color
+    ];
 
     if let Some(medal) = &mut self.medal {
-      if let Some(other) = other.medal {
+      // self some
+      modified |= if let Some(other) = other.medal {
+        // other some
         medal.apply_update(other)
       } else {
-        self.medal = other.medal
+        // other none
+        self.medal = other.medal;
+        true
       }
-    } else {
-      self.medal = other.medal
+    } else if other.medal.is_some() {
+      // self none, other some
+      self.medal = other.medal;
+      modified = true;
     }
+
+    modified
   }
 }

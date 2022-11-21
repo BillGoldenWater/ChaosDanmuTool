@@ -91,8 +91,10 @@ create table if not exists medal_data
     let cached = self.get(&info.uid).await;
 
     if let Some(mut cached) = cached {
-      cached.apply_update(info);
-      self.insert_or_replace(&cached).await;
+      let modified = cached.apply_update(info);
+      if modified {
+        self.insert_or_replace(&cached).await;
+      }
       cached
     } else {
       self.insert_or_replace(&info).await;

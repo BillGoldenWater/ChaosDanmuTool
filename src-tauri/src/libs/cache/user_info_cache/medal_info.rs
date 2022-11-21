@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+use crate::user_info_apply_updates;
+
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, Default, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "../src/share/type/rust/cache/userInfo/")]
@@ -15,16 +17,20 @@ pub struct MedalInfo {
 }
 
 impl MedalInfo {
-  pub fn apply_update(&mut self, other: Self) {
+  pub fn apply_update(&mut self, other: Self) -> bool {
+    let mut modified = false;
+
     if self.anchor_roomid != other.anchor_roomid {
       self.anchor_roomid = other.anchor_roomid;
+      modified = true;
     }
 
-    if other.anchor_name.is_some() {
-      self.anchor_name = other.anchor_name;
-    }
-    if other.medal_name.is_some() {
-      self.medal_name = other.medal_name;
-    }
+    user_info_apply_updates![
+      other => self, modified;
+      anchor_name,
+      medal_name
+    ];
+
+    modified
   }
 }

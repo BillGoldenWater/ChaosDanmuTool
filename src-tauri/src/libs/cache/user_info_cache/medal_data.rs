@@ -6,6 +6,7 @@
 use log::error;
 use serde_json::Value;
 
+use crate::user_info_apply_updates;
 use crate::libs::cache::user_info_cache::medal_info::MedalInfo;
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, Default, PartialEq, Debug, Clone)]
@@ -56,30 +57,21 @@ impl MedalData {
     Ok(result)
   }
 
-  pub fn apply_update(&mut self, other: Self) {
-    self.info.apply_update(other.info);
+  pub fn apply_update(&mut self, other: Self) -> bool {
+    let mut modified = self.info.apply_update(other.info);
 
-    if other.is_lighted.is_some() {
-      self.is_lighted = other.is_lighted;
-    }
-    if other.guard_level.is_some() {
-      self.guard_level = other.guard_level;
-    }
-    if other.level.is_some() {
-      self.level = other.level;
-    }
-    if other.color.is_some() {
-      self.color = other.color;
-    }
-    if other.color_border.is_some() {
-      self.color_border = other.color_border;
-    }
-    if other.color_end.is_some() {
-      self.color_end = other.color_end;
-    }
-    if other.color_start.is_some() {
-      self.color_start = other.color_start;
-    }
+    user_info_apply_updates![
+      other => self, modified;
+      is_lighted,
+      guard_level,
+      level,
+      color,
+      color_border,
+      color_start,
+      color_end
+    ];
+
+    modified
   }
 }
 
