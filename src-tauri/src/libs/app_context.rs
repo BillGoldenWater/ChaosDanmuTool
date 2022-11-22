@@ -39,6 +39,10 @@ impl AppContext {
           attach_console();
         }
       }
+
+      if let Some(dir) = &args.home_dir {
+        std::env::set_var("HOME", dir);
+      }
       // endregion
 
       let data_dir = app_config_dir(&config).unwrap();
@@ -85,4 +89,7 @@ pub struct Args {
   #[cfg(target_os = "windows")]
   #[arg(short, long)]
   pub attach_console: bool,
+  /// Set home dir
+  #[arg(long)]
+  pub home_dir: Option<String>,
 }
