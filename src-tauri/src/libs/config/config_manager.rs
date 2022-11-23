@@ -64,7 +64,8 @@ impl ConfigManager {
 
     let parse_result = serde_json::from_str(config_str.as_str());
 
-    if let Err(_err) = parse_result {
+    if let Err(err) = parse_result {
+      error!("unable to parse config \n{err:?}");
       let reset = dialog_ask!(@error, "无法解析配置文件.\n重置配置文件或退出?", @o "重置".to_string(), @c "退出".to_string());
       if reset {
         self.reset(true).await;
