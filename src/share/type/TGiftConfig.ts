@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-export type TGiftConfigMap = Map<number, TGiftConfig>;
+export type TGiftConfig = Map<number, TGiftConfigItem>;
 
 interface TGiftCountMap {
   num: number;
@@ -29,7 +29,7 @@ interface TGiftBanner {
   web_jump_url: string;
 }
 
-export interface TGiftConfig {
+export interface TGiftConfigItem {
   id: number;
   name: string;
   price: number;
@@ -78,12 +78,12 @@ export interface TGiftConfig {
 }
 
 export interface TGiftConfigResponse {
-  list: TGiftConfig[];
+  list: TGiftConfigItem[];
 }
 
-export function parseGiftConfigResponse(response: unknown): TGiftConfigMap {
+export function parseGiftConfigResponse(response: unknown): TGiftConfig {
   let res = response as TGiftConfigResponse;
-  let result: TGiftConfigMap = new Map();
+  let result: TGiftConfig = new Map();
 
   for (const item of res.list) {
     result.set(item.id, item);

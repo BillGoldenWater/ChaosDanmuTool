@@ -10,6 +10,9 @@ import "./share/app/BackendApi.ts";
 import "./index.css";
 import ReactDOM from "react-dom/client";
 import { App } from "./App";
+import { backend } from "./share/app/BackendApi";
+import { defaultConfig } from "./share/app/AppCtx";
 
 let root = ReactDOM.createRoot(document.getElementById("root")!);
-root.render(<App />);
+let config = backend ? await backend.getConfig() : defaultConfig;
+root.render(<App firstConfig={config} />);

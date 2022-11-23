@@ -5,11 +5,11 @@
 
 export type AObjectKey = string | number;
 
-export type ObjectPath<T extends object> = {
+export type TObjectKey<T extends object> = {
   [K in keyof T]: T[K] extends object
     ? K extends AObjectKey
-      ? ObjectPath<T[K]> extends AObjectKey
-        ? `${K}.${ObjectPath<T[K]>}`
+      ? TObjectKey<T[K]> extends AObjectKey
+        ? `${K}.${TObjectKey<T[K]>}`
         : K
       : K
     : K;
