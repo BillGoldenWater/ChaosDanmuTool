@@ -33,7 +33,12 @@ import { backend } from "./share/app/BackendApi";
 import { pages, TPage } from "./page/Page";
 import { TUserInfoCache } from "./share/type/TUserInfoCache";
 import { CommandReceiver } from "./share/app/CommandReceiver";
-import { isDark } from "./share/component/ThemeCtx";
+import {
+  genColors,
+  isDark,
+  ThemeCtxProvider,
+  TThemeCtx,
+} from "./share/component/ThemeCtx";
 
 interface Props {
   debug: boolean;
@@ -128,9 +133,19 @@ export class App extends React.Component<Props, State> {
       eventTarget: this.eventTarget,
     };
 
+    let themeCfg = this.configGet("frontend.mainView.theme");
+    let theme: TThemeCtx = {
+      theme: themeCfg,
+      colors: genColors(themeCfg),
+    };
+
     let page = pages.find((it) => it.pageId == ctx.params.pageId) as TPage;
 
-    return <AppCtxProvider value={ctx}>{page.page()}</AppCtxProvider>;
+    return (
+      <AppCtxProvider value={ctx}>
+        <ThemeCtxProvider value={theme}>{page.page()}</ThemeCtxProvider>
+      </AppCtxProvider>
+    );
   }
 
   // endregion
