@@ -30,12 +30,11 @@ use crate::libs::command::command_packet::bilibili_command::BiliBiliCommand;
 use crate::libs::command::command_packet::CommandPacket;
 use crate::libs::config::config::backend_config::danmu_receiver_config::DanmuReceiverConfig;
 use crate::libs::config::config_manager::{modify_cfg, ConfigManager};
+use crate::libs::network::api_request::bilibili_response::Error::EmptyData;
 use crate::libs::network::api_request::danmu_server_info_getter::{self, DanmuServerInfoGetter};
 use crate::libs::network::api_request::room_info_getter::{self, RoomInfoGetter};
 use crate::libs::network::command_broadcast_server::CommandBroadcastServer;
-use crate::libs::network::danmu_receiver::danmu_receiver::ConnectError::{
-  FailedToConnect, FailedToGetServerInfo,
-};
+use crate::libs::network::danmu_receiver::danmu_receiver::ConnectError::{FailedToConnect, FailedToGetServerInfo, IllegalRoomid};
 use crate::libs::network::danmu_receiver::data_type::DataType;
 use crate::libs::network::danmu_receiver::op_code::OpCode;
 use crate::libs::network::danmu_receiver::packet::{JoinPacketInfo, Packet};
@@ -57,6 +56,7 @@ pub struct DanmuReceiver {
   // status
   connected_data: StatusConnectedData,
   reconnect_count: u8,
+  reconnect_time: Instant,
 }
 
 impl DanmuReceiver {
@@ -67,6 +67,7 @@ impl DanmuReceiver {
 
       connected_data: StatusConnectedData::default(),
       reconnect_count: 0,
+      reconnect_time: Instant::now(),
     }
   }
 
@@ -163,9 +164,16 @@ impl DanmuReceiver {
   async fn get_token_and_url(&mut self, roomid: u32) -> ConnectResult<(Token, Url)> {
     let token_and_url_result = DanmuServerInfoGetter::get_token_and_url(roomid).await;
 
-    if token_and_url_result.is_err() {
+    if let Err(err) = token_and_url_result {
+      if let danmu_server_info_getter::Error::Request(EmptyData(data)) = &err {
+        if data.code == Some(1002002) {
+          return Err(IllegalRoomid(roomid))
+        }
+      }
+
       self.on_error("failed to get server info").await;
-      return Err(FailedToGetServerInfo(token_and_url_result.unwrap_err()));
+
+      return Err(FailedToGetServerInfo(err));
     }
 
     let token_and_url = token_and_url_result.unwrap();
@@ -231,11 +239,13 @@ impl DanmuReceiver {
         // endregion
       }
       ReceiverStatus::Reconnecting => {
-        self.reconnect_count += 1;
-        info!("reconnecting (count: {})", self.reconnect_count);
-        let result = self.connect().await;
-        if let Err(err) = result {
-          error!("unable to reconnect: {:?}", err);
+        if self.reconnect_time.elapsed().as_secs() >= 2 {
+          self.reconnect_count += 1;
+          info!("reconnecting (count: {})", self.reconnect_count);
+          let result = self.connect().await;
+          if let Err(err) = result {
+            error!("unable to reconnect: {:?}", err);
+          }
         }
       }
       ReceiverStatus::Interrupted => {
@@ -283,6 +293,9 @@ impl DanmuReceiver {
     // reset data
     if let ReceiverStatus::Connected = status {
       self.connected_data = StatusConnectedData::default()
+    }
+    if let ReceiverStatus::Reconnecting = status {
+      self.reconnect_time = Instant::now()
     }
 
     CommandBroadcastServer::i()
@@ -485,6 +498,8 @@ pub type ConnectResult<T> = Result<T, ConnectError>;
 pub enum ConnectError {
   #[error("failed to get actual roomid")]
   FailedToGetActualRoomid(#[from] room_info_getter::Error),
+  #[error("illegal roomid: {0}")]
+  IllegalRoomid(u32),
   #[error("failed to get server info")]
   FailedToGetServerInfo(#[from] danmu_server_info_getter::Error),
   #[error("failed to connect")]
