@@ -23,6 +23,7 @@ import { TGiftConfig } from "./share/type/TGiftConfig";
 import { ReceiverStatus } from "./share/type/rust/command/commandPacket/appCommand/receiverStatusUpdate/ReceiverStatus";
 import { ViewerStatus } from "./share/type/rust/command/commandPacket/appCommand/viewerStatusUpdate/ViewerStatus";
 import { backend } from "./share/app/BackendApi";
+import { pages, TPage } from "./page/Page";
 
 interface Props {
   firstConfig: Config;
@@ -83,11 +84,9 @@ export class App extends React.Component<Props, State> {
       eventTarget: this.eventTarget,
     };
 
-    return (
-      <AppCtxProvider value={ctx}>
-        <div>App</div>
-      </AppCtxProvider>
-    );
+    let page = pages.find((it) => it.pageId == ctx.params.pageId) as TPage;
+
+    return <AppCtxProvider value={ctx}>{page.page()}</AppCtxProvider>;
   }
 
   // endregion

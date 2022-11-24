@@ -15,6 +15,7 @@ import { ViewerStatus } from "../type/rust/command/commandPacket/appCommand/view
 import { AppEventTarget } from "../event/AppEventTarget";
 import { TObjGetAndSet } from "../type/TGetAndSet";
 import { AppPath, TAppPath } from "./AppPath";
+import { TPage } from "../../page/Page";
 
 // region default config
 export const defaultConfig: Config = defaultConfigSource as Config;
@@ -24,7 +25,7 @@ export const defaultViewerConfig: ViewerViewConfig =
 // endregion
 
 export interface TAppParams {
-  pageId: "main" | "viewer";
+  pageId: TPage["pageId"];
   viewerId: string;
 }
 

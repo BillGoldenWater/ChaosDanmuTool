@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React, { Component } from "react";
+import React from "react";
 
-export class MainPage extends Component {
+export class MainPage extends React.Component {
   render() {
     return <div>main_page</div>;
   }

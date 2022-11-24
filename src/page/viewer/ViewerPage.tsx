@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React, { Component } from "react";
+import React from "react";
 
-export class ViewerPage extends Component {
+export class ViewerPage extends React.Component {
   render() {
     return <div>viewer_page</div>;
   }
