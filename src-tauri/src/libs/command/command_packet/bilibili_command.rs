@@ -11,7 +11,7 @@ use crate::libs::command::command_packet::bilibili_command::danmu_message::Danmu
 pub mod activity_update;
 pub mod danmu_message;
 
-#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Eq, Debug, Clone)]
 #[serde(rename_all = "camelCase", tag = "cmd")]
 #[ts(export, export_to = "../src/share/type/rust/command/commandPacket/")]
 pub enum BiliBiliCommand {

@@ -24,7 +24,7 @@ impl RoomInfoGetter {
     if let Some(data) = res.data {
       Ok(data.room_id)
     } else {
-      Err(Error::EmptyData(res))
+      Err(Error::EmptyData(Box::from(res)))
     }
   }
 }
@@ -56,5 +56,5 @@ pub enum Error {
   #[error("{0}")]
   Request(#[from] bilibili_response::Error),
   #[error("unexpected response {0:?}")]
-  EmptyData(BiliBiliResponse<RoomInfoResponse>),
+  EmptyData(Box<BiliBiliResponse<RoomInfoResponse>>),
 }

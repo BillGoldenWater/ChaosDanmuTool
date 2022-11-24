@@ -22,10 +22,10 @@ pub mod viewer_status_update;
 #[ts(export, export_to = "../src/share/type/rust/command/commandPacket/")]
 pub enum AppCommand {
   BiliBiliPacketParseError { data: BiliBiliPacketParseError },
-  ConfigUpdate { data: ConfigUpdate },
+  ConfigUpdate { data: Box<ConfigUpdate> },
   GiftConfigUpdate { data: GiftConfigUpdate },
   ReceiverStatusUpdate { data: ReceiverStatusUpdate },
-  UserInfoUpdate { data: UserInfoUpdate },
+  UserInfoUpdate { data: Box<UserInfoUpdate> },
   ViewerStatusUpdate { data: ViewerStatusUpdate },
 }
 
@@ -40,7 +40,7 @@ impl AppCommand {
 
   pub fn from_config_update(config_update: ConfigUpdate) -> Self {
     Self::ConfigUpdate {
-      data: config_update,
+      data: Box::from(config_update),
     }
   }
 
@@ -58,7 +58,7 @@ impl AppCommand {
 
   pub fn from_user_info_update(user_info_update: UserInfoUpdate) -> Self {
     Self::UserInfoUpdate {
-      data: user_info_update,
+      data: Box::from(user_info_update),
     }
   }
 

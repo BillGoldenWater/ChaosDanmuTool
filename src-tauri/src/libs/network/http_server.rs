@@ -8,6 +8,7 @@ use std::error::Error;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 
 use get_port::{tcp::TcpPort, Ops};
+use hyper::http::HeaderValue;
 use hyper::server::conn::AddrStream;
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{Body, Method, Request as HyperRequest, Response, Server, StatusCode, Version};
@@ -140,7 +141,7 @@ impl HttpServer {
       info!("saving changed port config");
       modify_cfg(
         |cfg| {
-          (*cfg).backend.http_server.port = port;
+          cfg.backend.http_server.port = port;
         },
         false,
       )
@@ -296,8 +297,8 @@ fn create_websocket_upgrade_response(request: &HyperRequest<Body>) -> Option<Res
   if !request
     .headers()
     .get("Sec-WebSocket-Version")
-    .and_then(|value| value.to_str().ok())
-    .map(|value| {
+    .and_then(|value: &HeaderValue| value.to_str().ok())
+    .map(|value: &str| {
       value
         .split(|c| c == ' ' || c == ',')
         .any(|value| value.eq_ignore_ascii_case("13"))

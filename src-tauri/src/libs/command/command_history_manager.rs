@@ -136,7 +136,7 @@ create index if not exists command_history_timestamp_index
     sql.push_str(" order by id");
 
     if let Some((limit, offset)) = paging {
-      sql.push_str(&*format!(" limit {limit} offset {offset}"))
+      sql.push_str(&format!(" limit {limit} offset {offset}"))
     }
     // endregion
 

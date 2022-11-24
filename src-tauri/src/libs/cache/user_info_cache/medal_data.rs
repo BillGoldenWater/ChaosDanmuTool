@@ -9,7 +9,7 @@ use serde_json::Value;
 use crate::user_info_apply_updates;
 use crate::libs::cache::user_info_cache::medal_info::MedalInfo;
 
-#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, Default, PartialEq, Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, Default, PartialEq, Eq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "../src/share/type/rust/cache/userInfo/")]
 pub struct MedalData {
@@ -75,7 +75,7 @@ impl MedalData {
   }
 }
 
-#[derive(thiserror::Error, Debug, PartialEq)]
+#[derive(thiserror::Error, Debug, PartialEq, Eq)]
 pub enum FromRawError {
   #[error("unexpected none of anchor roomid")]
   NoneAnchorRoomid,

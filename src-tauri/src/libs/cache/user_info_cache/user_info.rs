@@ -17,7 +17,7 @@ macro_rules! user_info_apply_updates {
     };
 }
 
-#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, Default, PartialEq, Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, Default, PartialEq, Eq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "../src/share/type/rust/cache/userInfo/")]
 pub struct UserInfo {

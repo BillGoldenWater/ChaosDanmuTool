@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-#[derive(serde::Serialize, serde::Deserialize, Default, PartialEq, Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize, Default, PartialEq, Eq, Debug, Clone)]
 pub struct MedalInfo {
   is_lighted: u8,
 

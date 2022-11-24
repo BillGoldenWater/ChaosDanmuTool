@@ -14,7 +14,7 @@ use crate::libs::cache::user_info_cache::user_info::UserInfo;
 use crate::libs::cache::user_info_cache::UserInfoCache;
 use crate::libs::types::bilibili::emoji_data::EmojiData;
 
-#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Eq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[ts(
   export,
@@ -143,7 +143,7 @@ pub enum DanmuMessageParseError {
   WrongCommandType(String),
 }
 
-#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, Default, PartialEq, Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, Default, PartialEq, Eq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[ts(
   export,

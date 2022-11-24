@@ -29,7 +29,7 @@ impl DanmuServerInfoGetter {
     let data = if let Some(data) = res.data {
       data
     } else {
-      return Err(Error::EmptyData(res));
+      return Err(Error::EmptyData(Box::from(res)));
     };
 
     if !data.host_list.is_empty() {
@@ -77,5 +77,5 @@ pub enum Error {
   #[error("{0}")]
   Request(#[from] bilibili_response::Error),
   #[error("unexpected response {0:?}")]
-  EmptyData(BiliBiliResponse<DanmuServerInfoResponse>),
+  EmptyData(Box<BiliBiliResponse<DanmuServerInfoResponse>>),
 }

@@ -36,7 +36,7 @@ impl Packet {
     result.put_u16(Self::get_header_length());
     result.put_u16(self.data_type as u16);
     result.put_u32(self.op_code as u32);
-    result.put_u32(self.sequence_id as u32);
+    result.put_u32(self.sequence_id);
 
     result.put_slice(self.body.to_vec().as_slice());
 

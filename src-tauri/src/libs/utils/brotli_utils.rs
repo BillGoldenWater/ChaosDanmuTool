@@ -44,7 +44,7 @@ pub fn brotli_decompress(data: &Vec<u8>) -> Result<Vec<u8>> {
 
 pub fn brotli_decompress_str(base64: String) -> Result<String> {
   let decoded = base64::decode(base64)?;
-  Ok(String::from_utf8_lossy(&*brotli_decompress(&decoded)?).to_string())
+  Ok(String::from_utf8_lossy(&brotli_decompress(&decoded)?).to_string())
 }
 
 pub type Result<T> = std::result::Result<T, Error>;

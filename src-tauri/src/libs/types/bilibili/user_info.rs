@@ -5,7 +5,7 @@
 
 pub mod medal_info;
 
-#[derive(serde::Serialize, serde::Deserialize, Default, PartialEq, Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize, Default, PartialEq, Eq, Debug, Clone)]
 pub struct UserInfo {
   #[serde(alias = "uname")]
   name: String,

@@ -76,7 +76,7 @@ impl DanmuReceiver {
       warn!("this shouldn't be call in release build");
       print_trace()
     }
-    modify_cfg(|cfg| (*cfg).backend.danmu_receiver.roomid = roomid, false).await;
+    modify_cfg(|cfg| cfg.backend.danmu_receiver.roomid = roomid, false).await;
     let result = self.connect().await;
     info!("{result:?}");
   }
@@ -144,7 +144,7 @@ impl DanmuReceiver {
     let roomid_result = RoomInfoGetter::get_actual_room_id(roomid).await;
     if let Ok(roomid) = roomid_result {
       modify_cfg(
-        |cfg| (*cfg).backend.danmu_receiver.actual_roomid_cache = format!("{cache_prefix}{roomid}"),
+        |cfg| cfg.backend.danmu_receiver.actual_roomid_cache = format!("{cache_prefix}{roomid}"),
         true,
       )
       .await;

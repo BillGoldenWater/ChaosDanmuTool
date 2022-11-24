@@ -10,11 +10,11 @@ use crate::libs::config::config::frontend_config::main_view_config::functions_co
 pub mod danmu_gacha_config;
 pub mod room_connection_config;
 
-#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Eq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[ts(
-  export,
-  export_to = "../src/share/type/rust/config/frontendConfig/mainViewConfig/"
+export,
+export_to = "../src/share/type/rust/config/frontendConfig/mainViewConfig/"
 )]
 pub struct FunctionsConfig {
   #[serde(default = "room_connection_default")]
