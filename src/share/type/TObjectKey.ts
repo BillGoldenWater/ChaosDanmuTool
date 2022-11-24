@@ -9,7 +9,7 @@ export type TObjectKey<T extends object> = {
   [K in keyof T]: T[K] extends object
     ? K extends AObjectKey
       ? TObjectKey<T[K]> extends AObjectKey
-        ? `${K}.${TObjectKey<T[K]>}`
+        ? K | `${K}.${TObjectKey<T[K]>}`
         : K
       : K
     : K;
