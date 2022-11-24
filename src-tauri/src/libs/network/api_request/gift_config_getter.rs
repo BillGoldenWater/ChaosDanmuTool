@@ -5,7 +5,7 @@
 
 use serde_json::Value;
 
-use crate::libs::network::api_request::bilibili_response::{execute_request, BiliBiliResponse};
+use crate::libs::network::api_request::bilibili_response::bilibili_get;
 
 use super::bilibili_response;
 
@@ -15,9 +15,9 @@ static GIFT_CONFIG_API_URL: &str =
 pub struct GiftConfigGetter {}
 
 impl GiftConfigGetter {
-  pub async fn get(room_id: u32) -> bilibili_response::Result<BiliBiliResponse<Value>> {
+  pub async fn get(room_id: u32) -> bilibili_response::ResponseResult<Value> {
     let url = format!("{}?platform=pc&room_id={}", GIFT_CONFIG_API_URL, room_id);
 
-    execute_request(&url).await
+    bilibili_get(&url).await
   }
 }

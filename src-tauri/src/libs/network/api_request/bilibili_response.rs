@@ -15,20 +15,36 @@ pub struct BiliBiliResponse<Data> {
   pub data: Option<Data>,
 }
 
-pub async fn execute_request<T: DeserializeOwned>(uri: &str) -> Result<BiliBiliResponse<T>> {
+pub async fn bilibili_get<T: DeserializeOwned>(uri: &str) -> ResponseResult<T> {
+  let res: BiliBiliResponse<T> = bilibili_get_unchecked::<T>(uri).await?;
+
+  if res.data.is_none() {
+    return Err(Error::EmptyData(Box::from(res)));
+  }
+
+  Ok(res)
+}
+
+pub async fn bilibili_get_unchecked<T: DeserializeOwned>(
+  uri: &str,
+) -> ResponseResult<T> {
   let result = reqwest::get(uri).await?;
 
   let text = result.text().await?;
 
-  Ok(serde_json::from_str(&text)?)
+  let res = serde_json::from_str(&text)?;
+
+  Ok(res)
 }
 
-pub type Result<T> = std::result::Result<T, Error>;
+pub type ResponseResult<ResponseData> = Result<BiliBiliResponse<ResponseData>, Error<ResponseData>>;
 
 #[derive(thiserror::Error, Debug)]
-pub enum Error {
+pub enum Error<ResponseData> {
   #[error("failed to make request: {0}")]
   Reqwest(#[from] reqwest::Error),
   #[error("failed to parse response")]
   SerdeJson(#[from] serde_json::Error),
+  #[error("unexpected response with empty data \n{0:?}")]
+  EmptyData(Box<BiliBiliResponse<ResponseData>>),
 }

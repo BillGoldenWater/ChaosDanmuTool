@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-use crate::libs::network::api_request::bilibili_response::{execute_request, BiliBiliResponse};
+use crate::libs::network::api_request::bilibili_response::bilibili_get;
 
 use super::bilibili_response;
 
@@ -12,20 +12,16 @@ static ROOM_INFO_API_URL: &str = "https://api.live.bilibili.com/room/v1/Room/roo
 pub struct RoomInfoGetter {}
 
 impl RoomInfoGetter {
-  pub async fn get(room_id: u32) -> bilibili_response::Result<BiliBiliResponse<RoomInfoResponse>> {
+  pub async fn get(room_id: u32) -> bilibili_response::ResponseResult<RoomInfoResponse> {
     let url = format!("{}?id={}", ROOM_INFO_API_URL, room_id);
 
-    execute_request(&url).await
+    bilibili_get(&url).await
   }
 
   pub async fn get_actual_room_id(room_id: u32) -> Result<u32, Error> {
     let res = Self::get(room_id).await?;
 
-    if let Some(data) = res.data {
-      Ok(data.room_id)
-    } else {
-      Err(Error::EmptyData(Box::from(res)))
-    }
+    Ok(res.data.unwrap().room_id)
   }
 }
 
@@ -54,7 +50,5 @@ pub struct RoomInfoResponse {
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
   #[error("{0}")]
-  Request(#[from] bilibili_response::Error),
-  #[error("unexpected response {0:?}")]
-  EmptyData(Box<BiliBiliResponse<RoomInfoResponse>>),
+  Request(#[from] bilibili_response::Error<RoomInfoResponse>),
 }
