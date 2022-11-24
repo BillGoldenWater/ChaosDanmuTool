@@ -16,6 +16,11 @@ dist-ssr
 .old_src
 ChaosDanmuToolOld
 
+# dev file
+devHome
+test.sqlite
+app-icon.png
+
 # cargo output
 src-tauri/target
 src-tauri/static_object/target
