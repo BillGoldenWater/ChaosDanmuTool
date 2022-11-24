@@ -40,6 +40,15 @@ export class ReceiverStatusUpdateEvent extends Event {
   }
 }
 
+export class UserInfoUpdateEvent extends Event {
+  userInfo;
+
+  constructor(userInfo) {
+    super("userInfoUpdate");
+    this.userInfo = userInfo;
+  }
+}
+
 export class ViewerStatusUpdateEvent extends Event {
   status;
 

@@ -8,6 +8,7 @@ import type { Config } from "../type/rust/config/Config";
 import type { ReceiverStatus } from "../type/rust/command/commandPacket/appCommand/receiverStatusUpdate/ReceiverStatus";
 import type { ViewerStatus } from "../type/rust/command/commandPacket/appCommand/viewerStatusUpdate/ViewerStatus";
 import type { DanmuMessage } from "../type/rust/command/commandPacket/bilibiliCommand/DanmuMessage";
+import { UserInfo } from "../type/rust/cache/userInfo/UserInfo";
 
 //region appCommand
 declare class BiliBiliPackParseErrorEvent extends Event {
@@ -32,6 +33,12 @@ declare class ReceiverStatusUpdateEvent extends Event {
   status: ReceiverStatus;
 
   constructor(status: ReceiverStatus);
+}
+
+declare class UserInfoUpdateEvent extends Event {
+  userInfo: UserInfo;
+
+  constructor(userInfo: UserInfo);
 }
 
 declare class ViewerStatusUpdateEvent extends Event {
@@ -68,6 +75,7 @@ interface AppEventMap {
   configUpdate: ConfigUpdateEvent;
   giftConfigUpdate: GiftConfigUpdateEvent;
   receiverStatusUpdate: ReceiverStatusUpdateEvent;
+  userInfoUpdate: UserInfoUpdateEvent;
   viewerStatusUpdate: ViewerStatusUpdateEvent;
 
   activityUpdate: ActivityUpdateEvent;

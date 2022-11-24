@@ -12,6 +12,8 @@ import {
   GiftConfigUpdateEvent,
   RawBiliBiliCommandEvent,
   ReceiverStatusUpdateEvent,
+  UserInfoUpdateEvent,
+  ViewerStatusUpdateEvent,
 } from "../event/AppEventTarget";
 import { defaultConfig } from "./AppCtx";
 import { TPartialRequired } from "../type/TPartialRequired";
@@ -116,6 +118,14 @@ export class CommandReceiver {
           }
           case "receiverStatusUpdate": {
             de(new ReceiverStatusUpdateEvent(appCommand.data.status));
+            break;
+          }
+          case "userInfoUpdate": {
+            de(new UserInfoUpdateEvent(appCommand.data.userInfo));
+            break;
+          }
+          case "viewerStatusUpdate": {
+            de(new ViewerStatusUpdateEvent(appCommand.data.status));
             break;
           }
         }

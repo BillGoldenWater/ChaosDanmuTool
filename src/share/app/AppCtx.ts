@@ -16,6 +16,7 @@ import { AppEventTarget } from "../event/AppEventTarget";
 import { TObjGetAndSet } from "../type/TGetAndSet";
 import { AppPath, TAppPath } from "./AppPath";
 import { TPage } from "../../page/Page";
+import { TUserInfoCache } from "../type/TUserInfoCache";
 
 // region default config
 export const defaultConfig: Config = defaultConfigSource as Config;
@@ -50,6 +51,7 @@ export interface TAppCtx {
   giftConfig: TGiftConfig;
   receiverStatus: ReceiverStatus;
   viewerStatus: ViewerStatus;
+  userInfoCache: TUserInfoCache;
 
   eventTarget: AppEventTarget;
 }
@@ -65,6 +67,7 @@ const appCtx = createContext<TAppCtx>({
   giftConfig: new Map(),
   receiverStatus: "close",
   viewerStatus: "close",
+  userInfoCache: new Map(),
 
   eventTarget: new AppEventTarget(),
 });
