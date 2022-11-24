@@ -22,16 +22,16 @@ serde = { version = "1.0.147", features = ["derive"] }
 # live template: sddfc (serde default define & function - config)
 #
 # #[serde(default = "$fieldName$_default")]
-# #[serde(skip_serializing_if = "$skipFunctionName$")]
+# #[serde(skip_serializing_if = "$fieldName$_skip_if")]
 # // region $fieldName$
-# fn $defaultFunctionName$() -> $typeName$ {
+# fn $fieldName$_default() -> $typeName$ {
 #   $defaultValue$
 # }
-# 
-# fn $skipFunctionName$(value: &$typeName$) -> bool {
-#   *value == $defaultFunctionName$() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
+#
+# fn $fieldName$_skip_if(value: &$typeName$) -> bool {
+#   *value == $fieldName$_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 # }
-# //ednregion
+# // endregion
 #
 # live template: seo (serde empty object)
 # serde_json::from_str("{}").unwrap()
