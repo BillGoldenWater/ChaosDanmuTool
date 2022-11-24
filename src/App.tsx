@@ -33,6 +33,7 @@ import { backend } from "./share/app/BackendApi";
 import { pages, TPage } from "./page/Page";
 import { TUserInfoCache } from "./share/type/TUserInfoCache";
 import { CommandReceiver } from "./share/app/CommandReceiver";
+import { isDark } from "./share/component/ThemeCtx";
 
 interface Props {
   debug: boolean;
@@ -83,11 +84,22 @@ export class App extends React.Component<Props, State> {
 
     this.registerListeners();
     this.receiver.open();
+
+    // @ts-ignore
+    window.toggleTheme = this.toggleTheme.bind(this);
   }
 
-  componentWillUnmount() {
+  async componentWillUnmount() {
     this.unregisterListeners();
     this.receiver.close();
+
+    let dark = isDark();
+    if (
+      dark != null &&
+      this.state.config.frontend.mainView.theme.followSystem
+    ) {
+      await this.toggleTheme(dark);
+    }
   }
 
   render(): ReactNode {
@@ -264,6 +276,17 @@ export class App extends React.Component<Props, State> {
       "viewerStatusUpdate",
       this.onViewerStatusUpdate.bind(this)
     );
+
+    if (
+      window.matchMedia &&
+      this.state.config.frontend.mainView.theme.followSystem
+    ) {
+      window
+        ?.matchMedia("(prefers-color-scheme: dark)")
+        ?.addEventListener("change", async (event) => {
+          await this.toggleTheme(event?.matches || false);
+        });
+    }
   }
 
   unregisterListeners() {
@@ -290,4 +313,17 @@ export class App extends React.Component<Props, State> {
   }
 
   // endregion
+
+  async toggleTheme(dark?: boolean) {
+    let oldDark = this.configGet("frontend.mainView.theme.themeId") === "dark";
+
+    let newDark;
+    if (dark != null) newDark = dark;
+    else newDark = !oldDark;
+
+    await this.configSet(
+      "frontend.mainView.theme.themeId",
+      newDark ? "dark" : "light"
+    );
+  }
 }

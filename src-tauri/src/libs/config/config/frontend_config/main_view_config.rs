@@ -4,9 +4,11 @@
  */
 
 use crate::libs::config::config::frontend_config::main_view_config::functions_config::FunctionsConfig;
+use crate::libs::config::config::frontend_config::main_view_config::theme_config::ThemeConfig;
 use crate::libs::config::config::ALLOW_CONFIG_SKIP_IF;
 
 pub mod functions_config;
+pub mod theme_config;
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Eq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -18,6 +20,9 @@ pub struct MainViewConfig {
   #[serde(default = "functions_default")]
   #[serde(skip_serializing_if = "functions_skip_if")]
   pub functions: FunctionsConfig,
+  #[serde(default = "theme_default")]
+  #[serde(skip_serializing_if = "theme_skip_if")]
+  pub theme: ThemeConfig,
 }
 
 fn path_default() -> String {
@@ -35,3 +40,13 @@ fn functions_default() -> FunctionsConfig {
 fn functions_skip_if(value: &FunctionsConfig) -> bool {
   *value == functions_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
 }
+
+// region theme
+fn theme_default() -> ThemeConfig {
+  serde_json::from_str("{}").unwrap()
+}
+
+fn theme_skip_if(value: &ThemeConfig) -> bool {
+  *value == theme_default() && *ALLOW_CONFIG_SKIP_IF.read().unwrap()
+}
+// endregion
