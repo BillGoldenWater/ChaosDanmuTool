@@ -28,7 +28,8 @@ pub fn init_logger() {
       LevelFilter::Debug
     } else {
       LevelFilter::Info
-    });
+    })
+    .level_for("sqlx", LevelFilter::Info);
   // endregion
 
   let mut dispatch = fern::Dispatch::new().chain(stdout_dispatch);
