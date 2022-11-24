@@ -4,9 +4,10 @@
  */
 
 import React from "react";
+import { Background } from "../../share/component/Background";
 
 export class MainPage extends React.Component {
   render() {
-    return <div>main_page</div>;
+    return <Background>main_page</Background>;
   }
 }
