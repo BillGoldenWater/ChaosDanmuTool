@@ -4,7 +4,13 @@ import react from "@vitejs/plugin-react";
 // https://vitejs.dev/config/
 // noinspection JSUnusedGlobalSymbols
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react({
+      babel: {
+        plugins: [["babel-plugin-styled-components"]],
+      },
+    }),
+  ],
 
   build: {
     // Tauri supports es2021
