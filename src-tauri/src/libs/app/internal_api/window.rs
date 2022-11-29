@@ -30,14 +30,27 @@ pub fn show_main_window(app_handle: tauri::AppHandle) {
 
 #[command]
 pub fn create_main_window(app_handle: tauri::AppHandle) {
-  let main_window = tauri::WindowBuilder::new(
+  let main_window_builder = tauri::WindowBuilder::new(
     &app_handle,
     "main",
     tauri::WindowUrl::App("index.html".into()),
   )
-  .transparent(true)
-  .build()
-  .unwrap();
+  .transparent(true);
+
+  let main_window = {
+    #[cfg(target_os = "windows")]
+    {
+      let window = main_window_builder.decorations(false).build().unwrap();
+      window
+        .set_decorations(true)
+        .expect("failed to set decoration of main_window back to true");
+      window
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+      main_window_builder.build().unwrap()
+    }
+  };
 
   main_window
     .set_title("Chaos Danmu Tool")
