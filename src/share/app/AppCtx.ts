@@ -31,8 +31,8 @@ export interface TAppParams {
 }
 
 export function getParams(): TAppParams {
-  let pageId = getParam("pageId");
-  let viewerId = getParam("viewerId");
+  const pageId = getParam("pageId");
+  const viewerId = getParam("viewerId");
   return {
     pageId: pageId != null ? (pageId == "viewer" ? pageId : "main") : "main",
     viewerId:

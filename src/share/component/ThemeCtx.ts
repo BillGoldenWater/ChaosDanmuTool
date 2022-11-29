@@ -37,7 +37,7 @@ export interface TColorPlate {
   [key: string]: Color;
 }
 
-export interface TColors extends TPropToString<TColorPlate> {}
+export type TColors = TPropToString<TColorPlate>;
 
 export interface TThemeCtx {
   theme: ThemeConfig;
@@ -46,7 +46,7 @@ export interface TThemeCtx {
 }
 
 function colorPlateToColors(colorPlate: TColorPlate): TColors {
-  let result: TColors = {} as TColors;
+  const result: TColors = {} as TColors;
   for (const key in colorPlate) {
     result[key] = colorPlate[key].hsl().string();
   }
@@ -54,7 +54,7 @@ function colorPlateToColors(colorPlate: TColorPlate): TColors {
 }
 
 export function genColors(theme: ThemeConfig): [TColorPlate, TColors] {
-  let themeColor = Color(theme.themeColor);
+  const themeColor = Color(theme.themeColor);
 
   function getDown(percent: number) {
     return Color([0, 0, 0, percent], "hsl");

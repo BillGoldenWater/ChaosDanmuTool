@@ -82,8 +82,8 @@ export interface TGiftConfigResponse {
 }
 
 export function parseGiftConfigResponse(response: unknown): TGiftConfig {
-  let res = response as TGiftConfigResponse;
-  let result: TGiftConfig = new Map();
+  const res = response as TGiftConfigResponse;
+  const result: TGiftConfig = new Map();
 
   for (const item of res.list) {
     result.set(item.id, item);

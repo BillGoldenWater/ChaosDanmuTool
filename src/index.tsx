@@ -13,9 +13,9 @@ import { App } from "./App";
 import { backend } from "./share/app/BackendApi";
 import { defaultConfig } from "./share/app/AppCtx";
 
-let root = ReactDOM.createRoot(document.getElementById("root")!);
+const root = ReactDOM.createRoot(document.getElementById("root")!);
 
-let config = backend ? await backend.getConfig() : defaultConfig;
-let debug = backend ? await backend.isDebug() : true;
+const config = backend ? await backend.getConfig() : defaultConfig;
+const debug = backend ? await backend.isDebug() : true;
 
 root.render(<App firstConfig={config} debug={debug} />);

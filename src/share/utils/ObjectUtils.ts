@@ -4,7 +4,7 @@
  */
 
 export function takeNotNull(...args: (unknown | undefined | null)[]) {
-  for (let arg of args) {
+  for (const arg of args) {
     if (arg != null) return arg;
   }
   return null;

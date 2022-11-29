@@ -23,7 +23,7 @@ export class AppPath implements TAppPath {
   }
 
   get<T>(key: string, defaultValue?: T): T | undefined {
-    let resultStr = this.url.searchParams.get(key);
+    const resultStr = this.url.searchParams.get(key);
     if (resultStr != null) {
       return JSON.parse(resultStr);
     }
