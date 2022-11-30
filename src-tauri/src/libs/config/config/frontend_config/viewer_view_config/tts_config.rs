@@ -15,8 +15,8 @@ pub mod tts_text_replacer;
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[ts(
-export,
-export_to = "../src/share/type/rust/config/frontendConfig/viewerViewConfig/"
+  export,
+  export_to = "../src/share/type/rust/config/frontendConfig/viewerViewConfig/"
 )]
 pub struct TTSConfig {
   #[serde(default = "enable_default")]

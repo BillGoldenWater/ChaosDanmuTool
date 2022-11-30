@@ -25,9 +25,7 @@ pub async fn bilibili_get<T: DeserializeOwned>(uri: &str) -> ResponseResult<T> {
   Ok(res)
 }
 
-pub async fn bilibili_get_unchecked<T: DeserializeOwned>(
-  uri: &str,
-) -> ResponseResult<T> {
+pub async fn bilibili_get_unchecked<T: DeserializeOwned>(uri: &str) -> ResponseResult<T> {
   let result = reqwest::get(uri).await?;
 
   let text = result.text().await?;

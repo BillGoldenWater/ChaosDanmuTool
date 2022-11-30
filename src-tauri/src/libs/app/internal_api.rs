@@ -6,10 +6,10 @@
 use tauri::Wry;
 
 pub mod app;
+pub mod cache;
 pub mod config_manager;
 pub mod danmu_receiver;
 pub mod window;
-pub mod cache;
 
 pub fn invoke_handler(invoke: tauri::Invoke<Wry>) {
   invoke_tauri_handlers(

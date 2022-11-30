@@ -15,8 +15,8 @@ pub mod gift_display_config;
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Eq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[ts(
-export,
-export_to = "../src/share/type/rust/config/frontendConfig/viewerViewConfig/"
+  export,
+  export_to = "../src/share/type/rust/config/frontendConfig/viewerViewConfig/"
 )]
 pub struct DanmuViewerCustomConfig {
   #[serde(default = "danmu_filter_default")]

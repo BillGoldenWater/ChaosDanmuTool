@@ -8,8 +8,8 @@ use crate::libs::config::config::ALLOW_CONFIG_SKIP_IF;
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Eq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[ts(
-export,
-export_to = "../src/share/type/rust/config/frontendConfig/viewerViewConfig/danmuViewerCustomConfig/"
+  export,
+  export_to = "../src/share/type/rust/config/frontendConfig/viewerViewConfig/danmuViewerCustomConfig/"
 )]
 pub struct DanmuFilterConfig {
   #[serde(default = "type_blacklist_default")]

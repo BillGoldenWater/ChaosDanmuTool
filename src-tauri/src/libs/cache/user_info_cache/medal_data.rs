@@ -6,8 +6,8 @@
 use log::error;
 use serde_json::Value;
 
-use crate::user_info_apply_updates;
 use crate::libs::cache::user_info_cache::medal_info::MedalInfo;
+use crate::user_info_apply_updates;
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, Default, PartialEq, Eq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]

@@ -34,7 +34,9 @@ use crate::libs::network::api_request::bilibili_response::Error::EmptyData;
 use crate::libs::network::api_request::danmu_server_info_getter::{self, DanmuServerInfoGetter};
 use crate::libs::network::api_request::room_info_getter::{self, RoomInfoGetter};
 use crate::libs::network::command_broadcast_server::CommandBroadcastServer;
-use crate::libs::network::danmu_receiver::danmu_receiver::ConnectError::{FailedToConnect, FailedToGetServerInfo, IllegalRoomid};
+use crate::libs::network::danmu_receiver::danmu_receiver::ConnectError::{
+  FailedToConnect, FailedToGetServerInfo, IllegalRoomid,
+};
 use crate::libs::network::danmu_receiver::data_type::DataType;
 use crate::libs::network::danmu_receiver::op_code::OpCode;
 use crate::libs::network::danmu_receiver::packet::{JoinPacketInfo, Packet};
@@ -167,7 +169,7 @@ impl DanmuReceiver {
     if let Err(err) = token_and_url_result {
       if let danmu_server_info_getter::Error::Request(EmptyData(data)) = &err {
         if data.code == Some(1002002) {
-          return Err(IllegalRoomid(roomid))
+          return Err(IllegalRoomid(roomid));
         }
       }
 

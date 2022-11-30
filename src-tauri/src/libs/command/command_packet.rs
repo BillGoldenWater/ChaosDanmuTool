@@ -74,10 +74,12 @@ impl CommandPacket {
   }
 
   pub fn timestamp(&self) -> DateTime<Utc> {
-    Utc.timestamp_millis_opt(*match self {
-      CommandPacket::AppCommand { timestamp, .. } => timestamp,
-      CommandPacket::BiliBiliCommand { timestamp, .. } => timestamp,
-    }).unwrap()
+    Utc
+      .timestamp_millis_opt(*match self {
+        CommandPacket::AppCommand { timestamp, .. } => timestamp,
+        CommandPacket::BiliBiliCommand { timestamp, .. } => timestamp,
+      })
+      .unwrap()
   }
 }
 
