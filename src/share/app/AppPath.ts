@@ -5,15 +5,17 @@
 
 import { Config } from "../type/rust/config/Config";
 
-export interface TAppPath {
-  set<T>(key: string, value: T): void;
-
-  get<T>(key: string, defaultValue?: T): T | undefined;
-
-  get<T>(key: string, defaultValue?: T): Promise<T | undefined>;
+export interface TAppPathSet {
+  set<T>(key: string, value: T): void | Promise<void>;
 }
 
-export class AppPath implements TAppPath {
+export interface TAppPathGet {
+  get<T>(key: string, defaultValue?: T): T | undefined;
+}
+
+export type TAppPath = TAppPathGet & TAppPathSet;
+
+export class AppPath implements TAppPathSet, TAppPathGet {
   url: URL;
 
   constructor(config: Config) {
