@@ -5,8 +5,6 @@
 
 import React from "react";
 
-export class ViewerPage extends React.Component {
-  render() {
-    return <div>viewer_page</div>;
-  }
+export function ViewerPage() {
+  return <div>viewer_page</div>;
 }

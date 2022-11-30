@@ -6,8 +6,6 @@
 import React from "react";
 import { Background } from "../../share/component/Background";
 
-export class MainPage extends React.Component {
-  render() {
-    return <Background>main_page</Background>;
-  }
+export function MainPage() {
+  return <Background>main_page</Background>;
 }
