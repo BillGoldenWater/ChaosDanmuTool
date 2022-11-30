@@ -6,27 +6,33 @@
 import { TObjectKey } from "./TObjectKey";
 import { TGetType } from "./TGetType";
 
-export interface TObjGetAndSet<T extends object> {
-  get<K extends TObjectKey<T>, V extends TGetType<T, K>>(
-    key: K,
-    defaultValue?: V
-  ): V;
+export type TObjGetAndSet<T extends object> = {
+  get: TObjGet<T>;
+  set: TObjSet<T>;
+};
 
-  set<K extends TObjectKey<T>, V extends TGetType<T, K>>(
-    key: K,
-    value: V
-  ): void;
+export type TObjGet<T extends object> = <
+  K extends TObjectKey<T>,
+  V extends TGetType<T, K>
+>(
+  key: K,
+  defaultValue?: V
+) => V;
 
-  set<K extends TObjectKey<T>, V extends TGetType<T, K>>(
-    key: K,
-    value: V
-  ): Promise<void>;
-}
+export type TObjSet<T extends object> =
+  | (<K extends TObjectKey<T>, V extends TGetType<T, K>>(
+      key: K,
+      value: V
+    ) => void)
+  | (<K extends TObjectKey<T>, V extends TGetType<T, K>>(
+      key: K,
+      value: V
+    ) => Promise<void>);
 
-export interface TGetAndSet<K, V> {
-  get(key: K, defaultValue?: V): V;
+export type TGetAndSet<K, V> = { get: TGet<K, V>; set: TSet<K, V> };
 
-  set(key: K, value: V): void;
+export type TGet<K, V> = (key: K, defaultValue?: V) => V;
 
-  set(key: K, value: V): Promise<void>;
-}
+export type TSet<K, V> =
+  | ((key: K, value: V) => void)
+  | ((key: K, value: V) => Promise<void>);
