@@ -8,7 +8,7 @@
   windows_subsystem = "windows"
 )]
 
-use chaos_danmu_tool::libs::app::run;
+use chaos_danmu_tool::app::run;
 
 #[tokio::main]
 async fn main() {
