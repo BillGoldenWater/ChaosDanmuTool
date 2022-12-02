@@ -3,26 +3,22 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React, { PropsWithChildren } from "react";
-import { ThemeCtxConsumer, TThemeCtx } from "./ThemeCtx";
+import React, { PropsWithChildren, useContext } from "react";
+import { themeCtx } from "./ThemeCtx";
 
-export class Background extends React.Component<PropsWithChildren> {
-  render() {
-    return <ThemeCtxConsumer>{this.renderInner.bind(this)}</ThemeCtxConsumer>;
-  }
+export function Background({ children }: PropsWithChildren) {
+  const theme = useContext(themeCtx);
 
-  renderInner(theme: TThemeCtx) {
-    return (
-      <div
-        css={`
-          width: 100vw;
-          height: 100vh;
-          background-color: ${theme.colors[1].background};
-          color: ${theme.colors[1].text};
-        `}
-      >
-        {this.props.children}
-      </div>
-    );
-  }
+  return (
+    <div
+      css={`
+        width: 100vw;
+        height: 100vh;
+        background-color: ${theme.colors[1].background};
+        color: ${theme.colors[1].text};
+      `}
+    >
+      {children}
+    </div>
+  );
 }

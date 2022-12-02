@@ -3,8 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { createContext } from "react";
-import { defaultConfig } from "../app/AppCtx";
+import {
+  createContext,
+  PropsWithChildren,
+  useCallback,
+  useContext,
+  useLayoutEffect,
+  useMemo,
+} from "react";
+import { appCtx, defaultConfig } from "../app/AppCtx";
 import { Config } from "../type/rust/config/Config";
 import Color from "color";
 import { TPropToString } from "../type/TPropToString";
@@ -41,8 +48,8 @@ export type TColors = TPropToString<TColorPlate>;
 
 export interface TThemeCtx {
   theme: ThemeConfig;
-
   colors: [TColorPlate, TColors];
+  toggleTheme: (dark?: boolean) => void;
 }
 
 function colorPlateToColors(colorPlate: TColorPlate): TColors {
@@ -78,7 +85,8 @@ export function genColors(theme: ThemeConfig): [TColorPlate, TColors] {
 
   let colorPlate: TColorPlate;
   if (theme.themeId === "dark") {
-    // todo
+    // todo isVibrancyApplied
+    // todo finish colorPlate
     colorPlate = {
       background: getTheme(1.0).desaturate(0.95).darken(0.8).alpha(0.8),
 
@@ -131,16 +139,98 @@ export function genColors(theme: ThemeConfig): [TColorPlate, TColors] {
   return [colorPlate, colorPlateToColors(colorPlate)];
 }
 
-export function isDark(): boolean | undefined {
-  return window.matchMedia("(prefers-color-scheme: dark)")?.matches;
+export function isDark(): boolean {
+  return window.matchMedia("(prefers-color-scheme: dark)").matches;
 }
 
-const themeCtx = createContext<TThemeCtx>({
+export const themeCtx = createContext<TThemeCtx>({
   theme: defaultConfig.frontend.mainView.theme,
 
   colors: genColors(defaultConfig.frontend.mainView.theme),
+
+  toggleTheme: () => undefined,
 });
 themeCtx.displayName = "ThemeContext";
 
-export const ThemeCtxProvider = themeCtx.Provider;
-export const ThemeCtxConsumer = themeCtx.Consumer;
+const ThemeCtxProv = themeCtx.Provider;
+
+export function ThemeCtxProvider({ children }: PropsWithChildren) {
+  const app = useContext(appCtx);
+
+  const toggleTheme: TThemeCtx["toggleTheme"] = useCallback(
+    (dark?: boolean) => {
+      const oldDark =
+        app.config.get("frontend.mainView.theme.themeId") === "dark";
+
+      const newDark = dark != null ? dark : !oldDark;
+      const themeId = newDark ? "dark" : "light";
+
+      app.config.set("frontend.mainView.theme.followSystem", false);
+      app.config.set("frontend.mainView.theme.themeId", themeId);
+    },
+    [app.config]
+  );
+
+  // region event
+  useLayoutEffect(() => {
+    function onChange(event: MediaQueryListEvent) {
+      toggleTheme(event.matches);
+    }
+
+    if (
+      window.matchMedia &&
+      app.config.get("frontend.mainView.theme.followSystem")
+    ) {
+      // add listener
+      const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
+
+      matchMedia.addEventListener("change", onChange);
+      // endregion
+
+      // region sync to system
+      const dark = isDark();
+      if (
+        dark !=
+        (app.config.get("frontend.mainView.theme.themeId") === "dark")
+      ) {
+        toggleTheme(dark);
+      }
+      // endregion
+
+      return () => matchMedia.removeEventListener("change", onChange);
+    }
+
+    return () => undefined;
+  }, [app.config, toggleTheme]);
+
+  useLayoutEffect(() => {
+    window.toggleTheme = toggleTheme;
+    return () => {
+      Reflect.deleteProperty(window, "toggleTheme");
+    };
+  }, [toggleTheme]);
+  // endregion
+
+  // region ctx
+  const themeCfg = useMemo(
+    () => app.config.get("frontend.mainView.theme"),
+    [app.config]
+  );
+  const colors = useMemo(() => genColors(themeCfg), [themeCfg]);
+
+  const ctx: TThemeCtx = {
+    theme: themeCfg,
+    colors,
+    toggleTheme,
+  };
+  // endregion
+
+  return <ThemeCtxProv value={ctx}>{children}</ThemeCtxProv>;
+}
+
+declare global {
+  // noinspection JSUnusedGlobalSymbols
+  interface Window {
+    toggleTheme: TThemeCtx["toggleTheme"] | undefined;
+  }
+}
