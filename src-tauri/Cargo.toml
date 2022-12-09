@@ -41,7 +41,7 @@ window-shadows = "0.2.0"
 raw-window-handle = "0.5.0"
 futures-util = "0.3.25"
 tokio = { version = "1.22.0", features = ["full"] }
-tokio-tungstenite = { version = "0.17.2", features = ["native-tls"] }
+tokio-tungstenite = { version = "0.18.0", features = ["native-tls"] }
 hyper = { version = "0.14.23", features = ["http1", "http2", "server"] }
 reqwest = { version = "0.11.13", features = ["blocking", "native-tls"] }
 oneshot = "0.1.5"
@@ -53,7 +53,7 @@ rfd = { version = "0.10.0", features = ["common-controls-v6"] }
 chrono = "0.4.23"
 netstat2 = "0.9.1"
 get-port = "4.0.0"
-sysinfo = "0.26.8"
+sysinfo = "0.27.0"
 async-recursion = "1.0.0"
 sqlx = { version = "0.6.2", features = ["runtime-tokio-native-tls", "sqlite"] }
 base64 = "0.13.1"
