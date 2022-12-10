@@ -16,7 +16,6 @@ use tokio_tungstenite::tungstenite::protocol::CloseFrame;
 use tokio_tungstenite::tungstenite::Message;
 use tokio_tungstenite::{MaybeTlsStream, WebSocketStream};
 
-use crate::get_cfg;
 use crate::command::command_history_manager::CommandHistoryManager;
 use crate::command::command_packet::app_command::config_update::ConfigUpdate;
 use crate::command::command_packet::app_command::gift_config_update::GiftConfigUpdate;
@@ -25,6 +24,7 @@ use crate::command::command_packet::app_command::AppCommand;
 use crate::command::command_packet::bilibili_command::BiliBiliCommand;
 use crate::command::command_packet::CommandPacket;
 use crate::config::config_manager::ConfigManager;
+use crate::get_cfg;
 use crate::network::api_request::gift_config_getter::GiftConfigGetter;
 use crate::network::danmu_receiver::danmu_receiver::DanmuReceiver;
 use crate::network::websocket::websocket_connection::WebSocketConnection;

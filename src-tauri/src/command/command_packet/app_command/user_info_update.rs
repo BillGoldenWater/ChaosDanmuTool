@@ -8,8 +8,8 @@ use crate::cache::user_info_cache::user_info::UserInfo;
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Eq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[ts(
-export,
-export_to = "../src/share/type/rust/command/commandPacket/appCommand/"
+  export,
+  export_to = "../src/share/type/rust/command/commandPacket/appCommand/"
 )]
 pub struct UserInfoUpdate {
   user_info: UserInfo,

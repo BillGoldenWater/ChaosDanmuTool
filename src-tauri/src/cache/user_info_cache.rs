@@ -171,7 +171,8 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
           if let Ok(medal) = medal_result {
             Some(medal)
           } else {
-            if let Err(UserInfoCacheError::Empty) = medal_result {} else {
+            if let Err(UserInfoCacheError::Empty) = medal_result {
+            } else {
               error!(
                 "failed to get medal \n{err:?}",
                 err = medal_result.unwrap_err()

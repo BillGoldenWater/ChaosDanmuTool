@@ -17,8 +17,8 @@ use crate::types::bilibili::emoji_data::EmojiData;
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Eq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[ts(
-export,
-export_to = "../src/share/type/rust/command/commandPacket/bilibiliCommand/"
+  export,
+  export_to = "../src/share/type/rust/command/commandPacket/bilibiliCommand/"
 )]
 pub struct DanmuMessage {
   fontsize: i32,
@@ -146,8 +146,8 @@ pub enum DanmuMessageParseError {
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, Default, PartialEq, Eq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[ts(
-export,
-export_to = "../src/share/type/rust/command/commandPacket/bilibiliCommand/danmuMessage/"
+  export,
+  export_to = "../src/share/type/rust/command/commandPacket/bilibiliCommand/danmuMessage/"
 )]
 pub enum DanmuType {
   #[default]

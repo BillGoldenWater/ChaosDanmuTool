@@ -5,9 +5,9 @@
 
 use tauri::command;
 
-use crate::get_cfg;
 use crate::config::config::serialize_config;
 use crate::config::config_manager::{modify_cfg, ConfigManager};
+use crate::get_cfg;
 
 #[command]
 pub async fn get_config() -> String {

@@ -8,8 +8,8 @@ use crate::config::config::ALLOW_CONFIG_SKIP_IF;
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Eq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[ts(
-export,
-export_to = "../src/share/type/rust/config/backendConfig/windowConfig/"
+  export,
+  export_to = "../src/share/type/rust/config/backendConfig/windowConfig/"
 )]
 pub struct MainWindowConfig {
   #[serde(default = "placeholder_default")]

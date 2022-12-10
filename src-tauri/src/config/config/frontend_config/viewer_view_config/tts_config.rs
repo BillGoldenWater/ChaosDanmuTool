@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-use crate::config::config::ALLOW_CONFIG_SKIP_IF;
 use crate::config::config::frontend_config::viewer_view_config::tts_config::tts_blacklist_config::TTSBlacklistConfig;
 use crate::config::config::frontend_config::viewer_view_config::tts_config::tts_danmu_config::TTSDanmuConfig;
 use crate::config::config::frontend_config::viewer_view_config::tts_config::tts_text_replacer::TTSTextReplacer;
+use crate::config::config::ALLOW_CONFIG_SKIP_IF;
 
 pub mod tts_blacklist_config;
 pub mod tts_danmu_config;

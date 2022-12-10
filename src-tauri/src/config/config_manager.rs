@@ -184,8 +184,8 @@ macro_rules! get_cfg {
 }
 
 pub async fn modify_cfg<F>(do_modify: F, broadcast: bool)
-  where
-    F: FnOnce(&mut MutexGuard<'_, Config>),
+where
+  F: FnOnce(&mut MutexGuard<'_, Config>),
 {
   let cfg_m = ConfigManager::i();
 

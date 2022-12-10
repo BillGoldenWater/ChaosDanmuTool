@@ -69,12 +69,12 @@ create index if not exists command_history_timestamp_index
     sqlx::query(
       "insert into command_history (sessionId, cmd, timestamp, content) values (?,?,?,?)",
     )
-      .bind(&*session_id)
-      .bind(command.command())
-      .bind(command.timestamp().to_rfc3339())
-      .bind(command.to_string()?)
-      .execute(&mut *db)
-      .await?;
+    .bind(&*session_id)
+    .bind(command.command())
+    .bind(command.timestamp().to_rfc3339())
+    .bind(command.to_string()?)
+    .execute(&mut *db)
+    .await?;
 
     Ok(())
   }

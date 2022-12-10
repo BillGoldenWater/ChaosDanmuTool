@@ -83,7 +83,7 @@ mod test {
       "../src/share/type/rust/config/defaultConfig.json",
       default_config,
     )
-      .expect("Failed write default config.");
+    .expect("Failed write default config.");
   }
 
   #[test]
@@ -97,6 +97,6 @@ mod test {
       "../src/share/type/rust/config/defaultViewerConfig.json",
       default_viewer_config,
     )
-      .expect("Failed write viewer default config.");
+    .expect("Failed write viewer default config.");
   }
 }

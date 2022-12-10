@@ -7,12 +7,12 @@ use static_object::StaticObject;
 use tauri::{command, Manager, WindowEvent, Wry};
 use tokio::sync::RwLock;
 
-use crate::get_cfg;
 use crate::command::command_packet::app_command::viewer_status_update::{
   ViewerStatus, ViewerStatusUpdate,
 };
 use crate::command::command_packet::app_command::AppCommand;
 use crate::config::config_manager::{modify_cfg, ConfigManager};
+use crate::get_cfg;
 use crate::network::command_broadcast_server::CommandBroadcastServer;
 use crate::utils::async_utils::run_blocking;
 use crate::utils::immutable_utils::Immutable;
@@ -35,7 +35,7 @@ pub fn create_main_window(app_handle: tauri::AppHandle) {
     "main",
     tauri::WindowUrl::App("index.html".into()),
   )
-    .transparent(true);
+  .transparent(true);
 
   let main_window = {
     #[cfg(target_os = "windows")]
@@ -110,12 +110,12 @@ pub fn create_viewer_window(app_handle: &tauri::AppHandle<Wry>) {
     "viewer",
     tauri::WindowUrl::App("index.html?window=viewer".into()),
   )
-    .transparent(true)
-    .decorations(false)
-    .position(cfg.x as f64, cfg.y as f64)
-    .inner_size(cfg.width as f64, cfg.height as f64)
-    .build()
-    .unwrap();
+  .transparent(true)
+  .decorations(false)
+  .position(cfg.x as f64, cfg.y as f64)
+  .inner_size(cfg.width as f64, cfg.height as f64)
+  .build()
+  .unwrap();
 
   viewer_window
     .set_title("Chaos Danmu Tool - Viewer")

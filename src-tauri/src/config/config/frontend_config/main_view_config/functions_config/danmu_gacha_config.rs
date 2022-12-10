@@ -11,8 +11,8 @@ pub mod join_by_config;
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Eq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[ts(
-export,
-export_to = "../src/share/type/rust/config/frontendConfig/mainViewConfig/functionsConfig/"
+  export,
+  export_to = "../src/share/type/rust/config/frontendConfig/mainViewConfig/functionsConfig/"
 )]
 pub struct DanmuGachaConfig {
   #[serde(default = "join_by_default")]
