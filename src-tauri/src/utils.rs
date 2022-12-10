@@ -13,6 +13,7 @@ pub mod fs_utils;
 pub mod immutable_utils;
 pub mod mut_bytes_utils;
 pub mod mutex_utils;
+pub mod panic_utils;
 pub mod process_utils;
 pub mod trace_utils;
 pub mod window_utils;

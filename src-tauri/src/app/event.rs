@@ -17,10 +17,13 @@ use crate::network::command_broadcast_server::CommandBroadcastServer;
 use crate::network::danmu_receiver::danmu_receiver::DanmuReceiver;
 use crate::network::http_server::HttpServer;
 use crate::utils::debug_utils::init_logger;
+use crate::utils::panic_utils::setup_panic_hook;
 
 pub fn on_init<A: Assets>(context: &Context<A>) {
   AppContext::init(context.config().clone());
   init_logger();
+
+  setup_panic_hook();
 
   tauri::async_runtime::set(tokio::runtime::Handle::current());
 
