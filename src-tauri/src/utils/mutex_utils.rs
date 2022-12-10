@@ -20,7 +20,7 @@ lazy_static! {
 }
 
 pub fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
-  lock_custom_timeout(mutex, 1000)
+  lock_custom_timeout(mutex, *TIMEOUT_MILLIS)
 }
 
 pub fn lock_custom_timeout<T>(mutex: &Mutex<T>, time_millis: u64) -> MutexGuard<'_, T> {
@@ -28,7 +28,7 @@ pub fn lock_custom_timeout<T>(mutex: &Mutex<T>, time_millis: u64) -> MutexGuard<
 }
 
 pub async fn a_lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
-  a_lock_custom_timeout(mutex, 1000).await
+  a_lock_custom_timeout(mutex, *TIMEOUT_MILLIS).await
 }
 
 pub async fn a_lock_custom_timeout<T>(mutex: &Mutex<T>, time_millis: u64) -> MutexGuard<'_, T> {
