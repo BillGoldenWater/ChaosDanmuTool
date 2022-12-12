@@ -52,7 +52,7 @@ export type TColors = TPropToString<TColorPlate>;
 export interface TThemeCtx {
   theme: ThemeConfig;
   colors: [TColorPlate, TColors];
-  toggleTheme: (dark?: boolean) => void;
+  toggleTheme: (dark?: boolean, fromFollow?: boolean) => void;
 }
 
 function colorPlateToColors(colorPlate: TColorPlate): TColors {
@@ -170,14 +170,15 @@ export function ThemeCtxProvider({ children }: PropsWithChildren) {
   const app = useContext(appCtx);
 
   const toggleTheme: TThemeCtx["toggleTheme"] = useCallback(
-    (dark?: boolean) => {
+    (dark?: boolean, fromFollow?: boolean) => {
       const oldDark =
         app.config.get("frontend.mainView.theme.themeId") === "dark";
 
       const newDark = dark != null ? dark : !oldDark;
       const themeId = newDark ? "dark" : "light";
 
-      app.config.set("frontend.mainView.theme.followSystem", false); // fixme
+      if (!fromFollow)
+        app.config.set("frontend.mainView.theme.followSystem", false);
       app.config.set("frontend.mainView.theme.themeId", themeId);
     },
     [app.config]
@@ -186,7 +187,7 @@ export function ThemeCtxProvider({ children }: PropsWithChildren) {
   // region event
   useLayoutEffect(() => {
     function onChange(event: MediaQueryListEvent) {
-      toggleTheme(event.matches);
+      toggleTheme(event.matches, true);
     }
 
     if (
@@ -205,7 +206,7 @@ export function ThemeCtxProvider({ children }: PropsWithChildren) {
         dark !=
         (app.config.get("frontend.mainView.theme.themeId") === "dark")
       ) {
-        toggleTheme(dark);
+        toggleTheme(dark, true);
       }
       // endregion
 
