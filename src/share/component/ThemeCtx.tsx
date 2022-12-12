@@ -36,6 +36,7 @@ export type TCssConstants = TPropToString<TThemeConstants>;
 export interface TThemeCtx {
   theme: ThemeConfig;
   consts: [TThemeConstants, TCssConstants];
+  isHorizontal: boolean;
   toggleTheme: (dark?: boolean, fromFollow?: boolean) => void;
 }
 
@@ -108,11 +109,17 @@ export function isDark(): boolean {
   return window.matchMedia("(prefers-color-scheme: dark)").matches;
 }
 
+export function isHorizontal(): boolean {
+  return window.innerWidth > window.innerHeight;
+}
+
 const defaultConsts = await genConstants(defaultConfig.frontend.mainView.theme);
 export const themeCtx = createContext<TThemeCtx>({
   theme: defaultConfig.frontend.mainView.theme,
 
   consts: defaultConsts,
+
+  isHorizontal: isHorizontal(),
 
   toggleTheme: () => undefined,
 });
@@ -176,6 +183,20 @@ export function ThemeCtxProvider({ children }: PropsWithChildren) {
       Reflect.deleteProperty(window, "toggleTheme");
     };
   }, [toggleTheme]);
+
+  const [horizontal, setHorizontal] = useState(
+    () => window.innerHeight <= window.innerWidth
+  );
+  useLayoutEffect(() => {
+    function onResize() {
+      if (horizontal != isHorizontal()) {
+        setHorizontal(isHorizontal());
+      }
+    }
+
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [horizontal]);
   // endregion
 
   // region ctx
@@ -205,6 +226,7 @@ export function ThemeCtxProvider({ children }: PropsWithChildren) {
   const ctx: TThemeCtx = {
     theme: themeCfg,
     consts: consts,
+    isHorizontal: horizontal,
     toggleTheme,
   };
   // endregion
