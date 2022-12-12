@@ -21,7 +21,7 @@ import { backend } from "../app/BackendApi";
 
 type ThemeConfig = Config["frontend"]["mainView"]["theme"];
 
-export interface TColorPlate {
+export interface TThemeConstants {
   background: Color;
 
   text: Color;
@@ -47,25 +47,27 @@ export interface TColorPlate {
   [key: string]: Color;
 }
 
-export type TColors = TPropToString<TColorPlate>;
+export type TCssConstants = TPropToString<TThemeConstants>;
 
 export interface TThemeCtx {
   theme: ThemeConfig;
-  colors: [TColorPlate, TColors];
+  consts: [TThemeConstants, TCssConstants];
   toggleTheme: (dark?: boolean, fromFollow?: boolean) => void;
 }
 
-function colorPlateToColors(colorPlate: TColorPlate): TColors {
-  const result: TColors = {} as TColors;
-  for (const key in colorPlate) {
-    result[key] = colorPlate[key].hsl().string();
+function themeConstants2CssConstants(
+  themeConstants: TThemeConstants
+): TCssConstants {
+  const result: TCssConstants = {} as TCssConstants;
+  for (const key in themeConstants) {
+    result[key] = themeConstants[key].hsl().string();
   }
   return result;
 }
 
-export async function genColors(
+export async function genConstants(
   theme: ThemeConfig
-): Promise<[TColorPlate, TColors]> {
+): Promise<[TThemeConstants, TCssConstants]> {
   const vibrancyApplied = (await backend?.isVibrancyApplied()) || false;
   const themeColor = Color(theme.themeColor);
 
@@ -89,10 +91,10 @@ export async function genColors(
     );
   }
 
-  let colorPlate: TColorPlate;
+  let themeConstants: TThemeConstants;
   if (theme.themeId === "dark") {
-    // todo finish colorPlate
-    colorPlate = {
+    // todo finish themeConstants
+    themeConstants = {
       background: getTheme(1.0).desaturate(0.95).darken(0.8).fade(0.2),
 
       text: getTheme(1.0).desaturate(0.95).lighten(0.9).fade(0.05),
@@ -116,10 +118,10 @@ export async function genColors(
       themeText: Color(),
     };
     if (!vibrancyApplied) {
-      colorPlate.background = colorPlate.background.alpha(1);
+      themeConstants.background = themeConstants.background.alpha(1);
     }
   } else {
-    colorPlate = {
+    themeConstants = {
       background: getTheme(1.0).desaturate(0.9).lighten(0.7).fade(0.1),
 
       text: Color(),
@@ -143,22 +145,22 @@ export async function genColors(
       themeText: Color(),
     };
     if (!vibrancyApplied) {
-      colorPlate.background = colorPlate.background.alpha(1);
+      themeConstants.background = themeConstants.background.alpha(1);
     }
   }
 
-  return [colorPlate, colorPlateToColors(colorPlate)];
+  return [themeConstants, themeConstants2CssConstants(themeConstants)];
 }
 
 export function isDark(): boolean {
   return window.matchMedia("(prefers-color-scheme: dark)").matches;
 }
 
-const defaultColors = await genColors(defaultConfig.frontend.mainView.theme);
+const defaultConsts = await genConstants(defaultConfig.frontend.mainView.theme);
 export const themeCtx = createContext<TThemeCtx>({
   theme: defaultConfig.frontend.mainView.theme,
 
-  colors: defaultColors,
+  consts: defaultConsts,
 
   toggleTheme: () => undefined,
 });
@@ -230,18 +232,18 @@ export function ThemeCtxProvider({ children }: PropsWithChildren) {
     [app.config]
   );
 
-  // region colors
-  const [colors, setColors] = useState(defaultColors);
+  // region consts
+  const [consts, setConsts] = useState(defaultConsts);
   useEffect(() => {
-    async function updateColors() {
-      const colors = await genColors(themeCfg);
+    async function updateConsts() {
+      const consts = await genConstants(themeCfg);
       if (!canceled) {
-        setColors(colors);
+        setConsts(consts);
       }
     }
 
     let canceled = false;
-    updateColors().then();
+    updateConsts().then();
     return () => {
       canceled = true;
     };
@@ -250,7 +252,7 @@ export function ThemeCtxProvider({ children }: PropsWithChildren) {
 
   const ctx: TThemeCtx = {
     theme: themeCfg,
-    colors,
+    consts: consts,
     toggleTheme,
   };
   // endregion
