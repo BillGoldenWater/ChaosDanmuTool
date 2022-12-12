@@ -59,10 +59,16 @@ export class CommandReceiver {
 
   open() {
     this.close();
-    this.log("client.open", `ws://localhost:${this.option.port} Connecting`);
-    this.client = new WebSocket(`ws://localhost:${this.option.port}`);
+    this.log(
+      "client.open",
+      `ws://${this.option.host}:${this.option.port} Connecting`
+    );
+    this.client = new WebSocket(`ws://${this.option.host}:${this.option.port}`);
     this.client.onopen = () => {
-      this.log("client.onopen", `ws://localhost:${this.option.port} Opened`);
+      this.log(
+        "client.onopen",
+        `ws://${this.option.host}:${this.option.port} Opened`
+      );
       this.reconnectCount = 0;
     };
     this.client.onclose = (event) => {
