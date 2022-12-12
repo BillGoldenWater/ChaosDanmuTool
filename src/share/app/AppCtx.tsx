@@ -29,7 +29,7 @@ import {
 } from "../event/AppEventTarget";
 import { TObjGet, TObjGetAndSet, TObjSet } from "../type/TGetAndSet";
 import { AppPath, TAppPath } from "./AppPath";
-import { TWindow } from "../../window/Page";
+import { TWindow } from "../../window/Window";
 import { TUserInfoCache } from "../type/TUserInfoCache";
 import { CommandReceiver } from "./CommandReceiver";
 import { backend } from "./BackendApi";
@@ -309,7 +309,8 @@ export function initialAppConstant(
     port: firstConfig.backend.httpServer.port,
   });
 
-  if (params.windowId === "viewer") {
+  // in viewer or open in browser
+  if (params.windowId === "viewer" || !backend) {
     receiver.updateOption({ host: window.location.hostname });
   }
 
