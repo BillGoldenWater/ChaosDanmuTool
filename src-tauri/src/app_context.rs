@@ -80,7 +80,7 @@ static mut APP_CONTEXT: *const AppContext = 0 as *const AppContext;
 #[command(author, version, about = None, long_about = None)]
 pub struct Args {
   /// How long that mutex lock should wait for (millisecond)
-  #[arg(short = 'L', long, default_value_t = 1000)]
+  #[arg(short = 'L', long, default_value_t = 10_000)]
   pub lock_timeout_millis: u64,
   /// Enable output full backtrace
   #[arg(short, long)]
