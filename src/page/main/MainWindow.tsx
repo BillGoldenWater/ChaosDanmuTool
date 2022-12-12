@@ -6,6 +6,6 @@
 import React from "react";
 import { Background } from "../../share/component/Background";
 
-export function MainPage() {
-  return <Background>main_page</Background>;
+export function MainWindow() {
+  return <Background>main_window</Background>;
 }

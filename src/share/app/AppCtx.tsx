@@ -29,7 +29,7 @@ import {
 } from "../event/AppEventTarget";
 import { TObjGet, TObjGetAndSet, TObjSet } from "../type/TGetAndSet";
 import { AppPath, TAppPath } from "./AppPath";
-import { TPage } from "../../page/Page";
+import { TWindow } from "../../page/Page";
 import { TUserInfoCache } from "../type/TUserInfoCache";
 import { CommandReceiver } from "./CommandReceiver";
 import { backend } from "./BackendApi";
@@ -43,15 +43,15 @@ export const defaultViewerConfig: ViewerViewConfig =
 // endregion
 
 export interface TAppParams {
-  pageId: TPage["pageId"];
+  windowId: TWindow["windowId"];
   viewerId: string;
 }
 
 export function getParams(): TAppParams {
-  const pageId = getParam("pageId");
+  const pageId = getParam("windowId");
   const viewerId = getParam("viewerId");
   return {
-    pageId: pageId != null ? (pageId == "viewer" ? pageId : "main") : "main",
+    windowId: pageId != null ? (pageId == "viewer" ? pageId : "main") : "main",
     viewerId:
       viewerId != null ? viewerId : "93113675-999d-469c-a280-47ed2c5a09e4",
   };
@@ -309,7 +309,7 @@ export function initialAppConstant(
     port: firstConfig.backend.httpServer.port,
   });
 
-  if (params.pageId === "viewer") {
+  if (params.windowId === "viewer") {
     receiver.updateOption({ host: window.location.hostname });
   }
 

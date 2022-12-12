@@ -5,13 +5,16 @@
 
 import { useContext, useMemo } from "react";
 import { appCtx } from "./share/app/AppCtx";
-import { pages, TPage } from "./page/Page";
+import { pages, TWindow } from "./page/Page";
 
 export function App() {
   const ctx = useContext(appCtx);
 
   return useMemo(
-    () => (pages.find((it) => it.pageId == ctx.params.pageId) as TPage).page(),
-    [ctx.params.pageId]
+    () =>
+      (
+        pages.find((it) => it.windowId == ctx.params.windowId) as TWindow
+      ).window(),
+    [ctx.params.windowId]
   );
 }

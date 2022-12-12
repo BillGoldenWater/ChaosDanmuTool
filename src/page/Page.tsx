@@ -3,16 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { MainPage } from "./main/MainPage";
-import { ViewerPage } from "./viewer/ViewerPage";
+import { MainWindow } from "./main/MainWindow";
+import { ViewerWindow } from "./viewer/ViewerWindow";
 import React from "react";
 
-export interface TPage {
-  pageId: "main" | "viewer";
-  page: () => JSX.Element;
+export interface TWindow {
+  windowId: "main" | "viewer";
+  window: () => JSX.Element;
 }
 
-export const pages: TPage[] = [
-  { pageId: "main", page: () => <MainPage /> },
-  { pageId: "viewer", page: () => <ViewerPage /> },
+export const pages: TWindow[] = [
+  { windowId: "main", window: () => <MainWindow /> },
+  { windowId: "viewer", window: () => <ViewerWindow /> },
 ];

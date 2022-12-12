@@ -5,6 +5,6 @@
 
 import React from "react";
 
-export function ViewerPage() {
-  return <div>viewer_page</div>;
+export function ViewerWindow() {
+  return <div>viewer_window</div>;
 }

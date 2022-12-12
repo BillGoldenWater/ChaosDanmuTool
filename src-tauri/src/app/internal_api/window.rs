@@ -108,7 +108,7 @@ pub fn create_viewer_window(app_handle: &tauri::AppHandle<Wry>) {
   let viewer_window = tauri::WindowBuilder::new(
     app_handle,
     "viewer",
-    tauri::WindowUrl::App("index.html?window=viewer".into()),
+    tauri::WindowUrl::App("index.html?windowId=viewer".into()),
   )
   .transparent(true)
   .decorations(false)
