@@ -5,7 +5,7 @@
 
 import { useContext, useMemo } from "react";
 import { appCtx } from "./share/app/AppCtx";
-import { pages, TWindow } from "./page/Page";
+import { windows, TWindow } from "./window/Window";
 
 export function App() {
   const ctx = useContext(appCtx);
@@ -13,7 +13,7 @@ export function App() {
   return useMemo(
     () =>
       (
-        pages.find((it) => it.windowId == ctx.params.windowId) as TWindow
+        windows.find((it) => it.windowId == ctx.params.windowId) as TWindow
       ).window(),
     [ctx.params.windowId]
   );

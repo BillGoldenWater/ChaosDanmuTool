@@ -12,7 +12,7 @@ export interface TWindow {
   window: () => JSX.Element;
 }
 
-export const pages: TWindow[] = [
+export const windows: TWindow[] = [
   { windowId: "main", window: () => <MainWindow /> },
   { windowId: "viewer", window: () => <ViewerWindow /> },
 ];
