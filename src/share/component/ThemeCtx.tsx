@@ -8,13 +8,16 @@ import {
   PropsWithChildren,
   useCallback,
   useContext,
+  useEffect,
   useLayoutEffect,
   useMemo,
+  useState,
 } from "react";
 import { appCtx, defaultConfig } from "../app/AppCtx";
 import { Config } from "../type/rust/config/Config";
 import Color from "color";
 import { TPropToString } from "../type/TPropToString";
+import { backend } from "../app/BackendApi";
 
 type ThemeConfig = Config["frontend"]["mainView"]["theme"];
 
@@ -60,7 +63,10 @@ function colorPlateToColors(colorPlate: TColorPlate): TColors {
   return result;
 }
 
-export function genColors(theme: ThemeConfig): [TColorPlate, TColors] {
+export async function genColors(
+  theme: ThemeConfig
+): Promise<[TColorPlate, TColors]> {
+  const vibrancyApplied = (await backend?.isVibrancyApplied()) || false;
   const themeColor = Color(theme.themeColor);
 
   function getDown(percent: number) {
@@ -85,14 +91,13 @@ export function genColors(theme: ThemeConfig): [TColorPlate, TColors] {
 
   let colorPlate: TColorPlate;
   if (theme.themeId === "dark") {
-    // todo isVibrancyApplied
     // todo finish colorPlate
     colorPlate = {
-      background: getTheme(1.0).desaturate(0.95).darken(0.8).alpha(0.8),
+      background: getTheme(1.0).desaturate(0.95).darken(0.8).fade(0.2),
 
-      text: getTheme(1.0).desaturate(0.95).lighten(0.9).alpha(0.95),
-      titleText: getTheme(1.0).desaturate(0.95).lighten(0.9).alpha(1),
-      secondaryText: getTheme(1.0).desaturate(0.95).lighten(0.9).alpha(0.6),
+      text: getTheme(1.0).desaturate(0.95).lighten(0.9).fade(0.05),
+      titleText: getTheme(1.0).desaturate(0.95).lighten(0.9).fade(0),
+      secondaryText: getTheme(1.0).desaturate(0.95).lighten(0.9).fade(0.4),
 
       up: Color(),
       upDouble: Color(),
@@ -110,9 +115,12 @@ export function genColors(theme: ThemeConfig): [TColorPlate, TColors] {
       themeSolid: Color(),
       themeText: Color(),
     };
+    if (!vibrancyApplied) {
+      colorPlate.background = colorPlate.background.alpha(1);
+    }
   } else {
     colorPlate = {
-      background: getTheme(1.0).desaturate(0.9).lighten(0.7).alpha(0.9),
+      background: getTheme(1.0).desaturate(0.9).lighten(0.7).fade(0.1),
 
       text: Color(),
       titleText: Color(),
@@ -134,6 +142,9 @@ export function genColors(theme: ThemeConfig): [TColorPlate, TColors] {
       themeSolid: Color(),
       themeText: Color(),
     };
+    if (!vibrancyApplied) {
+      colorPlate.background = colorPlate.background.alpha(1);
+    }
   }
 
   return [colorPlate, colorPlateToColors(colorPlate)];
@@ -143,10 +154,11 @@ export function isDark(): boolean {
   return window.matchMedia("(prefers-color-scheme: dark)").matches;
 }
 
+const defaultColors = await genColors(defaultConfig.frontend.mainView.theme);
 export const themeCtx = createContext<TThemeCtx>({
   theme: defaultConfig.frontend.mainView.theme,
 
-  colors: genColors(defaultConfig.frontend.mainView.theme),
+  colors: defaultColors,
 
   toggleTheme: () => undefined,
 });
@@ -165,7 +177,7 @@ export function ThemeCtxProvider({ children }: PropsWithChildren) {
       const newDark = dark != null ? dark : !oldDark;
       const themeId = newDark ? "dark" : "light";
 
-      app.config.set("frontend.mainView.theme.followSystem", false);
+      app.config.set("frontend.mainView.theme.followSystem", false); // fixme
       app.config.set("frontend.mainView.theme.themeId", themeId);
     },
     [app.config]
@@ -216,7 +228,24 @@ export function ThemeCtxProvider({ children }: PropsWithChildren) {
     () => app.config.get("frontend.mainView.theme"),
     [app.config]
   );
-  const colors = useMemo(() => genColors(themeCfg), [themeCfg]);
+
+  // region colors
+  const [colors, setColors] = useState(defaultColors);
+  useEffect(() => {
+    async function updateColors() {
+      const colors = await genColors(themeCfg);
+      if (!canceled) {
+        setColors(colors);
+      }
+    }
+
+    let canceled = false;
+    updateColors().then();
+    return () => {
+      canceled = true;
+    };
+  }, [themeCfg]);
+  // endregion
 
   const ctx: TThemeCtx = {
     theme: themeCfg,
