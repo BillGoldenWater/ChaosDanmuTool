@@ -28,22 +28,6 @@ export interface TThemeConstants {
   titleText: Color;
   secondaryText: Color;
 
-  up: Color;
-  upDouble: Color;
-  down: Color;
-  downDouble: Color;
-
-  themeUp: Color;
-  themeUpDouble: Color;
-  themeDown: Color;
-
-  themePrimary: Color;
-  themePrimaryUp: Color;
-  themePrimaryDown: Color;
-
-  themeSolid: Color;
-  themeText: Color;
-
   [key: string]: Color;
 }
 
@@ -68,7 +52,7 @@ function themeConstants2CssConstants(
 export async function genConstants(
   theme: ThemeConfig
 ): Promise<[TThemeConstants, TCssConstants]> {
-  const vibrancyApplied = (await backend?.isVibrancyApplied()) || false;
+  const vibrancyApplied = backend ? await backend.isVibrancyApplied() : false;
   const themeColor = Color(theme.themeColor);
 
   function getDown(percent: number) {
@@ -100,49 +84,17 @@ export async function genConstants(
       text: getTheme(1.0).desaturate(0.95).lighten(0.9).fade(0.05),
       titleText: getTheme(1.0).desaturate(0.95).lighten(0.9).fade(0),
       secondaryText: getTheme(1.0).desaturate(0.95).lighten(0.9).fade(0.4),
-
-      up: Color(),
-      upDouble: Color(),
-      down: Color(),
-      downDouble: Color(),
-
-      themeUp: Color(),
-      themeUpDouble: Color(),
-      themeDown: Color(),
-
-      themePrimary: Color(),
-      themePrimaryUp: Color(),
-      themePrimaryDown: Color(),
-
-      themeSolid: Color(),
-      themeText: Color(),
     };
     if (!vibrancyApplied) {
       themeConstants.background = themeConstants.background.alpha(1);
     }
   } else {
     themeConstants = {
-      background: getTheme(1.0).desaturate(0.9).lighten(0.7).fade(0.1),
+      background: getTheme(1.0).desaturate(0.95).lighten(0.6).fade(0.2),
 
       text: Color(),
       titleText: Color(),
       secondaryText: Color(),
-
-      up: Color(),
-      upDouble: Color(),
-      down: Color(),
-      downDouble: Color(),
-
-      themeUp: Color(),
-      themeUpDouble: Color(),
-      themeDown: Color(),
-
-      themePrimary: Color(),
-      themePrimaryUp: Color(),
-      themePrimaryDown: Color(),
-
-      themeSolid: Color(),
-      themeText: Color(),
     };
     if (!vibrancyApplied) {
       themeConstants.background = themeConstants.background.alpha(1);
