@@ -14,8 +14,8 @@ export function Background({ children }: PropsWithChildren) {
       css={`
         width: 100vw;
         height: 100vh;
-        background-color: ${theme.consts[1].background};
-        color: ${theme.consts[1].text};
+        background-color: ${theme.consts.background};
+        color: ${theme.consts.text};
       `}
     >
       {children}

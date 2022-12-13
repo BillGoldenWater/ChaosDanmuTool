@@ -22,11 +22,13 @@ import { backend } from "../app/BackendApi";
 type ThemeConfig = Config["frontend"]["mainView"]["theme"];
 
 export interface TThemeConstants {
-  background: Color;
-
   text: Color;
   titleText: Color;
   secondaryText: Color;
+
+  background: Color;
+
+  contentBackground: Color;
 
   [key: string]: Color;
 }
@@ -35,36 +37,37 @@ export type TCssConstants = TPropToString<TThemeConstants>;
 
 export interface TThemeCtx {
   theme: ThemeConfig;
-  consts: [TThemeConstants, TCssConstants];
+  consts: TCssConstants & { raw: TThemeConstants };
   isHorizontal: boolean;
   toggleTheme: (dark?: boolean, fromFollow?: boolean) => void;
 }
 
-function themeConstants2CssConstants(
+function themeConstants2Consts(
   themeConstants: TThemeConstants
-): TCssConstants {
-  const result: TCssConstants = {} as TCssConstants;
+): TThemeCtx["consts"] {
+  const result: TThemeCtx["consts"] = {} as TThemeCtx["consts"];
   for (const key in themeConstants) {
     result[key] = themeConstants[key].hsl().string();
   }
+  result.raw = themeConstants;
   return result;
 }
 
 export async function genConstants(
-  theme: ThemeConfig
-): Promise<[TThemeConstants, TCssConstants]> {
+  themeCfg: ThemeConfig
+): Promise<TThemeCtx["consts"]> {
   const vibrancyApplied = backend ? await backend.isVibrancyApplied() : false;
-  const themeColor = Color(theme.themeColor);
+  const themeColor = Color(themeCfg.themeColor);
 
-  function getDown(percent: number) {
+  function black(percent: number) {
     return Color([0, 0, 0, percent], "hsl");
   }
 
-  function getUp(percent: number) {
+  function white(percent: number) {
     return Color([0, 0, 100, percent], "hsl");
   }
 
-  function getTheme(percent: number) {
+  function theme(percent: number) {
     return Color(
       [
         themeColor.hue(),
@@ -77,32 +80,36 @@ export async function genConstants(
   }
 
   let themeConstants: TThemeConstants;
-  if (theme.themeId === "dark") {
-    // todo finish themeConstants
-    themeConstants = {
-      background: getTheme(1.0).desaturate(0.95).darken(0.8).fade(0.2),
 
-      text: getTheme(1.0).desaturate(0.95).lighten(0.9).fade(0.05),
-      titleText: getTheme(1.0).desaturate(0.95).lighten(0.9).fade(0),
-      secondaryText: getTheme(1.0).desaturate(0.95).lighten(0.9).fade(0.4),
-    };
-    if (!vibrancyApplied) {
-      themeConstants.background = themeConstants.background.alpha(1);
-    }
-  } else {
-    themeConstants = {
-      background: getTheme(1.0).desaturate(0.95).lighten(0.6).fade(0.2),
+  themeConstants = {
+    text: theme(1).desaturate(0.95).lighten(0.9).fade(0.05),
+    titleText: theme(1).desaturate(0.95).lighten(0.9).fade(0),
+    secondaryText: theme(1).desaturate(0.95).lighten(0.9).fade(0.4),
 
-      text: Color(),
-      titleText: Color(),
-      secondaryText: Color(),
+    background: theme(1).desaturate(0.95).darken(0.8).fade(0.2),
+
+    contentBackground: white(0.075),
+  };
+  if (!vibrancyApplied) {
+    themeConstants.background = themeConstants.background.alpha(1);
+  }
+
+  if (themeCfg.themeId !== "dark") {
+    themeConstants = {
+      text: theme(1).desaturate(0.95).darken(0.9).fade(0.05),
+      titleText: theme(1).desaturate(0.95).darken(0.9).fade(0),
+      secondaryText: theme(1).desaturate(0.95).darken(0.4),
+
+      background: theme(1).desaturate(0.95).lighten(0.85).fade(0.4),
+
+      contentBackground: white(0.9),
     };
     if (!vibrancyApplied) {
       themeConstants.background = themeConstants.background.alpha(1);
     }
   }
 
-  return [themeConstants, themeConstants2CssConstants(themeConstants)];
+  return themeConstants2Consts(themeConstants);
 }
 
 export function isDark(): boolean {
