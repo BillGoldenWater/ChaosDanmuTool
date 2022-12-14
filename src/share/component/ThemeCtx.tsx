@@ -18,6 +18,7 @@ import { Config } from "../type/rust/config/Config";
 import Color from "color";
 import { TPropToString } from "../type/TPropToString";
 import { backend } from "../app/BackendApi";
+import { ThemeProvider } from "styled-components";
 
 type ThemeConfig = Config["frontend"]["mainView"]["theme"];
 
@@ -238,7 +239,11 @@ export function ThemeCtxProvider({ children }: PropsWithChildren) {
   };
   // endregion
 
-  return <ThemeCtxProv value={ctx}>{children}</ThemeCtxProv>;
+  return (
+    <ThemeCtxProv value={ctx}>
+      <ThemeProvider theme={ctx}>{children}</ThemeProvider>
+    </ThemeCtxProv>
+  );
 }
 
 declare global {
