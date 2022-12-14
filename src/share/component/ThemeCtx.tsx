@@ -30,6 +30,7 @@ export interface TThemeConstants {
   background: Color;
 
   contentBackground: Color;
+  tooltipBackground: Color;
 
   [key: string]: Color;
 }
@@ -89,7 +90,8 @@ export async function genConstants(
 
     background: theme(1).desaturate(0.95).darken(0.8).fade(0.2),
 
-    contentBackground: white(0.075),
+    contentBackground: white(0.06),
+    tooltipBackground: black(0.15),
   };
   if (!vibrancyApplied) {
     themeConstants.background = themeConstants.background.alpha(1);
@@ -104,6 +106,7 @@ export async function genConstants(
       background: theme(1).desaturate(0.95).lighten(0.85).fade(0.4),
 
       contentBackground: white(0.9),
+      tooltipBackground: white(0.15),
     };
     if (!vibrancyApplied) {
       themeConstants.background = themeConstants.background.alpha(1);
