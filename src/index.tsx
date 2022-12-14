@@ -12,6 +12,7 @@ import { backend } from "./share/app/BackendApi";
 import { AppCtxProvider, defaultConfig } from "./share/app/AppCtx";
 import { ThemeCtxProvider } from "./share/component/ThemeCtx";
 import React from "react";
+import { WindowCtxProvider } from "./share/component/WindowCtx";
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const root = ReactDOM.createRoot(document.getElementById("root")!);
@@ -20,9 +21,11 @@ const config = backend ? await backend.getConfig() : defaultConfig;
 const debug = backend ? await backend.isDebug() : true;
 
 root.render(
-  <AppCtxProvider debug={debug} firstConfig={config}>
-    <ThemeCtxProvider>
-      <App />
-    </ThemeCtxProvider>
-  </AppCtxProvider>
+  <WindowCtxProvider>
+    <AppCtxProvider debug={debug} firstConfig={config}>
+      <ThemeCtxProvider>
+        <App />
+      </ThemeCtxProvider>
+    </AppCtxProvider>
+  </WindowCtxProvider>
 );
