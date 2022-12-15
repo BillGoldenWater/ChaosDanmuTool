@@ -23,6 +23,8 @@ import { ThemeProvider } from "styled-components";
 type ThemeConfig = Config["frontend"]["mainView"]["theme"];
 
 export interface TThemeConstants {
+  theme: Color;
+
   text: Color;
   titleText: Color;
   secondaryText: Color;
@@ -30,6 +32,9 @@ export interface TThemeConstants {
   background: Color;
 
   contentBackground: Color;
+  menuItemBackground: Color;
+  menuItemActiveBackground: Color;
+
   tooltipBackground: Color;
 
   [key: string]: Color;
@@ -69,6 +74,8 @@ export async function genConstants(
   let themeConstants: TThemeConstants;
 
   themeConstants = {
+    theme: theme(1),
+
     text: theme(1).desaturate(0.95).lighten(0.9).fade(0.05),
     titleText: theme(1).desaturate(0.95).lighten(0.9).fade(0),
     secondaryText: theme(1).desaturate(0.95).lighten(0.9).fade(0.4),
@@ -76,6 +83,8 @@ export async function genConstants(
     background: theme(1).desaturate(0.95).darken(0.8).fade(0.2),
 
     contentBackground: white(0.06),
+    menuItemBackground: white(0.06),
+    menuItemActiveBackground: theme(0.1),
     tooltipBackground: black(0.15),
   };
   if (!vibrancyApplied) {
@@ -84,6 +93,8 @@ export async function genConstants(
 
   if (themeCfg.themeId !== "dark") {
     themeConstants = {
+      theme: theme(1),
+
       text: theme(1).desaturate(0.95).darken(0.9).fade(0.05),
       titleText: theme(1).desaturate(0.95).darken(0.9).fade(0),
       secondaryText: theme(1).desaturate(0.95).darken(0.4),
@@ -91,6 +102,8 @@ export async function genConstants(
       background: theme(1).desaturate(0.95).lighten(0.85).fade(0.4),
 
       contentBackground: white(0.9),
+      menuItemBackground: black(0.06),
+      menuItemActiveBackground: theme(0.2),
       tooltipBackground: black(0.1),
     };
     if (!vibrancyApplied) {
