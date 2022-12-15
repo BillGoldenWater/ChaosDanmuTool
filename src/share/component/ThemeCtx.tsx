@@ -118,6 +118,8 @@ export interface TThemeCtx {
   theme: ThemeConfig;
   consts: TCssConstants & { raw: TThemeConstants };
   isHorizontal: boolean;
+  selectable: boolean;
+
   toggleTheme: (dark?: boolean, fromFollow?: boolean) => void;
 }
 
@@ -147,6 +149,8 @@ export const themeCtx = createContext<TThemeCtx>({
   consts: defaultConsts,
 
   isHorizontal: isHorizontal(),
+
+  selectable: false,
 
   toggleTheme: () => undefined,
 });
@@ -224,6 +228,29 @@ export function ThemeCtxProvider({ children }: PropsWithChildren) {
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, [horizontal]);
+
+  const [selectable, setSelectable] = useState(false);
+  useLayoutEffect(() => {
+    function onKeyPress(e: KeyboardEvent) {
+      if (e.key === "Alt") {
+        setSelectable(true);
+      }
+    }
+
+    function onKeyUp(e: KeyboardEvent) {
+      if (e.key === "Alt") {
+        setSelectable(false);
+        window.getSelection()?.empty();
+      }
+    }
+
+    window.addEventListener("keypress", onKeyPress);
+    window.addEventListener("keyup", onKeyUp);
+    return () => {
+      window.removeEventListener("keypress", onKeyPress);
+      window.addEventListener("keyup", onKeyUp);
+    };
+  });
   // endregion
 
   // region ctx
@@ -254,6 +281,7 @@ export function ThemeCtxProvider({ children }: PropsWithChildren) {
     theme: themeCfg,
     consts: consts,
     isHorizontal: horizontal,
+    selectable,
     toggleTheme,
   };
   // endregion
