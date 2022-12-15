@@ -3,39 +3,49 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import {createContext, PropsWithChildren, useLayoutEffect, useState} from "react";
+import {
+  createContext,
+  PropsWithChildren,
+  useLayoutEffect,
+  useState,
+} from "react";
 
 export interface TWindowCtx {
-  height: number,
-  width: number,
+  height: number;
+  width: number;
+  scrollX: number;
+  scrollY: number;
 }
 
-export const windowCtx = createContext<TWindowCtx>({height: window.innerHeight, width: window.innerWidth});
+function getLatest() {
+  return {
+    height: window.innerHeight,
+    width: window.innerWidth,
+    scrollX: window.scrollX + Math.random() * 0.001,
+    scrollY: window.scrollY + Math.random() * 0.001,
+  };
+}
+
+export const windowCtx = createContext<TWindowCtx>(getLatest());
 
 const WindowCtxProv = windowCtx.Provider;
 
-export function WindowCtxProvider({children}: PropsWithChildren) {
-  const [height, setHeight] = useState(window.innerHeight);
-  const [width, setWidth] = useState(window.innerWidth);
-
+export function WindowCtxProvider({ children }: PropsWithChildren) {
+  const [ctx, setCtx] = useState(() => getLatest());
 
   useLayoutEffect(() => {
-    function onResize() {
-      setHeight(window.innerHeight);
-      setWidth(window.innerWidth);
+    function onUpdate() {
+      setCtx(getLatest());
     }
 
-    window.addEventListener("resize", onResize)
+    window.addEventListener("resize", onUpdate);
+    window.addEventListener("scroll", onUpdate, true);
 
     return () => {
-      window.removeEventListener("resize", onResize)
-    }
-  }, [setHeight, setWidth])
+      window.removeEventListener("resize", onUpdate);
+      window.removeEventListener("scroll", onUpdate, true);
+    };
+  }, []);
 
-  const ctx = {
-    height,
-    width
-  }
-
-  return <WindowCtxProv value={ctx}>{children}</WindowCtxProv>
+  return <WindowCtxProv value={ctx}>{children}</WindowCtxProv>;
 }
