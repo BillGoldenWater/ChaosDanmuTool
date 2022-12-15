@@ -299,3 +299,8 @@ declare global {
     toggleTheme: TThemeCtx["toggleTheme"] | undefined;
   }
 }
+
+export const zIndex = {
+  base: 0,
+  popup: 1000,
+};

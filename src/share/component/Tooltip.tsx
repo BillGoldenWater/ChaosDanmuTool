@@ -11,6 +11,7 @@ import {
 } from "react";
 import styled from "styled-components";
 import { windowCtx } from "./WindowCtx";
+import { zIndex } from "./ThemeCtx";
 
 export interface TooltipProps {
   tooltip: string | JSX.Element;
@@ -55,6 +56,8 @@ const TooltipPopupBase = styled.div.attrs<{
   }
 
   margin-${(p) => p.marginPos}: 0.2em;
+
+  z-index: ${zIndex.popup};
 `;
 
 const TooltipBase = styled.div`
