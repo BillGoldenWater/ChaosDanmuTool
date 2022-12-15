@@ -41,11 +41,10 @@ const TooltipPopupBase = styled.div.attrs<{
   padding: 0.5em;
 
   background-color: ${(p) => p.theme.consts.tooltipBackground};
-  box-shadow: 0 0 0.3em 0.1em ${(p) => p.theme.consts.tooltipBackground};
+  box-shadow: 0.1em 0.1em 0.2em 0.1em ${(p) =>
+    p.theme.consts.raw.tooltipBackground.opaquer(0.8)};
   backdrop-filter: blur(0.5em);
 
-  ${(p) =>
-    p.theme.theme.themeId === "light" ? `border: 0.05em solid #0003;` : ""}
   border-radius: 0.5em;
 
   &:hover {

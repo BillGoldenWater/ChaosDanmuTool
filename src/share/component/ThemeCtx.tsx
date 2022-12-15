@@ -37,27 +37,10 @@ export interface TThemeConstants {
 
 export type TCssConstants = TPropToString<TThemeConstants>;
 
-export interface TThemeCtx {
-  theme: ThemeConfig;
-  consts: TCssConstants & { raw: TThemeConstants };
-  isHorizontal: boolean;
-  toggleTheme: (dark?: boolean, fromFollow?: boolean) => void;
-}
-
-function themeConstants2Consts(
-  themeConstants: TThemeConstants
-): TThemeCtx["consts"] {
-  const result: TThemeCtx["consts"] = {} as TThemeCtx["consts"];
-  for (const key in themeConstants) {
-    result[key] = themeConstants[key].hsl().string();
-  }
-  result.raw = themeConstants;
-  return result;
-}
-
 export async function genConstants(
   themeCfg: ThemeConfig
 ): Promise<TThemeCtx["consts"]> {
+  // region init
   const vibrancyApplied = backend ? await backend.isVibrancyApplied() : false;
   const themeColor = Color(themeCfg.themeColor);
 
@@ -80,6 +63,8 @@ export async function genConstants(
       "hsl"
     );
   }
+
+  // endregion
 
   let themeConstants: TThemeConstants;
 
@@ -106,7 +91,7 @@ export async function genConstants(
       background: theme(1).desaturate(0.95).lighten(0.85).fade(0.4),
 
       contentBackground: white(0.9),
-      tooltipBackground: white(0.15),
+      tooltipBackground: black(0.1),
     };
     if (!vibrancyApplied) {
       themeConstants.background = themeConstants.background.alpha(1);
@@ -114,6 +99,24 @@ export async function genConstants(
   }
 
   return themeConstants2Consts(themeConstants);
+}
+
+export interface TThemeCtx {
+  theme: ThemeConfig;
+  consts: TCssConstants & { raw: TThemeConstants };
+  isHorizontal: boolean;
+  toggleTheme: (dark?: boolean, fromFollow?: boolean) => void;
+}
+
+function themeConstants2Consts(
+  themeConstants: TThemeConstants
+): TThemeCtx["consts"] {
+  const result: TThemeCtx["consts"] = {} as TThemeCtx["consts"];
+  for (const key in themeConstants) {
+    result[key] = themeConstants[key].hsl().string();
+  }
+  result.raw = themeConstants;
+  return result;
 }
 
 export function isDark(): boolean {
