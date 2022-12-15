@@ -33,7 +33,7 @@ const TooltipPopupBase = styled.div.attrs<{
 }>`
   transition: visibility linear 0.2s, opacity ease-out 0.2s;
 
-  position: absolute;
+  position: fixed;
 
   visibility: hidden;
   opacity: 0;
@@ -58,7 +58,7 @@ const TooltipPopupBase = styled.div.attrs<{
 const TooltipBase = styled.div`
   display: inline-block;
 
-  &:hover ${TooltipPopupBase} {
+  &:hover > ${TooltipPopupBase} {
     visibility: visible;
     opacity: 1;
   }
@@ -140,7 +140,15 @@ export function Tooltip({
         break;
       }
     }
-  }, [position, ref, tipRef, windowInfo.height, windowInfo.width]);
+  }, [
+    position,
+    ref,
+    tipRef,
+    windowInfo.height,
+    windowInfo.width,
+    windowInfo.scrollX,
+    windowInfo.scrollY,
+  ]);
 
   return (
     <TooltipBase ref={setRef}>
