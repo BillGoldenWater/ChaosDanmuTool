@@ -29,3 +29,37 @@ root.render(
     </AppCtxProvider>
   </WindowCtxProvider>
 );
+
+if (debug) {
+  window.addEventListener(
+    "keydown",
+    (e) => {
+      if (e.ctrlKey) {
+        // @ts-ignore
+        let zoom = parseFloat(document.body.style.zoom);
+        if (isNaN(zoom)) zoom = 1.0;
+
+        switch (e.key) {
+          case "=":
+          case "+": {
+            // @ts-ignore
+            zoom *= 1.2;
+            break;
+          }
+          case "-": {
+            zoom *= 0.8;
+            break;
+          }
+          case "0": {
+            zoom = 1.0;
+            break;
+          }
+        }
+
+        // @ts-ignore
+        document.body.style.zoom = zoom.toString();
+      }
+    },
+    true
+  );
+}
