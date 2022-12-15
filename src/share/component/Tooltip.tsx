@@ -16,6 +16,8 @@ export interface TooltipProps {
   tooltip: string | JSX.Element;
 
   position?: "auto" | "top" | "right" | "bottom" | "left";
+
+  lazyLoad?: boolean;
 }
 
 const TooltipPopupBase = styled.div.attrs<{
@@ -68,9 +70,11 @@ export function Tooltip({
   children,
   tooltip,
   position,
+  lazyLoad,
 }: PropsWithChildren<TooltipProps>) {
   const windowInfo = useContext(windowCtx);
 
+  // region position
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
   const [tipRef, setTipRef] = useState<HTMLDivElement | null>(null);
 
@@ -149,18 +153,25 @@ export function Tooltip({
     windowInfo.scrollX,
     windowInfo.scrollY,
   ]);
+  // endregion
+
+  const [inited, setInited] = useState(!lazyLoad);
 
   return (
-    <TooltipBase ref={setRef}>
+    <TooltipBase ref={setRef} onMouseEnter={setInited.bind(undefined, true)}>
       {children}
-      <TooltipPopupBase
-        ref={setTipRef}
-        left={Math.max(offset[0], 0)}
-        top={Math.max(offset[1], 0)}
-        marginPos={marginPos}
-      >
-        {tooltip}
-      </TooltipPopupBase>
+      {inited ? (
+        <TooltipPopupBase
+          ref={setTipRef}
+          left={Math.max(offset[0], 0)}
+          top={Math.max(offset[1], 0)}
+          marginPos={marginPos}
+        >
+          {tooltip}
+        </TooltipPopupBase>
+      ) : (
+        <></>
+      )}
     </TooltipBase>
   );
 }
