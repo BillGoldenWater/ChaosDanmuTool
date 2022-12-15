@@ -72,7 +72,7 @@ const MenuBase = styled.div`
 
   background-color: ${(props) => props.theme.consts.contentBackground};
 
-  overflow: auto;
+  //overflow: hidden; weird issue
 `;
 
 function Menu({ defaultKey, menuItems, menuOnClick }: MenuProps) {
