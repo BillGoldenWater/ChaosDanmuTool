@@ -46,6 +46,7 @@
     "@tauri-apps/api": "1.2.0",
     "color": "4.2.3",
     "dot-prop": "7.2.0",
+    "framer-motion": "7.10.0",
     "html2canvas": "1.4.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
