@@ -231,7 +231,7 @@ export function ThemeCtxProvider({ children }: PropsWithChildren) {
 
   const [selectable, setSelectable] = useState(false);
   useLayoutEffect(() => {
-    function onKeyPress(e: KeyboardEvent) {
+    function onKeyDown(e: KeyboardEvent) {
       if (e.key === "Alt") {
         setSelectable(true);
       }
@@ -244,10 +244,10 @@ export function ThemeCtxProvider({ children }: PropsWithChildren) {
       }
     }
 
-    window.addEventListener("keypress", onKeyPress);
+    window.addEventListener("keydown", onKeyDown);
     window.addEventListener("keyup", onKeyUp);
     return () => {
-      window.removeEventListener("keypress", onKeyPress);
+      window.removeEventListener("keypress", onKeyDown);
       window.addEventListener("keyup", onKeyUp);
     };
   });
