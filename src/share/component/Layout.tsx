@@ -118,6 +118,8 @@ const MenuBase = styled.div`
 
   background-color: ${(props) => props.theme.consts.contentBackground};
 
+  ${(p) => (p.theme.selectable ? "" : "user-select: none")};
+
   //overflow: hidden; weird issue
 `;
 
