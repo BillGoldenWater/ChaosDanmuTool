@@ -5,17 +5,23 @@
 
 import { css } from "styled-components";
 
-export const buttonTransition = css`
+export const buttonTransition = css<{ disabled?: boolean }>`
   transition: background-color ease-out 0.1s,
     transform cubic-bezier(0.1, 0, 0.5, 2) 0.1s;
 
-  cursor: pointer;
+  cursor: ${(p) => (p.disabled ? "not-allowed" : "pointer")};
 
-  &:hover {
-    transform: scale(1.025);
-  }
+  ${(p) => {
+    if (!p.disabled) {
+      return css`
+        &:hover {
+          transform: scale(1.025);
+        }
 
-  &:active {
-    transform: scale(0.95);
-  }
+        &:active {
+          transform: scale(0.95);
+        }
+      `;
+    }
+  }}
 `;
