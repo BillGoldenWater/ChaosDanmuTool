@@ -83,6 +83,7 @@ export async function genConstants(
     background: theme(1).desaturate(0.95).darken(0.85).fade(0.2),
 
     contentBackground: white(0.05),
+    inputBackground: white(0.05),
     buttonBackground: white(0.05),
     buttonPrimaryBackground: theme(0.75),
 
@@ -105,6 +106,7 @@ export async function genConstants(
       background: theme(1).desaturate(0.95).lighten(0.85).fade(0.4),
 
       contentBackground: white(0.9),
+      inputBackground: black(0.1),
       buttonBackground: black(0.1),
       buttonPrimaryBackground: theme(1).lighten(0.4),
 

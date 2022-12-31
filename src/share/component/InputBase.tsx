@@ -6,6 +6,8 @@
 import styled from "styled-components";
 
 export const InputBase = styled.input`
+  outline: none;
+
   padding: 0.45em 0.5em;
 
   border: 0;
