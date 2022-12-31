@@ -80,10 +80,10 @@ export async function genConstants(
     titleText: theme(1).desaturate(0.95).lighten(0.9).fade(0),
     secondaryText: theme(1).desaturate(0.95).lighten(0.9).fade(0.4),
 
-    background: theme(1).desaturate(0.95).darken(0.8).fade(0.2),
+    background: theme(1).desaturate(0.95).darken(0.85).fade(0.2),
 
-    contentBackground: white(0.06),
-    menuItemBackground: white(0.06),
+    contentBackground: white(0.05),
+    menuItemBackground: white(0.05),
     menuItemActiveBackground: theme(0.1),
     tooltipBackground: black(0.15),
   };
