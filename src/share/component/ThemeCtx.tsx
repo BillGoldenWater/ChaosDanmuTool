@@ -83,6 +83,9 @@ export async function genConstants(
     background: theme(1).desaturate(0.95).darken(0.85).fade(0.2),
 
     contentBackground: white(0.05),
+    buttonBackground: white(0.05),
+    buttonPrimaryBackground: theme(0.75),
+
     menuItemBackground: white(0.05),
     menuItemActiveBackground: theme(0.1),
     tooltipBackground: black(0.15),
@@ -102,6 +105,9 @@ export async function genConstants(
       background: theme(1).desaturate(0.95).lighten(0.85).fade(0.4),
 
       contentBackground: white(0.9),
+      buttonBackground: black(0.1),
+      buttonPrimaryBackground: theme(1).lighten(0.4),
+
       menuItemBackground: black(0.06),
       menuItemActiveBackground: theme(0.2),
       tooltipBackground: black(0.1),
