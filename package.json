@@ -48,6 +48,7 @@
     "dot-prop": "7.2.0",
     "framer-motion": "7.10.0",
     "html2canvas": "1.4.1",
+    "normalize.css": "^8.0.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "styled-components": "5.3.6",
