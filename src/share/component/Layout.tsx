@@ -11,6 +11,7 @@ import { Spacer } from "./Spacer";
 import { themeCtx } from "./ThemeCtx";
 import Color from "color";
 import { AnimatePresence, motion } from "framer-motion";
+import { buttonTransition } from "./ButtonTransition";
 
 const layoutSpacing = "0.8em";
 const menuSpacing = "0.4em";
@@ -150,8 +151,7 @@ export interface MenuItemProps extends TMenuItem {
 }
 
 const MenuItemBase = styled.div<{ active: boolean; background: Color }>`
-  transition: background-color ease-out 0.2s,
-    transform cubic-bezier(0.3, 0, 0.4, 1) 0.1s;
+  ${buttonTransition};
 
   display: flex;
 
@@ -164,12 +164,12 @@ const MenuItemBase = styled.div<{ active: boolean; background: Color }>`
 
   &:hover {
     background-color: ${(p) => p.background.opaquer(0.5).string()};
-    transform: scale(1.1);
+    ${(p) => (p.active ? `transform: scale(1.1)` : "")};
   }
 
   &:active {
     background-color: ${(p) => p.background.fade(0.1).string()};
-    transform: scale(0.9);
+    ${(p) => (p.active ? `transform: scale(0.95)` : "")};
   }
 `;
 
