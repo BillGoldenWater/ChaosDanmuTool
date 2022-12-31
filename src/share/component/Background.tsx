@@ -3,22 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React, { PropsWithChildren, useContext } from "react";
-import { themeCtx } from "./ThemeCtx";
+import styled from "styled-components";
 
-export function Background({ children }: PropsWithChildren) {
-  const theme = useContext(themeCtx);
-
-  return (
-    <div
-      css={`
-        width: 100vw;
-        height: 100vh;
-        background-color: ${theme.consts.background};
-        color: ${theme.consts.text};
-      `}
-    >
-      {children}
-    </div>
-  );
-}
+export const Background = styled.div`
+  width: 100vw;
+  height: 100vh;
+  background-color: ${(p) => p.theme.consts.background};
+  color: ${(p) => p.theme.consts.text};
+`;
