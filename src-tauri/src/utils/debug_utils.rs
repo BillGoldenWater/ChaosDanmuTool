@@ -107,10 +107,7 @@ fn get_logger_file_by_path(path: PathBuf) -> Result<File, Error> {
 }
 
 fn gen_logger_file_path(name: String) -> Result<PathBuf, Error> {
-  let log_dir = AppContext::i().data_dir.join("logs");
-  if !log_dir.exists() {
-    fs::create_dir_all(&log_dir)?;
-  }
+  let log_dir = AppContext::i().logs_dir;
 
   Ok(log_dir.join(format!("{name}.log")))
 }
