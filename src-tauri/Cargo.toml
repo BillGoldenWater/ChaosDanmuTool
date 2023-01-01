@@ -66,7 +66,8 @@ thiserror = "1.0.37"
 log = { version = "0.4.17", features = ["max_level_debug", "release_max_level_debug"] }
 fern = { version = "0.6.1", features = ["colored"] }
 clap = { version = "4.0.26", features = ["derive"] }
-human-panic = "1.0.3"
+os_type = "2.6.0"
+toml = "0.5.10"
 ts-rs = "6.2.1"
 # live template: tss
 # #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
