@@ -104,7 +104,7 @@ panic = "abort" # Strip expensive panic clean-up logic
 codegen-units = 1 # Compile crates one after another so the compiler can optimize better
 lto = true # Enables link to optimizations
 opt-level = "s" # Optimize for binary size
-strip = true  # Automatically strip symbols from the binary.
+#strip = true  # Automatically strip symbols from the binary.
 incremental = true
 
 [patch.crates-io]
