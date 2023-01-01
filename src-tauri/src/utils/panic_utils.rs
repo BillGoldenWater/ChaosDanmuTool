@@ -14,7 +14,7 @@ use crate::app_context::AppContext;
 use crate::utils::gen_utils::gen_time_with_uuid;
 
 pub fn setup_panic_hook() {
-  #[cfg(not(debug_assertions))]
+  // #[cfg(not(debug_assertions))]
   std::panic::set_hook(Box::new(handle_panic));
 }
 
@@ -88,12 +88,9 @@ fn create_dump(panic_data: PanicData<'_>) -> Result<PathBuf, DumpCreateError> {
   // endregion
 
   // region get backtrace
-  static SKIP_FRAMES_NUM: usize = 4 + 2 + 6; // 4(backtrace) + 2(panic_utils) + 6(std)
-
   let backtrace = Backtrace::new()
     .frames()
     .iter()
-    .skip(SKIP_FRAMES_NUM)
     .flat_map(|frame| {
       let symbols = frame.symbols();
       if symbols.is_empty() {
@@ -109,13 +106,34 @@ fn create_dump(panic_data: PanicData<'_>) -> Result<PathBuf, DumpCreateError> {
         .collect::<Vec<_>>()
     })
     .collect::<Vec<_>>();
-  let backtrace_filtered = backtrace
+
+  fn is_in_panic(it: &&String) -> bool { // true if current frame still in panic process
+    let started = it.contains("rust_begin_unwind")
+      || it.contains("__mh_execute_header")
+      || it.contains("<unresolved>")
+      || it.contains("<unknown>");
+    !started
+  }
+
+  let backtrace_trimmed = backtrace
+    .iter()
+    .skip_while(is_in_panic)
+    .map(String::clone)
+    .collect::<Vec<_>>();
+
+  let backtrace_filtered = backtrace_trimmed
     .iter()
     .filter(|it| it.contains(panic_data.name.as_ref()))
     .map(String::clone)
     .collect::<Vec<_>>()
     .join("\n");
-  let backtrace_full = backtrace.join("\n");
+  let backtrace_full = backtrace_trimmed.join("\n");
+  let backtrace_extra = backtrace
+    .iter()
+    .take_while(is_in_panic)
+    .map(String::clone)
+    .collect::<Vec<_>>()
+    .join("\n");
   // endregion
 
   // region gen dump
@@ -128,6 +146,7 @@ fn create_dump(panic_data: PanicData<'_>) -> Result<PathBuf, DumpCreateError> {
     location,
     backtrace_filtered,
     backtrace_full,
+    backtrace_extra,
   };
 
   let file_name = format!("cdt_crash_report_{}.toml", gen_time_with_uuid());
@@ -177,6 +196,7 @@ struct PanicDump {
 
   backtrace_filtered: String,
   backtrace_full: String,
+  backtrace_extra: String,
 }
 
 impl PanicDump {
