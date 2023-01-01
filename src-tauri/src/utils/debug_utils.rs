@@ -13,6 +13,7 @@ use fern::FormatCallback;
 use log::{LevelFilter, Record};
 
 use crate::app_context::AppContext;
+use crate::utils::gen_utils::gen_time_with_uuid;
 
 enum LogTarget {
   Stdout,
@@ -88,11 +89,7 @@ fn format_log(out: FormatCallback, message: &Arguments, record: &Record, target:
 }
 
 fn get_logger_file() -> Result<File, Error> {
-  get_logger_file_by_path(gen_logger_file_path(format!(
-    "{ts}_{uuid}",
-    ts = chrono::Local::now().format("%Y-%m-%d_%H-%M-%S_%3f"),
-    uuid = uuid::Uuid::new_v4(),
-  ))?)
+  get_logger_file_by_path(gen_logger_file_path(gen_time_with_uuid())?)
 }
 
 fn get_debug_logger_file() -> Result<File, Error> {
