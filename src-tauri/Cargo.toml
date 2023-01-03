@@ -13,15 +13,14 @@ rust-version = "1.57"
 
 [build-dependencies]
 tauri-build = { version = "1.2.1", features = [] }
-embed-resource = "1.7.4"
 
 #[target.'cfg(target_os = "windows")'.build-dependencies]
-#embed-resource = "1.7.4"
+#embed-resource = "1.8.0"
 
 [dependencies]
 static_object = { git = "https://github.com/BiliGoldenWater/StaticObject.git" }
-serde_json = "1.0.89"
-serde = { version = "1.0.147", features = ["derive"] }
+serde_json = "1.0.91"
+serde = { version = "1.0.152", features = ["derive"] }
 # live template: sddfc (serde default define & function - config)
 #
 # #[serde(default = "$fieldName$_default")]
@@ -38,12 +37,12 @@ serde = { version = "1.0.147", features = ["derive"] }
 #
 # live template: seo (serde empty object)
 # serde_json::from_str("{}").unwrap()
-tauri = { version = "1.2.1", features = ["macos-private-api", "updater", "window-start-dragging"] }
+tauri = { version = "1.2.3", features = ["macos-private-api", "updater", "window-start-dragging"] }
 window-vibrancy = "0.3.2"
-window-shadows = "0.2.0"
+window-shadows = "0.2.1"
 raw-window-handle = "0.5.0"
 futures-util = "0.3.25"
-tokio = { version = "1.22.0", features = ["full"] }
+tokio = { version = "1.23.0", features = ["full"] }
 tokio-tungstenite = { version = "0.18.0", features = ["native-tls"] }
 hyper = { version = "0.14.23", features = ["http1", "http2", "server"] }
 reqwest = { version = "0.11.13", features = ["blocking", "native-tls"] }
@@ -56,16 +55,16 @@ rfd = { version = "0.10.0", features = ["common-controls-v6"] }
 chrono = "0.4.23"
 netstat2 = "0.9.1"
 get-port = "4.0.0"
-sysinfo = "0.27.0"
+sysinfo = "0.27.2"
 async-recursion = "1.0.0"
 sqlx = { version = "0.6.2", features = ["runtime-tokio-native-tls", "sqlite"] }
-base64 = "0.13.1"
+base64 = "0.20.0"
 rand = "0.8.5"
-backtrace = "0.3.66"
-thiserror = "1.0.37"
+backtrace = "0.3.67"
+thiserror = "1.0.38"
 log = { version = "0.4.17", features = ["max_level_debug", "release_max_level_debug"] }
 fern = { version = "0.6.1", features = ["colored"] }
-clap = { version = "4.0.26", features = ["derive"] }
+clap = { version = "4.0.32", features = ["derive"] }
 os_type = "2.6.0"
 toml = "0.5.10"
 ts-rs = "6.2.1"
@@ -89,7 +88,7 @@ winapi = "0.3.9"
 cocoa = "0.24.1"
 objc = "0.2.7"
 MacTypes-sys = "2.1.0"
-libc = "0.2.137"
+libc = "0.2.139"
 
 [features]
 # by default Tauri runs in production mode
@@ -107,6 +106,6 @@ opt-level = "s" # Optimize for binary size
 #strip = true  # Automatically strip symbols from the binary.
 incremental = true
 
-[patch.crates-io]
-tauri = { git = "https://github.com/BiliGoldenWater/tauri.git" }
-tao = { git = "https://github.com/BiliGoldenWater/tao.git" }
+#[patch.crates-io]
+#tauri = { git = "https://github.com/BiliGoldenWater/tauri.git", rev = "75a0c79dea39e3e8372097152a0fa82cf6493686" }
+#tao = { git = "https://github.com/BiliGoldenWater/tao.git" }

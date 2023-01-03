@@ -6,7 +6,7 @@
 use log::info;
 use tauri::{App, Assets, Context};
 
-use crate::app::event::{on_activate, on_exit, on_init, on_ready, on_setup};
+use crate::app::event::{on_exit, on_init, on_ready, on_setup};
 use crate::app::internal_api::invoke_handler;
 use crate::utils::async_utils::run_blocking;
 
@@ -57,12 +57,11 @@ fn run_tauri_app(app: App) {
       info!("exiting");
       run_blocking(on_exit(app_handle));
     }
-    ApplicationShouldHandleReopen { api, .. } => {
-      info!("handling reopen");
-      run_blocking(on_activate(app_handle));
-      api.prevent_default();
-    }
-
+    // ApplicationShouldHandleReopen { api, .. } => {
+    //   info!("handling reopen");
+    //   run_blocking(on_activate(app_handle));
+    //   api.prevent_default();
+    // }
     _ => {}
   });
 }

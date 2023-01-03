@@ -183,6 +183,11 @@ const spinning_keyframes = keyframes`
   }
 `;
 
+const SpinningIcon = styled.div`
+  display: flex;
+  animation: ${spinning_keyframes} 2s linear infinite;
+`;
+
 function MenuItem({
   itemKey,
   text,
@@ -207,16 +212,7 @@ function MenuItem({
     newIcon = icon;
   }
   if (spinning) {
-    newIcon = (
-      <div
-        css={`
-          display: flex;
-          animation: ${spinning_keyframes} 2s linear infinite;
-        `}
-      >
-        {newIcon}
-      </div>
-    );
+    newIcon = <SpinningIcon>{newIcon}</SpinningIcon>;
   }
   // endregion
 
