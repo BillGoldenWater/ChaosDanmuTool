@@ -48,15 +48,16 @@ fn run_tauri_app(app: App) {
       info!("ready");
       run_blocking(on_ready(app_handle))
     }
-    #[cfg(target_os = "macos")]
-    ExitRequested { api, .. } => {
-      api.prevent_exit();
-      info!("exit prevented");
-    }
     Exit => {
       info!("exiting");
       run_blocking(on_exit(app_handle));
     }
+
+    // #[cfg(target_os = "macos")]
+    // ExitRequested { api, .. } => {
+    //   api.prevent_exit();
+    //   info!("exit prevented");
+    // }
     // ApplicationShouldHandleReopen { api, .. } => {
     //   info!("handling reopen");
     //   run_blocking(on_activate(app_handle));
