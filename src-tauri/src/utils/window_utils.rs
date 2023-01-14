@@ -3,19 +3,22 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-#[cfg(target_os = "macos")]
-pub fn set_visible_on_all_workspaces<Window: raw_window_handle::HasRawWindowHandle>(
+use tauri::Window;
+
+#[allow(unused_variables)]
+pub fn set_visible_on_all_workspaces(
   window: &Window,
   visible: bool,
   visible_on_full_screen: bool,
   skip_transform_process_type: bool,
 ) {
+  #[cfg(target_os = "macos")]
   unsafe {
     use crate::utils::process_utils::{get_psn, TransformProcessType};
     use cocoa::appkit::{NSWindow, NSWindowCollectionBehavior};
     use MacTypes_sys::ProcessSerialNumberPtr;
 
-    let ns_window = get_ns_window(window).unwrap();
+    let ns_window = window.ns_window().unwrap() as cocoa::base::id;
 
     // In order for NSWindows to be visible on fullscreen we need to functionally
     // mimic app.dock.hide() since Apple changed the underlying functionality of
@@ -40,43 +43,38 @@ pub fn set_visible_on_all_workspaces<Window: raw_window_handle::HasRawWindowHand
     }
 
     set_collection_behavior(
-      ns_window,
+      window,
       visible,
       NSWindowCollectionBehavior::NSWindowCollectionBehaviorCanJoinAllSpaces,
     );
     set_collection_behavior(
-      ns_window,
+      window,
       visible_on_full_screen,
       NSWindowCollectionBehavior::NSWindowCollectionBehaviorFullScreenAuxiliary,
     );
   }
 }
 
-#[allow(clippy::missing_safety_doc)]
-#[cfg(target_os = "macos")]
-pub unsafe fn set_collection_behavior(
-  ns_window: cocoa::base::id,
+#[allow(unused_variables)]
+pub fn set_collection_behavior(
+  window: &Window,
   enable: bool,
   collection_behavior: cocoa::appkit::NSWindowCollectionBehavior,
 ) {
-  use cocoa::appkit::NSWindow;
+  #[cfg(target_os = "macos")]
+  unsafe {
+    use cocoa::appkit::{NSControl, NSWindow, NSWindowButton};
 
-  if enable {
-    ns_window.setCollectionBehavior_(ns_window.collectionBehavior() | collection_behavior);
-  } else {
-    ns_window.setCollectionBehavior_(ns_window.collectionBehavior() & (!collection_behavior));
-  }
-}
+    let ns_window = window.ns_window().unwrap() as cocoa::base::id;
 
-#[cfg(target_os = "macos")]
-pub fn get_ns_window<Window: raw_window_handle::HasRawWindowHandle>(
-  window: &Window,
-) -> Option<cocoa::base::id> {
-  use raw_window_handle::RawWindowHandle::AppKit;
+    if enable {
+      ns_window.setCollectionBehavior_(ns_window.collectionBehavior() | collection_behavior);
+    } else {
+      ns_window.setCollectionBehavior_(ns_window.collectionBehavior() & (!collection_behavior));
+    }
 
-  if let AppKit(handle) = window.raw_window_handle() {
-    Some(handle.ns_window as cocoa::base::id)
-  } else {
-    None
+    ns_window
+      .standardWindowButton_(NSWindowButton::NSWindowZoomButton)
+      .setEnabled_(cocoa::base::YES);
   }
 }
