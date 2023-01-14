@@ -16,6 +16,7 @@ use crate::get_cfg;
 use crate::network::command_broadcast_server::CommandBroadcastServer;
 use crate::utils::async_utils::run_blocking;
 use crate::utils::immutable_utils::Immutable;
+use crate::utils::window_utils::set_visible_on_all_workspaces;
 
 #[command]
 pub fn show_main_window(app_handle: tauri::AppHandle) {
@@ -61,7 +62,19 @@ pub fn create_main_window(app_handle: tauri::AppHandle) {
     main_window
       .set_always_on_top(true)
       .expect("failed to set always on top of main_window");
-    main_window.open_devtools()
+    main_window.open_devtools();
+
+    #[cfg(target_os = "macos")]
+    {
+      use crate::utils::window_utils::set_collection_behavior;
+      use cocoa::appkit::NSWindowCollectionBehavior;
+
+      set_collection_behavior(
+        &main_window,
+        true,
+        NSWindowCollectionBehavior::NSWindowCollectionBehaviorManaged,
+      );
+    }
   }
 
   #[cfg(any(target_os = "windows", target_os = "macos"))]
@@ -148,10 +161,17 @@ pub fn create_viewer_window(app_handle: &tauri::AppHandle<Wry>) {
     .set_always_on_top(true)
     .expect("failed to set always on top of viewer_window");
 
+  set_visible_on_all_workspaces(&viewer_window, true, true, false);
   #[cfg(target_os = "macos")]
   {
-    use crate::utils::window_utils::set_visible_on_all_workspaces;
-    set_visible_on_all_workspaces(&viewer_window, true, true, false);
+    use crate::utils::window_utils::set_collection_behavior;
+    use cocoa::appkit::NSWindowCollectionBehavior;
+
+    set_collection_behavior(
+      &viewer_window,
+      true,
+      NSWindowCollectionBehavior::NSWindowCollectionBehaviorStationary,
+    );
   }
 
   let _ = window_shadows::set_shadow(viewer_window, false);
