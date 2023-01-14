@@ -63,11 +63,6 @@ pub fn create_main_window(app_handle: tauri::AppHandle) {
       .expect("failed to set always on top of main_window");
     main_window.open_devtools()
   }
-  main_window
-    .set_always_on_top(true)
-    .expect("failed to set always on top of main_window");
-  use crate::utils::window_utils::set_visible_on_all_workspaces;
-  set_visible_on_all_workspaces(&main_window, true, false, false);
 
   #[cfg(any(target_os = "windows", target_os = "macos"))]
   apply_vibrancy_effect(&main_window);
