@@ -11,8 +11,9 @@ pub fn set_visible_on_all_workspaces<Window: raw_window_handle::HasRawWindowHand
   skip_transform_process_type: bool,
 ) {
   unsafe {
-    use crate::utils::process_utils::{get_psn_ptr, TransformProcessType};
+    use crate::utils::process_utils::{get_psn, TransformProcessType};
     use cocoa::appkit::{NSWindow, NSWindowCollectionBehavior};
+    use MacTypes_sys::ProcessSerialNumberPtr;
 
     let ns_window = get_ns_window(window).unwrap();
 
@@ -20,19 +21,21 @@ pub fn set_visible_on_all_workspaces<Window: raw_window_handle::HasRawWindowHand
     // mimic app.dock.hide() since Apple changed the underlying functionality of
     // NSWindows starting with 10.14 to disallow NSWindows from floating on top of
     // fullscreen apps.
+    //
     // from electron:
-    //   https://github.com/electron/electron/blob/c885f9063bda5032fe430bbee724f77b66ce034a/shell/browser/native_window_mac.mm#L1342-L1363
+    //   https://github.com/electron/electron/blob/ad1a09bb10870a73de95232d97886ae273226242/shell/browser/native_window_mac.mm#L1278-L1299
 
     if !skip_transform_process_type {
-      let psn = get_psn_ptr();
+      let mut psn = get_psn();
+      let psn_ptr = (&mut psn) as ProcessSerialNumberPtr;
       use objc::runtime::{NO, YES};
 
       if visible_on_full_screen {
         ns_window.setCanHide_(NO);
-        TransformProcessType(psn, 4);
+        TransformProcessType(psn_ptr, 4); // kProcessTransformToUIElementApplication = 4
       } else {
         ns_window.setCanHide_(YES);
-        TransformProcessType(psn, 1);
+        TransformProcessType(psn_ptr, 1); // kProcessTransformToForegroundApplication = 1
       }
     }
 

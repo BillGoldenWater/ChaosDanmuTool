@@ -13,11 +13,6 @@ extern "C" {
 }
 
 #[cfg(target_os = "macos")]
-pub fn get_psn_ptr() -> *mut MacTypes_sys::ProcessSerialNumber {
-  &mut get_psn() as *mut MacTypes_sys::ProcessSerialNumber
-}
-
-#[cfg(target_os = "macos")]
 pub fn get_psn() -> MacTypes_sys::ProcessSerialNumber {
   MacTypes_sys::ProcessSerialNumber {
     highLongOfPSN: 0,
