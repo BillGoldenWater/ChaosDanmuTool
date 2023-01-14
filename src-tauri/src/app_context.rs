@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Golden_Water
+ * Copyright 2021-2023 Golden_Water
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
@@ -65,7 +65,8 @@ impl AppContext {
       std::fs::create_dir_all(&ctx.data_dir).expect("unable to create app data dir");
       std::fs::create_dir_all(&ctx.cache_dir).expect("unable to create app cache dir");
       std::fs::create_dir_all(&ctx.logs_dir).expect("unable to create app logs dir");
-      std::fs::create_dir_all(&ctx.crash_report_dir).expect("unable to create app crash report dir");
+      std::fs::create_dir_all(&ctx.crash_report_dir)
+        .expect("unable to create app crash report dir");
 
       unsafe { APP_CONTEXT = Box::leak(Box::new(ctx)) }
     });

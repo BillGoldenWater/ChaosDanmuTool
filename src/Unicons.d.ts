@@ -1,7 +1,7 @@
 // noinspection JSUnusedGlobalSymbols,SpellCheckingInspection
 
 /*
- * Copyright 2021-2022 Golden_Water
+ * Copyright 2021-2023 Golden_Water
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 

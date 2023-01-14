@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Golden_Water
+ * Copyright 2021-2023 Golden_Water
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
@@ -107,7 +107,8 @@ fn create_dump(panic_data: PanicData<'_>) -> Result<PathBuf, DumpCreateError> {
     })
     .collect::<Vec<_>>();
 
-  fn is_in_panic(it: &&String) -> bool { // true if current frame still in panic process
+  fn is_in_panic(it: &&String) -> bool {
+    // true if current frame still in panic process
     let started = it.contains("rust_begin_unwind")
       || it.contains("__mh_execute_header")
       || it.contains("<unresolved>")

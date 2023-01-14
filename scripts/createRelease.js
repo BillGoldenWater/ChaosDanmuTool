@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Golden_Water
+ * Copyright 2021-2023 Golden_Water
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
@@ -11,8 +11,11 @@ function highlightLog(msg) {
 }
 
 module.exports = async ({ github, context }) => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const semver = require("semver");
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const path = require("path");
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const fs = require("fs/promises");
 
   // noinspection JSFileReferences
