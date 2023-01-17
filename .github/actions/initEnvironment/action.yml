@@ -22,9 +22,12 @@ runs:
       run: |
         sudo apt-get update
         sudo apt-get install -y libgtk-3-dev webkit2gtk-4.0 libappindicator3-dev librsvg2-dev patchelf
+      shell: "bash"
 
     - name: yarn install
       run: yarn install
+      shell: "bash"
 
     - name: mkdir dist
       run: mkdir dist
+      shell: "bash"
