@@ -1,4 +1,4 @@
-name: Test Build
+name: Build
 
 on:
   workflow_dispatch:
@@ -14,50 +14,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: install Node.js 18.x
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.x
-
-      - name: install Rust stable
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-
-      - name: get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-
-      - name: cache yarn
-        uses: actions/cache@v3
-        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: universal-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            universal-yarn
-
-      - name: cache cargo and target
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cargo/
-            ./src-tauri/target/
-          key: ${{ runner.os }}-cargo-${{ github.run_id }}
-          restore-keys: |
-            ${{ runner.os }}-cargo
-
-      - name: install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-latest'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev webkit2gtk-4.0 libappindicator3-dev librsvg2-dev patchelf
-
-      - name: yarn install
-        run: yarn install
-
-      - name: mkdir dist
-        run: mkdir dist
+      - name: init environment
+        uses: ./.github/actions/initEnvironment.yml
 
       - name: before build
         if: success()

@@ -24,24 +24,7 @@ function highlightLog(msg) {
 }
 
 async function main() {
-  // region add macOS targets
-  highlightLog("add targets");
-
-  switch (process.platform) {
-    case "darwin": {
-      execCommand("rustup target add x86_64-apple-darwin aarch64-apple-darwin");
-      break;
-    }
-    case "linux": {
-      execCommand("rustup target add x86_64-unknown-linux-gnu");
-      break;
-    }
-    case "win32": {
-      execCommand("rustup target add x86_64-pc-windows-msvc");
-      break;
-    }
-  }
-  // endregion
+  await import("./rustupAddTargets.mjs");
 
   // region install tool
   highlightLog("install cargo tauri-cli");

@@ -1,0 +1,31 @@
+name: "Cache yarn and cargo"
+description: ""
+
+runs:
+  using: "composite"
+  steps:
+    - name: get yarn cache directory path
+      id: yarn-cache-dir-path
+      run: echo "::set-output name=dir::$(yarn cache dir)"
+      shell: "bash"
+
+    - name: cache yarn
+      uses: actions/cache@v3
+      id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+      with:
+        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+        key: universal-yarn-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          universal-yarn-${{ hashFiles('**/yarn.lock') }}
+          universal-yarn
+
+    - name: cache cargo and target
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/
+          ./src-tauri/target/
+        key: ${{ runner.os }}-cargo-${{ github.run_id }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-${{ github.run_id }}
+          ${{ runner.os }}-cargo

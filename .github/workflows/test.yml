@@ -1,0 +1,29 @@
+name: Test Build
+
+on:
+  push:
+    branches:
+      - dev
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ macos-latest, ubuntu-latest, windows-latest ]
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: init environment
+        uses: ./.github/actions/initEnvironment.yml
+
+      - name: test build frontend
+        if: success()
+        run: yarn build
+
+      - name: backend lint
+        if: success()
+        run: node scripts/backendLint.mjs
