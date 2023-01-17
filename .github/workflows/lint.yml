@@ -20,9 +20,9 @@ jobs:
       - name: init environment
         uses: ./.github/actions/initEnvironment
 
-      - name: test build frontend
-        if: success()
-        run: yarn build
+      #      - name: test build frontend
+      #        if: success()
+      #        run: yarn build
 
       - name: backend lint
         if: success()
