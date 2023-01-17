@@ -16,7 +16,6 @@ runs:
         path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
         key: universal-yarn-${{ hashFiles('**/yarn.lock') }}
         restore-keys: |
-          universal-yarn-${{ hashFiles('**/yarn.lock') }}
           universal-yarn
 
     - name: cache cargo and target
@@ -27,5 +26,4 @@ runs:
           ./src-tauri/target/
         key: ${{ runner.os }}-cargo-${{ github.run_id }}
         restore-keys: |
-          ${{ runner.os }}-cargo-${{ github.run_id }}
           ${{ runner.os }}-cargo
