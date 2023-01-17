@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: init environment
-        uses: ./.github/actions/initEnvironment.yml
+        uses: ./.github/actions/initEnvironment
 
       - name: before build
         if: success()
