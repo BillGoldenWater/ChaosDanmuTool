@@ -24,7 +24,8 @@ runs:
         path: |
           ~/.cargo/
           ./src-tauri/target/
-        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-${{ hashFiles('~/.cargo/**/*') }}
         #        key: ${{ runner.os }}-cargo-${{ github.run_id }}
         restore-keys: |
+          ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           ${{ runner.os }}-cargo
