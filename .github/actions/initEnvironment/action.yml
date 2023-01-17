@@ -4,6 +4,8 @@ description: ""
 runs:
   using: "composite"
   steps:
+    - uses: actions/checkout@v2
+
     - name: install Node.js 18.x
       uses: actions/setup-node@v3
       with:
