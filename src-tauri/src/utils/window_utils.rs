@@ -56,12 +56,12 @@ pub fn set_visible_on_all_workspaces(
 }
 
 #[allow(unused_variables)]
+#[cfg(target_os = "macos")]
 pub fn set_collection_behavior(
   window: &Window,
   enable: bool,
   collection_behavior: cocoa::appkit::NSWindowCollectionBehavior,
 ) {
-  #[cfg(target_os = "macos")]
   unsafe {
     use cocoa::appkit::{NSControl, NSWindow, NSWindowButton};
 
