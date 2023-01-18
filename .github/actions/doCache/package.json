@@ -3,12 +3,17 @@
   "version": "1.0.0",
   "description": "",
   "main": "main.js",
-  "scripts": {},
+  "scripts": {
+    "build": "rm -rf out && npx ncc build main.js -m -o out/main && npx ncc build post.js -m -o out/post"
+  },
   "author": "Golden_Water",
   "license": "MIT",
   "dependencies": {
     "@actions/cache": "^3.1.2",
     "@actions/core": "^1.10.0",
     "@actions/github": "^5.1.1"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "^0.36.0"
   }
 }

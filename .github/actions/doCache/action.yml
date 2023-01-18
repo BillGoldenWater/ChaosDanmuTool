@@ -3,5 +3,5 @@ description: ""
 
 runs:
   using: node16
-  main: "dist/main.js"
-  post: "dist/post.js"
+  main: "out/main/index.js"
+  post: "out/post/index.js"
