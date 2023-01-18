@@ -48,9 +48,9 @@ async function getFolderSize(path) {
 }
 
 export async function main() {
-  // const yarnPath = execCommand("yarn cache dir").toString().trim();
-  //
-  // const yarnHash = getHash("yarn.lock");
+  const yarnPath = execCommand("yarn cache dir").toString().trim();
+
+  const yarnHash = getHash("yarn.lock");
   const cargoHash = getHash("src-tauri/Cargo.lock");
 
   const crateVersions = [];
@@ -58,8 +58,8 @@ export async function main() {
 
   const targetSize = await getFolderSize("./src-tauri/target");
 
-  // console.log(`yarnPath=${yarnPath}`);
-  // console.log(`yarnCacheKey=${yarnHash}`);
+  console.log(`yarnPath=${yarnPath}`);
+  console.log(`yarnCacheKey=${yarnHash}`);
   console.log(
     `cargoCacheKey=${cargoHash}-${targetSize}-${crateVersions.join("_")}`
   );
