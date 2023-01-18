@@ -40,3 +40,6 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           path: out/*
+
+      - name: save cache
+        uses: ./.github/actions/saveCache

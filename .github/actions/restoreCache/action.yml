@@ -1,0 +1,29 @@
+name: "Restore cache"
+description: ""
+
+runs:
+  using: "composite"
+  steps:
+    - name: gen cache variables
+      id: gen-vars
+      run: node scripts/genCacheVariables.mjs >> $GITHUB_OUTPUT
+      shell: "bash"
+
+    - name: restore yarn
+      uses: actions/cache/restore@v3
+      with:
+        path: ${{ steps.gen-vars.outputs.yarnPath }}
+        key: ${{ runner.os }}-yarn-${{ steps.gen-vars.outputs.yarnCacheKey }}
+        restore-keys: |
+          ${{ runner.os }}-yarn
+
+    - name: restore cargo and target
+      uses: actions/cache/restore@v3
+      with:
+        path: |
+          ~/.cargo/
+          ./src-tauri/target/
+        key: ${{ runner.os }}-cargo-${{ steps.gen-vars.outputs.cargoCacheKey }}
+        #        key: ${{ runner.os }}-cargo-${{ github.run_id }}
+        restore-keys: |
+          ${{ runner.os }}-cargo

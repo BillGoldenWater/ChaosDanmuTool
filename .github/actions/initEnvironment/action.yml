@@ -19,8 +19,8 @@ runs:
       with:
         toolchain: stable
 
-    - name: cache yarn and cargo
-      uses: ./.github/actions/cacheYarnAndCargo
+    - name: restore cache
+      uses: ./.github/actions/restoreCache
       if: inputs.requireCache == 'true'
 
     - name: install dependencies (ubuntu only)
