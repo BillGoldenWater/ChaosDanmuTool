@@ -32,7 +32,7 @@ function highlightLog(msg) {
  * @param {string} target
  */
 function clippy(target) {
-  execCommand(`cargo clippy --target ${target} -- -Dwarnings`, "src-tauri");
+  execCommand(`cargo clippy -r --target ${target} -- -Dwarnings`, "src-tauri");
 }
 
 export async function main() {
