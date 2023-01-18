@@ -11,7 +11,7 @@ runs:
 
     - name: gen cache keys
       id: cache-keys
-      run: node scripts/genCacheKeys.mjs
+      run: node scripts/genCacheKeys.mjs >> $GITHUB_OUTPUT
       shell: "bash"
 
     - name: cache yarn
