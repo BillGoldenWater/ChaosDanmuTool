@@ -4,7 +4,7 @@ inputs:
   requireCache:
     description: "require cache or not"
     required: false
-    default: "false"
+    default: "true"
 
 runs:
   using: "composite"
