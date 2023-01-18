@@ -7,16 +7,20 @@ const core = require("@actions/core");
 const cache = require("@actions/cache");
 const { gen } = require("./genCacheInfos.mjs");
 
-try {
-  let cacheItems = gen();
+async function main() {
+  try {
+    let cacheItems = gen();
 
-  for (let cacheItem of cacheItems) {
-    await cache.restoreCache(
-      cacheItem.paths,
-      cacheItem.key,
-      cacheItem.restoreKeys
-    );
+    for (let cacheItem of cacheItems) {
+      await cache.restoreCache(
+        cacheItem.paths,
+        cacheItem.key,
+        cacheItem.restoreKeys
+      );
+    }
+  } catch (error) {
+    core.setFailed(error.message);
   }
-} catch (error) {
-  core.setFailed(error.message);
 }
+
+main().then();
