@@ -71,7 +71,6 @@
     "eslint-plugin-prettier": "4.2.1",
     "eslint-plugin-react": "7.31.11",
     "eslint-plugin-react-hooks": "4.6.0",
-    "fast-folder-size": "^1.7.1",
     "internal-ip": "7.0.0",
     "semver": "7.3.8",
     "toml-patch": "0.2.3",
