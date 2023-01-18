@@ -1,6 +1,7 @@
 import { execSync } from "child_process";
 import fs from "fs";
 import crypto from "crypto";
+import { join as pathJoin } from "path";
 
 /**
  * @param command {string}
@@ -33,6 +34,20 @@ function getHash(path) {
   return hash.digest("hex");
 }
 
+function dirSize(dirPath) {
+  const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+
+  const sizes = entries.map((entry) => {
+    const path = pathJoin(dirPath, entry.name);
+
+    if (entry.isFile()) return fs.statSync(path).size;
+    else if (entry.isDirectory()) return dirSize(path);
+    else return 0;
+  });
+
+  return sizes.flat(Infinity).reduce((p, c) => p + c, 0);
+}
+
 export async function main() {
   const yarnPath = execCommand("yarn cache dir").toString().trim();
 
@@ -40,12 +55,17 @@ export async function main() {
   const cargoHash = getHash("src-tauri/Cargo.lock");
 
   const crateVersions = [];
-
   crateVersions.push(getCargoCrateVersion("tauri-cli"));
+
+  const targetSize = dirSize("src-tauri/target");
 
   console.log(`yarnPath=${yarnPath}`);
   console.log(`yarnCacheKey=${yarnHash}`);
-  console.log(`cargoCacheKey=${cargoHash}-${crateVersions.join("_")}`);
+  console.log(
+    `cargoCacheKey=${cargoHash}-${crateVersions
+      .map((it) => it.replace("-", "_"))
+      .join("-")}-${targetSize}`
+  );
 }
 
 main().then();
