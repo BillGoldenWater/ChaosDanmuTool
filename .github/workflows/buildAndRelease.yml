@@ -16,6 +16,8 @@ jobs:
 
       - name: init environment
         uses: ./.github/actions/initEnvironment
+        with:
+          requireCache: "false"
 
       - uses: actions/download-artifact@v3
         with:
