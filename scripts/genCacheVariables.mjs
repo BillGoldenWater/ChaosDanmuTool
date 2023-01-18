@@ -44,8 +44,8 @@ export async function main() {
   crateVersions.push(getCargoCrateVersion("tauri-cli"));
 
   console.log(`yarnPath=${yarnPath}`);
-  console.log(`yarn=${yarnHash}`);
-  console.log(`cargo=${cargoHash}-${crateVersions.join("_")}`);
+  console.log(`yarnCacheKey=${yarnHash}`);
+  console.log(`cargoCacheKey=${cargoHash}-${crateVersions.join("_")}`);
 }
 
 main().then();
