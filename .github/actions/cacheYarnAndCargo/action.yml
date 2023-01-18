@@ -9,12 +9,17 @@ runs:
       run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
       shell: "bash"
 
+    - name: gen cache keys
+      id: cache-keys
+      run: node scripts/genCacheKeys.mjs
+      shell: "bash"
+
     - name: cache yarn
       uses: actions/cache@v3
       id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
       with:
         path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+        key: ${{ runner.os }}-yarn-${{ steps.cache-keys.outputs.yarn }}
         restore-keys: |
           ${{ runner.os }}-yarn
 
@@ -24,8 +29,7 @@ runs:
         path: |
           ~/.cargo/
           ./src-tauri/target/
-        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-${{ hashFiles('~/.cargo/bin/**') }}
+        key: ${{ runner.os }}-cargo-${{ steps.cache-keys.outputs.cargo }}
         #        key: ${{ runner.os }}-cargo-${{ github.run_id }}
         restore-keys: |
-          ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           ${{ runner.os }}-cargo
