@@ -27,6 +27,3 @@ jobs:
       - name: backend lint
         if: success()
         run: node scripts/backendLint.mjs
-        
-      - name: save cache
-        uses: ./.github/actions/saveCache

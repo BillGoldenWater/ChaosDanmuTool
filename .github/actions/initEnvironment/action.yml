@@ -1,4 +1,4 @@
-name: "Cache yarn and cargo"
+name: "Init environment"
 description: ""
 inputs:
   requireCache:
@@ -19,8 +19,8 @@ runs:
       with:
         toolchain: stable
 
-    - name: restore cache
-      uses: ./.github/actions/restoreCache
+    - name: do cache
+      uses: ./.github/actions/doCache
       if: inputs.requireCache == 'true'
 
     - name: install dependencies (ubuntu only)
