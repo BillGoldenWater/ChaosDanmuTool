@@ -56,6 +56,7 @@ function dirSize(dirPath) {
 
 /**
  * @typedef {Object} CacheItem
+ * @property {string} id
  * @property {string[]} paths
  * @property {string} key
  * @property {string[]} restoreKeys
@@ -83,11 +84,13 @@ export function gen() {
 
   return [
     {
+      id: "yarn",
       paths: [yarnPath],
       key: yarnCacheKey,
       restoreKeys: [`yarn-${platform}`, `yarn`],
     },
     {
+      id: "cargo",
       paths: ["~/.cargo/", "./src-tauri/target/"],
       key: cargoCacheKey,
       restoreKeys: [

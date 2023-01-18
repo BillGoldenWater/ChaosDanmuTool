@@ -19,6 +19,11 @@ async function main() {
     let cacheItems = gen();
 
     for (let cacheItem of cacheItems) {
+      if (core.getState(`${cacheItem.id}_cacheKey`) === cacheItem.key) {
+        highlightLog(`cache ${cacheItem.key} exists, skipped.`);
+        continue;
+      }
+
       highlightLog(`saving ${cacheItem.key}`);
       try {
         await cache.saveCache(cacheItem.paths, cacheItem.key);

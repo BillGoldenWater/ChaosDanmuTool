@@ -25,13 +25,17 @@ async function main() {
         cacheItem.key,
         cacheItem.restoreKeys
       );
+
       if (hit_key === undefined) {
         highlightLog(`failed to restore ${cacheItem.key}`);
+        continue;
       } else if (hit_key !== cacheItem.key) {
         highlightLog(`unable to find ${cacheItem.key}, fallback to ${hit_key}`);
       } else {
         highlightLog(`${hit_key} restored`);
       }
+
+      core.saveState(`${cacheItem.id}_cacheKey`, hit_key);
     }
   } catch (error) {
     core.setFailed(error.message);
