@@ -21,7 +21,7 @@ runs:
 
     - name: cache yarn and cargo
       uses: ./.github/actions/cacheYarnAndCargo
-      if: ${{ inputs.requireCache == "true" }}
+      if: inputs.requireCache == "true"
 
     - name: install dependencies (ubuntu only)
       if: matrix.platform == 'ubuntu-latest'
