@@ -34,6 +34,8 @@ function getHash(path) {
 }
 
 export async function main() {
+  const yarnPath = execCommand("yarn cache dir").toString().trim();
+
   const yarnHash = getHash("yarn.lock");
   const cargoHash = getHash("src-tauri/Cargo.lock");
 
@@ -41,6 +43,7 @@ export async function main() {
 
   crateVersions.push(getCargoCrateVersion("tauri-cli"));
 
+  console.log(`yarnPath=${yarnPath}`);
   console.log(`yarn=${yarnHash}`);
   console.log(`cargo=${cargoHash}-${crateVersions.join("_")}`);
 }

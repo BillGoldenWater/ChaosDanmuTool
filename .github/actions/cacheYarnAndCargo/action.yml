@@ -4,22 +4,17 @@ description: ""
 runs:
   using: "composite"
   steps:
-    - name: get yarn cache directory path
-      id: yarn-cache-dir-path
-      run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
-      shell: "bash"
-
-    - name: gen cache keys
-      id: cache-keys
-      run: node scripts/genCacheKeys.mjs >> $GITHUB_OUTPUT
+    - name: gen cache variables
+      id: cache-vars
+      run: node scripts/genCacheVariables.mjs >> $GITHUB_OUTPUT
       shell: "bash"
 
     - name: cache yarn
       uses: actions/cache@v3
       id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
       with:
-        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-        key: ${{ runner.os }}-yarn-${{ steps.cache-keys.outputs.yarn }}
+        path: ${{ steps.cache-vars.outputs.yarnPath }}
+        key: ${{ runner.os }}-yarn-${{ steps.cache-vars.outputs.yarn }}
         restore-keys: |
           ${{ runner.os }}-yarn
 
@@ -29,7 +24,7 @@ runs:
         path: |
           ~/.cargo/
           ./src-tauri/target/
-        key: ${{ runner.os }}-cargo-${{ steps.cache-keys.outputs.cargo }}
+        key: ${{ runner.os }}-cargo-${{ steps.cache-vars.outputs.cargo }}
         #        key: ${{ runner.os }}-cargo-${{ github.run_id }}
         restore-keys: |
           ${{ runner.os }}-cargo
