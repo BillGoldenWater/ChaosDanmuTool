@@ -1,6 +1,7 @@
 import { execSync } from "child_process";
 import fs from "fs";
 import crypto from "crypto";
+import fastFolderSize from "fast-folder-size";
 
 /**
  * @param command {string}
@@ -33,6 +34,19 @@ function getHash(path) {
   return hash.digest("hex");
 }
 
+/**
+ * @param {string} path
+ * @return { Promise<number> }
+ */
+async function getFolderSize(path) {
+  return new Promise((resolve, reject) => {
+    fastFolderSize(path, (err, bytes) => {
+      if (err) reject(err);
+      else resolve(bytes);
+    });
+  });
+}
+
 export async function main() {
   const yarnPath = execCommand("yarn cache dir").toString().trim();
 
@@ -40,12 +54,15 @@ export async function main() {
   const cargoHash = getHash("src-tauri/Cargo.lock");
 
   const crateVersions = [];
-
   crateVersions.push(getCargoCrateVersion("tauri-cli"));
+
+  const targetSize = await getFolderSize("./src-tauri/target");
 
   console.log(`yarnPath=${yarnPath}`);
   console.log(`yarnCacheKey=${yarnHash}`);
-  console.log(`cargoCacheKey=${cargoHash}-${crateVersions.join("_")}`);
+  console.log(
+    `cargoCacheKey=${cargoHash}-${targetSize}-${crateVersions.join("_")}`
+  );
 }
 
 main().then();
