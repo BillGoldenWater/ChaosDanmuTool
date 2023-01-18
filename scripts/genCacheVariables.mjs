@@ -34,7 +34,12 @@ function getHash(path) {
   return hash.digest("hex");
 }
 
+/**
+ * @param {string} dirPath
+ */
 function dirSize(dirPath) {
+  if (!fs.existsSync(dirPath)) return 0;
+
   const entries = fs.readdirSync(dirPath, { withFileTypes: true });
 
   const sizes = entries.map((entry) => {
