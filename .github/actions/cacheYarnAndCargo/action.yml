@@ -5,16 +5,15 @@ runs:
   using: "composite"
   steps:
     - name: gen cache variables
-      id: cache-vars
-      run: node scripts/genCacheVariables.mjs >> $GITHUB_OUTPUT
+      run: node scripts/genCacheVariables.mjs >> $GITHUB_STATE
       shell: "bash"
 
     - name: cache yarn
       uses: actions/cache@v3
       id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
       with:
-        path: ${{ steps.cache-vars.outputs.yarnPath }}
-        key: ${{ runner.os }}-yarn-${{ steps.cache-vars.outputs.yarn }}
+        path: ${{ env.STATE_yarnPath }}
+        key: ${{ runner.os }}-yarn-${{ env.STATE_yarn }}
         restore-keys: |
           ${{ runner.os }}-yarn
 
@@ -24,7 +23,7 @@ runs:
         path: |
           ~/.cargo/
           ./src-tauri/target/
-        key: ${{ runner.os }}-cargo-${{ steps.cache-vars.outputs.cargo }}
+        key: ${{ runner.os }}-cargo-${{ env.STATE_cargo }}
         #        key: ${{ runner.os }}-cargo-${{ github.run_id }}
         restore-keys: |
           ${{ runner.os }}-cargo
