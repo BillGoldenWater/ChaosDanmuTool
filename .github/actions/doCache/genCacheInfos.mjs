@@ -87,7 +87,7 @@ export function gen() {
       restoreKeys: [`yarn-${os}`, `yarn`],
     },
     {
-      paths: [""],
+      paths: ["~/.cargo/", "./src-tauri/target/"],
       key: cargoCacheKey,
       restoreKeys: [`cargo-${os}-${cargoHash}`, `cargo-${os}`],
     },
