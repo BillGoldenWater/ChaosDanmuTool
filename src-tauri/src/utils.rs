@@ -5,6 +5,7 @@
 
 pub mod async_utils;
 pub mod brotli_utils;
+pub mod bytes_utils;
 pub mod console_utils;
 pub mod db_utils;
 pub mod debug_utils;
@@ -12,7 +13,6 @@ pub mod dialog_utils;
 pub mod fs_utils;
 pub mod gen_utils;
 pub mod immutable_utils;
-pub mod mut_bytes_utils;
 pub mod mutex_utils;
 pub mod panic_utils;
 pub mod process_utils;

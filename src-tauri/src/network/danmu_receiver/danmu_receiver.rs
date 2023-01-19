@@ -7,7 +7,6 @@ use std::borrow::Cow;
 use std::str::FromStr;
 use std::time::Instant;
 
-use bytes::{Buf, BytesMut};
 use log::{error, info, warn};
 use serde_json::Value;
 use static_object::StaticObject;
@@ -29,7 +28,6 @@ use crate::command::command_packet::bilibili_command::BiliBiliCommand;
 use crate::command::command_packet::CommandPacket;
 use crate::config::config::backend_config::danmu_receiver_config::DanmuReceiverConfig;
 use crate::config::config_manager::{modify_cfg, ConfigManager};
-use crate::get_cfg;
 use crate::network::api_request::bilibili_response::Error::EmptyData;
 use crate::network::api_request::danmu_server_info_getter::{self, DanmuServerInfoGetter};
 use crate::network::api_request::room_info_getter::{self, RoomInfoGetter};
@@ -42,10 +40,11 @@ use crate::network::danmu_receiver::op_code::OpCode;
 use crate::network::danmu_receiver::packet::{JoinPacketInfo, Packet};
 use crate::network::websocket::websocket_connection::WebSocketConnectError;
 use crate::network::websocket::websocket_connection_reusable::WebSocketConnectionReusable;
+use crate::utils::bytes_utils::bytes_to_hex;
 use crate::utils::immutable_utils::Immutable;
-use crate::utils::mut_bytes_utils::bytes_to_hex;
 use crate::utils::trace_utils::print_trace;
 use crate::utils::ws_utils::close_frame;
+use crate::{b_get, get_cfg};
 
 type Url = String;
 type Token = String;
@@ -312,7 +311,7 @@ impl DanmuReceiver {
   async fn on_message(&mut self, message: Message) {
     match message {
       Message::Binary(data) => {
-        let packets = Packet::from_bytes(&mut BytesMut::from(data.as_slice()));
+        let packets = Packet::from_bytes(&data.as_slice());
 
         for packet in packets {
           self.parse_packet(packet).await;
@@ -354,7 +353,7 @@ impl DanmuReceiver {
       .await
   }
 
-  async fn parse_packet(&mut self, mut packet: Packet) {
+  async fn parse_packet(&mut self, packet: Packet) {
     match packet.op_code {
       OpCode::JoinResponse => {}
       OpCode::HeartbeatResponse => {
@@ -369,7 +368,8 @@ impl DanmuReceiver {
 
         self.connected_data.heartbeat_received = true;
 
-        let activity = packet.body.get_u32();
+        let mut offset = 0;
+        let activity = b_get!(@u32, packet.body, offset);
         CommandBroadcastServer::i()
           .broadcast_bilibili_command(BiliBiliCommand::from_activity_update(ActivityUpdate::new(
             activity,

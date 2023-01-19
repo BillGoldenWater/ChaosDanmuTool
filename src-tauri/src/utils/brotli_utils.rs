@@ -18,7 +18,7 @@ lazy_static! {
   };
 }
 
-pub fn brotli_compress(data: &Vec<u8>) -> Result<Vec<u8>> {
+pub fn brotli_compress<D: AsRef<[u8]>>(data: &D) -> Result<Vec<u8>> {
   let mut compressed = vec![];
 
   brotli::BrotliCompress(
@@ -34,7 +34,7 @@ pub fn brotli_compress_str(data: String) -> Result<String> {
   Ok(base64::encode(brotli_compress(&data.as_bytes().to_vec())?))
 }
 
-pub fn brotli_decompress(data: &Vec<u8>) -> Result<Vec<u8>> {
+pub fn brotli_decompress<D: AsRef<[u8]>>(data: &D) -> Result<Vec<u8>> {
   let mut decompressed = vec![];
 
   brotli::BrotliDecompress(&mut Cursor::new(data), &mut Cursor::new(&mut decompressed))?;
