@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-use crate::utils::async_utils::run_blocking;
+use std::borrow::Cow;
+
 use futures_util::stream::{SplitSink, SplitStream};
 use futures_util::{SinkExt, StreamExt};
 use log::{error, info};
-use std::borrow::Cow;
 use tokio::{
   net::TcpStream,
   sync::{
@@ -21,7 +21,8 @@ use tokio_tungstenite::tungstenite::protocol::CloseFrame;
 use tokio_tungstenite::tungstenite::Error;
 use tokio_tungstenite::{connect_async, tungstenite::Message, MaybeTlsStream, WebSocketStream};
 
-use crate::utils::mutex_utils::{a_lock, lock};
+use crate::utils::async_utils::run_blocking;
+use crate::utils::mutex_utils::a_lock;
 
 type WebSocket = WebSocketStream<MaybeTlsStream<TcpStream>>;
 type WebSocketWriter = SplitSink<WebSocket, Message>;
@@ -137,12 +138,12 @@ impl WebSocketConnection {
     result
   }
 
-  pub fn is_connected(&self) -> bool {
-    *lock(&self.connected)
+  pub async fn is_connected(&self) -> bool {
+    *a_lock(&self.connected).await
   }
 
-  pub fn get_id(&self) -> String {
-    self.connection_id.clone()
+  pub fn get_id(&self) -> &ConnectionId {
+    &self.connection_id
   }
 
   fn start_recv_loop(reader: WebSocketReader, tx: UnboundedSender<Message>) {
@@ -188,10 +189,12 @@ impl WebSocketConnection {
 
 impl Drop for WebSocketConnection {
   fn drop(&mut self) {
-    if self.is_connected() {
-      run_blocking(self.disconnect(None));
-      info!("{}: closed on drop", self.connection_id);
-    }
+    run_blocking(async {
+      if self.is_connected().await {
+        self.disconnect(None).await;
+        info!("{}: closed on drop", self.connection_id);
+      }
+    });
   }
 }
 

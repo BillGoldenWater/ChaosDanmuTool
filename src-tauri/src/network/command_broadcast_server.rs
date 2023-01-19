@@ -4,13 +4,11 @@
  */
 
 use std::collections::HashMap;
-use std::time::Duration;
 
-use log::{error, info, warn};
+use log::{error, info};
 use static_object::StaticObject;
 use tokio::net::TcpStream;
 use tokio::sync::Mutex;
-use tokio::time::timeout;
 use tokio_tungstenite::tungstenite::protocol::frame::coding::CloseCode;
 use tokio_tungstenite::tungstenite::protocol::CloseFrame;
 use tokio_tungstenite::tungstenite::Message;
@@ -74,7 +72,7 @@ impl CommandBroadcastServer {
       .await
   }
 
-  pub async fn send_command(&mut self, connection_id: String, command: CommandPacket) {
+  pub async fn send_command(&mut self, connection_id: &ConnectionId, command: CommandPacket) {
     let command_str_result = command.to_string();
 
     if let Ok(str) = command_str_result {
@@ -84,7 +82,7 @@ impl CommandBroadcastServer {
     }
   }
 
-  pub async fn send_app_command(&mut self, connection_id: String, app_command: AppCommand) {
+  pub async fn send_app_command(&mut self, connection_id: &ConnectionId, app_command: AppCommand) {
     self
       .send_command(connection_id, CommandPacket::from_app_command(app_command))
       .await
@@ -92,7 +90,7 @@ impl CommandBroadcastServer {
 
   pub async fn send_bilibili_command(
     &mut self,
-    connection_id: String,
+    connection_id: &ConnectionId,
     bilibili_command: BiliBiliCommand,
   ) {
     self
@@ -105,17 +103,13 @@ impl CommandBroadcastServer {
   // endregion
 
   pub async fn broadcast(&mut self, message: Message) {
-    for (id, conn) in &mut *a_lock(&self.connections).await {
-      let timeout_result = timeout(Duration::from_secs(5), conn.send(message.clone())).await;
-      if timeout_result.is_err() {
-        warn!("connection {} send timeout, disconnecting.", id);
-        conn.disconnect(None).await;
-      }
+    for conn in a_lock(&self.connections).await.values_mut() {
+      conn.send(message.clone()).await;
     }
   }
 
-  pub async fn send(&mut self, connection_id: String, message: Message) {
-    if let Some(conn) = a_lock(&self.connections).await.get_mut(&connection_id) {
+  pub async fn send(&mut self, connection_id: &ConnectionId, message: Message) {
+    if let Some(conn) = a_lock(&self.connections).await.get_mut(connection_id) {
       conn.send(message).await;
     }
   }
@@ -146,9 +140,21 @@ impl CommandBroadcastServer {
   pub async fn tick(&mut self) {
     let mut connections = a_lock(&self.connections).await;
 
-    connections.retain(|_, connection| connection.is_connected());
+    // region remove disconnected connections
+    let mut disconnected_connections: Vec<ConnectionId> = vec![];
 
-    // region tick connections
+    for (id, conn) in &*connections {
+      if !conn.is_connected().await {
+        disconnected_connections.push(id.clone())
+      }
+    }
+
+    for id in disconnected_connections {
+      connections.remove(&id);
+    }
+    // endregion
+
+    // region receive messages
     let mut incoming_messages = vec![];
 
     for (id, conn) in &mut *connections {
@@ -161,7 +167,7 @@ impl CommandBroadcastServer {
     drop(connections);
 
     for (id, msg) in incoming_messages {
-      self.on_message(msg, id).await;
+      self.on_message(msg, &id).await;
     }
     // endregion
   }
@@ -169,26 +175,26 @@ impl CommandBroadcastServer {
   pub async fn accept(&mut self, websocket_stream: WebSocket) {
     let connection = WebSocketConnection::from_ws_stream(websocket_stream);
 
-    let connection_id = connection.get_id();
+    let connection_id = connection.get_id().clone();
     a_lock(&self.connections)
       .await
       .insert(connection_id.clone(), connection);
-    self.on_connection(connection_id).await;
+    self.on_connection(&connection_id).await;
   }
 
-  async fn on_connection(&mut self, connection_id: String) {
+  async fn on_connection(&mut self, connection_id: &ConnectionId) {
     info!("new connection, id: {} ", connection_id);
 
     self
       .send_app_command(
-        connection_id.clone(),
+        connection_id,
         AppCommand::from_config_update(ConfigUpdate::new(&*get_cfg!())),
       )
       .await;
 
     self
       .send_app_command(
-        connection_id.clone(),
+        connection_id,
         AppCommand::from_receiver_status_update(ReceiverStatusUpdate::new(
           DanmuReceiver::i().get_status(),
         )),
@@ -202,7 +208,7 @@ impl CommandBroadcastServer {
         if let Some(gift_config) = gift_config.data {
           self
             .send_app_command(
-              connection_id.clone(),
+              connection_id,
               AppCommand::from_gift_config_update(GiftConfigUpdate::new(gift_config)),
             )
             .await;
@@ -214,7 +220,7 @@ impl CommandBroadcastServer {
     }
   }
 
-  async fn on_message(&mut self, message: Message, connection_id: String) {
+  async fn on_message(&mut self, message: Message, connection_id: &String) {
     info!("{}: {:?} ", connection_id, message);
 
     self.send(connection_id, message).await;

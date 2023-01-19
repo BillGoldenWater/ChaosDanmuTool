@@ -223,7 +223,7 @@ impl DanmuReceiver {
         }
         // endregion
 
-        if !self.ws.is_connected() && self.status == ReceiverStatus::Connected {
+        if !self.ws.is_connected().await && self.status == ReceiverStatus::Connected {
           self.on_error("unknown disconnect").await;
           return;
         }
@@ -278,8 +278,8 @@ impl DanmuReceiver {
     }
   }
 
-  pub fn is_connected(&self) -> bool {
-    self.ws.is_connected()
+  pub async fn is_connected(&self) -> bool {
+    self.ws.is_connected().await
   }
 
   pub fn get_status(&self) -> ReceiverStatus {

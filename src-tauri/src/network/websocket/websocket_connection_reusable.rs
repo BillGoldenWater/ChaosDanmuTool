@@ -53,15 +53,15 @@ impl WebSocketConnectionReusable {
     }
   }
 
-  pub fn is_connected(&self) -> bool {
+  pub async fn is_connected(&self) -> bool {
     if let Some(ws) = &self.inner {
-      ws.is_connected()
+      ws.is_connected().await
     } else {
       false
     }
   }
 
-  pub fn get_id(&self) -> String {
+  pub fn get_id(&self) -> &String {
     if let Some(ws) = &self.inner {
       ws.get_id()
     } else {
