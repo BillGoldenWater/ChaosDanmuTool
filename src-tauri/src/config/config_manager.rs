@@ -20,7 +20,7 @@ use crate::config::config::{serialize_config, Config};
 use crate::network::command_broadcast_server::CommandBroadcastServer;
 use crate::utils::async_utils::run_blocking;
 use crate::utils::immutable_utils::Immutable;
-use crate::utils::mutex_utils::{a_lock, lock};
+use crate::utils::mutex_utils::a_lock;
 use crate::{dialog_ask, dialog_notice};
 
 #[derive(StaticObject)]
@@ -78,20 +78,20 @@ impl ConfigManager {
     *a_lock(&self.config).await = parse_result.unwrap()
   }
 
-  pub fn save(&mut self) {
-    let mut changed = lock(&self.changed);
+  pub async fn save(&mut self) {
+    let mut changed = a_lock(&self.changed).await;
 
     info!("save config");
     let result = fs::write(
       self.config_file_path.as_path(),
-      serialize_config(&*lock(&self.config), true),
+      serialize_config(&*a_lock(&self.config).await, true),
     );
     if let Err(err) = result {
       error!("failed to write config file\n{:#?}", err);
       return;
     }
     *changed = false;
-    *lock(&self.last_save_ts) = Instant::now();
+    *a_lock(&self.last_save_ts).await = Instant::now();
     info!("config successfully saved");
 
     drop(changed);
@@ -116,15 +116,15 @@ impl ConfigManager {
     info!("reset config");
     *a_lock(&self.config).await = serde_json::from_str("{}").unwrap();
     self.on_change(true).await;
-    self.save();
+    self.save().await;
   }
 
   fn get_config(&self) -> Arc<Mutex<Config>> {
     Arc::clone(&self.config)
   }
 
-  pub fn get_readonly_config(&self) -> Immutable<Config> {
-    Immutable::new(lock(&self.config).clone())
+  pub async fn get_readonly_config(&self) -> Immutable<Config> {
+    Immutable::new(a_lock(&self.config).await.clone())
   }
 
   async fn on_change(&mut self, broadcast: bool) {
@@ -148,15 +148,20 @@ impl ConfigManager {
     {
       if *a_lock(&self.changed).await && a_lock(&self.last_save_ts).await.elapsed().as_secs() >= 5 {
         info!("save on change");
-        self.save();
+        self.save().await;
       }
     }
   }
 
-  pub fn on_exit(&mut self) {
-    if lock(&self.config).backend.config_manager.save_on_exit {
+  pub async fn on_exit(&mut self) {
+    if a_lock(&self.config)
+      .await
+      .backend
+      .config_manager
+      .save_on_exit
+    {
       info!("save on exit");
-      self.save();
+      self.save().await;
     }
   }
 }
@@ -179,7 +184,11 @@ fn wrap_cfg(config: Config) -> Arc<Mutex<Config>> {
 macro_rules! get_cfg {
   () => {{
     use static_object::StaticObject;
-    ConfigManager::i().get_readonly_config()
+    ConfigManager::i().get_readonly_config().await
+  }};
+  (sync) => {{
+    use static_object::StaticObject;
+    $crate::utils::async_utils::run_blocking(ConfigManager::i().get_readonly_config())
   }};
 }
 

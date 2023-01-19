@@ -116,7 +116,7 @@ pub fn is_viewer_window_open(app_handle: tauri::AppHandle) -> bool {
 }
 
 pub fn create_viewer_window(app_handle: &tauri::AppHandle<Wry>) {
-  let cfg = Immutable::new(get_cfg!().backend.window.viewer_window.clone());
+  let cfg = Immutable::new(get_cfg!(sync).backend.window.viewer_window.clone());
 
   let viewer_window = tauri::WindowBuilder::new(
     app_handle,

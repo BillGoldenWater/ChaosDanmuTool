@@ -46,6 +46,7 @@ pub async fn on_setup(app: &mut App<Wry>) {
 }
 
 pub async fn on_ready(app_handle: &AppHandle<Wry>) {
+  DanmuReceiver::i().connect_to(1134).await;
   show_main_window(app_handle.clone());
 }
 
@@ -62,5 +63,5 @@ pub async fn on_exit(_app_handle: &AppHandle<Wry>) {
 
   HttpServer::i().stop().await;
   CommandBroadcastServer::i().close_all().await;
-  ConfigManager::i().on_exit();
+  ConfigManager::i().on_exit().await;
 }
