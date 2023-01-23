@@ -46,7 +46,6 @@ pub async fn on_setup(app: &mut App<Wry>) {
 }
 
 pub async fn on_ready(app_handle: &AppHandle<Wry>) {
-  DanmuReceiver::i().connect_to(1134).await;
   show_main_window(app_handle.clone());
 }
 
