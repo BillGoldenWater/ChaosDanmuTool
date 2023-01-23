@@ -146,31 +146,34 @@ create index if not exists command_history_timestamp_index
     }
     // endregion
 
-    let query_result = query.fetch_all(&mut *db).await?;
-
-    // region parse
-    let mut result = vec![];
-
-    for it in query_result {
-      let item = it.try_get::<&str, &str>("content");
-      if let Ok(item) = item {
-        let item = serde_json::from_str(item);
+    let result = query
+      .map(|row| {
+        let item: sqlx::Result<&str> = row.try_get::<&str, &str>("content");
         if let Ok(item) = item {
-          result.push(item);
+          let item: serde_json::Result<CommandPacket> = serde_json::from_str(item);
+          if let Ok(item) = item {
+            Some(item)
+          } else {
+            error!(
+              "error occurred when parsing content: {err}",
+              err = item.unwrap_err()
+            );
+            None
+          }
         } else {
           error!(
-            "error occurred when parsing content: {err}",
+            "error occurred when parsing query result: {err}",
             err = item.unwrap_err()
           );
+          None
         }
-      } else {
-        error!(
-          "error occurred when parsing query result: {err}",
-          err = item.unwrap_err()
-        );
-      }
-    }
-    // endregion
+      })
+      .fetch_all(&mut *db)
+      .await?
+      .into_iter()
+      .flatten()
+      .collect::<Vec<_>>();
+
     Ok(result)
   }
 
