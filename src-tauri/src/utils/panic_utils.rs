@@ -14,7 +14,7 @@ use crate::app_context::AppContext;
 use crate::utils::gen_utils::gen_time_with_uuid;
 
 pub fn setup_panic_hook() {
-  // #[cfg(not(debug_assertions))]
+  #[cfg(not(debug_assertions))]
   std::panic::set_hook(Box::new(handle_panic));
 }
 
