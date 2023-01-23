@@ -88,21 +88,20 @@ impl AppLoop {
 
   async fn each_iter(&self) -> LoopCost {
     let start = Instant::now();
+
     DanmuReceiver::i().tick().await;
     let danmu_receiver = start.elapsed().as_millis();
 
-    let start = Instant::now();
     CommandBroadcastServer::i().tick().await;
     let command_broadcast_server = start.elapsed().as_millis();
 
-    let start = Instant::now();
     ConfigManager::i().tick().await;
     let config_manager = start.elapsed().as_millis();
 
     LoopCost {
       danmu_receiver,
-      command_broadcast_server,
-      config_manager,
+      command_broadcast_server: command_broadcast_server - danmu_receiver,
+      config_manager: config_manager - command_broadcast_server,
     }
   }
 }
