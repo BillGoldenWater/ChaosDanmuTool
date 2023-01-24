@@ -259,10 +259,15 @@ impl DanmuReceiver {
 
   #[inline]
   async fn tick_heartbeat(&mut self) {
+    let tick_elapsed = self
+      .connected_data
+      .last_heartbeat_tick_ts
+      .elapsed()
+      .as_secs();
     let elapsed = self.connected_data.last_heartbeat_ts.elapsed().as_secs();
     let cfg = self.fetch_config().await;
 
-    if !self.connected_data.heartbeat_received && elapsed > 5 {
+    if !self.connected_data.heartbeat_received && (elapsed - tick_elapsed) > 5 {
       error!("heartbeat timeout");
       self.disconnect().await;
       return;
@@ -277,6 +282,8 @@ impl DanmuReceiver {
       self.connected_data.last_heartbeat_ts = Instant::now();
       self.connected_data.heartbeat_received = false;
     }
+
+    self.connected_data.last_heartbeat_tick_ts = Instant::now();
   }
 
   pub async fn is_connected(&self) -> bool {
@@ -464,6 +471,7 @@ pub enum ConnectError {
 
 struct StatusConnectedData {
   last_heartbeat_ts: Instant,
+  last_heartbeat_tick_ts: Instant,
   heartbeat_received: bool,
 }
 
@@ -471,6 +479,7 @@ impl Default for StatusConnectedData {
   fn default() -> Self {
     Self {
       last_heartbeat_ts: Instant::now(),
+      last_heartbeat_tick_ts: Instant::now(),
       heartbeat_received: true,
     }
   }
