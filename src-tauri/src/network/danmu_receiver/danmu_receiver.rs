@@ -298,7 +298,7 @@ impl DanmuReceiver {
     }
 
     CommandBroadcastServer::i()
-      .broadcast_cmd(ReceiverStatusUpdate::new(status.clone()))
+      .broadcast_cmd(ReceiverStatusUpdate::new(status.clone()).into())
       .await;
 
     self.status = status;
@@ -367,7 +367,7 @@ impl DanmuReceiver {
         let mut offset = 0;
         let activity = b_get!(@u32, packet.body, offset);
         CommandBroadcastServer::i()
-          .broadcast_cmd(ActivityUpdate::new(activity))
+          .broadcast_cmd(ActivityUpdate::new(activity).into())
           .await;
       }
       OpCode::Message => {
@@ -388,7 +388,7 @@ impl DanmuReceiver {
             // region parse to bilibili command
             let cmd_parse_result = Self::parse_raw(raw.clone()).await;
             if let Ok(command) = cmd_parse_result {
-              CommandBroadcastServer::i().broadcast_cmd(command.0).await;
+              CommandBroadcastServer::i().broadcast_cmd(command.0.into()).await;
 
               if let Some(raw_backup) = command.1 {
                 let result =
@@ -473,7 +473,7 @@ impl DanmuReceiver {
   async fn on_parse_error(message: String) {
     error!("{}", message);
     CommandBroadcastServer::i()
-      .broadcast_cmd(BiliBiliPacketParseError::new(message))
+      .broadcast_cmd(BiliBiliPacketParseError::new(message).into())
       .await
   }
 }

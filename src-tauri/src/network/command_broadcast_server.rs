@@ -43,8 +43,7 @@ impl CommandBroadcastServer {
     }
   }
 
-  pub async fn broadcast_cmd<Command: Into<CommandPacket>>(&mut self, command: Command) {
-    let command = command.into();
+  pub async fn broadcast_cmd(&mut self, command: CommandPacket) {
     let command_str_result = command.to_string();
 
     if let Ok(str) = command_str_result {
@@ -55,6 +54,26 @@ impl CommandBroadcastServer {
       }
     } else {
       error!("failed to serialize command {:?}", command_str_result)
+    }
+  }
+
+  pub async fn broadcast_cmd_many(&mut self, commands: Vec<CommandPacket>) {
+    let commands_msgs = commands
+      .iter()
+      .filter_map(|cmd| {
+        let result = cmd.to_string();
+        if let Ok(cmd) = result {
+          Some(Message::Text(cmd))
+        } else {
+          error!("failed to serialize command {:?}", result.unwrap_err());
+          None
+        }
+      })
+      .collect::<Vec<_>>();
+    self.broadcast_many(commands_msgs).await;
+    let result = CommandHistoryManager::i().write_many(&commands).await;
+    if let Err(err) = result {
+      error!("{err}");
     }
   }
 
@@ -76,6 +95,12 @@ impl CommandBroadcastServer {
   pub async fn broadcast(&mut self, message: Message) {
     for conn in a_lock(&self.connections).await.values_mut() {
       conn.send(message.clone()).await;
+    }
+  }
+
+  pub async fn broadcast_many(&mut self, messages: Vec<Message>) {
+    for conn in a_lock(&self.connections).await.values_mut() {
+      conn.send_many(messages.clone()).await;
     }
   }
 

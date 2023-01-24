@@ -91,7 +91,7 @@ pub fn show_viewer_window(app_handle: tauri::AppHandle) {
   }
 
   run_blocking(
-    CommandBroadcastServer::i().broadcast_cmd(ViewerStatusUpdate::new(ViewerStatus::Open)),
+    CommandBroadcastServer::i().broadcast_cmd(ViewerStatusUpdate::new(ViewerStatus::Open).into()),
   )
 }
 
@@ -151,7 +151,7 @@ pub fn create_viewer_window(app_handle: &tauri::AppHandle<Wry>) {
       true,
     )),
     WindowEvent::Destroyed => run_blocking(
-      CommandBroadcastServer::i().broadcast_cmd(ViewerStatusUpdate::new(ViewerStatus::Close)),
+      CommandBroadcastServer::i().broadcast_cmd(ViewerStatusUpdate::new(ViewerStatus::Close).into()),
     ),
     _ => {}
   });

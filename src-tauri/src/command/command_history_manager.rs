@@ -5,7 +5,7 @@
 
 use chrono::Utc;
 use log::error;
-use sqlx::{Row, SqliteConnection};
+use sqlx::{QueryBuilder, Row, SqliteConnection};
 use tokio::sync::Mutex;
 
 use crate::app_context::AppContext;
@@ -75,6 +75,35 @@ create index if not exists command_history_timestamp_index
     .bind(command.to_string()?)
     .execute(&mut *db)
     .await?;
+
+    Ok(())
+  }
+
+  pub async fn write_many(&mut self, commands: &Vec<CommandPacket>) -> Result<()> {
+    let mut db = a_lock(&self.db).await;
+    let session_id = a_lock(&self.session_id).await;
+
+    let mut cmds = Vec::with_capacity(commands.len());
+
+    for cmd in commands {
+      cmds.push((
+        cmd.command(),
+        cmd.timestamp().to_rfc3339(),
+        cmd.to_string()?,
+      ));
+    }
+
+    let mut query_builder =
+      QueryBuilder::new("insert into command_history (sessionId, cmd, timestamp, content) ");
+
+    query_builder.push_values(cmds, |mut b, cmd| {
+      b.push_bind(&*session_id)
+        .push_bind(cmd.0)
+        .push_bind(cmd.1)
+        .push_bind(cmd.2);
+    });
+
+    query_builder.build().execute(&mut *db).await?;
 
     Ok(())
   }

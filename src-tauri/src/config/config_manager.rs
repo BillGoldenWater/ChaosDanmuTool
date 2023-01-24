@@ -130,7 +130,7 @@ impl ConfigManager {
     *a_lock(&self.changed).await = true;
     if broadcast {
       CommandBroadcastServer::i()
-        .broadcast_cmd(ConfigUpdate::new(a_lock(&self.config).await.clone()))
+        .broadcast_cmd(ConfigUpdate::new(a_lock(&self.config).await.clone()).into())
         .await;
     }
   }

@@ -107,7 +107,7 @@ create table if not exists medal_data
 
   async fn insert_or_replace(&mut self, info: &UserInfo) {
     CommandBroadcastServer::i()
-      .broadcast_cmd(UserInfoUpdate::new(info.clone()))
+      .broadcast_cmd(UserInfoUpdate::new(info.clone()).into())
       .await;
 
     static SQL: &str = r#"
