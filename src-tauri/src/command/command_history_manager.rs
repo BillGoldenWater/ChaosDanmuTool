@@ -80,6 +80,10 @@ create index if not exists command_history_timestamp_index
   }
 
   pub async fn write_many(&mut self, commands: &Vec<CommandPacket>) -> Result<()> {
+    if commands.is_empty() {
+      return Ok(());
+    }
+
     let mut db = a_lock(&self.db).await;
     let session_id = a_lock(&self.session_id).await;
 

@@ -24,10 +24,7 @@ pub enum BiliBiliCommand {
   Raw {
     #[ts(type = "unknown")]
     data: Value,
-  },
-  RawBackup {
-    #[ts(type = "unknown")]
-    data: Value,
+    is_backup: bool,
   },
   ParseFailed {
     data: String,
@@ -40,28 +37,26 @@ impl BiliBiliCommand {
     Self::ParseFailed { data, message }
   }
 
-  pub fn new_raw(raw: Value) -> BiliBiliCommand {
-    BiliBiliCommand::Raw { data: raw }
-  }
-
-  pub fn new_raw_backup(raw: Value) -> BiliBiliCommand {
-    BiliBiliCommand::RawBackup { data: raw }
+  pub fn new_raw(raw: Value, is_backup: bool) -> BiliBiliCommand {
+    Self::Raw {
+      data: raw,
+      is_backup,
+    }
   }
 
   pub fn command(&self) -> String {
     match self {
-      BiliBiliCommand::ActivityUpdate { .. } => "activityUpdate".to_string(),
-      BiliBiliCommand::DanmuMessage { .. } => "danmuMessage".to_string(),
-      BiliBiliCommand::Raw { data } => {
-        format!("raw.{cmd}", cmd = data["cmd"].as_str().unwrap_or("unknown"))
+      Self::ActivityUpdate { .. } => "activityUpdate".to_string(),
+      Self::DanmuMessage { .. } => "danmuMessage".to_string(),
+      Self::Raw { data, is_backup } => {
+        let cmd = data["cmd"].as_str().unwrap_or("unknown");
+        if *is_backup {
+          format!("rawBackup.{cmd}")
+        } else {
+          format!("raw.{cmd}")
+        }
       }
-      BiliBiliCommand::RawBackup { data } => {
-        format!(
-          "rawBackup.{cmd}",
-          cmd = data["cmd"].as_str().unwrap_or("unknown")
-        )
-      }
-      BiliBiliCommand::ParseFailed { .. } => "parseFailed".to_string(),
+      Self::ParseFailed { .. } => "parseFailed".to_string(),
     }
   }
 }

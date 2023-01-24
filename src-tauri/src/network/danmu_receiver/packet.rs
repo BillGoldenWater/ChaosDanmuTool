@@ -49,7 +49,7 @@ impl Packet {
     (self.body.len() as u32) + (Self::HEAD_SIZE as u32)
   }
 
-  pub fn from_bytes<D: AsRef<[u8]>>(data: &D) -> Vec<Packet> {
+  pub fn parse_bytes<D: AsRef<[u8]>>(data: &D) -> Vec<Packet> {
     if data.as_ref().len() < Self::HEAD_SIZE as usize {
       return vec![];
     }
@@ -75,7 +75,7 @@ impl Packet {
         }
         let decompressed = decompress_result.unwrap();
 
-        Self::from_bytes(&decompressed.as_slice())
+        Self::parse_bytes(&decompressed.as_slice())
       }
       DataType::CompressedZlib => {
         info!("unsupported compress format");
@@ -91,7 +91,7 @@ impl Packet {
         }];
 
         if !extra.is_empty() {
-          result.append(&mut Self::from_bytes(&extra))
+          result.append(&mut Self::parse_bytes(&extra))
         }
 
         result

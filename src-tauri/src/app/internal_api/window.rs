@@ -151,7 +151,8 @@ pub fn create_viewer_window(app_handle: &tauri::AppHandle<Wry>) {
       true,
     )),
     WindowEvent::Destroyed => run_blocking(
-      CommandBroadcastServer::i().broadcast_cmd(ViewerStatusUpdate::new(ViewerStatus::Close).into()),
+      CommandBroadcastServer::i()
+        .broadcast_cmd(ViewerStatusUpdate::new(ViewerStatus::Close).into()),
     ),
     _ => {}
   });

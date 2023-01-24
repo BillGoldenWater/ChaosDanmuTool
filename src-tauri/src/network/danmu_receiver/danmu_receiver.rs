@@ -14,16 +14,14 @@ use tokio_tungstenite::tungstenite::protocol::frame::coding::CloseCode;
 use tokio_tungstenite::tungstenite::protocol::CloseFrame;
 use tokio_tungstenite::tungstenite::Message;
 
-use crate::command::command_history_manager::CommandHistoryManager;
 use crate::command::command_packet::app_command::bilibili_packet_parse_error::BiliBiliPacketParseError;
 use crate::command::command_packet::app_command::receiver_status_update::{
   ReceiverStatus, ReceiverStatusUpdate,
 };
 use crate::command::command_packet::bilibili_command::activity_update::ActivityUpdate;
-use crate::command::command_packet::bilibili_command::danmu_message::{
-  DanmuMessage, DanmuMessageParseError,
-};
+use crate::command::command_packet::bilibili_command::danmu_message::DanmuMessage;
 use crate::command::command_packet::bilibili_command::BiliBiliCommand;
+use crate::command::command_packet::CommandPacket;
 use crate::config::config::backend_config::danmu_receiver_config::DanmuReceiverConfig;
 use crate::config::config_manager::{modify_cfg, ConfigManager};
 use crate::network::api_request::bilibili_response::Error::EmptyData;
@@ -215,8 +213,14 @@ impl DanmuReceiver {
         // region recv message
         let messages = self.ws.tick().await;
 
+        let mut commands = vec![];
         for msg in messages {
-          self.on_message(msg).await;
+          self.parse_message(&mut commands, msg).await
+        }
+        if !commands.is_empty() {
+          CommandBroadcastServer::i()
+            .broadcast_cmd_many(commands)
+            .await;
         }
         // endregion
 
@@ -304,34 +308,6 @@ impl DanmuReceiver {
     self.status = status;
   }
 
-  async fn on_message(&mut self, message: Message) {
-    match message {
-      Message::Binary(data) => {
-        let packets = Packet::from_bytes(&data.as_slice());
-
-        for packet in packets {
-          self.parse_packet(packet).await;
-        }
-      }
-      Message::Close(close_frame) => {
-        let close_frame = close_frame.unwrap_or(CloseFrame {
-          code: CloseCode::Normal,
-          reason: Cow::Owned("".to_string()),
-        });
-
-        if close_frame.code == CloseCode::Abnormal {
-          self.on_disconnect(true).await;
-        } else {
-          self.on_disconnect(false).await;
-        }
-      }
-      Message::Ping(..) | Message::Pong(..) | Message::Frame(..) => {}
-      _ => {
-        info!("{:?}", message)
-      }
-    }
-  }
-
   #[inline]
   async fn on_error(&mut self, msg: &str) {
     self.set_status(ReceiverStatus::Error).await;
@@ -349,139 +325,125 @@ impl DanmuReceiver {
       .await
   }
 
-  async fn parse_packet(&mut self, packet: Packet) {
+  // region parse message
+  async fn parse_message(&mut self, buf: &mut Vec<CommandPacket>, message: Message) {
+    match message {
+      Message::Binary(data) => {
+        for packet in Packet::parse_bytes(&data.as_slice()) {
+          self.parse_packet(buf, packet).await;
+        }
+      }
+      Message::Close(close_frame) => {
+        let close_frame = close_frame.unwrap_or(CloseFrame {
+          code: CloseCode::Normal,
+          reason: Cow::Owned("".to_string()),
+        });
+
+        if close_frame.code == CloseCode::Abnormal {
+          warn!("receiver disconnected abnormally, {close_frame:?}");
+          self.on_disconnect(true).await;
+        } else {
+          self.on_disconnect(false).await;
+        }
+      }
+      Message::Ping(..) | Message::Pong(..) | Message::Frame(..) => {}
+      _ => info!("{:?}", message),
+    }
+  }
+
+  async fn parse_packet(&mut self, buf: &mut Vec<CommandPacket>, packet: Packet) {
     match packet.op_code {
       OpCode::JoinResponse => {}
-      OpCode::HeartbeatResponse => {
-        if packet.data_type != DataType::HeartbeatOrJoin {
-          let message = format!(
-            "unexpect data_type when OpCode::HeartbeatResponse, {:?}",
-            packet.data_type
-          );
-          Self::on_parse_error(message).await;
-          return;
-        }
-
-        self.connected_data.heartbeat_received = true;
-
-        let mut offset = 0;
-        let activity = b_get!(@u32, packet.body, offset);
-        CommandBroadcastServer::i()
-          .broadcast_cmd(ActivityUpdate::new(activity).into())
-          .await;
-      }
-      OpCode::Message => {
-        if packet.data_type != DataType::Json {
-          let message = format!(
-            "unexpect data_type when OpCode::Message, {:?}",
-            packet.data_type
-          );
-          Self::on_parse_error(message).await;
-          return;
-        }
-        // region parse to string
-        let str_parse_result = std::str::from_utf8(packet.body.as_ref());
-        if let Ok(str) = str_parse_result {
-          // region parse to json object
-          let json_parse_result = serde_json::from_str::<Value>(str);
-          if let Ok(raw) = json_parse_result {
-            // region parse to bilibili command
-            let cmd_parse_result = Self::parse_raw(raw.clone()).await;
-            if let Ok(command) = cmd_parse_result {
-              CommandBroadcastServer::i().broadcast_cmd(command.0.into()).await;
-
-              if let Some(raw_backup) = command.1 {
-                let result =
-                  write_bilibili_command(BiliBiliCommand::new_raw_backup(raw_backup)).await;
-
-                if let Err(err) = result {
-                  error!("unable to write raw_backup\n {err:?}")
-                }
-              }
-            } else {
-              // on failed
-              let msg = format!(
-                "failed when parse json object: {err}",
-                err = cmd_parse_result.unwrap_err()
-              );
-              error!("{msg}");
-
-              let result =
-                write_bilibili_command(BiliBiliCommand::new_parse_failed(str.to_string(), msg))
-                  .await;
-
-              if let Err(err) = result {
-                error!("unable to write json object parse failed command\n {err:?}")
-              }
-            }
-            // endregion
-          } else {
-            let msg = format!(
-              "unable to parse json string\n {err}\n {str}",
-              err = json_parse_result.unwrap_err()
-            );
-            error!("{msg}");
-
-            let result =
-              write_bilibili_command(BiliBiliCommand::new_parse_failed(str.to_string(), msg)).await;
-
-            if let Err(err) = result {
-              error!("unable to write json string parse failed command\n {err:?}")
-            }
-          }
-          // endregion
-        } else {
-          let data_str = bytes_to_hex(&packet.body);
-          let msg = format!(
-            "unable to decode message to utf8\n{err}\n{data_str}",
-            err = str_parse_result.unwrap_err()
-          );
-          error!("{msg}");
-
-          let result =
-            write_bilibili_command(BiliBiliCommand::new_parse_failed(data_str, msg)).await;
-
-          if let Err(err) = result {
-            error!("unable to write hex parse failed command\n {err:?}")
-          }
-        }
-        // endregion
-      }
+      OpCode::HeartbeatResponse => self.parse_heartbeat_response(buf, packet).await,
+      OpCode::Message => self.parse_danmu_message(buf, packet).await,
       _ => {
         let message = format!("unexpected op_code: {:?}", packet.op_code);
-        Self::on_parse_error(message).await
+        self.push_parse_error(buf, message)
       }
     }
+  }
+
+  async fn parse_heartbeat_response(&mut self, buf: &mut Vec<CommandPacket>, packet: Packet) {
+    if packet.data_type != DataType::HeartbeatOrJoin {
+      let message = format!(
+        "unexpect data_type {:?} when OpCode::HeartbeatResponse",
+        packet.data_type
+      );
+      self.push_parse_error(buf, message);
+    }
+
+    self.connected_data.heartbeat_received = true;
+
+    let mut offset = 0;
+    let activity = b_get!(@u32, packet.body, offset);
+    buf.push(ActivityUpdate::new(activity).into())
+  }
+
+  async fn parse_danmu_message(&mut self, buf: &mut Vec<CommandPacket>, packet: Packet) {
+    // region check data type
+    if packet.data_type != DataType::Json {
+      let message = format!(
+        "unexpect data_type {:?} when OpCode::Message",
+        packet.data_type
+      );
+      self.push_parse_error(buf, message);
+      return;
+    }
+    // endregion
+
+    // region parse to json object
+    let msg_str = String::from_utf8_lossy(packet.body.as_ref());
+
+    let raw = match serde_json::from_str::<Value>(&msg_str) {
+      Ok(raw) => raw,
+      Err(err) => {
+        let msg = format!(
+          "unable to parse json string\n{err}\n{msg_str}\n{hex}",
+          hex = bytes_to_hex(&packet.body.as_slice())
+        );
+        error!("{msg}");
+        buf.push(BiliBiliCommand::new_parse_failed(msg_str.to_string(), msg).into());
+        return;
+      }
+    };
+    // endregion
+
+    self.parse_raw(buf, raw).await;
   }
 
   ///
   /// returns: (BiliBiliCommand, Option<Value>) second is raw for backup if needed
   ///
-  pub async fn parse_raw(
-    raw: Value,
-  ) -> Result<(BiliBiliCommand, Option<Value>), DanmuMessageParseError> {
+  async fn parse_raw(&mut self, buf: &mut Vec<CommandPacket>, raw: Value) {
     let cmd = raw["cmd"].as_str().unwrap_or("");
 
     if cmd.starts_with("DANMU_MSG") {
-      let dm = DanmuMessage::from_raw(&raw).await?;
-      Ok((BiliBiliCommand::from(dm), Some(raw)))
+      let dm_result = DanmuMessage::from_raw(&raw).await;
+
+      let dm = match dm_result {
+        Ok(dm) => dm,
+        Err(err) => {
+          let msg = format!("failed to parse danmuMessage\n{err:?}");
+          error!("{msg}");
+          buf.push(
+            BiliBiliCommand::new_parse_failed(serde_json::to_string(&raw).unwrap(), msg).into(),
+          );
+          return;
+        }
+      };
+
+      buf.push(BiliBiliCommand::from(dm).into());
+      buf.push(BiliBiliCommand::new_raw(raw, true).into());
     } else {
-      Ok((BiliBiliCommand::new_raw(raw), None))
+      buf.push(BiliBiliCommand::new_raw(raw, false).into());
     }
   }
 
-  async fn on_parse_error(message: String) {
+  fn push_parse_error(&mut self, buf: &mut Vec<CommandPacket>, message: String) {
     error!("{}", message);
-    CommandBroadcastServer::i()
-      .broadcast_cmd(BiliBiliPacketParseError::new(message).into())
-      .await
+    buf.push(BiliBiliPacketParseError::new(message).into())
   }
-}
-
-async fn write_bilibili_command(
-  command: BiliBiliCommand,
-) -> crate::command::command_history_manager::Result<()> {
-  CommandHistoryManager::i().write(&command.into()).await
+  // endregion
 }
 
 pub type ConnectResult<T> = Result<T, ConnectError>;
