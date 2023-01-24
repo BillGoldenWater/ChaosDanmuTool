@@ -10,7 +10,6 @@ use tokio::sync::RwLock;
 use crate::command::command_packet::app_command::viewer_status_update::{
   ViewerStatus, ViewerStatusUpdate,
 };
-use crate::command::command_packet::app_command::AppCommand;
 use crate::config::config_manager::{modify_cfg, ConfigManager};
 use crate::get_cfg;
 use crate::network::command_broadcast_server::CommandBroadcastServer;
@@ -91,9 +90,9 @@ pub fn show_viewer_window(app_handle: tauri::AppHandle) {
     create_viewer_window(&app_handle)
   }
 
-  run_blocking(CommandBroadcastServer::i().broadcast_app_command(
-    AppCommand::from_viewer_status_update(ViewerStatusUpdate::new(ViewerStatus::Open)),
-  ))
+  run_blocking(
+    CommandBroadcastServer::i().broadcast_cmd(ViewerStatusUpdate::new(ViewerStatus::Open)),
+  )
 }
 
 #[command]
@@ -151,9 +150,9 @@ pub fn create_viewer_window(app_handle: &tauri::AppHandle<Wry>) {
       },
       true,
     )),
-    WindowEvent::Destroyed => run_blocking(CommandBroadcastServer::i().broadcast_app_command(
-      AppCommand::from_viewer_status_update(ViewerStatusUpdate::new(ViewerStatus::Close)),
-    )),
+    WindowEvent::Destroyed => run_blocking(
+      CommandBroadcastServer::i().broadcast_cmd(ViewerStatusUpdate::new(ViewerStatus::Close)),
+    ),
     _ => {}
   });
 

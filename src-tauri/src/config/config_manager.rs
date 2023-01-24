@@ -15,7 +15,6 @@ use tokio::sync::{Mutex, MutexGuard};
 
 use crate::app_context::AppContext;
 use crate::command::command_packet::app_command::config_update::ConfigUpdate;
-use crate::command::command_packet::app_command::AppCommand;
 use crate::config::config::{serialize_config, Config};
 use crate::network::command_broadcast_server::CommandBroadcastServer;
 use crate::utils::async_utils::run_blocking;
@@ -131,9 +130,7 @@ impl ConfigManager {
     *a_lock(&self.changed).await = true;
     if broadcast {
       CommandBroadcastServer::i()
-        .broadcast_app_command(AppCommand::from_config_update(ConfigUpdate::new(
-          &*a_lock(&self.config).await,
-        )))
+        .broadcast_cmd(ConfigUpdate::new(a_lock(&self.config).await.clone()))
         .await;
     }
   }

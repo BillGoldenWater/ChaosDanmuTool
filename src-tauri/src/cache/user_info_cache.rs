@@ -13,7 +13,6 @@ use crate::cache::user_info_cache::medal_data::MedalData;
 use crate::cache::user_info_cache::medal_info::MedalInfo;
 use crate::cache::user_info_cache::user_info::UserInfo;
 use crate::command::command_packet::app_command::user_info_update::UserInfoUpdate;
-use crate::command::command_packet::app_command::AppCommand;
 use crate::network::command_broadcast_server::CommandBroadcastServer;
 use crate::utils::async_utils::run_blocking;
 use crate::utils::db_utils::create_db;
@@ -107,13 +106,9 @@ create table if not exists medal_data
   }
 
   async fn insert_or_replace(&mut self, info: &UserInfo) {
-    // region send update command
     CommandBroadcastServer::i()
-      .broadcast_app_command(AppCommand::from_user_info_update(UserInfoUpdate::new(
-        info.clone(),
-      )))
+      .broadcast_cmd(UserInfoUpdate::new(info.clone()))
       .await;
-    // endregion
 
     static SQL: &str = r#"
 insert or replace into user_info (uid, name, userLevel, face, faceFrame, isVip, isSvip, isMainVip, isManager, title, levelColor,

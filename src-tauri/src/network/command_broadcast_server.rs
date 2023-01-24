@@ -18,8 +18,6 @@ use crate::command::command_history_manager::CommandHistoryManager;
 use crate::command::command_packet::app_command::config_update::ConfigUpdate;
 use crate::command::command_packet::app_command::gift_config_update::GiftConfigUpdate;
 use crate::command::command_packet::app_command::receiver_status_update::ReceiverStatusUpdate;
-use crate::command::command_packet::app_command::AppCommand;
-use crate::command::command_packet::bilibili_command::BiliBiliCommand;
 use crate::command::command_packet::CommandPacket;
 use crate::config::config_manager::ConfigManager;
 use crate::get_cfg;
@@ -45,8 +43,8 @@ impl CommandBroadcastServer {
     }
   }
 
-  // region send api
-  pub async fn broadcast_command(&mut self, command: CommandPacket) {
+  pub async fn broadcast_cmd<Command: Into<CommandPacket>>(&mut self, command: Command) {
+    let command = command.into();
     let command_str_result = command.to_string();
 
     if let Ok(str) = command_str_result {
@@ -60,19 +58,12 @@ impl CommandBroadcastServer {
     }
   }
 
-  pub async fn broadcast_app_command(&mut self, app_command: AppCommand) {
-    self
-      .broadcast_command(CommandPacket::from_app_command(app_command))
-      .await
-  }
-
-  pub async fn broadcast_bilibili_command(&mut self, bilibili_command: BiliBiliCommand) {
-    self
-      .broadcast_command(CommandPacket::from_bilibili_command(bilibili_command))
-      .await
-  }
-
-  pub async fn send_command(&mut self, connection_id: &ConnectionId, command: CommandPacket) {
+  pub async fn send_cmd<Command: Into<CommandPacket>>(
+    &mut self,
+    connection_id: &ConnectionId,
+    command: Command,
+  ) {
+    let command = command.into();
     let command_str_result = command.to_string();
 
     if let Ok(str) = command_str_result {
@@ -81,26 +72,6 @@ impl CommandBroadcastServer {
       error!("failed to serialize command {:?}", command_str_result)
     }
   }
-
-  pub async fn send_app_command(&mut self, connection_id: &ConnectionId, app_command: AppCommand) {
-    self
-      .send_command(connection_id, CommandPacket::from_app_command(app_command))
-      .await
-  }
-
-  pub async fn send_bilibili_command(
-    &mut self,
-    connection_id: &ConnectionId,
-    bilibili_command: BiliBiliCommand,
-  ) {
-    self
-      .send_command(
-        connection_id,
-        CommandPacket::from_bilibili_command(bilibili_command),
-      )
-      .await
-  }
-  // endregion
 
   pub async fn broadcast(&mut self, message: Message) {
     for conn in a_lock(&self.connections).await.values_mut() {
@@ -186,18 +157,13 @@ impl CommandBroadcastServer {
     info!("new connection, id: {} ", connection_id);
 
     self
-      .send_app_command(
-        connection_id,
-        AppCommand::from_config_update(ConfigUpdate::new(&*get_cfg!())),
-      )
+      .send_cmd(connection_id, ConfigUpdate::new((*get_cfg!()).clone()))
       .await;
 
     self
-      .send_app_command(
+      .send_cmd(
         connection_id,
-        AppCommand::from_receiver_status_update(ReceiverStatusUpdate::new(
-          DanmuReceiver::i().get_status(),
-        )),
+        ReceiverStatusUpdate::new(DanmuReceiver::i().get_status()),
       )
       .await;
 
@@ -207,10 +173,7 @@ impl CommandBroadcastServer {
       Ok(gift_config) => {
         if let Some(gift_config) = gift_config.data {
           self
-            .send_app_command(
-              connection_id,
-              AppCommand::from_gift_config_update(GiftConfigUpdate::new(gift_config)),
-            )
+            .send_cmd(connection_id, GiftConfigUpdate::new(gift_config))
             .await;
         }
       }

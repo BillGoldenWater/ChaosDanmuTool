@@ -30,44 +30,6 @@ pub enum AppCommand {
 }
 
 impl AppCommand {
-  pub fn from_bilibili_packet_parse_error(
-    bilibili_packet_parse_error: BiliBiliPacketParseError,
-  ) -> Self {
-    Self::BiliBiliPacketParseError {
-      data: bilibili_packet_parse_error,
-    }
-  }
-
-  pub fn from_config_update(config_update: ConfigUpdate) -> Self {
-    Self::ConfigUpdate {
-      data: Box::from(config_update),
-    }
-  }
-
-  pub fn from_gift_config_update(gift_config_update: GiftConfigUpdate) -> Self {
-    Self::GiftConfigUpdate {
-      data: gift_config_update,
-    }
-  }
-
-  pub fn from_receiver_status_update(receiver_status_update: ReceiverStatusUpdate) -> Self {
-    Self::ReceiverStatusUpdate {
-      data: receiver_status_update,
-    }
-  }
-
-  pub fn from_user_info_update(user_info_update: UserInfoUpdate) -> Self {
-    Self::UserInfoUpdate {
-      data: Box::from(user_info_update),
-    }
-  }
-
-  pub fn from_viewer_status_update(viewer_status_update: ViewerStatusUpdate) -> Self {
-    Self::ViewerStatusUpdate {
-      data: viewer_status_update,
-    }
-  }
-
   pub fn command(&self) -> String {
     match self {
       Self::BiliBiliPacketParseError { .. } => "bilibiliPacketParseError".to_string(),
@@ -77,5 +39,45 @@ impl AppCommand {
       Self::UserInfoUpdate { .. } => "userInfoUpdate".to_string(),
       Self::ViewerStatusUpdate { .. } => "viewerStatusUpdate".to_string(),
     }
+  }
+}
+
+impl From<BiliBiliPacketParseError> for AppCommand {
+  fn from(value: BiliBiliPacketParseError) -> Self {
+    Self::BiliBiliPacketParseError { data: value }
+  }
+}
+
+impl From<ConfigUpdate> for AppCommand {
+  fn from(value: ConfigUpdate) -> Self {
+    Self::ConfigUpdate {
+      data: Box::from(value),
+    }
+  }
+}
+
+impl From<GiftConfigUpdate> for AppCommand {
+  fn from(value: GiftConfigUpdate) -> Self {
+    Self::GiftConfigUpdate { data: value }
+  }
+}
+
+impl From<ReceiverStatusUpdate> for AppCommand {
+  fn from(value: ReceiverStatusUpdate) -> Self {
+    Self::ReceiverStatusUpdate { data: value }
+  }
+}
+
+impl From<UserInfoUpdate> for AppCommand {
+  fn from(value: UserInfoUpdate) -> Self {
+    Self::UserInfoUpdate {
+      data: Box::from(value),
+    }
+  }
+}
+
+impl From<ViewerStatusUpdate> for AppCommand {
+  fn from(value: ViewerStatusUpdate) -> Self {
+    Self::ViewerStatusUpdate { data: value }
   }
 }

@@ -19,13 +19,11 @@ use crate::command::command_packet::app_command::bilibili_packet_parse_error::Bi
 use crate::command::command_packet::app_command::receiver_status_update::{
   ReceiverStatus, ReceiverStatusUpdate,
 };
-use crate::command::command_packet::app_command::AppCommand;
 use crate::command::command_packet::bilibili_command::activity_update::ActivityUpdate;
 use crate::command::command_packet::bilibili_command::danmu_message::{
   DanmuMessage, DanmuMessageParseError,
 };
 use crate::command::command_packet::bilibili_command::BiliBiliCommand;
-use crate::command::command_packet::CommandPacket;
 use crate::config::config::backend_config::danmu_receiver_config::DanmuReceiverConfig;
 use crate::config::config_manager::{modify_cfg, ConfigManager};
 use crate::network::api_request::bilibili_response::Error::EmptyData;
@@ -300,9 +298,7 @@ impl DanmuReceiver {
     }
 
     CommandBroadcastServer::i()
-      .broadcast_app_command(AppCommand::from_receiver_status_update(
-        ReceiverStatusUpdate::new(status.clone()),
-      ))
+      .broadcast_cmd(ReceiverStatusUpdate::new(status.clone()))
       .await;
 
     self.status = status;
@@ -371,9 +367,7 @@ impl DanmuReceiver {
         let mut offset = 0;
         let activity = b_get!(@u32, packet.body, offset);
         CommandBroadcastServer::i()
-          .broadcast_bilibili_command(BiliBiliCommand::from_activity_update(ActivityUpdate::new(
-            activity,
-          )))
+          .broadcast_cmd(ActivityUpdate::new(activity))
           .await;
       }
       OpCode::Message => {
@@ -394,13 +388,11 @@ impl DanmuReceiver {
             // region parse to bilibili command
             let cmd_parse_result = Self::parse_raw(raw.clone()).await;
             if let Ok(command) = cmd_parse_result {
-              CommandBroadcastServer::i()
-                .broadcast_bilibili_command(command.0)
-                .await;
+              CommandBroadcastServer::i().broadcast_cmd(command.0).await;
 
               if let Some(raw_backup) = command.1 {
                 let result =
-                  write_bilibili_command(BiliBiliCommand::from_raw_backup(raw_backup)).await;
+                  write_bilibili_command(BiliBiliCommand::new_raw_backup(raw_backup)).await;
 
                 if let Err(err) = result {
                   error!("unable to write raw_backup\n {err:?}")
@@ -415,7 +407,8 @@ impl DanmuReceiver {
               error!("{msg}");
 
               let result =
-                write_bilibili_command(BiliBiliCommand::parse_failed(str.to_string(), msg)).await;
+                write_bilibili_command(BiliBiliCommand::new_parse_failed(str.to_string(), msg))
+                  .await;
 
               if let Err(err) = result {
                 error!("unable to write json object parse failed command\n {err:?}")
@@ -430,7 +423,7 @@ impl DanmuReceiver {
             error!("{msg}");
 
             let result =
-              write_bilibili_command(BiliBiliCommand::parse_failed(str.to_string(), msg)).await;
+              write_bilibili_command(BiliBiliCommand::new_parse_failed(str.to_string(), msg)).await;
 
             if let Err(err) = result {
               error!("unable to write json string parse failed command\n {err:?}")
@@ -445,7 +438,8 @@ impl DanmuReceiver {
           );
           error!("{msg}");
 
-          let result = write_bilibili_command(BiliBiliCommand::parse_failed(data_str, msg)).await;
+          let result =
+            write_bilibili_command(BiliBiliCommand::new_parse_failed(data_str, msg)).await;
 
           if let Err(err) = result {
             error!("unable to write hex parse failed command\n {err:?}")
@@ -470,18 +464,16 @@ impl DanmuReceiver {
 
     if cmd.starts_with("DANMU_MSG") {
       let dm = DanmuMessage::from_raw(&raw).await?;
-      Ok((BiliBiliCommand::from_danmu_message(dm), Some(raw)))
+      Ok((BiliBiliCommand::from(dm), Some(raw)))
     } else {
-      Ok((BiliBiliCommand::from_raw(raw), None))
+      Ok((BiliBiliCommand::new_raw(raw), None))
     }
   }
 
   async fn on_parse_error(message: String) {
     error!("{}", message);
     CommandBroadcastServer::i()
-      .broadcast_app_command(AppCommand::from_bilibili_packet_parse_error(
-        BiliBiliPacketParseError::new(message),
-      ))
+      .broadcast_cmd(BiliBiliPacketParseError::new(message))
       .await
   }
 }
@@ -489,9 +481,7 @@ impl DanmuReceiver {
 async fn write_bilibili_command(
   command: BiliBiliCommand,
 ) -> crate::command::command_history_manager::Result<()> {
-  CommandHistoryManager::i()
-    .write(&CommandPacket::from_bilibili_command(command))
-    .await
+  CommandHistoryManager::i().write(&command.into()).await
 }
 
 pub type ConnectResult<T> = Result<T, ConnectError>;

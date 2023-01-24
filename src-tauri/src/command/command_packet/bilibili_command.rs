@@ -36,28 +36,16 @@ pub enum BiliBiliCommand {
 }
 
 impl BiliBiliCommand {
-  pub fn from_activity_update(activity_update: ActivityUpdate) -> BiliBiliCommand {
-    BiliBiliCommand::ActivityUpdate {
-      data: activity_update,
-    }
+  pub fn new_parse_failed(data: String, message: String) -> Self {
+    Self::ParseFailed { data, message }
   }
 
-  pub fn from_danmu_message(danmu_message: DanmuMessage) -> BiliBiliCommand {
-    BiliBiliCommand::DanmuMessage {
-      data: Box::new(danmu_message),
-    }
-  }
-
-  pub fn from_raw(raw: Value) -> BiliBiliCommand {
+  pub fn new_raw(raw: Value) -> BiliBiliCommand {
     BiliBiliCommand::Raw { data: raw }
   }
 
-  pub fn from_raw_backup(raw: Value) -> BiliBiliCommand {
+  pub fn new_raw_backup(raw: Value) -> BiliBiliCommand {
     BiliBiliCommand::RawBackup { data: raw }
-  }
-
-  pub fn parse_failed(data: String, message: String) -> BiliBiliCommand {
-    BiliBiliCommand::ParseFailed { data, message }
   }
 
   pub fn command(&self) -> String {
@@ -75,5 +63,31 @@ impl BiliBiliCommand {
       }
       BiliBiliCommand::ParseFailed { .. } => "parseFailed".to_string(),
     }
+  }
+}
+
+impl From<ActivityUpdate> for BiliBiliCommand {
+  fn from(value: ActivityUpdate) -> Self {
+    Self::ActivityUpdate { data: value }
+  }
+}
+
+impl From<DanmuMessage> for BiliBiliCommand {
+  fn from(value: DanmuMessage) -> Self {
+    Self::DanmuMessage {
+      data: Box::from(value),
+    }
+  }
+}
+
+pub fn from_activity_update(activity_update: ActivityUpdate) -> BiliBiliCommand {
+  BiliBiliCommand::ActivityUpdate {
+    data: activity_update,
+  }
+}
+
+pub fn from_danmu_message(danmu_message: DanmuMessage) -> BiliBiliCommand {
+  BiliBiliCommand::DanmuMessage {
+    data: Box::new(danmu_message),
   }
 }
