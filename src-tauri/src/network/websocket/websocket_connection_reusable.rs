@@ -45,6 +45,12 @@ impl WebSocketConnectionReusable {
     }
   }
 
+  pub async fn send_many(&mut self, messages: Vec<Message>) {
+    if let Some(ws) = &mut self.inner {
+      ws.send_many(messages).await
+    }
+  }
+
   pub async fn tick(&mut self) -> Vec<Message> {
     if let Some(ws) = &mut self.inner {
       ws.tick().await

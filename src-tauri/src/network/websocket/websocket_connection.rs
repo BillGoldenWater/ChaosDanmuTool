@@ -24,6 +24,18 @@ use tokio_tungstenite::{connect_async, tungstenite::Message, MaybeTlsStream, Web
 use crate::utils::async_utils::run_blocking;
 use crate::utils::mutex_utils::a_lock;
 
+macro_rules! log_err {
+  ($methodName:literal, $expr:expr) => {{
+    let result = $expr;
+    if let Err(err) = result {
+      error!(
+        "error occurs in {__methodName__} \n{err}",
+        __methodName__ = $methodName
+      );
+    }
+  }};
+}
+
 type WebSocket = WebSocketStream<MaybeTlsStream<TcpStream>>;
 type WebSocketWriter = SplitSink<WebSocket, Message>;
 type WebSocketReader = SplitStream<WebSocket>;
@@ -70,9 +82,12 @@ impl WebSocketConnection {
     let mut connected = a_lock(&self.connected).await;
 
     if *connected {
-      let _ = self.writer.send(Message::Close(close_frame)).await;
-      let _ = self.writer.flush().await;
-      let _ = self.writer.close().await;
+      log_err!(
+        "disconnect",
+        self.writer.send(Message::Close(close_frame)).await
+      );
+      log_err!("disconnect", self.writer.flush().await);
+      log_err!("disconnect", self.writer.close().await);
       *connected = false;
     }
 
@@ -83,7 +98,7 @@ impl WebSocketConnection {
     let connected = a_lock(&self.connected).await;
 
     if *connected {
-      let _ = self.writer.send(message).await;
+      log_err!("send", self.writer.send(message).await);
     }
 
     drop(connected)
@@ -93,7 +108,7 @@ impl WebSocketConnection {
     let connected = a_lock(&self.connected).await;
 
     if *connected {
-      let _ = self.writer.feed(message).await;
+      log_err!("feed", self.writer.feed(message).await);
     }
 
     drop(connected)
@@ -103,7 +118,21 @@ impl WebSocketConnection {
     let connected = a_lock(&self.connected).await;
 
     if *connected {
-      let _ = self.writer.flush().await;
+      log_err!("flush", self.writer.flush().await);
+    }
+
+    drop(connected)
+  }
+
+  pub async fn send_many(&mut self, messages: Vec<Message>) {
+    let connected = a_lock(&self.connected).await;
+
+    if *connected {
+      for msg in messages {
+        log_err!("send_many", self.writer.feed(msg).await);
+      }
+
+      log_err!("send_many", self.writer.flush().await);
     }
 
     drop(connected)
@@ -182,6 +211,9 @@ impl WebSocketConnection {
 
     // forward
     if let Some(message) = item {
+      // safe to ignore.
+      // no full because unbounded.
+      // if closed, this will quickly exit.
       let _ = tx.send(message);
     }
   }
