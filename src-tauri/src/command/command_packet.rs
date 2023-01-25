@@ -21,23 +21,46 @@ pub enum CommandPacket {
     uuid: String,
     timestamp: i64,
     data: AppCommand,
+    #[serde(skip)]
+    str_cache: Option<String>,
   },
   BiliBiliCommand {
     uuid: String,
     timestamp: i64,
     data: BiliBiliCommand,
+    #[serde(skip)]
+    str_cache: Option<String>,
   },
 }
 
 impl CommandPacket {
   pub fn to_string(&self) -> Result<String> {
-    match self {
-      CommandPacket::AppCommand {
-        data: AppCommand::ConfigUpdate { .. },
-        ..
-      } => Ok(serialize_config(self, false)),
-      _ => Ok(serde_json::to_string(self)?),
+    if let Some(cache) = match self {
+      Self::AppCommand { str_cache, .. } => str_cache,
+      Self::BiliBiliCommand { str_cache, .. } => str_cache,
+    } {
+      Ok(cache.clone())
+    } else {
+      let result = match self {
+        CommandPacket::AppCommand {
+          data: AppCommand::ConfigUpdate { .. },
+          ..
+        } => serialize_config(self, false),
+        _ => serde_json::to_string(self)?,
+      };
+
+      Ok(result)
     }
+  }
+
+  fn gen_str_cache(&mut self) -> Result<()> {
+    let str_opt = Some(self.to_string()?);
+    let str_cache = match self {
+      Self::AppCommand { str_cache, .. } => str_cache,
+      Self::BiliBiliCommand { str_cache, .. } => str_cache,
+    };
+    *str_cache = str_opt;
+    Ok(())
   }
 
   pub fn compressed_base64(&self) -> Result<String> {
@@ -65,21 +88,27 @@ impl CommandPacket {
 
 impl From<AppCommand> for CommandPacket {
   fn from(value: AppCommand) -> Self {
-    Self::AppCommand {
+    let mut this = Self::AppCommand {
       uuid: uuid::Uuid::new_v4().to_string(),
       timestamp: Utc::now().timestamp_millis(),
       data: value,
-    }
+      str_cache: None,
+    };
+    let _ = this.gen_str_cache();
+    this
   }
 }
 
 impl From<BiliBiliCommand> for CommandPacket {
   fn from(value: BiliBiliCommand) -> Self {
-    CommandPacket::BiliBiliCommand {
+    let mut this = Self::BiliBiliCommand {
       uuid: uuid::Uuid::new_v4().to_string(),
       timestamp: Utc::now().timestamp_millis(),
       data: value,
-    }
+      str_cache: None,
+    };
+    let _ = this.gen_str_cache();
+    this
   }
 }
 
@@ -87,7 +116,32 @@ impl TryFrom<&str> for CommandPacket {
   type Error = Error;
 
   fn try_from(value: &str) -> std::result::Result<Self, Self::Error> {
-    Ok(serde_json::from_str(value)?)
+    let result = serde_json::from_str(value)?;
+    let result = match result {
+      Self::AppCommand {
+        uuid,
+        timestamp,
+        data,
+        ..
+      } => Self::AppCommand {
+        uuid,
+        timestamp,
+        data,
+        str_cache: Some(value.to_string()),
+      },
+      Self::BiliBiliCommand {
+        uuid,
+        timestamp,
+        data,
+        ..
+      } => Self::BiliBiliCommand {
+        uuid,
+        timestamp,
+        data,
+        str_cache: Some(value.to_string()),
+      },
+    };
+    Ok(result)
   }
 }
 
