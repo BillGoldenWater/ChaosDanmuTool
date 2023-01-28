@@ -14,6 +14,21 @@ export default defineConfig(async () => {
           plugins: [["babel-plugin-styled-components"]],
         },
       }),
+      {
+        name: "add react-devtools",
+        transformIndexHtml(html) {
+          if (process.env.NODE_ENV === "development")
+            return html.replace(
+              "<!--react-devtools-placeholder-->",
+              '<script src="http://localhost:8097"></script>'
+            );
+          else
+            return html.replace(
+              /\n\W*?<!--react-devtools-placeholder-->\W*?\n/,
+              "\n"
+            );
+        },
+      },
     ],
 
     build: {

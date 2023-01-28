@@ -53,7 +53,8 @@ export class BackendApi {
 
 export const backend = window.__TAURI_METADATA__ ? new BackendApi() : null;
 
-if (backend && (await backend.isDebug())) {
+// @ts-ignore
+if (window.backend === undefined && backend && (await backend.isDebug())) {
   // @ts-ignore
   window.backend = backend;
 }

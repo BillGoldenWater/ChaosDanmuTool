@@ -9,7 +9,7 @@
   },
   "license": "AGPL-3.0-only",
   "scripts": {
-    "dev": "vite",
+    "dev": "(react-devtools&) && vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "cargo tauri"
@@ -72,6 +72,7 @@
     "eslint-plugin-react": "7.31.11",
     "eslint-plugin-react-hooks": "4.6.0",
     "internal-ip": "7.0.0",
+    "react-devtools": "4.27.1",
     "semver": "7.3.8",
     "toml-patch": "0.2.3",
     "tslib": "2.4.1",
