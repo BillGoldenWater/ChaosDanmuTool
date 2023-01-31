@@ -43,5 +43,5 @@ pub type Result<T> = std::result::Result<T, Error>;
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
   #[error("failed to compress: {0:?}")]
-  IoError(#[from] std::io::Error)
+  IoError(#[from] std::io::Error),
 }

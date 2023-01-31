@@ -4,17 +4,29 @@
  */
 
 #[cfg(target_os = "macos")]
-#[link(name = "ApplicationServices", kind = "framework")]
-extern "C" {
-  pub(crate) fn TransformProcessType(
-    psn: MacTypes_sys::ProcessSerialNumberPtr,
-    transform_state: u32,
-  ) -> MacTypes_sys::OSStatus;
+#[allow(non_snake_case)]
+#[repr(C)]
+#[derive(Clone, Copy, Debug, Default, Eq, Hash, PartialEq)]
+pub struct ProcessSerialNumber {
+  pub highLongOfPSN: u32,
+  pub lowLongOfPSN: u32,
 }
 
 #[cfg(target_os = "macos")]
-pub fn get_psn() -> MacTypes_sys::ProcessSerialNumber {
-  MacTypes_sys::ProcessSerialNumber {
+pub type ProcessSerialNumberPtr = *mut ProcessSerialNumber;
+#[cfg(target_os = "macos")]
+pub type OSStatus = i32;
+
+#[cfg(target_os = "macos")]
+#[link(name = "ApplicationServices", kind = "framework")]
+extern "C" {
+  pub(crate) fn TransformProcessType(psn: ProcessSerialNumberPtr, transform_state: u32)
+    -> OSStatus;
+}
+
+#[cfg(target_os = "macos")]
+pub fn get_psn() -> ProcessSerialNumber {
+  ProcessSerialNumber {
     highLongOfPSN: 0,
     lowLongOfPSN: 2,
   }

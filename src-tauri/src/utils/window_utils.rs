@@ -14,9 +14,8 @@ pub fn set_visible_on_all_workspaces(
 ) {
   #[cfg(target_os = "macos")]
   unsafe {
-    use crate::utils::process_utils::{get_psn, TransformProcessType};
+    use crate::utils::process_utils::{get_psn, ProcessSerialNumberPtr, TransformProcessType};
     use cocoa::appkit::{NSWindow, NSWindowCollectionBehavior};
-    use MacTypes_sys::ProcessSerialNumberPtr;
 
     let ns_window = window.ns_window().unwrap() as cocoa::base::id;
 
