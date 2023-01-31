@@ -95,7 +95,7 @@ pub struct Args {
   /// enable output full backtrace
   #[argh(switch)]
   pub backtrace_detail: bool,
-  /// Output to console
+  /// output to console
   #[cfg(target_os = "windows")]
   #[argh(switch)]
   pub with_console: bool,
