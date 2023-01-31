@@ -5,7 +5,6 @@
 
 use std::path::PathBuf;
 
-use clap::Parser;
 use tauri::api::path::app_config_dir;
 use tauri::Config;
 
@@ -32,13 +31,14 @@ impl AppContext {
       use crate::utils::console_utils::{attach_console, detach_console};
 
       attach_console();
-      let args = Args::parse();
+      let args: Args = argh::from_env();
       detach_console();
 
       #[cfg(target_os = "windows")]
       {
-        if args.attach_console {
-          attach_console();
+        use crate::utils::console_utils::alloc_console;
+        if args.with_console {
+          alloc_console();
         }
       }
 
@@ -86,20 +86,20 @@ impl AppContext {
 
 static mut APP_CONTEXT: *const AppContext = 0 as *const AppContext;
 
-#[derive(Parser, Clone)]
-#[command(author, version, about = None, long_about = None)]
+#[derive(argh::FromArgs, Clone)]
+/// Chaos Danmu Tool options
 pub struct Args {
-  /// How long that mutex lock should wait for (millisecond)
-  #[arg(short = 'L', long, default_value_t = 10_000)]
+  /// how long that mutex lock should wait for (millisecond)
+  #[argh(short = 'L', option, default = "10_000")]
   pub lock_timeout_millis: u64,
-  /// Enable output full backtrace
-  #[arg(short, long)]
+  /// enable output full backtrace
+  #[argh(switch)]
   pub backtrace_detail: bool,
   /// Output to console
   #[cfg(target_os = "windows")]
-  #[arg(short, long)]
-  pub attach_console: bool,
-  /// Set home dir
-  #[arg(long)]
+  #[argh(switch)]
+  pub with_console: bool,
+  /// set home dir
+  #[argh(option)]
   pub home_dir: Option<String>,
 }

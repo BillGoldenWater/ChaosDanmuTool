@@ -6,7 +6,7 @@
 pub fn attach_console() {
   #[cfg(target_os = "windows")]
   {
-    use winapi::um::wincon::{AttachConsole, ATTACH_PARENT_PROCESS};
+    use windows::Win32::System::Console::{AttachConsole, ATTACH_PARENT_PROCESS};
     unsafe {
       AttachConsole(ATTACH_PARENT_PROCESS);
     }
@@ -16,9 +16,19 @@ pub fn attach_console() {
 pub fn detach_console() {
   #[cfg(target_os = "windows")]
   {
-    use winapi::um::wincon::FreeConsole;
+    use windows::Win32::System::Console::FreeConsole;
     unsafe {
       FreeConsole();
+    }
+  }
+}
+
+pub fn alloc_console() {
+  #[cfg(target_os = "windows")]
+  {
+    use windows::Win32::System::Console::AllocConsole;
+    unsafe {
+      AllocConsole();
     }
   }
 }

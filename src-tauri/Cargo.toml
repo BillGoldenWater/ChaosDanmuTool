@@ -63,7 +63,7 @@ backtrace = "0.3.67"
 thiserror = "1.0.38"
 log = { version = "0.4.17", features = ["max_level_debug", "release_max_level_debug"] }
 fern = { version = "0.6.1", features = ["colored"] }
-clap = { version = "4.1.4", features = ["derive"] }
+argh = "0.1.10"
 os_type = "2.6.0"
 toml = "0.7.1"
 ts-rs = "6.2.1"
@@ -80,8 +80,8 @@ ts-rs = "6.2.1"
 # #[serde(rename_all = "camelCase")]
 # #[ts(export, export_to = "../src/share/type/rust/$PATH$")]
 
-[target.'cfg(target_os = "windows")'.dependencies]
-winapi = "0.3.9"
+#[target.'cfg(target_os = "windows")'.dependencies]
+windows = { version = "0.44.0", features = ["Win32_Foundation", "Win32_System_Console"] }
 
 [target.'cfg(target_os = "macos")'.dependencies]
 cocoa = "0.24.1"
