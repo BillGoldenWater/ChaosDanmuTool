@@ -64,7 +64,7 @@ async function copy(platform, buildInfos) {
     const signature = (await fs.readFile(sigPath)).toString();
     updateInfo[updateTarget] = {
       signature: signature,
-      url: `https://github.com/BiliGoldenWater/ChaosDanmuTool/releases/download/${version}/${updatePkg}`,
+      url: `https://github.com/BillGoldenWater/ChaosDanmuTool/releases/download/${version}/${updatePkg}`,
       cdn_url: `https://cdn.goldenwater.ml/releases?repo=ChaosDanmuTool&tag=${version}&file=${updatePkg}`,
     };
     // endregion

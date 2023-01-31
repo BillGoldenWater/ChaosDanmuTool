@@ -25,9 +25,9 @@ function highlightLog(msg) {
 
 async function main() {
   highlightLog("cloning tao");
-  execCommand("git clone https://github.com/BiliGoldenWater/tao ../tao");
+  execCommand("git clone https://github.com/BillGoldenWater/tao ../tao");
   highlightLog("cloning tauri");
-  execCommand("git clone https://github.com/BiliGoldenWater/tauri ../tauri");
+  execCommand("git clone https://github.com/BillGoldenWater/tauri ../tauri");
 }
 
 main().then();

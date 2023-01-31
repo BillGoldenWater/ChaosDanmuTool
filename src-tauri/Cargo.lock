@@ -3339,7 +3339,7 @@ dependencies = [
 [[package]]
 name = "static_object"
 version = "0.1.0"
-source = "git+https://github.com/BiliGoldenWater/StaticObject.git#2004bf726665cec547da01282353637ee742560c"
+source = "git+https://github.com/BillGoldenWater/StaticObject.git#2004bf726665cec547da01282353637ee742560c"
 dependencies = [
  "static_object_derive",
 ]
@@ -3347,7 +3347,7 @@ dependencies = [
 [[package]]
 name = "static_object_derive"
 version = "0.1.0"
-source = "git+https://github.com/BiliGoldenWater/StaticObject.git#2004bf726665cec547da01282353637ee742560c"
+source = "git+https://github.com/BillGoldenWater/StaticObject.git#2004bf726665cec547da01282353637ee742560c"
 dependencies = [
  "quote",
  "syn",

@@ -4,7 +4,7 @@ version = "0.10.0"
 description = "A tool for process/view Danmu on bilibili"
 authors = ["Golden_Water"]
 license = "AGPL-3.0-only"
-repository = "https://github.com/BiliGoldenWater/ChaosDanmuTool.git"
+repository = "https://github.com/BillGoldenWater/ChaosDanmuTool.git"
 default-run = "chaos_danmu_tool"
 edition = "2021"
 rust-version = "1.57"
@@ -18,7 +18,7 @@ tauri-build = { version = "1.2.1", features = [] }
 #embed-resource = "1.8.0"
 
 [dependencies]
-static_object = { git = "https://github.com/BiliGoldenWater/StaticObject.git" }
+static_object = { git = "https://github.com/BillGoldenWater/StaticObject.git" }
 serde_json = "1.0.91"
 serde = { version = "1.0.152", features = ["derive"] }
 # live template: sddfc (serde default define & function - config)
@@ -105,5 +105,5 @@ opt-level = "s" # Optimize for binary size
 incremental = true
 
 #[patch.crates-io]
-#tauri = { git = "https://github.com/BiliGoldenWater/tauri.git", rev = "75a0c79dea39e3e8372097152a0fa82cf6493686" }
-#tao = { git = "https://github.com/BiliGoldenWater/tao.git" }
+#tauri = { git = "https://github.com/BillGoldenWater/tauri.git", rev = "75a0c79dea39e3e8372097152a0fa82cf6493686" }
+#tao = { git = "https://github.com/BillGoldenWater/tao.git" }
