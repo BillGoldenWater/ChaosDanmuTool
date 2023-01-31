@@ -58,7 +58,6 @@ get-port = "4.0.0"
 sysinfo = "0.27.7"
 async-recursion = "1.0.2"
 sqlx = { version = "0.6.2", features = ["runtime-tokio-native-tls", "sqlite"] }
-base64 = "0.21.0"
 rand = "0.8.5"
 backtrace = "0.3.67"
 thiserror = "1.0.38"

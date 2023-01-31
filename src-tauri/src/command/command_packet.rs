@@ -8,7 +8,7 @@ use chrono::{DateTime, TimeZone, Utc};
 use crate::command::command_packet::app_command::AppCommand;
 use crate::command::command_packet::bilibili_command::BiliBiliCommand;
 use crate::config::config::serialize_config;
-use crate::utils::brotli_utils::{self, brotli_compress_str};
+use crate::utils::brotli_utils;
 
 pub mod app_command;
 pub mod bilibili_command;
@@ -61,10 +61,6 @@ impl CommandPacket {
     };
     *str_cache = str_opt;
     Ok(())
-  }
-
-  pub fn compressed_base64(&self) -> Result<String> {
-    Ok(brotli_compress_str(self.to_string()?)?)
   }
 
   pub fn command(&self) -> String {

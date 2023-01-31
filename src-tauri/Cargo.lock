@@ -349,7 +349,6 @@ dependencies = [
  "MacTypes-sys",
  "async-recursion",
  "backtrace",
- "base64 0.21.0",
  "brotli",
  "bytes",
  "chrono",

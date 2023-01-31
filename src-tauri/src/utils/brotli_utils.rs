@@ -30,10 +30,6 @@ pub fn brotli_compress<D: AsRef<[u8]>>(data: &D) -> Result<Vec<u8>> {
   Ok(compressed)
 }
 
-pub fn brotli_compress_str(data: String) -> Result<String> {
-  Ok(base64::encode(brotli_compress(&data.as_bytes().to_vec())?))
-}
-
 pub fn brotli_decompress<D: AsRef<[u8]>>(data: &D) -> Result<Vec<u8>> {
   let mut decompressed = vec![];
 
@@ -42,17 +38,10 @@ pub fn brotli_decompress<D: AsRef<[u8]>>(data: &D) -> Result<Vec<u8>> {
   Ok(decompressed)
 }
 
-pub fn brotli_decompress_str(base64: String) -> Result<String> {
-  let decoded = base64::decode(base64)?;
-  Ok(String::from_utf8_lossy(&brotli_decompress(&decoded)?).to_string())
-}
-
 pub type Result<T> = std::result::Result<T, Error>;
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
   #[error("failed to compress: {0:?}")]
-  IoError(#[from] std::io::Error),
-  #[error("failed to decode base64 string: {0:?}")]
-  Base64DecodeError(#[from] base64::DecodeError),
+  IoError(#[from] std::io::Error)
 }
