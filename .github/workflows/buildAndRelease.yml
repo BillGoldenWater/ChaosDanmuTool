@@ -22,13 +22,7 @@ jobs:
 
       - uses: actions/download-artifact@v3
         with:
-          path: out
-
-      - name: move artifacts folder
-        run: |
-          mv out/artifact out_
-          rm -rf out
-          mv out_ out
+          path: .
 
       - name: generate update info
         run: node scripts/genUpdateInfo.mjs
