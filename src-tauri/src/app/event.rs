@@ -46,6 +46,10 @@ pub async fn on_setup(app: &mut App<Wry>) {
 }
 
 pub async fn on_ready(app_handle: &AppHandle<Wry>) {
+  if let Some(roomid) = AppContext::i().args.connect {
+    DanmuReceiver::i().connect_to(roomid).await;
+  }
+
   show_main_window(app_handle.clone());
 }
 

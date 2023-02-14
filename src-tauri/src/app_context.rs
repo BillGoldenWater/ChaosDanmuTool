@@ -90,7 +90,7 @@ static mut APP_CONTEXT: *const AppContext = 0 as *const AppContext;
 /// Chaos Danmu Tool options
 pub struct Args {
   /// how long that mutex lock should wait for (millisecond)
-  #[argh(short = 'L', option, default = "10_000")]
+  #[argh(option, short = 'L', default = "10_000")]
   pub lock_timeout_millis: u64,
   /// enable output full backtrace
   #[argh(switch)]
@@ -102,4 +102,7 @@ pub struct Args {
   /// set home dir
   #[argh(option)]
   pub home_dir: Option<String>,
+  /// connect room on startup
+  #[argh(option, short = 'C')]
+  pub connect: Option<u32>,
 }
