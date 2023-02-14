@@ -34,6 +34,7 @@ type Option = {
 };
 
 export class CommandReceiver {
+  id = window.crypto.randomUUID().slice(0, 6);
   client: WebSocket | undefined;
   option: Option = {
     host: "localhost",
@@ -45,6 +46,7 @@ export class CommandReceiver {
     location: "CommandReceiver",
     eventTarget: new AppEventTarget(),
   };
+  connected = false;
 
   reconnectTimeoutId: number | undefined;
   reconnectCount = 0;
@@ -57,10 +59,23 @@ export class CommandReceiver {
     this.option = { ...this.option, ...option };
   }
 
+  updateId() {
+    this.id = window.crypto.randomUUID().slice(0, 6);
+  }
+
   open() {
-    this.close();
+    this.updateId();
+    this.log("client.open", "open called");
+
+    this.close_();
+    this.open_();
+
+    this.connected = true;
+  }
+
+  private open_() {
     this.log(
-      "client.open",
+      "client.open_",
       `ws://${this.option.host}:${this.option.port} Connecting`
     );
     this.client = new WebSocket(`ws://${this.option.host}:${this.option.port}`);
@@ -71,25 +86,44 @@ export class CommandReceiver {
       );
       this.reconnectCount = 0;
     };
-    this.client.onclose = (event) => {
-      if (
+    this.client.onclose = ((id: string, event: CloseEvent) => {
+      const noReconnect =
         this.option.noReconnectCodes.find((value) => value == event.code) ==
-        null
-      ) {
+        null;
+      const isSameSession = id === this.id;
+
+      if (noReconnect && this.connected && isSameSession) {
         this.error(
           "client.onclose",
-          `Code: ${event.code}, Reason: ${event.reason}`
+          `Code: ${event.code}, Reason: ${event.reason}`,
+          id
         );
         this.tryReconnect();
       } else {
         this.log(
           "client.onclose",
-          `Code: ${event.code}, Reason: ${event.reason}`
+          `Code: ${event.code}, Reason: ${event.reason}`,
+          id
         );
       }
-    };
+    }).bind(this, this.id);
 
     this.client.onmessage = this.onMessage.bind(this);
+  }
+
+  close(code?: number) {
+    this.log("client.close", "close called");
+    this.close_(code);
+
+    this.connected = false;
+  }
+
+  private close_(code?: number) {
+    if (this.client != null) {
+      this.log("client.close_", "closing");
+      this.client?.close(code ? code : 1000);
+      this.client = undefined;
+    }
   }
 
   onMessage(event: MessageEvent) {
@@ -159,10 +193,6 @@ export class CommandReceiver {
     }
   }
 
-  close(code?: number) {
-    this.client?.close(code ? code : 1000);
-  }
-
   tryReconnect() {
     window.clearTimeout(this.reconnectTimeoutId);
     if (
@@ -172,16 +202,20 @@ export class CommandReceiver {
       return;
 
     window.setTimeout(() => {
-      this.open();
+      this.open_();
       this.reconnectCount++;
     }, 1000);
   }
 
-  log(location: string, message: string) {
-    console.log(`[${this.option.location}.${location}] ${message}`);
+  log(location: string, message: string, id?: string) {
+    console.log(
+      `[${id || this.id}:${this.option.location}.${location}] ${message}`
+    );
   }
 
-  error(location: string, message: string) {
-    console.error(`[${this.option.location}.${location}] ${message}`);
+  error(location: string, message: string, id?: string) {
+    console.error(
+      `[${id || this.id}:${this.option.location}.${location}] ${message}`
+    );
   }
 }
