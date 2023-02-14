@@ -12,7 +12,7 @@ import { App } from "./App";
 import { backend } from "./share/app/BackendApi";
 import { AppCtxProvider, defaultConfig } from "./share/app/AppCtx";
 import { ThemeCtxProvider } from "./share/component/ThemeCtx";
-import React from "react";
+import React, { StrictMode } from "react";
 import { WindowCtxProvider } from "./share/component/WindowCtx";
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -22,13 +22,15 @@ const config = backend ? await backend.getConfig() : defaultConfig;
 const debug = backend ? await backend.isDebug() : true;
 
 root.render(
-  <WindowCtxProvider>
-    <AppCtxProvider debug={debug} firstConfig={config}>
-      <ThemeCtxProvider>
-        <App />
-      </ThemeCtxProvider>
-    </AppCtxProvider>
-  </WindowCtxProvider>
+  <StrictMode>
+    <WindowCtxProvider>
+      <AppCtxProvider debug={debug} firstConfig={config}>
+        <ThemeCtxProvider>
+          <App />
+        </ThemeCtxProvider>
+      </AppCtxProvider>
+    </WindowCtxProvider>
+  </StrictMode>
 );
 
 if (debug) {
