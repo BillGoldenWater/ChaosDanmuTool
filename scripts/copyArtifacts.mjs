@@ -24,7 +24,7 @@ async function copy(platform, buildInfos) {
 
   for (const buildInfo of buildInfos) {
     // region destruct
-    const {versionInfo, pkgFile, updatePkgFile} = buildInfo;
+    const { versionInfo, pkgFile, updatePkgFile } = buildInfo;
     const [target, updateTarget, version] = versionInfo.split("|");
     const [pkgFilePath, pkgExt] = pkgFile.split("|");
     const [updatePkgFilePath, updatePkgExt] = updatePkgFile.split("|");
@@ -77,12 +77,12 @@ async function main() {
   /**
    * @type string
    */
-    // noinspection JSFileReferences
+  // noinspection JSFileReferences
   const version = JSON.parse(
-      (await fs.readFile("./package.json")).toString()
-    ).version;
+    (await fs.readFile("./package.json")).toString()
+  ).version;
 
-  await fs.rm("out", {recursive: true, force: true});
+  await fs.rm("out", { recursive: true, force: true });
   await fs.mkdir("out");
 
   switch (process.platform) {

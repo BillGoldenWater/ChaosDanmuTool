@@ -3,14 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-export type AObjectKey = string | number;
+type ObjectKey = string | number | bigint | boolean | null | undefined;
 
 export type TObjectKey<T extends object> = {
-  [K in keyof T]: T[K] extends object
-    ? K extends AObjectKey
-      ? TObjectKey<T[K]> extends AObjectKey
-        ? K | `${K}.${TObjectKey<T[K]>}`
-        : K
+  [K in keyof T]: K extends ObjectKey
+    ? T[K] extends object
+      // eslint-disable-next-line @typescript-eslint/ban-types
+      ? T[K] extends Function
+        ? never
+        : K | `${K}.${TObjectKey<T[K]>}`
       : K
-    : K;
+    : never;
 }[keyof T];
