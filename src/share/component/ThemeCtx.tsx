@@ -18,24 +18,29 @@ import { Config } from "../type/rust/config/Config";
 import Color from "color";
 import { TPropToString } from "../type/TPropToString";
 import { backend } from "../app/BackendApi";
-import { ThemeProvider } from "styled-components";
+import { css, ThemeProvider } from "styled-components";
 
 type ThemeConfig = Config["frontend"]["mainView"]["theme"];
 
 export interface TThemeConstants {
   theme: Color;
+  thHover: Color;
 
-  text: Color;
-  titleText: Color;
-  secondaryText: Color;
+  bgWindow: Color;
+  bgContent: Color;
+  bgItem: Color;
+  bgHover: Color;
+  bgTheme: Color;
+  bgThHover: Color;
 
-  background: Color;
+  txt: Color;
+  txtSecond: Color;
+  txtBlack: Color;
 
-  contentBackground: Color;
-  menuItemBackground: Color;
-  menuItemActiveBackground: Color;
-
-  tooltipBackground: Color;
+  fnInfo: Color;
+  fnSuccess: Color;
+  fnWarn: Color;
+  fnErr: Color;
 
   [key: string]: Color;
 }
@@ -49,15 +54,15 @@ export async function genConstants(
   const vibrancyApplied = backend ? await backend.isVibrancyApplied() : false;
   const themeColor = Color(themeCfg.themeColor);
 
-  function black(percent: number) {
+  function bl(percent: number) {
     return Color([0, 0, 0, percent], "hsl");
   }
 
-  function white(percent: number) {
+  function wh(percent: number) {
     return Color([0, 0, 100, percent], "hsl");
   }
 
-  function theme(percent: number) {
+  function th(percent: number) {
     return Color(
       [
         themeColor.hue(),
@@ -74,48 +79,48 @@ export async function genConstants(
   let themeConstants: TThemeConstants;
 
   themeConstants = {
-    theme: theme(1),
+    theme: th(1),
+    thHover: th(1).lighten(0.2),
 
-    text: theme(1).desaturate(0.95).lighten(0.9).fade(0.05),
-    titleText: theme(1).desaturate(0.95).lighten(0.9).fade(0),
-    secondaryText: theme(1).desaturate(0.95).lighten(0.9).fade(0.4),
+    bgWindow: th(1).saturationl(1).lightness(5).alpha(0.32),
+    bgContent: th(1).saturationl(1).lightness(10),
+    bgItem: th(1).saturationl(1).lightness(15),
+    bgHover: th(1).saturationl(1).lightness(25),
+    bgTheme: th(1).saturationl(100).lightness(20),
+    bgThHover: th(1).saturationl(100).lightness(30),
 
-    background: theme(1).desaturate(0.95).darken(0.85).fade(0.2),
+    txt: wh(1).lightness(95),
+    txtSecond: wh(1).lightness(70),
+    txtBlack: bl(1),
 
-    contentBackground: white(0.05),
-    inputBackground: white(0.05),
-    buttonBackground: white(0.05),
-    buttonPrimaryBackground: theme(0.75),
-
-    menuItemBackground: white(0.05),
-    menuItemActiveBackground: theme(0.1),
-    tooltipBackground: black(0.15),
+    fnInfo: Color([200, 100, 50], "hsl"),
+    fnSuccess: Color([145, 100, 42], "hsl"),
+    fnWarn: Color([50, 100, 60], "hsl"),
+    fnErr: Color([360, 100, 60], "hsl"),
   };
   if (!vibrancyApplied) {
-    themeConstants.background = themeConstants.background.alpha(1);
+    themeConstants.bgWindow = themeConstants.bgWindow.alpha(1);
   }
 
   if (themeCfg.themeId !== "dark") {
     themeConstants = {
-      theme: theme(1),
+      ...themeConstants,
+      theme: th(1),
+      thHover: th(1).lighten(0.2),
 
-      text: theme(1).desaturate(0.95).darken(0.9).fade(0.05),
-      titleText: theme(1).desaturate(0.95).darken(0.9).fade(0),
-      secondaryText: theme(1).desaturate(0.95).darken(0.4),
+      bgWindow: th(1).saturationl(1).lightness(5).alpha(0.32),
+      bgContent: th(1).saturationl(1).lightness(10),
+      bgItem: th(1).saturationl(1).lightness(15),
+      bgHover: th(1).saturationl(1).lightness(25),
+      bgTheme: th(1).saturationl(100).lightness(20),
+      bgThHover: th(1).saturationl(100).lightness(30),
 
-      background: theme(1).desaturate(0.95).lighten(0.85).fade(0.4),
-
-      contentBackground: white(0.9),
-      inputBackground: black(0.1),
-      buttonBackground: black(0.1),
-      buttonPrimaryBackground: theme(1).lighten(0.4),
-
-      menuItemBackground: black(0.06),
-      menuItemActiveBackground: theme(0.2),
-      tooltipBackground: black(0.1),
+      txt: wh(1).lightness(95),
+      txtSecond: wh(1).lightness(70),
+      txtBlack: bl(1),
     };
     if (!vibrancyApplied) {
-      themeConstants.background = themeConstants.background.alpha(1);
+      themeConstants.bgWindow = themeConstants.bgWindow.alpha(1);
     }
   }
 
@@ -308,7 +313,10 @@ declare global {
   }
 }
 
-export const zIndex = {
-  base: 0,
-  popup: 1000,
-};
+export const itemShadow = css`
+  filter: drop-shadow(4px, 4px, 8px, rgba(0, 0, 0, 25%));
+`;
+
+export const contentShadow = css`
+  filter: drop-shadow(4px, 4px, 16px, rgba(0, 0, 0, 50%));
+`;
