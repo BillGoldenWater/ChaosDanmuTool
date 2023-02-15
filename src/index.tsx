@@ -6,12 +6,11 @@
 import "./share/app/BackendApi.ts";
 
 import "normalize.css";
-import "./index.css";
 import ReactDOM from "react-dom/client";
 import { App } from "./App";
 import { backend } from "./share/app/BackendApi";
 import { AppCtxProvider, defaultConfig } from "./share/app/AppCtx";
-import { ThemeCtxProvider } from "./share/component/ThemeCtx";
+import { GlobalStyle, ThemeCtxProvider } from "./share/component/ThemeCtx";
 import React, { StrictMode } from "react";
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -24,6 +23,7 @@ root.render(
   <StrictMode>
     <AppCtxProvider debug={debug} firstConfig={config}>
       <ThemeCtxProvider>
+        <GlobalStyle />
         <App />
       </ThemeCtxProvider>
     </AppCtxProvider>

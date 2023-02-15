@@ -16,9 +16,10 @@ import {
 import { appCtx, defaultConfig } from "../app/AppCtx";
 import { Config } from "../type/rust/config/Config";
 import Color from "color";
-import { TPropToString } from "../type/TPropToString";
+import { TPropTo } from "../type/TPropTo";
 import { backend } from "../app/BackendApi";
-import { css, ThemeProvider } from "styled-components";
+import { createGlobalStyle, css, ThemeProvider } from "styled-components";
+import { Property } from "csstype";
 
 type ThemeConfig = Config["frontend"]["mainView"]["theme"];
 
@@ -45,7 +46,7 @@ export interface TThemeConstants {
   [key: string]: Color;
 }
 
-export type TCssConstants = TPropToString<TThemeConstants>;
+export type TCssConstants = TPropTo<TThemeConstants, Property.Color>;
 
 export async function genConstants(
   themeCfg: ThemeConfig
@@ -313,10 +314,179 @@ declare global {
   }
 }
 
-export const itemShadow = css`
-  filter: drop-shadow(4px, 4px, 8px, rgba(0, 0, 0, 25%));
-`;
+type StyleFnProps = { theme: TThemeCtx };
 
-export const contentShadow = css`
-  filter: drop-shadow(4px, 4px, 16px, rgba(0, 0, 0, 50%));
+type ColorFn = (p: StyleFnProps) => Property.Color;
+type ColorFns = {
+  theme: ColorFn;
+  thHover: ColorFn;
+
+  bgWindow: ColorFn;
+  bgContent: ColorFn;
+  bgItem: ColorFn;
+  bgHover: ColorFn;
+  bgTheme: ColorFn;
+  bgThHover: ColorFn;
+
+  txt: ColorFn;
+  txtSecond: ColorFn;
+  txtBlack: ColorFn;
+
+  fnInfo: ColorFn;
+  fnSuccess: ColorFn;
+  fnWarn: ColorFn;
+  fnErr: ColorFn;
+};
+
+export const color: ColorFns = {
+  theme: (p) => p.theme.consts.theme,
+  thHover: (p) => p.theme.consts.thHover,
+
+  bgWindow: (p) => p.theme.consts.bgWindow,
+  bgContent: (p) => p.theme.consts.bgContent,
+  bgItem: (p) => p.theme.consts.bgItem,
+  bgHover: (p) => p.theme.consts.bgHover,
+  bgTheme: (p) => p.theme.consts.bgTheme,
+  bgThHover: (p) => p.theme.consts.bgThHover,
+
+  txt: (p) => p.theme.consts.txt,
+  txtSecond: (p) => p.theme.consts.txtSecond,
+  txtBlack: (p) => p.theme.consts.txtBlack,
+
+  fnInfo: (p) => p.theme.consts.fnInfo,
+  fnSuccess: (p) => p.theme.consts.fnSuccess,
+  fnWarn: (p) => p.theme.consts.fnWarn,
+  fnErr: (p) => p.theme.consts.fnErr,
+};
+
+const shadowTransition = css`
+  transition: box-shadow 0.1s ease-out;
+`;
+export const shadow = {
+  content: css`
+    box-shadow: 0.25rem 0.25rem 1rem rgba(0, 0, 0, 0.5);
+  `,
+
+  contentHover: css`
+    ${shadowTransition}
+    &:hover {
+      box-shadow: 0.25rem 0.25rem 1rem rgba(0, 0, 0, 0.5);
+    }
+  `,
+
+  item: css`
+    box-shadow: 0.25rem 0.25rem 0.5rem rgba(0, 0, 0, 0.25);
+  `,
+
+  itemHover: css`
+    ${shadowTransition}
+    &:hover {
+      box-shadow: 0.25rem 0.25rem 0.5rem rgba(0, 0, 0, 0.25);
+    }
+  `,
+};
+
+export const font = {
+  normal: css`
+    font-size: 1rem;
+    line-height: 1.1875rem;
+    font-weight: 400;
+
+    font-style: normal;
+  `,
+  second: css`
+    font-size: 0.875rem;
+    line-height: 0.875rem;
+    font-weight: 400;
+
+    font-style: normal;
+  `,
+
+  title: css`
+    font-size: 2rem;
+    line-height: initial;
+    font-weight: 500;
+
+    font-style: normal;
+  `,
+  input: css`
+    font-size: 0.875rem;
+    line-height: 0.875rem;
+    font-weight: 400;
+
+    font-style: normal;
+  `,
+  userName: css`
+    font-size: 0.875rem;
+    line-height: 0.875rem;
+    font-weight: 500;
+
+    font-style: normal;
+  `,
+  dmContent: css`
+    font-size: 1rem;
+    line-height: 1rem;
+    font-weight: 500;
+
+    font-style: normal;
+  `,
+};
+
+export const radius = {
+  small: css`
+    border-radius: 0.3125rem;
+  `,
+  normal: css`
+    border-radius: 0.625rem;
+  `,
+};
+
+export const paddingValue = {
+  small: 0.3125,
+  normal: 0.625,
+  window: 0.9375,
+};
+export const padding = {
+  small: css`
+    padding: ${paddingValue.small}rem;
+  `,
+  normal: css`
+    padding: ${paddingValue.normal}rem;
+  `,
+  window: css`
+    padding: ${paddingValue.window}rem;
+  `,
+};
+
+export const dynamicSelect = (p: StyleFnProps) =>
+  p.theme.selectable ? "" : "user-select: none";
+
+export const GlobalStyle = createGlobalStyle`
+  body {
+    font-size: 0.5cm;
+  }
+
+  #root {
+    ${font.normal}
+  }
+
+  html,
+  body {
+    padding: 0;
+    margin: 0;
+
+    font-family: sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  /* prevent overscroll */
+  body {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+  }
 `;
