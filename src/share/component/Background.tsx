@@ -4,8 +4,11 @@
  */
 
 import styled from "styled-components";
+import { padding } from "./ThemeCtx";
 
 export const Background = styled.div`
+  ${padding.window};
+
   width: 100vw;
   height: 100vh;
   background-color: ${(p) => p.theme.consts.bgWindow};
