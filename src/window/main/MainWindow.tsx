@@ -5,7 +5,12 @@
 
 import React from "react";
 import { Background } from "../../share/component/Background";
+import { ConnectPanel } from "./ConnectPanel";
 
 export function MainWindow() {
-  return <Background>main_window</Background>;
+  return (
+    <Background>
+      <ConnectPanel />
+    </Background>
+  );
 }
