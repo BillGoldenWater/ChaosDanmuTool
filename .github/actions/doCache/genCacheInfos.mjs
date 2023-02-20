@@ -35,7 +35,7 @@ function getHash(...paths) {
     hash.update(fs.readFileSync(path));
   }
 
-  return hash.digest("hex");
+  return hash.digest("hex").slice(0, 8);
 }
 
 function getHashDir(dirPath, hash) {
@@ -53,7 +53,7 @@ function getHashDir(dirPath, hash) {
     else if (entry.isDirectory()) getHashDir(path, hash_);
   }
 
-  if (root) return hash_.digest("hex");
+  if (root) return hash_.digest("hex").slice(0, 8);
 }
 
 /**
