@@ -27,10 +27,3 @@ jobs:
       - name: backend lint
         if: success()
         run: node scripts/backendLint.mjs
-
-      - name: upload target
-        if: success()
-        uses: actions/upload-artifact@v3
-        with:
-          name: target-${{ runner.os }}
-          path: src-tauri/target

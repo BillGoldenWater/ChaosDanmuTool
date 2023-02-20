@@ -105,16 +105,27 @@ function purgeTarget(path) {
     if (fs.existsSync(path)) fs.rmSync(path, { recursive: true, force: true });
   }
 
+  const cdtRegex = /.*Chaos.*Danmu.*Tool.*/i;
+
   for (let entry of entries) {
     let name = entry.split("/").pop();
-    if (name === "incremental") {
-      del(entry);
-    } else if (name === "bundle") {
-      del(entry);
-    } else if (name.indexOf("chaos_danmu_tool") !== -1) {
-      del(entry);
+    switch (name) {
+      case "incremental":
+      case "bundle":
+      case ".rustc_info.json":
+        del(entry);
+        break;
+      default:
+        if (name.match(cdtRegex)) {
+          del(entry);
+        }
     }
   }
+
+  fs.writeFileSync(
+    pathJoin(path, "rustcVersionVerbose.txt"),
+    execCommand("rustc -V -v").toString().trim()
+  );
 }
 
 /**
