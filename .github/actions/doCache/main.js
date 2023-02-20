@@ -16,16 +16,6 @@ function highlightLog(msg) {
 
 async function main() {
   try {
-    core.exportVariable(
-      "ACTIONS_CACHE_URL",
-      process.env.ACTIONS_CACHE_URL || ""
-    );
-    core.exportVariable(
-      "ACTIONS_RUNTIME_TOKEN",
-      process.env.ACTIONS_RUNTIME_TOKEN || ""
-    );
-    core.exportVariable("SCCACHE_GHA_ENABLED", "on");
-
     let cacheItems = gen();
 
     for (let cacheItem of cacheItems) {
@@ -35,8 +25,6 @@ async function main() {
         cacheItem.key,
         cacheItem.restoreKeys
       );
-
-      if (cacheItem.afterRestore !== undefined) cacheItem.afterRestore();
 
       if (hit_key === undefined) {
         highlightLog(`failed to restore ${cacheItem.key}`);

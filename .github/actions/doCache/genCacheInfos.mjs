@@ -1,7 +1,7 @@
 import { execSync } from "child_process";
 import fs from "fs";
 import crypto from "crypto";
-// import { join as pathJoin } from "path";
+import { join as pathJoin } from "path";
 import os from "os";
 
 /**
@@ -13,77 +13,62 @@ function execCommand(command, cwd = undefined) {
 }
 
 /**
- * @param command {string}
- * @param cwd {string}
- */
-function execCommandInheritOut(command, cwd = undefined) {
-  console.log(`running ${command}`);
-  return execSync(command, { cwd, stdio: "inherit" });
-}
-
-// /**
-//  * @param {string} id
-//  * @return {string}
-//  */
-// function getCargoCrateVersion(id) {
-//   const p = execCommand(`cargo search ${id}`);
-//   return p
-//     .toString()
-//     .trim()
-//     .replaceAll(/.*?"([a-zA-Z.\d-]*?)".*/g, "$1");
-// }
-
-/**
- * @param {string} paths
+ * @param {string} id
  * @return {string}
  */
-function getHash(...paths) {
+function getCargoCrateVersion(id) {
+  const p = execCommand(`cargo search ${id}`);
+  return p
+    .toString()
+    .trim()
+    .replaceAll(/.*?"([a-zA-Z.\d-]*?)".*/g, "$1");
+}
+
+/**
+ * @param {string} path
+ * @return {string}
+ */
+function getHash(path) {
+  const buf = fs.readFileSync(path);
   const hash = crypto.createHash("md5");
-  for (let path of paths) {
-    hash.update(fs.readFileSync(path));
-  }
+  hash.update(buf);
   return hash.digest("hex");
 }
 
-// /**
-//  * @param {string | Buffer | URL} dirPath
-//  * @param {Hash | undefined} hash
-//  * @return {string}
-//  */
-// function getHashDir(dirPath, hash) {
-//   const root = hash === undefined;
-//   const hash_ = root ? crypto.createHash("md5") : hash;
-//
-//   const entries = fs.readdirSync(dirPath, {withFileTypes: true});
-//
-//   for (let entry of entries) {
-//     const path = pathJoin(dirPath, entry.name);
-//
-//     if (entry.isFile()) hash_.update(fs.readFileSync(path));
-//     else if (entry.isDirectory()) getHashDir(path, hash_);
-//   }
-//
-//   if (root) return hash_.digest("hex");
-// }
+function getHashDir(dirPath, hash) {
+  const root = hash === undefined;
+  const hash_ = root ? crypto.createHash("md5") : hash;
 
-// /**
-//  * @param {string} dirPath
-//  */
-// function dirSize(dirPath) {
-//   if (!fs.existsSync(dirPath)) return 0;
-//
-//   const entries = fs.readdirSync(dirPath, { withFileTypes: true });
-//
-//   const sizes = entries.map((entry) => {
-//     const path = pathJoin(dirPath, entry.name);
-//
-//     if (entry.isFile()) return fs.statSync(path).size;
-//     else if (entry.isDirectory()) return dirSize(path);
-//     else return 0;
-//   });
-//
-//   return sizes.flat(Infinity).reduce((p, c) => p + c, 0);
-// }
+  const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+
+  for (let entry of entries) {
+    const path = pathJoin(dirPath, entry.name);
+
+    if (entry.isFile()) hash_.update(fs.readFileSync(path));
+    else if (entry.isDirectory()) getHashDir(path, hash_);
+  }
+
+  if (root) return hash_.digest("hex");
+}
+
+/**
+ * @param {string} dirPath
+ */
+function dirSize(dirPath) {
+  if (!fs.existsSync(dirPath)) return 0;
+
+  const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+
+  const sizes = entries.map((entry) => {
+    const path = pathJoin(dirPath, entry.name);
+
+    if (entry.isFile()) return fs.statSync(path).size;
+    else if (entry.isDirectory()) return dirSize(path);
+    else return 0;
+  });
+
+  return sizes.flat(Infinity).reduce((p, c) => p + c, 0);
+}
 
 /**
  * @typedef {Object} CacheItem
@@ -91,7 +76,6 @@ function getHash(...paths) {
  * @property {string[]} paths
  * @property {string} key
  * @property {string[]} restoreKeys
- * @property {(() => void) | undefined} afterRestore
  */
 
 /**
@@ -103,11 +87,9 @@ export function gen() {
   const yarnHash = getHash("yarn.lock");
   const cargoLockHash = getHash("src-tauri/Cargo.lock");
 
-  // const backendHash = getHashDir("src-tauri/src");
-  const cargoBinHash = getHash(
-    `${os.homedir()}/.cargo/.crates.toml`,
-    `${os.homedir()}/.cargo/.crates2.json`
-  );
+  const backendHash = getHashDir("src-tauri/src");
+  const cargoBinHash = getHashDir(`${os.homedir()}/.cargo/bin`);
+  const cargoTargetSize = dirSize("src-tauri/target");
 
   const { platform } = process;
 
@@ -130,22 +112,19 @@ export function gen() {
     },
     {
       id: "cargo-bin",
-      paths: [
-        "~/.cargo/bin/",
-        "~/.cargo/.crates.toml",
-        "~/.cargo/.crates2.json",
-      ],
+      paths: ["~/.cargo/bin/"],
       key: `cargo-bin-${platform}-${cargoBinHash}`,
       restoreKeys: [`cargo-bin-${platform}`],
-      afterRestore: () => {
-        execCommandInheritOut("cargo install sccache");
-
-        fs.mkdirSync(".cargo", { recursive: true });
-        fs.writeFileSync(
-          ".cargo/config.toml",
-          "[build]\n" + 'rustc-wrapper = "sccache"'
-        );
-      },
+    },
+    {
+      id: "cargo-target",
+      paths: ["src-tauri/target/"],
+      key: `cargo-target-${platform}-${cargoLockHash}-${backendHash}-${cargoTargetSize}`,
+      restoreKeys: [
+        `cargo-target-${platform}-${cargoLockHash}-${backendHash}`,
+        `cargo-target-${platform}-${cargoLockHash}`,
+        `cargo-target-${platform}`,
+      ],
     },
   ];
 }
