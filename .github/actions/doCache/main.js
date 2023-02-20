@@ -36,6 +36,8 @@ async function main() {
         cacheItem.restoreKeys
       );
 
+      if (cacheItem.afterRestore !== undefined) cacheItem.afterRestore();
+
       if (hit_key === undefined) {
         highlightLog(`failed to restore ${cacheItem.key}`);
         continue;
@@ -44,8 +46,6 @@ async function main() {
       } else {
         highlightLog(`${hit_key} restored`);
       }
-
-      if (cacheItem.afterRestore !== undefined) cacheItem.afterRestore();
 
       core.saveState(`${cacheItem.id}_cacheKey`, hit_key);
     }
