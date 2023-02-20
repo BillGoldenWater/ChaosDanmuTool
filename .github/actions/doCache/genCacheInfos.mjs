@@ -122,10 +122,11 @@ function purgeTarget(path) {
     }
   }
 
-  fs.writeFileSync(
-    pathJoin(path, "rustcVersionVerbose.txt"),
-    execCommand("rustc -V -v").toString().trim()
-  );
+  if (fs.existsSync(path))
+    fs.writeFileSync(
+      pathJoin(path, "rustcVersionVerbose.txt"),
+      execCommand("rustc -V -v").toString().trim()
+    );
 }
 
 /**
