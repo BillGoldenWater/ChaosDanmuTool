@@ -102,7 +102,7 @@ codegen-units = 1 # Compile crates one after another so the compiler can optimiz
 lto = true # Enables link to optimizations
 opt-level = "s" # Optimize for binary size
 #strip = true  # Automatically strip symbols from the binary.
-incremental = true
+incremental = false
 
 #[patch.crates-io]
 #tauri = { git = "https://github.com/BillGoldenWater/tauri.git", rev = "75a0c79dea39e3e8372097152a0fa82cf6493686" }
