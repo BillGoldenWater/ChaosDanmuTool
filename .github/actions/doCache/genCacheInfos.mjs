@@ -39,6 +39,8 @@ function getHash(...paths) {
 }
 
 function getHashDir(dirPath, hash) {
+  if (!fs.existsSync(dirPath)) return "00000000";
+
   const root = hash === undefined;
   const hash_ = root ? crypto.createHash("md5") : hash;
 
@@ -74,6 +76,48 @@ function dirSize(dirPath) {
 }
 
 /**
+ * @param {string|Buffer|URL} dirPath
+ * @return {string[]}
+ */
+function dirChildren(dirPath) {
+  if (!fs.existsSync(dirPath)) return [];
+
+  const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+
+  const sizes = entries.map((entry) => {
+    const path = pathJoin(dirPath, entry.name);
+
+    if (entry.isFile()) return path;
+    else if (entry.isDirectory()) return [path, dirChildren(path)];
+    else return [];
+  });
+
+  return sizes.flat(Infinity);
+}
+
+/**
+ * @param {string} path
+ */
+function purgeTarget(path) {
+  const entries = dirChildren(path);
+
+  function del(path) {
+    if (fs.existsSync(path)) fs.rmSync(path, { recursive: true, force: true });
+  }
+
+  for (let entry of entries) {
+    let name = entry.split("/").pop();
+    if (name === "incremental") {
+      del(entry);
+    } else if (name === "bundle") {
+      del(entry);
+    } else if (name.indexOf("chaos_danmu_tool") !== -1) {
+      del(entry);
+    }
+  }
+}
+
+/**
  * @typedef {Object} CacheItem
  * @property {string} id
  * @property {string[]} paths
@@ -95,6 +139,7 @@ export function gen() {
     `${os.homedir()}/.cargo/.crates2.json`
   );
 
+  purgeTarget("src-tauri/target");
   const backendHash = getHashDir("src-tauri/src");
   const cargoTargetSize = dirSize("src-tauri/target");
 
