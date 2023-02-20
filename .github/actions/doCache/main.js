@@ -16,7 +16,6 @@ function highlightLog(msg) {
 
 async function main() {
   try {
-    core.exportVariable("SCCACHE_DIR", "~/.cache/sccache");
     core.exportVariable(
       "ACTIONS_CACHE_URL",
       process.env.ACTIONS_CACHE_URL || ""
@@ -25,6 +24,7 @@ async function main() {
       "ACTIONS_RUNTIME_TOKEN",
       process.env.ACTIONS_RUNTIME_TOKEN || ""
     );
+    core.exportVariable("SCCACHE_GHA_ENABLED", "on");
 
     let cacheItems = gen();
 

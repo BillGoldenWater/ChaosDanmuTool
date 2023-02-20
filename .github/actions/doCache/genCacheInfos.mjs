@@ -111,11 +111,7 @@ export function gen() {
     },
     {
       id: "cargo-registry",
-      paths: [
-        "~/.cargo/registry/index/",
-        "~/.cargo/registry/cache/",
-        "~/.cargo/git/db/",
-      ],
+      paths: ["~/.cargo/registry/", "~/.cargo/git/"],
       key: `cargo-registry-${platform}-${cargoLockHash}`,
       restoreKeys: [`cargo-registry-${platform}`],
     },
