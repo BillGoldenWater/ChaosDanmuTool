@@ -131,7 +131,7 @@ export function gen() {
         fs.mkdirSync(".cargo", { recursive: true });
         fs.writeFileSync(
           ".cargo/config.toml",
-          "[build]\n" + 'rustc-wrapper = "~/.cargo/bin/sccache"'
+          "[build]\n" + 'rustc-wrapper = "/home/runner/.cargo/bin/sccache"'
         );
       },
     },
