@@ -35,6 +35,22 @@ function getHash(path) {
   return hash.digest("hex");
 }
 
+function getHashDir(dirPath, hash) {
+  const root = hash === undefined;
+  const hash_ = root ? crypto.createHash("md5") : hash;
+
+  const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+
+  for (let entry of entries) {
+    const path = pathJoin(dirPath, entry.name);
+
+    if (entry.isFile()) hash_.update(fs.readFileSync(path));
+    else if (entry.isDirectory()) getHashDir(path, hash_);
+  }
+
+  if (root) return hash_.digest("hex");
+}
+
 /**
  * @param {string} dirPath
  */
@@ -69,38 +85,48 @@ export function gen() {
   const yarnPath = execCommand("yarn cache dir").toString().trim();
 
   const yarnHash = getHash("yarn.lock");
-  const cargoHash = getHash("src-tauri/Cargo.lock");
+  const cargoLockHash = getHash("src-tauri/Cargo.lock");
 
-  const crateVersions = [];
-  crateVersions.push(getCargoCrateVersion("tauri-cli"));
-  const versionStr = crateVersions.map((it) => it.replace("-", "_")).join("-");
+  const backendHash = getHashDir("src-tauri/src");
+  const cargoBinHash = getHashDir(`${os.homedir()}/.cargo/bin`);
+  const cargoTargetSize = dirSize("src-tauri/target");
 
-  const cargoBinSize = dirSize(`${os.homedir()}/.cargo/bin`);
-  const targetSize = dirSize("src-tauri/target");
-
-  const platform = process.platform;
-  const yarnCacheKey = `yarn-${platform}-${yarnHash}`;
-  const cargoCacheKey = `cargo-${platform}-${cargoHash}-${cargoBinSize}-${targetSize}-${versionStr}`;
+  const { platform } = process;
 
   return [
     {
       id: "yarn",
       paths: [yarnPath],
-      key: yarnCacheKey,
+      key: `yarn-${platform}-${yarnHash}`,
       restoreKeys: [`yarn-${platform}`, `yarn`],
     },
     {
-      id: "cargo",
-      paths: ["~/.cargo/", "./src-tauri/target/"],
-      key: cargoCacheKey,
+      id: "cargo-registry",
+      paths: [
+        "~/.cargo/registry/index/",
+        "~/.cargo/registry/cache/",
+        "~/.cargo/git/db/",
+      ],
+      key: `cargo-registry-${platform}-${cargoLockHash}`,
+      restoreKeys: [`cargo-registry-${platform}`],
+    },
+    {
+      id: "cargo-bin",
+      paths: ["~/.cargo/bin/"],
+      key: `cargo-bin-${platform}-${cargoBinHash}`,
+      restoreKeys: [`cargo-bin-${platform}`],
+    },
+    {
+      id: "cargo-target",
+      paths: ["src-tauri/target/"],
+      key: `cargo-target-${platform}-${cargoLockHash}-${backendHash}-${cargoTargetSize}`,
       restoreKeys: [
-        `cargo-${platform}-${cargoHash}-${cargoBinSize}-${targetSize}`,
-        `cargo-${platform}-${cargoHash}-${cargoBinSize}`,
-        `cargo-${platform}-${cargoHash}`,
-        `cargo-${platform}`,
+        `cargo-target-${platform}-${cargoLockHash}-${backendHash}`,
+        `cargo-target-${platform}-${cargoLockHash}`,
+        `cargo-target-${platform}`,
       ],
     },
   ];
 }
 
-gen();
+console.log(gen());
