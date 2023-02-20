@@ -12,26 +12,29 @@ function execCommand(command, cwd = undefined) {
   return execSync(command, { cwd });
 }
 
-/**
- * @param {string} id
- * @return {string}
- */
-function getCargoCrateVersion(id) {
-  const p = execCommand(`cargo search ${id}`);
-  return p
-    .toString()
-    .trim()
-    .replaceAll(/.*?"([a-zA-Z.\d-]*?)".*/g, "$1");
-}
+// /**
+//  * @param {string} id
+//  * @return {string}
+//  */
+// function getCargoCrateVersion(id) {
+//   const p = execCommand(`cargo search ${id}`);
+//   return p
+//     .toString()
+//     .trim()
+//     .replaceAll(/.*?"([a-zA-Z.\d-]*?)".*/g, "$1");
+// }
 
 /**
- * @param {string} path
+ * @param {string} paths
  * @return {string}
  */
-function getHash(path) {
-  const buf = fs.readFileSync(path);
+function getHash(...paths) {
   const hash = crypto.createHash("md5");
-  hash.update(buf);
+
+  for (let path of paths) {
+    hash.update(fs.readFileSync(path));
+  }
+
   return hash.digest("hex");
 }
 
@@ -87,44 +90,57 @@ export function gen() {
   const yarnHash = getHash("yarn.lock");
   const cargoLockHash = getHash("src-tauri/Cargo.lock");
 
+  const cargoBinHash = getHash(
+    `${os.homedir()}/.cargo/.crates.toml`,
+    `${os.homedir()}/.cargo/.crates2.json`
+  );
+
   const backendHash = getHashDir("src-tauri/src");
-  const cargoBinHash = getHashDir(`${os.homedir()}/.cargo/bin`);
   const cargoTargetSize = dirSize("src-tauri/target");
 
   const { platform } = process;
+
+  /**
+   * @param {string} id
+   * @param {string} idents
+   */
+  function genKeys(id, ...idents) {
+    const key = `${id}-${idents.join("-")}`;
+    let restoreKeys = [];
+
+    idents.pop();
+    while (idents.length > 0) {
+      restoreKeys.push(`${id}-${idents.join("-")}`);
+      idents.pop();
+    }
+
+    return {
+      key,
+      restoreKeys,
+    };
+  }
 
   return [
     {
       id: "yarn",
       paths: [yarnPath],
-      key: `yarn-${platform}-${yarnHash}`,
-      restoreKeys: [`yarn-${platform}`, `yarn`],
+      ...genKeys("yarn", platform, yarnHash),
     },
     {
-      id: "cargo-registry",
-      paths: [
-        "~/.cargo/registry/index/",
-        "~/.cargo/registry/cache/",
-        "~/.cargo/git/db/",
-      ],
-      key: `cargo-registry-${platform}-${cargoLockHash}`,
-      restoreKeys: [`cargo-registry-${platform}`],
-    },
-    {
-      id: "cargo-bin",
-      paths: ["~/.cargo/bin/"],
-      key: `cargo-bin-${platform}-${cargoBinHash}`,
-      restoreKeys: [`cargo-bin-${platform}`],
+      id: "cargo",
+      paths: ["~/.cargo/"],
+      ...genKeys("cargo", platform, cargoLockHash, cargoBinHash),
     },
     {
       id: "cargo-target",
       paths: ["src-tauri/target/"],
-      key: `cargo-target-${platform}-${cargoLockHash}-${backendHash}-${cargoTargetSize}`,
-      restoreKeys: [
-        `cargo-target-${platform}-${cargoLockHash}-${backendHash}`,
-        `cargo-target-${platform}-${cargoLockHash}`,
-        `cargo-target-${platform}`,
-      ],
+      ...genKeys(
+        "cargo-target",
+        platform,
+        cargoLockHash,
+        backendHash,
+        cargoTargetSize
+      ),
     },
   ];
 }
