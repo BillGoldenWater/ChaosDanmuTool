@@ -60,24 +60,24 @@ function getHashDir(dirPath, hash) {
   if (root) return hash_.digest("hex");
 }
 
-/**
- * @param {string} dirPath
- */
-function dirSize(dirPath) {
-  if (!fs.existsSync(dirPath)) return 0;
-
-  const entries = fs.readdirSync(dirPath, { withFileTypes: true });
-
-  const sizes = entries.map((entry) => {
-    const path = pathJoin(dirPath, entry.name);
-
-    if (entry.isFile()) return fs.statSync(path).size;
-    else if (entry.isDirectory()) return dirSize(path);
-    else return 0;
-  });
-
-  return sizes.flat(Infinity).reduce((p, c) => p + c, 0);
-}
+// /**
+//  * @param {string} dirPath
+//  */
+// function dirSize(dirPath) {
+//   if (!fs.existsSync(dirPath)) return 0;
+//
+//   const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+//
+//   const sizes = entries.map((entry) => {
+//     const path = pathJoin(dirPath, entry.name);
+//
+//     if (entry.isFile()) return fs.statSync(path).size;
+//     else if (entry.isDirectory()) return dirSize(path);
+//     else return 0;
+//   });
+//
+//   return sizes.flat(Infinity).reduce((p, c) => p + c, 0);
+// }
 
 /**
  * @typedef {Object} CacheItem
@@ -99,7 +99,6 @@ export function gen() {
 
   // const backendHash = getHashDir("src-tauri/src");
   const cargoBinHash = getHashDir(`${os.homedir()}/.cargo/bin`);
-  const sccacheSize = dirSize("~/.cache/sccache");
 
   const { platform } = process;
 
@@ -134,15 +133,6 @@ export function gen() {
           "[build]\n" + 'rustc-wrapper = "sccache"'
         );
       },
-    },
-    {
-      id: "sccache",
-      paths: ["~/.cache/sccache/"],
-      key: `sccache-${platform}-${cargoLockHash}-${sccacheSize}`,
-      restoreKeys: [
-        `sccache-${platform}-${cargoLockHash}`,
-        `sccache-${platform}`,
-      ],
     },
   ];
 }
