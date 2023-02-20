@@ -18,15 +18,15 @@ runs:
       with:
         node-version: 18.x
 
+    - name: do cache
+      uses: ./.github/actions/doCache
+      if: inputs.requireCache == 'true'
+
     - name: install Rust stable
       uses: actions-rs/toolchain@v1
       if: inputs.rust == 'true'
       with:
         toolchain: stable
-
-    - name: do cache
-      uses: ./.github/actions/doCache
-      if: inputs.requireCache == 'true'
 
     - name: install dependencies (ubuntu only)
       uses: awalsh128/cache-apt-pkgs-action@latest
