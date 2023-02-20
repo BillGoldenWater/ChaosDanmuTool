@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [macos-latest, ubuntu-latest, windows-latest]
+        platform: [ macos-latest, ubuntu-latest, windows-latest ]
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -27,3 +27,10 @@ jobs:
       - name: backend lint
         if: success()
         run: node scripts/backendLint.mjs
+
+      - name: upload target
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: target
+          path: src-tauri/target
