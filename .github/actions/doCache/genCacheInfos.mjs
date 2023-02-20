@@ -1,7 +1,7 @@
 import { execSync } from "child_process";
 import fs from "fs";
 import crypto from "crypto";
-import { join as pathJoin } from "path";
+// import { join as pathJoin } from "path";
 import os from "os";
 
 /**
@@ -34,31 +34,37 @@ function execCommandInheritOut(command, cwd = undefined) {
 // }
 
 /**
- * @param {string} path
+ * @param {string} paths
  * @return {string}
  */
-function getHash(path) {
-  const buf = fs.readFileSync(path);
+function getHash(...paths) {
   const hash = crypto.createHash("md5");
-  hash.update(buf);
+  for (let path of paths) {
+    hash.update(fs.readFileSync(path));
+  }
   return hash.digest("hex");
 }
 
-function getHashDir(dirPath, hash) {
-  const root = hash === undefined;
-  const hash_ = root ? crypto.createHash("md5") : hash;
-
-  const entries = fs.readdirSync(dirPath, { withFileTypes: true });
-
-  for (let entry of entries) {
-    const path = pathJoin(dirPath, entry.name);
-
-    if (entry.isFile()) hash_.update(fs.readFileSync(path));
-    else if (entry.isDirectory()) getHashDir(path, hash_);
-  }
-
-  if (root) return hash_.digest("hex");
-}
+// /**
+//  * @param {string | Buffer | URL} dirPath
+//  * @param {Hash | undefined} hash
+//  * @return {string}
+//  */
+// function getHashDir(dirPath, hash) {
+//   const root = hash === undefined;
+//   const hash_ = root ? crypto.createHash("md5") : hash;
+//
+//   const entries = fs.readdirSync(dirPath, {withFileTypes: true});
+//
+//   for (let entry of entries) {
+//     const path = pathJoin(dirPath, entry.name);
+//
+//     if (entry.isFile()) hash_.update(fs.readFileSync(path));
+//     else if (entry.isDirectory()) getHashDir(path, hash_);
+//   }
+//
+//   if (root) return hash_.digest("hex");
+// }
 
 // /**
 //  * @param {string} dirPath
@@ -98,7 +104,10 @@ export function gen() {
   const cargoLockHash = getHash("src-tauri/Cargo.lock");
 
   // const backendHash = getHashDir("src-tauri/src");
-  const cargoBinHash = getHashDir(`${os.homedir()}/.cargo/bin`);
+  const cargoBinHash = getHash(
+    `${os.homedir()}/.cargo/.crates.toml`,
+    `${os.homedir()}/.cargo/.crates2.json`
+  );
 
   const { platform } = process;
 
@@ -111,13 +120,21 @@ export function gen() {
     },
     {
       id: "cargo-registry",
-      paths: ["~/.cargo/registry/", "~/.cargo/git/"],
+      paths: [
+        "~/.cargo/registry/index/",
+        "~/.cargo/registry/cache/",
+        "~/.cargo/git/db/",
+      ],
       key: `cargo-registry-${platform}-${cargoLockHash}`,
       restoreKeys: [`cargo-registry-${platform}`],
     },
     {
       id: "cargo-bin",
-      paths: ["~/.cargo/bin/"],
+      paths: [
+        "~/.cargo/bin/",
+        "~/.cargo/.crates.toml",
+        "~/.cargo/.crates2.json",
+      ],
       key: `cargo-bin-${platform}-${cargoBinHash}`,
       restoreKeys: [`cargo-bin-${platform}`],
       afterRestore: () => {
