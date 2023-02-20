@@ -13,16 +13,25 @@ function execCommand(command, cwd = undefined) {
 }
 
 /**
- * @param {string} id
- * @return {string}
+ * @param command {string}
+ * @param cwd {string}
  */
-function getCargoCrateVersion(id) {
-  const p = execCommand(`cargo search ${id}`);
-  return p
-    .toString()
-    .trim()
-    .replaceAll(/.*?"([a-zA-Z.\d-]*?)".*/g, "$1");
+function execCommandInheritOut(command, cwd = undefined) {
+  console.log(`running ${command}`);
+  return execSync(command, { cwd, stdio: "inherit" });
 }
+
+// /**
+//  * @param {string} id
+//  * @return {string}
+//  */
+// function getCargoCrateVersion(id) {
+//   const p = execCommand(`cargo search ${id}`);
+//   return p
+//     .toString()
+//     .trim()
+//     .replaceAll(/.*?"([a-zA-Z.\d-]*?)".*/g, "$1");
+// }
 
 /**
  * @param {string} path
@@ -117,7 +126,7 @@ export function gen() {
       key: `cargo-bin-${platform}-${cargoBinHash}`,
       restoreKeys: [`cargo-bin-${platform}`],
       afterRestore: () => {
-        execCommand("cargo install sccache");
+        execCommandInheritOut("cargo install sccache");
 
         fs.writeFileSync(
           ".cargo/config.toml",
