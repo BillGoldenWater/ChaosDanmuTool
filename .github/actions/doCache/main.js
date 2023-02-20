@@ -5,7 +5,7 @@
 
 const core = require("@actions/core");
 const cache = require("@actions/cache");
-const { gen } = require("./genCacheInfos.mjs");
+const {gen} = require("./genCacheInfos.mjs");
 
 /**
  * @param {string} msg
@@ -17,7 +17,6 @@ function highlightLog(msg) {
 async function main() {
   try {
     core.exportVariable("SCCACHE_DIR", "~/.cache/sccache");
-    core.exportVariable("RUSTC_WRAPPER", "~/.cargo/bin/sccache");
 
     let cacheItems = gen();
 

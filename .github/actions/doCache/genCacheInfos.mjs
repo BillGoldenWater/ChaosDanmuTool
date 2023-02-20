@@ -118,6 +118,11 @@ export function gen() {
       restoreKeys: [`cargo-bin-${platform}`],
       afterRestore: () => {
         execCommand("cargo install sccache");
+
+        fs.writeFileSync(
+          ".cargo/config.toml",
+          "[build]\n" + 'rustc-wrapper = "~/.cargo/bin/sccache"'
+        );
       },
     },
     {
