@@ -76,6 +76,7 @@ function dirSize(dirPath) {
  * @property {string[]} paths
  * @property {string} key
  * @property {string[]} restoreKeys
+ * @property {(() => void) | undefined} afterRestore
  */
 
 /**
@@ -87,9 +88,9 @@ export function gen() {
   const yarnHash = getHash("yarn.lock");
   const cargoLockHash = getHash("src-tauri/Cargo.lock");
 
-  const backendHash = getHashDir("src-tauri/src");
+  // const backendHash = getHashDir("src-tauri/src");
   const cargoBinHash = getHashDir(`${os.homedir()}/.cargo/bin`);
-  const cargoTargetSize = dirSize("src-tauri/target");
+  const sccacheSize = dirSize("~/.cache/sccache");
 
   const { platform } = process;
 
@@ -115,15 +116,17 @@ export function gen() {
       paths: ["~/.cargo/bin/"],
       key: `cargo-bin-${platform}-${cargoBinHash}`,
       restoreKeys: [`cargo-bin-${platform}`],
+      afterRestore: () => {
+        execCommand("cargo install sccache");
+      },
     },
     {
-      id: "cargo-target",
-      paths: ["src-tauri/target/"],
-      key: `cargo-target-${platform}-${cargoLockHash}-${backendHash}-${cargoTargetSize}`,
+      id: "sccache",
+      paths: ["~/.cache/sccache/"],
+      key: `sccache-${platform}-${cargoLockHash}-${sccacheSize}`,
       restoreKeys: [
-        `cargo-target-${platform}-${cargoLockHash}-${backendHash}`,
-        `cargo-target-${platform}-${cargoLockHash}`,
-        `cargo-target-${platform}`,
+        `sccache-${platform}-${cargoLockHash}`,
+        `sccache-${platform}`,
       ],
     },
   ];

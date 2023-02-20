@@ -16,6 +16,9 @@ function highlightLog(msg) {
 
 async function main() {
   try {
+    core.exportVariable("SCCACHE_DIR", "~/.cache/sccache");
+    core.exportVariable("RUSTC_WRAPPER", "~/.cargo/bin/sccache");
+
     let cacheItems = gen();
 
     for (let cacheItem of cacheItems) {
@@ -34,6 +37,8 @@ async function main() {
       } else {
         highlightLog(`${hit_key} restored`);
       }
+
+      if (cacheItem.afterRestore !== undefined) cacheItem.afterRestore();
 
       core.saveState(`${cacheItem.id}_cacheKey`, hit_key);
     }
