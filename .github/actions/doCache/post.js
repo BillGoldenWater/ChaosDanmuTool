@@ -10,6 +10,9 @@ const { createActionAuth } = require("@octokit/auth-action");
 
 const { gen } = require("./genCacheInfos.mjs");
 
+const OWNER = "BillGoldenWater";
+const REPO = "ChaosDanmuTool";
+
 /**
  * @param {string} msg
  */
@@ -20,15 +23,15 @@ function highlightLog(msg) {
 async function deleteCache(octokit, key) {
   highlightLog(`deleting cache ${key}`);
   let res = await octokit.request(
-    "DELETE /repos/{owner}/{repo}/actions/caches/{cache_id}",
+    "DELETE /repos/{owner}/{repo}/actions/caches{?key}",
     {
-      owner: "BillGoldenWater",
-      repo: "ChaosDanmuTool",
-      cache_id: key,
+      owner: OWNER,
+      repo: REPO,
+      key,
     }
   );
-  if (res.status === 204) {
-    highlightLog(`delete success with response code ${res.status}`);
+  if (res.status === 200) {
+    highlightLog(`delete success`);
   } else {
     highlightLog(`delete failed with response`);
     console.log(res);
