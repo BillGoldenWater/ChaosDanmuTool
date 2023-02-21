@@ -47,6 +47,9 @@ async function main() {
     let cacheItems = gen();
 
     for (let cacheItem of cacheItems) {
+      /**
+       * @type string
+       */
       const oldKey = core.getState(`${cacheItem.id}_cacheKey`);
       if (oldKey === cacheItem.key) {
         highlightLog(`cache ${cacheItem.key} exists, skipped.`);
@@ -57,8 +60,10 @@ async function main() {
       try {
         await cache.saveCache(cacheItem.paths, cacheItem.key);
         highlightLog(`cache ${cacheItem.key} saved`);
-        if (oldKey !== undefined) {
+        if (oldKey != null && oldKey !== "") {
           await deleteCache(actionOctokit, oldKey);
+        } else {
+          highlightLog(`no old cache, delete skipped.`);
         }
       } catch (e) {
         console.log(e);
