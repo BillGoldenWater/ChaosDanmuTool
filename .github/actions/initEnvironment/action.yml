@@ -21,8 +21,6 @@ runs:
     - name: do cache
       uses: ./.github/actions/doCache
       if: inputs.requireCache == 'true'
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: install Rust stable
       uses: actions-rs/toolchain@v1
