@@ -113,9 +113,8 @@ export class CommandReceiver {
 
   close(code?: number) {
     this.log("client.close", "close called");
-    this.close_(code);
-
     this.connected = false;
+    this.close_(code);
   }
 
   private close_(code?: number) {
