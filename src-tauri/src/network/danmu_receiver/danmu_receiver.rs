@@ -164,6 +164,7 @@ impl DanmuReceiver {
     if let Err(err) = token_and_url_result {
       if let danmu_server_info_getter::Error::Request(EmptyData(data)) = &err {
         if data.code == Some(1002002) {
+          self.set_status(ReceiverStatus::Close).await;
           return Err(IllegalRoomid(roomid));
         }
       }
@@ -315,6 +316,7 @@ impl DanmuReceiver {
     self.status = status;
   }
 
+  /// only should use for errors that not related to user input
   #[inline]
   async fn on_error(&mut self, msg: &str) {
     self.set_status(ReceiverStatus::Error).await;
