@@ -5,8 +5,9 @@
 
 import styled from "styled-components";
 import { padding } from "./ThemeCtx";
+import { motion } from "framer-motion";
 
-export const Background = styled.div`
+export const Background = styled(motion.div)`
   ${padding.window};
 
   width: 100vw;

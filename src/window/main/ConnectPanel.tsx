@@ -30,7 +30,7 @@ export function ConnectPanel() {
   const connecting = ctx.receiverStatus === "connecting";
 
   return (
-    <ConnectPanelBase layout layoutRoot connected={connected}>
+    <ConnectPanelBase layout connected={connected}>
       <InnerPanel
         {...(connected
           ? {}

@@ -9,7 +9,7 @@ import { ConnectPanel } from "./ConnectPanel";
 
 export function MainWindow() {
   return (
-    <Background>
+    <Background layout layoutRoot>
       <ConnectPanel />
     </Background>
   );
