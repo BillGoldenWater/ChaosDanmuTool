@@ -43,6 +43,7 @@
   },
   "dependencies": {
     "@iconscout/react-unicons": "1.1.6",
+    "@popperjs/core": "2.11.6",
     "@tauri-apps/api": "1.2.0",
     "color": "4.2.3",
     "dot-prop": "7.2.0",
@@ -51,6 +52,7 @@
     "normalize.css": "8.0.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-popper": "2.3.0",
     "styled-components": "5.3.6",
     "uuid": "9.0.0"
   },
