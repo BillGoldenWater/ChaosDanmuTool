@@ -100,8 +100,8 @@ const ConnectBtn = styled(motion.button)<ConnectStateProps>`
 
 // region panel base
 const unconnected = css`
-  height: calc(100vh - calc(2 * ${paddingValue.window}em));
-  width: calc(100vw - calc(2 * ${paddingValue.window}em));
+  height: calc(100vh - calc(2 * ${paddingValue.window}));
+  width: calc(100vw - calc(2 * ${paddingValue.window}));
 `;
 
 const connected = css`
@@ -130,7 +130,7 @@ const panelConnected = css`
   flex-direction: row;
   align-items: center;
 
-  gap: ${paddingValue.normal}rem;
+  gap: ${paddingValue.normal};
 `;
 
 const InnerPanel = styled(Panel)<ConnectStateProps>`

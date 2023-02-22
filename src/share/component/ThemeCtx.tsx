@@ -442,19 +442,19 @@ export const radius = {
 };
 
 export const paddingValue = {
-  small: 0.3125,
-  normal: 0.625,
-  window: 0.9375,
+  small: "0.3125rem",
+  normal: "0.625rem",
+  window: "0.9375rem",
 };
 export const padding = {
   small: css`
-    padding: ${paddingValue.small}rem;
+    padding: ${paddingValue.small};
   `,
   normal: css`
-    padding: ${paddingValue.normal}rem;
+    padding: ${paddingValue.normal};
   `,
   window: css`
-    padding: ${paddingValue.window}rem;
+    padding: ${paddingValue.window};
   `,
 };
 
