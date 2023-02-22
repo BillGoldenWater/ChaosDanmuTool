@@ -9,12 +9,14 @@ import {
   font,
   padding,
   paddingValue,
-  radius,
+  themeCtx,
 } from "../../share/component/ThemeCtx";
 import { Panel } from "../../share/component/Panel";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { motion } from "framer-motion";
 import { appCtx } from "../../share/app/AppCtx";
+import { UilLinkBroken } from "@iconscout/react-unicons";
+import { backend } from "../../share/app/BackendApi";
 
 interface ConnectStateProps {
   connected?: boolean;
@@ -23,7 +25,9 @@ interface ConnectStateProps {
 export function ConnectPanel() {
   const ctx = useContext(appCtx);
 
-  const [connected, setConnected] = useState(false);
+  const connected =
+    ctx.receiverStatus === "connected" || ctx.receiverStatus === "reconnecting";
+  const connecting = ctx.receiverStatus === "connecting";
 
   return (
     <ConnectPanelBase layout layoutRoot connected={connected}>
@@ -40,10 +44,9 @@ export function ConnectPanel() {
           connected={connected}
           onClick={() => {
             if (connected) {
-              setConnected(!connected);
+              backend?.disconnectRoom();
             } else {
-              // setConnected(!connected);
-              setTimeout(setConnected.bind(null, true), 500);
+              backend?.connectRoom();
             }
           }}
           whileHover={{
@@ -55,7 +58,14 @@ export function ConnectPanel() {
             transition: { type: "spring", damping: 20, stiffness: 1000 },
           }}
         >
-          {connected ? "D" : "连接"}
+          {connected ? (
+            <UilLinkBroken />
+          ) : (
+            <>
+              <BtnConnectingSvg connecting={connecting} />
+              连接
+            </>
+          )}
         </ConnectBtn>
       </InnerPanel>
     </ConnectPanelBase>
@@ -67,19 +77,14 @@ const btnUnconnected = css`
   width: 9.375rem;
   height: 9.375rem;
 
-  border-radius: 50%;
-  border-color: ${color.theme};
-
   color: ${color.theme};
 
   font-size: 2.5rem;
   font-weight: 400;
 `;
 const btnConnected = css`
-  padding: 0.3125rem 0.75rem;
-
-  ${radius.normal}
-  border-color: ${color.fnErr};
+  display: inline-flex;
+  padding: 0;
 
   color: ${color.fnErr};
 
@@ -87,15 +92,59 @@ const btnConnected = css`
 `;
 
 const ConnectBtn = styled(motion.button)<ConnectStateProps>`
+  position: relative;
   background-color: transparent;
 
   ${(p) => (p.connected ? btnConnected : btnUnconnected)}
 
-  border-style: solid;
-  border-width: 0.125rem;
+  border: 0;
 
   user-select: none;
 `;
+
+function BtnConnectingSvg({ connecting }: { connecting: boolean }) {
+  const theme = useContext(themeCtx);
+
+  return (
+    <svg
+      width={"100%"}
+      height={"100%"}
+      style={{
+        position: "absolute",
+        left: 0,
+        top: 0,
+      }}
+    >
+      <defs>
+        <circle id={"circle"} r={"50%"} cx={"50%"} cy={"50%"} />
+
+        <clipPath id={"innerStroke"}>
+          <use xlinkHref={"#circle"} />
+        </clipPath>
+      </defs>
+      <use
+        xlinkHref={"#circle"}
+        clipPath={"url(#innerStroke)"}
+        fill={"transparent"}
+        stroke={theme.consts.theme}
+        strokeWidth={"calc(0.125rem * 2)"}
+        strokeDasharray={`${Math.PI * 100}%`}
+      >
+        {connecting ? (
+          <animate
+            attributeName={"stroke-dashoffset"}
+            values={`0;${Math.PI * 200}%`}
+            dur={"1.25s"}
+            repeatCount={"indefinite"}
+          />
+        ) : (
+          <></>
+        )}
+      </use>
+    </svg>
+  );
+}
+
 // endregion
 
 // region panel base
