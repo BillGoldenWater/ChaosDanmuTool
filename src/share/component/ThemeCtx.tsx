@@ -461,6 +461,12 @@ export const padding = {
 export const dynamicSelect = (p: StyleFnProps) =>
   p.theme.selectable ? "" : "user-select: none";
 
+export const zIndex = {
+  popper: css`
+    z-index: 100;
+  `,
+};
+
 export const GlobalStyle = createGlobalStyle`
   body {
     font-size: 0.5cm;
