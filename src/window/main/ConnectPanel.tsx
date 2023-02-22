@@ -183,7 +183,7 @@ const panelConnected = css`
 `;
 
 const InnerPanel = styled(Panel)<ConnectStateProps>`
-  display: block flex;
+  display: flex;
 
   ${(p) => (p.connected ? panelConnected : panelUnconnected)};
 `;

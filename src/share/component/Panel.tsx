@@ -16,7 +16,7 @@ export interface PanelProps {
 }
 
 const panelFlex = css`
-  display: block flex;
+  display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 0.625rem;
