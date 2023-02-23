@@ -43,7 +43,7 @@ export function ConnectPanel() {
           layout
           connected={connected}
           onClick={() => {
-            if (connected) {
+            if (connected || connecting) {
               backend?.disconnectRoom();
             } else {
               backend?.connectRoom();
