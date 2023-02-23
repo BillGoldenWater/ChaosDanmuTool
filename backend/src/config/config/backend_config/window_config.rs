@@ -12,7 +12,10 @@ pub mod viewer_window_config;
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Eq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, export_to = "../frontend/src/share/type/rust/config/backendConfig/")]
+#[ts(
+  export,
+  export_to = "../frontend/src/share/type/rust/config/backendConfig/"
+)]
 pub struct WindowConfig {
   #[serde(default = "main_window_default")]
   #[serde(skip_serializing_if = "main_window_skip_if")]

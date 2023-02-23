@@ -14,7 +14,10 @@ pub mod tts_config;
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, export_to = "../frontend/src/share/type/rust/config/frontendConfig/")]
+#[ts(
+  export,
+  export_to = "../frontend/src/share/type/rust/config/frontendConfig/"
+)]
 pub struct ViewerViewConfig {
   #[serde(default = "uuid_default")]
   #[serde(skip_serializing_if = "uuid_skip_if")]

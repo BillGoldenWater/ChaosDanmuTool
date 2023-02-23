@@ -12,7 +12,10 @@ pub mod theme_config;
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Eq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, export_to = "../frontend/src/share/type/rust/config/frontendConfig/")]
+#[ts(
+  export,
+  export_to = "../frontend/src/share/type/rust/config/frontendConfig/"
+)]
 pub struct MainViewConfig {
   #[serde(default = "path_default")]
   #[serde(skip_serializing_if = "path_skip_if")]

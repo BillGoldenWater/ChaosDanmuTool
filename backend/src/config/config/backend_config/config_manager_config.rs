@@ -7,7 +7,10 @@ use crate::config::config::ALLOW_CONFIG_SKIP_IF;
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Eq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, export_to = "../frontend/src/share/type/rust/config/backendConfig/")]
+#[ts(
+  export,
+  export_to = "../frontend/src/share/type/rust/config/backendConfig/"
+)]
 pub struct ConfigManagerConfig {
   #[serde(default = "save_on_change_default")]
   #[serde(skip_serializing_if = "save_on_change_skip_if")]

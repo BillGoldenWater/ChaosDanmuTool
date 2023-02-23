@@ -7,7 +7,10 @@ use crate::config::config::ALLOW_CONFIG_SKIP_IF;
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Eq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, export_to = "../frontend/src/share/type/rust/config/backendConfig/")]
+#[ts(
+  export,
+  export_to = "../frontend/src/share/type/rust/config/backendConfig/"
+)]
 pub struct DanmuReceiverConfig {
   #[serde(default = "roomid_default")]
   #[serde(skip_serializing_if = "roomid_skip_if")]

@@ -13,7 +13,10 @@ pub mod danmu_message;
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Eq, Debug, Clone)]
 #[serde(rename_all = "camelCase", tag = "cmd")]
-#[ts(export, export_to = "../frontend/src/share/type/rust/command/commandPacket/")]
+#[ts(
+  export,
+  export_to = "../frontend/src/share/type/rust/command/commandPacket/"
+)]
 pub enum BiliBiliCommand {
   ActivityUpdate {
     data: ActivityUpdate,

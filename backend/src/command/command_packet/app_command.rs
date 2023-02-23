@@ -19,7 +19,10 @@ pub mod viewer_status_update;
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase", tag = "cmd")]
-#[ts(export, export_to = "../frontend/src/share/type/rust/command/commandPacket/")]
+#[ts(
+  export,
+  export_to = "../frontend/src/share/type/rust/command/commandPacket/"
+)]
 pub enum AppCommand {
   BiliBiliPacketParseError { data: BiliBiliPacketParseError },
   ConfigUpdate { data: Box<ConfigUpdate> },

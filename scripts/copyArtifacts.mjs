@@ -79,7 +79,7 @@ async function main() {
    */
   // noinspection JSFileReferences
   const version = JSON.parse(
-    (await fs.readFile("./package.json")).toString()
+    (await fs.readFile("./frontend/package.json")).toString()
   ).version;
 
   await fs.rm("out", { recursive: true, force: true });
