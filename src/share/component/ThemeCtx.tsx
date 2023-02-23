@@ -483,6 +483,10 @@ export const GlobalStyle = createGlobalStyle`
     font-family: sans-serif;
   }
 
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
   /* prevent overscroll */
   body {
     position: fixed;
