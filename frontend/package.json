@@ -9,9 +9,9 @@
   },
   "license": "AGPL-3.0-only",
   "scripts": {
-    "dev": "(react-devtools&) && ../node_modules/.bin/vite",
-    "build": "../node_modules/.bin/tsc && vite build",
-    "preview": "../node_modules/.bin/vite preview",
+    "dev": "(react-devtools&) && ./node_modules/.bin/vite",
+    "build": "./node_modules/.bin/tsc && vite build",
+    "preview": "./node_modules/.bin/vite preview",
     "tauri": "cargo tauri"
   },
   "eslintConfig": {
