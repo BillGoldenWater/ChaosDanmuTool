@@ -9,7 +9,7 @@ use crate::config::config::ALLOW_CONFIG_SKIP_IF;
 #[serde(rename_all = "camelCase")]
 #[ts(
   export,
-  export_to = "../src/share/type/rust/config/frontendConfig/viewerViewConfig/danmuViewerCustomConfig/"
+  export_to = "../frontend/src/share/type/rust/config/frontendConfig/viewerViewConfig/danmuViewerCustomConfig/"
 )]
 pub struct DanmuMergeConfig {
   #[serde(default = "interval_default")]
