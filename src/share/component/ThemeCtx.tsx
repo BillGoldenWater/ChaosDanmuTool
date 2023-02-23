@@ -473,19 +473,14 @@ export const GlobalStyle = createGlobalStyle`
   }
 
   #root {
-    ${font.normal}
+    ${font.normal};
+
+    width: 100%;
+    height: 100%;
   }
 
-  html,
   body {
-    padding: 0;
-    margin: 0;
-
     font-family: sans-serif;
-  }
-
-  * {
-    box-sizing: border-box;
   }
 
   /* prevent overscroll */

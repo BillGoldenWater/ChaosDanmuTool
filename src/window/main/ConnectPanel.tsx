@@ -149,13 +149,11 @@ function BtnConnectingSvg({ connecting }: { connecting: boolean }) {
 
 // region panel base
 const unconnected = css`
-  height: calc(100vh - calc(2 * ${paddingValue.window}));
-  width: calc(100vw - calc(2 * ${paddingValue.window}));
+  height: 100%;
 `;
 
 const connected = css`
   height: fit-content;
-  width: 100%;
 `;
 
 const ConnectPanelBase = styled(motion.div)<ConnectStateProps>`

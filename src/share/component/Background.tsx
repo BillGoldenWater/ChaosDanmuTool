@@ -4,14 +4,14 @@
  */
 
 import styled from "styled-components";
-import { padding } from "./ThemeCtx";
+import { padding, paddingValue } from "./ThemeCtx";
 import { motion } from "framer-motion";
 
 export const Background = styled(motion.div)`
   ${padding.window};
 
-  width: 100vw;
-  height: 100vh;
+  width: calc(100% - ${paddingValue.window} * 2);
+  height: calc(100% - ${paddingValue.window} * 2);
   background-color: ${(p) => p.theme.consts.bgWindow};
   color: ${(p) => p.theme.consts.txt};
 `;
