@@ -36,11 +36,9 @@ async function main() {
   highlightLog("rm last bundle output");
 
   try {
-    const bundleDirs = (await fs.readdir("src-tauri/target"))
+    const bundleDirs = (await fs.readdir("backend/target"))
       .filter((name) => name !== "release" && name !== "debug")
-      .map((name) =>
-        path.join("src-tauri", "target", name, "release", "bundle")
-      );
+      .map((name) => path.join("backend", "target", name, "release", "bundle"));
     for (const dir of bundleDirs) {
       try {
         await fs.rm(dir, { recursive: true, force: true });

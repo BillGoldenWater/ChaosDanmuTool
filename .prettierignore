@@ -1,4 +1,2 @@
-src-tauri/target
-src/share/type/rust
-src-tauri/**/target
+frontend/src/share/type/rust
 dist

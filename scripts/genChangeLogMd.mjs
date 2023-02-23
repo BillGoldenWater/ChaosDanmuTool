@@ -4,7 +4,7 @@
  */
 
 import fs from "fs/promises";
-import semver from "semver/preload.js";
+import semver from "../frontend/node_modules/semver";
 
 async function main() {
   let data = JSON.parse((await fs.readFile("changeLog.json")).toString());

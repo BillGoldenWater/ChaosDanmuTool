@@ -32,7 +32,7 @@ function highlightLog(msg) {
  * @param {string} target
  */
 function clippy(target) {
-  execCommand(`cargo clippy -r --target ${target} -- -Dwarnings`, "src-tauri");
+  execCommand(`cargo clippy -r --target ${target} -- -Dwarnings`, "backend");
 }
 
 export async function main() {
@@ -41,7 +41,7 @@ export async function main() {
   // region clippy
   highlightLog("cargo clippy");
 
-  await fs.rm("src/share/type/rust", { recursive: true, force: true });
+  await fs.rm("frontend/src/share/type/rust", { recursive: true, force: true });
   switch (process.platform) {
     case "darwin": {
       clippy("x86_64-apple-darwin");

@@ -24,7 +24,7 @@ jobs:
 
       #      - name: test build frontend
       #        if: success()
-      #        run: yarn build
+      #        run: cd frontend && yarn build
 
       - name: backend lint
         if: success()

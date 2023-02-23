@@ -32,7 +32,7 @@ async function copy(platform, buildInfos) {
 
     // region construct path
     const bundleDirPath = path.join(
-      "src-tauri",
+      "backend",
       "target",
       target,
       "release",
@@ -113,7 +113,7 @@ async function main() {
     }
     case "win32": {
       const tauriConfig = JSON.parse(
-        (await fs.readFile("./src-tauri/tauri.conf.json")).toString()
+        (await fs.readFile("./backend/tauri.conf.json")).toString()
       );
       // noinspection JSUnresolvedVariable
       const wL = tauriConfig?.tauri?.bundle?.windows?.wix?.language || "en-US";

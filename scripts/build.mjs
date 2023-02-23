@@ -17,16 +17,16 @@ function execCommand(command, cwd = undefined) {
 async function main() {
   switch (process.platform) {
     case "darwin": {
-      execCommand("yarn tauri build -t x86_64-apple-darwin");
-      execCommand("yarn tauri build -t aarch64-apple-darwin");
+      execCommand("cargo tauri build -t x86_64-apple-darwin");
+      execCommand("cargo tauri build -t aarch64-apple-darwin");
       break;
     }
     case "linux": {
-      execCommand("yarn tauri build -t x86_64-unknown-linux-gnu");
+      execCommand("cargo tauri build -t x86_64-unknown-linux-gnu");
       break;
     }
     case "win32": {
-      execCommand("yarn tauri build -t x86_64-pc-windows-msvc");
+      execCommand("cargo tauri build -t x86_64-pc-windows-msvc");
       break;
     }
   }

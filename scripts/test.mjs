@@ -26,17 +26,17 @@ export async function main() {
   // region test
   highlightLog("cargo test");
 
-  await fs.rm("src/share/type/rust", { recursive: true, force: true });
+  await fs.rm("frontend/src/share/type/rust", { recursive: true, force: true });
   switch (process.platform) {
     case "darwin": {
       execCommand(
         "cargo test --release --target x86_64-apple-darwin",
-        "src-tauri"
+        "backend"
       );
       if (process.arch === "arm64") {
         execCommand(
           "cargo test --release --target aarch64-apple-darwin",
-          "src-tauri"
+          "backend"
         );
       }
       break;
@@ -44,14 +44,14 @@ export async function main() {
     case "linux": {
       execCommand(
         "cargo test --release --target x86_64-unknown-linux-gnu",
-        "src-tauri"
+        "backend"
       );
       break;
     }
     case "win32": {
       execCommand(
         "cargo test --release --target x86_64-pc-windows-msvc",
-        "src-tauri"
+        "backend"
       );
       break;
     }

@@ -22,12 +22,12 @@ test.sqlite
 app-icon.png
 
 # cargo output
-src-tauri/target
-src-tauri/static_object/target
-src-tauri/static_object/static_object_derive/target
+backend/target
+backend/static_object/target
+backend/static_object/static_object_derive/target
 
 # generated code
-src/share/type/rust
+frontend/src/share/type/rust
 
 # Editor directories and files
 .vscode/*

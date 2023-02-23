@@ -143,17 +143,17 @@ function purgeTarget(path) {
 export function gen() {
   const yarnPath = execCommand("yarn cache dir").toString().trim();
 
-  const yarnHash = getHash("yarn.lock");
-  const cargoLockHash = getHash("src-tauri/Cargo.lock");
+  const yarnHash = getHash("frontend/yarn.lock");
+  const cargoLockHash = getHash("backend/Cargo.lock");
 
   const cargoBinHash = getHash(
     `${os.homedir()}/.cargo/.crates.toml`,
     `${os.homedir()}/.cargo/.crates2.json`
   );
 
-  purgeTarget("src-tauri/target");
-  const backendHash = getHashDir("src-tauri/src");
-  const cargoTargetSize = dirSize("src-tauri/target");
+  purgeTarget("backend/target");
+  const backendHash = getHashDir("backend/src");
+  const cargoTargetSize = dirSize("backend/target");
 
   const { platform } = process;
 
@@ -190,7 +190,7 @@ export function gen() {
     },
     {
       id: "cargo-target",
-      paths: ["src-tauri/target/"],
+      paths: ["backend/target/"],
       ...genKeys(
         "cargo-target",
         platform,

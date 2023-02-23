@@ -4,7 +4,7 @@
  */
 
 import fs from "fs/promises";
-import semver from "semver";
+import semver from "../frontend/node_modules/semver";
 
 async function main() {
   let pkg = JSON.parse((await fs.readFile("package.json")).toString());

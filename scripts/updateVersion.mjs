@@ -4,8 +4,8 @@
  */
 
 import fs from "fs/promises";
-import semver from "semver";
-import toml from "toml-patch";
+import semver from "../frontend/node_modules/semver";
+import toml from "../frontend/node_modules/toml-patch";
 
 /**
  * @param args {string[]}
@@ -24,7 +24,7 @@ async function main(args) {
 
   // region read files
   let pkg_raw = (await fs.readFile("package.json")).toString();
-  let cargo_raw = (await fs.readFile("src-tauri/Cargo.toml")).toString();
+  let cargo_raw = (await fs.readFile("backend/Cargo.toml")).toString();
   let pkg = JSON.parse(pkg_raw);
   let cargo = toml.parse(cargo_raw);
   // endregion
@@ -39,7 +39,7 @@ async function main(args) {
 
   // region output
   await fs.writeFile("package.json", JSON.stringify(pkg, null, 2));
-  await fs.writeFile("src-tauri/Cargo.toml", toml.patch(cargo_raw, cargo));
+  await fs.writeFile("backend/Cargo.toml", toml.patch(cargo_raw, cargo));
   // endregion
 }
 
