@@ -17,12 +17,12 @@ jobs:
 
       - name: init environment
         uses: ./.github/actions/initEnvironment
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: before build
         if: success()
         run: node scripts/beforeBuild.mjs
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: build
         if: success()
