@@ -109,6 +109,7 @@ function BtnConnectingSvg({ connecting }: { connecting: boolean }) {
     <svg
       width={"100%"}
       height={"100%"}
+      viewBox={"0 0 100 100"}
       style={{
         position: "absolute",
         left: 0,
@@ -116,7 +117,7 @@ function BtnConnectingSvg({ connecting }: { connecting: boolean }) {
       }}
     >
       <defs>
-        <circle id={"circle"} r={"50%"} cx={"50%"} cy={"50%"} />
+        <circle id={"circle"} r={"50"} cx={"50"} cy={"50"} />
 
         <clipPath id={"innerStroke"}>
           <use xlinkHref={"#circle"} />
@@ -128,15 +129,24 @@ function BtnConnectingSvg({ connecting }: { connecting: boolean }) {
         fill={"transparent"}
         stroke={theme.consts.theme}
         strokeWidth={"calc(0.125rem * 2)"}
-        strokeDasharray={`${Math.PI * 100}%`}
+        strokeDasharray={`${Math.PI * 100}`}
       >
         {connecting ? (
-          <animate
-            attributeName={"stroke-dashoffset"}
-            values={`0;${Math.PI * 200}%`}
-            dur={"1.25s"}
-            repeatCount={"indefinite"}
-          />
+          <>
+            <animate
+              attributeName={"stroke-dashoffset"}
+              values={`0; ${Math.PI * 200}`}
+              dur={"2.5s"}
+              repeatCount={"indefinite"}
+            />
+            <animateTransform
+              attributeName={"transform"}
+              type={"rotate"}
+              values={"360 50 50; 0 50 50"}
+              dur={"1s"}
+              repeatCount={"indefinite"}
+            />
+          </>
         ) : (
           <></>
         )}
