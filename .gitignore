@@ -23,8 +23,6 @@ app-icon.png
 
 # cargo output
 backend/target
-backend/static_object/target
-backend/static_object/static_object_derive/target
 
 # generated code
 frontend/src/share/type/rust
