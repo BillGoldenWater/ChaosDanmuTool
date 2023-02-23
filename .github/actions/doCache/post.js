@@ -22,19 +22,24 @@ function highlightLog(msg) {
 
 async function deleteCache(octokit, key) {
   highlightLog(`deleting cache ${key}`);
-  let res = await octokit.request(
-    "DELETE /repos/{owner}/{repo}/actions/caches{?key}",
-    {
-      owner: OWNER,
-      repo: REPO,
-      key,
+  try {
+    let res = await octokit.request(
+      "DELETE /repos/{owner}/{repo}/actions/caches{?key}",
+      {
+        owner: OWNER,
+        repo: REPO,
+        key,
+      }
+    );
+    if (res.status === 200) {
+      highlightLog(`delete success`);
+    } else {
+      highlightLog(`delete failed with response`);
+      console.log(res);
     }
-  );
-  if (res.status === 200) {
-    highlightLog(`delete success`);
-  } else {
-    highlightLog(`delete failed with response`);
-    console.log(res);
+  } catch (e) {
+    highlightLog(`delete failed with error`);
+    console.log(e);
   }
 }
 
