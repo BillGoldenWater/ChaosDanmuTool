@@ -40,5 +40,5 @@ runs:
       shell: "bash"
 
     - name: mkdir dist
-      run: mkdir dist
+      run: mkdir frontend/dist
       shell: "bash"
