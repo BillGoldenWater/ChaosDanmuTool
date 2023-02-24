@@ -28,10 +28,15 @@ macro_rules! log_err {
   ($methodName:literal, $expr:expr) => {{
     let result = $expr;
     if let Err(err) = result {
-      error!(
-        "error occurs in {__methodName__} \n{err}",
-        __methodName__ = $methodName
-      );
+      match err {
+        Error::ConnectionClosed => {}
+        _ => {
+          error!(
+            "error occurs in {__methodName__} \n{err}",
+            __methodName__ = $methodName
+          );
+        }
+      }
     }
   }};
 }
