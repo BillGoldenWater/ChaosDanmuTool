@@ -441,14 +441,29 @@ export const radius = {
   `,
 };
 
+export const border = {
+  small: css`
+    border-width: 0.0625rem;
+    border-style: solid;
+  `,
+  normal: css`
+    border-width: 0.125rem;
+    border-style: solid;
+  `,
+};
+
 export const paddingValue = {
   small: "0.3125rem",
+  input: "0.5rem",
   normal: "0.625rem",
   window: "0.9375rem",
 };
 export const padding = {
   small: css`
     padding: ${paddingValue.small};
+  `,
+  input: css`
+    padding: ${paddingValue.input};
   `,
   normal: css`
     padding: ${paddingValue.normal};
