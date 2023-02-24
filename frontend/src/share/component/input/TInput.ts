@@ -17,6 +17,7 @@ export interface TInputBase<T> {
   disabled?: boolean;
   placeholder?: string;
   className?: string;
+  autoWidth?: boolean;
 }
 
 export interface TInputWithValidation<Value, InputData> {

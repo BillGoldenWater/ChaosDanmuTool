@@ -12,9 +12,12 @@ import {
   FocusEventHandler,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useState,
 } from "react";
 import { border, color, dynamicSelect, padding, radius } from "../ThemeCtx";
+import { measureText } from "../../utils/StringUtils";
+import { Property } from "csstype";
 
 export function TextBaseInput<T>(
   props: Omit<TTextBaseInput<T>, "type"> & LayoutProps
@@ -23,6 +26,7 @@ export function TextBaseInput<T>(
     defaultValue,
     value,
     onChange,
+    autoWidth,
     checkValid,
     parser,
     stringifier,
@@ -34,6 +38,7 @@ export function TextBaseInput<T>(
   );
   const [focused, setFocused] = useState(false);
 
+  // apply value in props
   const syncFromProps = useCallback(() => {
     if (value != undefined) {
       if (stringifier) {
@@ -44,6 +49,7 @@ export function TextBaseInput<T>(
     }
   }, [stringifier, value]);
 
+  // apply value in props when not focused
   useEffect(() => {
     if (!focused) {
       syncFromProps();
@@ -69,14 +75,46 @@ export function TextBaseInput<T>(
   }, [cachedValue, checkValid, onChange, parser]);
   // endregion
 
+  // region autoWidth
+  const [width, setWidth] = useState<Property.Width>("auto");
+  const [ref, setRef] = useState<HTMLInputElement | null>(null);
+
+  useLayoutEffect(() => {
+    if (autoWidth && ref) {
+      const style = window.getComputedStyle(ref);
+      const {
+        paddingLeft: pl,
+        paddingRight: pr,
+        borderLeftWidth: blw,
+        borderRightWidth: brw,
+        fontWeight: fw,
+        fontSize: fs,
+        fontFamily: ff,
+      } = style;
+
+      const text = measureText(cachedValue, `${fw} ${fs} ${ff}`);
+
+      if (text?.width) {
+        setWidth(`calc(${text.width}px + ${pl} + ${pr} + ${blw} + ${brw})`);
+      } else {
+        setWidth(`calc(${pl} + ${pr} + ${blw} + ${brw})`);
+      }
+    } else {
+      setWidth("auto");
+    }
+  }, [autoWidth, cachedValue, ref]);
+  // endregion
+
   return (
     <InputBase>
       <TextBaseInputBase
         {...passableProps}
+        ref={setRef}
         value={cachedValue}
         onChange={onChangeEvent}
         onFocus={setFocused.bind(null, true)}
         onBlur={onBlur}
+        style={{ width: width }}
       />
     </InputBase>
   );
