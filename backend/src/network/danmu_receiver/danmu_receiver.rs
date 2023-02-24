@@ -195,8 +195,8 @@ impl DanmuReceiver {
       }
       ReceiverStatus::Connected => {
         info!("disconnecting");
-        self.ws.disconnect(close_frame(CloseCode::Normal, "")).await;
         self.set_status(ReceiverStatus::Close).await;
+        self.ws.disconnect(close_frame(CloseCode::Normal, "")).await;
         info!("disconnected");
       }
       ReceiverStatus::Connecting | ReceiverStatus::Reconnecting => {
