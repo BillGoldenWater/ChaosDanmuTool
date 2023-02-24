@@ -12,18 +12,24 @@ import {
   themeCtx,
 } from "../../share/component/ThemeCtx";
 import { Panel } from "../../share/component/Panel";
-import { useContext } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { appCtx } from "../../share/app/AppCtx";
 import { UilLinkBroken } from "@iconscout/react-unicons";
 import { backend } from "../../share/app/BackendApi";
+import { NumberInput } from "../../share/component/input/NumberInput";
 
 interface ConnectStateProps {
   connected?: boolean;
+  connectedHover?: boolean;
 }
+
+const defaultInnerPanelSize = { height: "25rem", width: "28.125rem" };
 
 export function ConnectPanel() {
   const ctx = useContext(appCtx);
+
+  const [hover, setHover] = useState(false);
 
   const connected =
     ctx.receiverStatus === "connected" || ctx.receiverStatus === "reconnecting";
@@ -32,21 +38,25 @@ export function ConnectPanel() {
   return (
     <ConnectPanelBase layout connected={connected}>
       <InnerPanel
-        {...(connected
-          ? {}
-          : { height: "25rem", width: "28.125rem", hover: true })}
-        connected={connected}
+        {...(connected ? {} : defaultInnerPanelSize)}
         layout
+        hover={!connected}
+        connectedHover={hover}
+        connected={connected}
+        onHoverStart={setHover.bind(null, true)}
+        onHoverEnd={setHover.bind(null, false)}
       >
-        <motion.input layout={"position"} defaultValue={953650} />
+        <RoomidInput connected={connected} hover={hover} />
         <ConnectBtn
-          layout
+          layout={"position"}
           connected={connected}
+          connectedHover={hover}
           onClick={() => {
             if (connected || connecting) {
               backend?.disconnectRoom();
             } else {
               backend?.connectRoom();
+              setHover(false);
             }
           }}
           whileHover={{
@@ -72,6 +82,59 @@ export function ConnectPanel() {
   );
 }
 
+// region roomid input
+interface RoomidInputProps {
+  connected: boolean;
+  hover: boolean;
+}
+
+const RoomidInputBase = styled(NumberInput)<RoomidInputProps>`
+  &:disabled {
+    ${padding.small};
+
+    color: ${(p) => (p.hover ? color.txt : color.txtSecond)} !important;
+    -webkit-text-fill-color: ${(p) => (p.hover ? color.txt : color.txtSecond)};
+
+    background-color: transparent;
+    border-color: transparent;
+  }
+`;
+
+function RoomidInput({ connected, ...props }: RoomidInputProps) {
+  const ctx = useContext(appCtx);
+
+  const [roomid, setRoomid] = useState(() =>
+    ctx.config.get("backend.danmuReceiver.roomid")
+  );
+
+  useEffect(() => {
+    setRoomid(ctx.config.get("backend.danmuReceiver.roomid"));
+  }, [ctx.config]);
+
+  const onChange = useCallback(
+    (value: number) => {
+      ctx.config.set("backend.danmuReceiver.roomid", value);
+      setRoomid(value);
+    },
+    [ctx.config]
+  );
+
+  return (
+    <RoomidInputBase
+      {...props}
+      layout
+      connected={connected}
+      value={roomid}
+      onChange={onChange}
+      placeholder={"房间号"}
+      disabled={connected}
+      autoWidth={connected}
+    />
+  );
+}
+
+// endregion
+
 // region connect button
 const btnUnconnected = css`
   width: 9.375rem;
@@ -82,11 +145,12 @@ const btnUnconnected = css`
   font-size: 2.5rem;
   font-weight: 400;
 `;
-const btnConnected = css`
+const btnConnected = css<ConnectStateProps>`
   display: inline-flex;
   padding: 0;
 
-  color: ${color.fnErr};
+  transition: color 0.2s ease-out;
+  color: ${(p) => (p.connectedHover ? color.fnErr : color.txtSecond)};
 
   ${font.input}
 `;
@@ -181,8 +245,8 @@ const panelUnconnected = css`
   justify-content: space-evenly;
   align-items: center;
 `;
-const panelConnected = css`
-  ${padding.normal}
+const panelConnected = css<ConnectStateProps>`
+  ${(p) => (p.connectedHover ? padding.normal : padding.small)}
 
   flex-direction: row;
   align-items: center;
