@@ -106,7 +106,7 @@ export function TextBaseInput<T>(
   // endregion
 
   return (
-    <InputBase>
+    <InputBase {...(passableProps as LayoutProps)}>
       <TextBaseInputBase
         {...passableProps}
         ref={setRef}

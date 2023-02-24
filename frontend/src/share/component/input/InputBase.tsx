@@ -4,7 +4,7 @@
  */
 
 import styled from "styled-components";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, LayoutProps, motion } from "framer-motion";
 import { PropsWithChildren, useState } from "react";
 import { usePopper } from "react-popper";
 import { zIndex } from "../ThemeCtx";
@@ -16,7 +16,8 @@ export interface InputBaseProps {
 export function InputBase({
   children,
   extra,
-}: PropsWithChildren<InputBaseProps>) {
+  ...layoutProps
+}: PropsWithChildren<InputBaseProps> & LayoutProps) {
   const [focus, setFocus] = useState(false);
   const [hoverExtra, setHoverExtra] = useState(false);
 
@@ -27,14 +28,17 @@ export function InputBase({
   const expand = focus || hoverExtra;
   return (
     <InputBaseContainer
-      layout
+      {...layoutProps}
       onFocus={setFocus.bind(null, true)}
       onBlur={setFocus.bind(null, false)}
     >
-      <MainContainer ref={setMainRef}>{children}</MainContainer>
+      <MainContainer {...layoutProps} ref={setMainRef}>
+        {children}
+      </MainContainer>
       <AnimatePresence>
         {expand && (
           <ExtraContainer
+            {...layoutProps}
             ref={setExtraRef}
             style={styles.popper}
             expand={focus}
