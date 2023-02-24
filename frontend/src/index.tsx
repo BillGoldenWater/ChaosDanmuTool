@@ -30,6 +30,15 @@ root.render(
   </StrictMode>
 );
 
+// window.addEventListener("blur", () => {
+//   const activeElement = document.activeElement;
+//
+//   if (activeElement && activeElement.tagName === "INPUT") {
+//     (activeElement as HTMLInputElement).blur();
+//     (activeElement as HTMLInputElement).focus();
+//   }
+// });
+
 if (debug) {
   window.addEventListener(
     "keydown",
