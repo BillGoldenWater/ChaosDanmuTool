@@ -223,7 +223,9 @@ function BtnConnectingSvg({ connecting }: { connecting: boolean }) {
 
 // region panel base
 const unconnected = css`
-  height: 100%;
+  --height: calc(100vh - ${paddingValue.window} * 2);
+  height: var(--height);
+  min-height: var(--height);
 `;
 
 const connected = css`
