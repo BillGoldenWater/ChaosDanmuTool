@@ -3,16 +3,27 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import styled from "styled-components";
+import styled, { css } from "styled-components";
+import { Property } from "csstype";
 
-export interface SpacerProps {
-  vertical?: boolean;
-
-  size: string;
+interface SpacerSizeProps {
+  size: Property.Width;
 }
 
-export const Spacer = styled.div<SpacerProps>`
-  display: flex;
+export interface SpacerProps extends SpacerSizeProps {
+  vertical?: boolean;
+}
 
-  ${(p) => (p.vertical ? `height: ${p.size}` : `width: ${p.size}`)}
+const vertical = css<SpacerSizeProps>`
+  display: block;
+  height: ${(p) => p.size};
+`;
+
+const horizontal = css<SpacerSizeProps>`
+  display: inline-block;
+  width: ${(p) => p.size};
+`;
+
+export const Spacer = styled.div<SpacerProps>`
+  ${(p) => (p.vertical ? vertical : horizontal)};
 `;
