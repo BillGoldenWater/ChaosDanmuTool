@@ -4,10 +4,13 @@
  */
 
 import fs from "fs/promises";
-import semver from "../frontend/node_modules/semver";
+import semver from "../frontend/node_modules/semver/index.js";
+import { settings } from "./settings.mjs";
 
 async function main() {
-  let pkg = JSON.parse((await fs.readFile("package.json")).toString());
+  let pkg = JSON.parse(
+    (await fs.readFile(settings.frontendFile("package.json"))).toString()
+  );
   let data = JSON.parse((await fs.readFile("changeLog.json")).toString());
 
   let date = new Date();

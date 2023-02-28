@@ -5,6 +5,7 @@
 
 import { execSync } from "child_process";
 import fs from "fs/promises";
+import { settings } from "./settings.mjs";
 
 /**
  * @param command {string}
@@ -26,7 +27,7 @@ export async function main() {
   // region test
   highlightLog("cargo test");
 
-  await fs.rm("frontend/src/share/type/rust", { recursive: true, force: true });
+  await fs.rm(settings.typeGenPath, { recursive: true, force: true });
   switch (process.platform) {
     case "darwin": {
       execCommand(

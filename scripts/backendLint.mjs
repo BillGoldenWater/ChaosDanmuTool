@@ -4,7 +4,6 @@
  */
 
 import { execSync } from "child_process";
-import fs from "fs/promises";
 
 let hasErr = false;
 
@@ -41,7 +40,6 @@ export async function main() {
   // region clippy
   highlightLog("cargo clippy");
 
-  await fs.rm("frontend/src/share/type/rust", { recursive: true, force: true });
   switch (process.platform) {
     case "darwin": {
       clippy("x86_64-apple-darwin");

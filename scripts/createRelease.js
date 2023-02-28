@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+const { settings } = require("./settings.mjs");
+
 /**
  * @param {string} msg
  */
@@ -20,7 +22,7 @@ module.exports = async ({ github, context }) => {
 
   // noinspection JSFileReferences
   const version = JSON.parse(
-    (await fs.readFile("./package.json")).toString()
+    (await fs.readFile(settings.frontendFile("package.json"))).toString()
   ).version;
   const changeLog = JSON.parse(
     (await fs.readFile("./changeLog.json")).toString()

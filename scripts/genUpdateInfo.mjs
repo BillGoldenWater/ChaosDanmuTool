@@ -5,6 +5,7 @@
 
 import fs from "fs/promises";
 import path from "path";
+import { settings } from "./settings.mjs";
 
 async function main() {
   /**
@@ -12,7 +13,7 @@ async function main() {
    */
   // noinspection JSFileReferences
   const version = JSON.parse(
-    (await fs.readFile("./package.json")).toString()
+    (await fs.readFile(settings.frontendFile("package.json"))).toString()
   ).version;
   const changeLog = JSON.parse(
     (await fs.readFile("./changeLog.json")).toString()

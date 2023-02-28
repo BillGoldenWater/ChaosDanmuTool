@@ -5,6 +5,7 @@
 
 import fs from "fs/promises";
 import path from "path";
+import { settings } from "./settings.mjs";
 
 const OUTPUT_APP_NAME = "Chaos Danmu Tool".replaceAll(" ", "-");
 
@@ -79,7 +80,9 @@ async function main() {
    */
   // noinspection JSFileReferences
   const version = JSON.parse(
-    (await fs.readFile("./frontend/package.json")).toString()
+    (
+      await fs.readFile(path.join(settings.frontendDir, "package.json"))
+    ).toString()
   ).version;
 
   await fs.rm("out", { recursive: true, force: true });
@@ -113,7 +116,9 @@ async function main() {
     }
     case "win32": {
       const tauriConfig = JSON.parse(
-        (await fs.readFile("./backend/tauri.conf.json")).toString()
+        (
+          await fs.readFile(path.join(settings.backendDir, "tauri.conf.json"))
+        ).toString()
       );
       // noinspection JSUnresolvedVariable
       const wL = tauriConfig?.tauri?.bundle?.windows?.wix?.language || "en-US";

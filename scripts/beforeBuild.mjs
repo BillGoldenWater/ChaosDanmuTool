@@ -6,6 +6,7 @@
 import { execSync } from "child_process";
 import fs from "fs/promises";
 import path from "path";
+import { settings } from "./settings.mjs";
 
 /**
  * @param command {string}
@@ -27,9 +28,10 @@ async function main() {
   await import("./rustupAddTargets.mjs");
 
   // region install tool
-  highlightLog("install cargo tauri-cli");
-
-  execCommand("cargo install tauri-cli");
+  for (let cargoTool of settings.cargoTools) {
+    highlightLog(`install cargo ${cargoTool}`);
+    execCommand(`cargo install ${cargoTool}`);
+  }
   // endregion
 
   // region rm last bundle output
