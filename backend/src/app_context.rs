@@ -72,7 +72,7 @@ impl AppContext {
     });
   }
 
-  pub fn i() -> AppContext {
+  pub fn i() -> &'static AppContext {
     unsafe {
       if APP_CONTEXT.is_null() {
         print_trace();
@@ -80,7 +80,7 @@ impl AppContext {
       }
     }
 
-    unsafe { (*APP_CONTEXT).clone() }
+    unsafe { &*APP_CONTEXT }
   }
 }
 
