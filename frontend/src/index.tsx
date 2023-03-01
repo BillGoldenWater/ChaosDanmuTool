@@ -21,7 +21,7 @@ const debug = backend ? await backend.isDebug() : true;
 
 root.render(
   <StrictMode>
-    <AppCtxProvider debug={debug} firstConfig={config}>
+    <AppCtxProvider firstConfig={config}>
       <ThemeCtxProvider>
         <GlobalStyle />
         <App />

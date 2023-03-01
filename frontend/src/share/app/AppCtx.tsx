@@ -93,7 +93,6 @@ appCtx.displayName = "AppContext";
 const AppCtxProv = appCtx.Provider;
 
 interface Props extends PropsWithChildren {
-  debug: boolean;
   firstConfig: Config;
 }
 
@@ -102,11 +101,11 @@ interface TAppConstant {
   receiver: CommandReceiver;
 }
 
-export function AppCtxProvider({ firstConfig, debug, children }: Props) {
+export function AppCtxProvider({ firstConfig, children }: Props) {
   // region state
   const [params, setParams] = useState<TAppParams>(() => getParams());
   const [appConstant] = useState<TAppConstant>(() =>
-    initialAppConstant(firstConfig, debug, params)
+    initialAppConstant(firstConfig, params)
   );
 
   const [config, setConfig] = useState<Config>(firstConfig);
@@ -298,14 +297,12 @@ export function AppCtxProvider({ firstConfig, debug, children }: Props) {
 
 export function initialAppConstant(
   firstConfig: Config,
-  debug: boolean,
   params: TAppParams
 ): TAppConstant {
   const eventTarget = new AppEventTarget();
   const receiver = new CommandReceiver({
     eventTarget,
     location: "AppContext",
-    debug: debug,
     port: firstConfig.backend.httpServer.port,
   });
 

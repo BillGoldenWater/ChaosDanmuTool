@@ -27,7 +27,6 @@ type Option = {
   port: number;
   maxReconnectCount: number;
   noReconnectCodes: number[];
-  debug: boolean;
 
   location: string;
   eventTarget: AppEventTarget;
@@ -41,7 +40,6 @@ export class CommandReceiver {
     port: defaultConfig.backend.httpServer.port,
     maxReconnectCount: -1,
     noReconnectCodes: [],
-    debug: false,
 
     location: "CommandReceiver",
     eventTarget: new AppEventTarget(),
@@ -130,9 +128,6 @@ export class CommandReceiver {
       this.option.eventTarget
     );
     const commandPack: CommandPacket = JSON.parse(event.data);
-    if (this.option.debug) {
-      console.log(commandPack.data);
-    }
 
     switch (commandPack.cmd) {
       case "appCommand": {
