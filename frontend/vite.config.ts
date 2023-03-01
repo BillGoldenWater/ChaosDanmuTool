@@ -1,5 +1,5 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+import react from "@vitejs/plugin-react-swc";
 
 // https://vitejs.dev/config/
 // noinspection JSUnusedGlobalSymbols
@@ -9,11 +9,7 @@ export default defineConfig(async () => {
 
   return {
     plugins: [
-      react({
-        babel: {
-          plugins: [["babel-plugin-styled-components"]],
-        },
-      }),
+      react(),
       {
         name: "add react-devtools",
         transformIndexHtml(html) {
