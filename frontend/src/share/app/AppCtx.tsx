@@ -205,7 +205,7 @@ export function AppCtxProvider({ firstConfig, children }: Props) {
   // region config
   const updateConfig = useCallback((config: Config) => {
     setConfig(config);
-    backend ? backend.updateConfig(config) : ""; // await
+    backend.updateConfig(config).then();
   }, []);
 
   const configGet: TObjGet<Config> = useCallback(
@@ -307,7 +307,7 @@ export function initialAppConstant(
   });
 
   // in viewer or open in browser
-  if (params.windowId === "viewer" || !backend) {
+  if (params.windowId === "viewer" || !backend.isInTauri) {
     receiver.updateOption({ host: window.location.hostname });
   }
 

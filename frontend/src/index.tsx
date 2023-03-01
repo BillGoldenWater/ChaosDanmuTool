@@ -9,15 +9,15 @@ import "normalize.css";
 import ReactDOM from "react-dom/client";
 import { App } from "./App";
 import { backend } from "./share/app/BackendApi";
-import { AppCtxProvider, defaultConfig } from "./share/app/AppCtx";
+import { AppCtxProvider } from "./share/app/AppCtx";
 import { GlobalStyle, ThemeCtxProvider } from "./share/component/ThemeCtx";
 import React, { StrictMode } from "react";
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const root = ReactDOM.createRoot(document.getElementById("root")!);
 
-const config = backend ? await backend.getConfig() : defaultConfig;
-const debug = backend ? await backend.isDebug() : true;
+const config = await backend.getConfig();
+const debug = await backend.isDebug();
 
 root.render(
   <StrictMode>

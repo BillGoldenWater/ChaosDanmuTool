@@ -21,6 +21,7 @@ import { CommandPacket } from "../type/rust/command/CommandPacket";
 import { AppCommand } from "../type/rust/command/commandPacket/AppCommand";
 import { BiliBiliCommand } from "../type/rust/command/commandPacket/BiliBiliCommand";
 import { parseGiftConfigResponse } from "../type/TGiftConfig";
+import { backendApiConfigCache } from "./BackendApi";
 
 type Option = {
   host: string;
@@ -139,6 +140,7 @@ export class CommandReceiver {
             break;
           }
           case "configUpdate": {
+            backendApiConfigCache.config = appCommand.data.config;
             de(new ConfigUpdateEvent(appCommand.data.config));
             break;
           }

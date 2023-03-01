@@ -52,7 +52,7 @@ export async function genConstants(
   themeCfg: ThemeConfig
 ): Promise<TThemeCtx["consts"]> {
   // region init
-  const vibrancyApplied = backend ? await backend.isVibrancyApplied() : false;
+  const vibrancyApplied = await backend.isVibrancyApplied();
   const themeColor = Color(themeCfg.themeColor);
 
   function bl(percent: number) {

@@ -53,9 +53,9 @@ export function ConnectPanel() {
           connectedHover={hover}
           onClick={() => {
             if (connected || connecting) {
-              backend?.disconnectRoom();
+              backend.disconnectRoom();
             } else {
-              backend?.connectRoom();
+              backend.connectRoom();
               setHover(false);
             }
           }}
