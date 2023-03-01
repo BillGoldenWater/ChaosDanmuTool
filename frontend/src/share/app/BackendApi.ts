@@ -92,8 +92,8 @@ export class BackendApi {
           }
         });
         // noinspection HttpUrlsUsage
-        xhr.open("GET", `http://${host}:${port}/userInfoCache?uid=${uid}`);
-        xhr.send();
+        xhr.open("POST", `http://${host}:${port}/userInfoCache`);
+        xhr.send(uid);
       });
     }
   }

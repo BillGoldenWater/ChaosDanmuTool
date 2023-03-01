@@ -8,6 +8,7 @@ use std::error::Error;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 
 use get_port::{tcp::TcpPort, Ops};
+use hyper::body::HttpBody;
 use hyper::http::HeaderValue;
 use hyper::server::conn::AddrStream;
 use hyper::service::{make_service_fn, service_fn};
@@ -23,6 +24,7 @@ use tokio_tungstenite::tungstenite::handshake::derive_accept_key;
 use tokio_tungstenite::tungstenite::protocol::Role;
 use tokio_tungstenite::{MaybeTlsStream, WebSocketStream};
 
+use crate::app::internal_api::cache::get_user_info;
 use crate::config::config_manager::modify_cfg;
 use crate::network::command_broadcast_server::CommandBroadcastServer;
 use crate::{dialog_ask, dialog_notice, location_info};
@@ -203,6 +205,35 @@ impl HttpServer {
     }
     // endregion
 
+    // region try api
+    if req.uri().path().eq("/userInfoCache") {
+      let res = match req.body_mut().data().await {
+        Some(Ok(data)) => {
+          let uid = String::from_utf8_lossy(data.as_ref()).to_string();
+          let info = get_user_info(uid).await;
+          if let Some(info) = info {
+            let info_str = serde_json::to_string(&info).unwrap();
+
+            create_response(StatusCode::OK, Body::from(info_str))
+          } else {
+            create_empty_response(StatusCode::NOT_FOUND)
+          }
+        }
+        Some(Err(err)) => {
+          error!("[userInfoCache] failed to read request body with error \n{err:?}");
+
+          create_empty_response(StatusCode::BAD_REQUEST)
+        }
+        None => {
+          error!("[userInfoCache] failed to read request body");
+
+          create_empty_response(StatusCode::BAD_REQUEST)
+        }
+      };
+      return Ok(res);
+    }
+    // endregion
+
     // region try asset
     if let Some(asset_resolver) = &self.asset_resolver {
       if let Some(asset) = asset_resolver.get(req.uri().to_string()) {
@@ -332,10 +363,19 @@ fn create_websocket_upgrade_response(request: &HyperRequest<Body>) -> Option<Res
   Some(res.unwrap())
 }
 
-fn create_empty_response(code: StatusCode) -> Response<Body> {
-  let mut res = Response::new(Body::empty());
-  *res.status_mut() = code;
-  res
+fn create_empty_response(status_code: StatusCode) -> Response<Body> {
+  response_builder()
+    .status(status_code)
+    .body(Body::empty())
+    .unwrap()
+}
+
+fn create_response(status_code: StatusCode, body: Body) -> Response<Body> {
+  response_builder().status(status_code).body(body).unwrap()
+}
+
+fn response_builder() -> hyper::http::response::Builder {
+  Response::builder().header("Access-Control-Allow-Origin", "*")
 }
 
 fn get_process_names_using(port: u16) -> Vec<String> {
