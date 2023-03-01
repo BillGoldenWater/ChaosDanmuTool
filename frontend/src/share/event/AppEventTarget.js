@@ -70,11 +70,11 @@ export class ActivityUpdateEvent extends Event {
   }
 }
 
-export class DanmuMessageEvent extends Event {
+export class BiliBiliMessageEvent extends Event {
   message;
 
   constructor(message) {
-    super("danmuMessage");
+    super("bilibiliMessage");
     this.message = message;
   }
 }

@@ -6,9 +6,9 @@
 import {
   ActivityUpdateEvent,
   AppEventTarget,
+  BiliBiliMessageEvent,
   BiliBiliPackParseErrorEvent,
   ConfigUpdateEvent,
-  DanmuMessageEvent,
   GiftConfigUpdateEvent,
   RawBiliBiliCommandEvent,
   ReceiverStatusUpdateEvent,
@@ -173,12 +173,12 @@ export class CommandReceiver {
             de(new ActivityUpdateEvent(bilibiliCommand.data.activity));
             break;
           }
-          case "danmuMessage": {
-            de(new DanmuMessageEvent(bilibiliCommand.data));
+          case "raw": {
+            de(new RawBiliBiliCommandEvent(commandPack));
             break;
           }
-          case "raw": {
-            de(new RawBiliBiliCommandEvent(bilibiliCommand.data));
+          default: {
+            de(new BiliBiliMessageEvent(commandPack));
             break;
           }
         }

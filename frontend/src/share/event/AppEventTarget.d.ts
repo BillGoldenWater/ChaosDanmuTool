@@ -7,8 +7,8 @@ import type { TGiftConfigMap } from "../type/bilibili/TGiftConfig";
 import type { Config } from "../type/rust/config/Config";
 import type { ReceiverStatus } from "../type/rust/command/commandPacket/appCommand/receiverStatusUpdate/ReceiverStatus";
 import type { ViewerStatus } from "../type/rust/command/commandPacket/appCommand/viewerStatusUpdate/ViewerStatus";
-import type { DanmuMessage } from "../type/rust/command/commandPacket/bilibiliCommand/DanmuMessage";
 import { UserInfo } from "../type/rust/cache/userInfo/UserInfo";
+import { CommandPacket } from "../type/rust/command/CommandPacket";
 
 //region appCommand
 declare class BiliBiliPackParseErrorEvent extends Event {
@@ -56,16 +56,16 @@ declare class ActivityUpdateEvent extends Event {
   constructor(activity: number);
 }
 
-declare class DanmuMessageEvent extends Event {
-  message: DanmuMessage;
+declare class BiliBiliMessageEvent extends Event {
+  message: CommandPacket;
 
-  constructor(message: DanmuMessage);
+  constructor(message: CommandPacket);
 }
 
 declare class RawBiliBiliCommandEvent extends Event {
-  raw: unknown;
+  raw: CommandPacket;
 
-  constructor(raw: unknown);
+  constructor(raw: CommandPacket);
 }
 
 //endregion
@@ -79,7 +79,7 @@ interface AppEventMap {
   viewerStatusUpdate: ViewerStatusUpdateEvent;
 
   activityUpdate: ActivityUpdateEvent;
-  danmuMessage: DanmuMessageEvent;
+  bilibiliMessage: BiliBiliMessageEvent;
   rawBiliBiliCommand: RawBiliBiliCommandEvent;
 }
 
