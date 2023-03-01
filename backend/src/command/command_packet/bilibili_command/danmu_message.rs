@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-use std::str::FromStr;
-
 use log::error;
 use serde_json::Value;
 use static_object::StaticObject;
@@ -26,13 +24,13 @@ pub struct DanmuMessage {
   /**
    * ms
    * */
-  timestamp: u64,
+  timestamp: String,
   danmu_type: DanmuType,
   emoji_data: Option<EmojiData>,
 
   content: String,
 
-  uid: u64,
+  uid: String,
 
   is_history: bool,
   is_special_type: bool,
@@ -44,11 +42,11 @@ impl DanmuMessage {
     DanmuMessage {
       fontsize: 0,
       color: 0,
-      timestamp: 0,
+      timestamp: "".to_string(),
       danmu_type: DanmuType::default(),
       emoji_data: None,
       content: "".to_string(),
-      uid: 0,
+      uid: "".to_string(),
       is_history: false,
       is_special_type: false,
       count: 1,
@@ -78,7 +76,7 @@ impl DanmuMessage {
     result.parse_medal(&info[3], &mut user_info);
     result.parse_level_info(&info[4], &mut user_info);
     result.parse_title_info(&info[5], &mut user_info);
-    result.uid = u64::from_str(&user_info.uid).unwrap();
+    result.uid = user_info.uid.clone();
     UserInfoCache::i().update(user_info).await;
 
     Ok(result)
@@ -87,7 +85,7 @@ impl DanmuMessage {
   fn parse_meta(&mut self, meta: &Value) {
     self.fontsize = meta[2].as_i64().unwrap_or(0) as i32;
     self.color = meta[3].as_i64().unwrap_or(0) as i32;
-    self.timestamp = meta[4].as_u64().unwrap_or(0);
+    self.timestamp = meta[4].as_u64().unwrap_or(0).to_string();
     self.danmu_type = DanmuType::from_u32(meta[12].as_u64().unwrap_or(0) as u32);
     if !meta[13].is_string() {
       self.emoji_data = EmojiData::from_raw(&meta[13]).map_or_else(
