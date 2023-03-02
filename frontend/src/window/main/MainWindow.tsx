@@ -8,40 +8,35 @@ import React from "react";
 import { Background } from "../../share/component/Background";
 import { ConnectPanel } from "./ConnectPanel";
 import { paddingValue } from "../../share/component/ThemeCtx";
+import { DanmuViewer } from "../../share/component/DanmuViewer";
+import styled from "styled-components";
+import { Panel } from "../../share/component/Panel";
 
 export function MainWindow() {
   return (
-    <Background
-      css={`
-        display: flex;
-        flex-direction: column;
-
-        gap: ${paddingValue.window};
-      `}
-    >
+    <MainWindowBackground>
       <LayoutGroup>
         <ConnectPanel />
-        <motion.div
-          layout={"preserve-aspect"}
-          css={`
-            display: flex;
-            background-color: gray;
-            flex-direction: column-reverse;
-            flex-grow: 1;
-          `}
-        >
-          123
-        </motion.div>
-        <motion.div
-          layout
-          css={`
-            background-color: gray;
-          `}
-          whileHover={{ padding: paddingValue.normal }}
-        >
+        <ViewerContainer layout={"preserve-aspect"}>
+          <DanmuViewer />
+        </ViewerContainer>
+        <motion.div layout whileHover={{ padding: paddingValue.normal }}>
           Toolbar
         </motion.div>
       </LayoutGroup>
-    </Background>
+    </MainWindowBackground>
   );
 }
+
+const MainWindowBackground = styled(Background)`
+  display: grid;
+  grid-template-rows: max-content auto max-content;
+
+  gap: ${paddingValue.window};
+`;
+
+const ViewerContainer = styled(Panel)`
+  overflow-y: hidden;
+`;
+
+ViewerContainer.defaultProps = { height: "100%", hover: true };
