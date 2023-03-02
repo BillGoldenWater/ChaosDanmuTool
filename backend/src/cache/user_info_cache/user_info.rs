@@ -100,7 +100,7 @@ impl Default for UserInfo {
   fn default() -> Self {
     Self {
       uid: "".to_string(),
-      name: Some("​".to_string()), // Zero-width space
+      name: Some("\u{200B}".to_string()), // Zero-width space
       user_level: None,
       face: Some("https://i0.hdslb.com/bfs/face/member/noface.jpg".to_string()),
       face_frame: None,
