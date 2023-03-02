@@ -17,7 +17,7 @@ macro_rules! user_info_apply_updates {
     };
 }
 
-#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, Default, PartialEq, Eq, Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Eq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "../frontend/src/share/type/rust/cache/userInfo/")]
 pub struct UserInfo {
@@ -94,4 +94,34 @@ impl UserInfo {
 
     modified
   }
+}
+
+impl Default for UserInfo {
+  fn default() -> Self {
+    Self {
+      uid: "".to_string(),
+      name: Some("​".to_string()), // Zero-width space
+      user_level: None,
+      face: Some("https://i0.hdslb.com/bfs/face/member/noface.jpg".to_string()),
+      face_frame: None,
+      is_vip: None,
+      is_svip: None,
+      is_main_vip: None,
+      is_manager: None,
+      title: None,
+      level_color: None,
+      name_color: None,
+      medal: None,
+    }
+  }
+}
+
+#[test]
+fn write_default_user_info() {
+  let default_user_info = serde_json::to_string(&UserInfo::default()).unwrap();
+  std::fs::write(
+    "../frontend/src/share/type/rust/cache/userInfo/defaultUserInfo.json",
+    default_user_info,
+  )
+  .expect("Failed write default user info.");
 }

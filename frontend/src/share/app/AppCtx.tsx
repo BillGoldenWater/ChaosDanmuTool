@@ -5,6 +5,7 @@
 
 import defaultConfigSource from "../type/rust/config/defaultConfig.json";
 import defaultViewerConfigSource from "../type/rust/config/defaultViewerConfig.json";
+import defaultUserInfoSource from "../type/rust/cache/userInfo/defaultUserInfo.json";
 import React, {
   createContext,
   PropsWithChildren,
@@ -34,11 +35,13 @@ import { TUserInfoCache } from "../type/TUserInfoCache";
 import { CommandReceiver } from "./CommandReceiver";
 import { backend } from "./BackendApi";
 import { getProp, setProp } from "../utils/DotPropUtils";
+import { UserInfo } from "../type/rust/cache/userInfo/UserInfo";
 
-// region default config
+// region defaults
 export const defaultConfig: Config = defaultConfigSource as Config;
 export const defaultViewerConfig: ViewerViewConfig =
   defaultViewerConfigSource as ViewerViewConfig;
+export const defaultUserInfo: UserInfo = defaultUserInfoSource as UserInfo;
 
 // endregion
 
