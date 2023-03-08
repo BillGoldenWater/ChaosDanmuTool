@@ -32,7 +32,17 @@ import { TUserInfoCache } from "../type/TUserInfoCache";
 import { CommandReceiver } from "./CommandReceiver";
 import { backend } from "./BackendApi";
 import { getProp, setProp } from "../utils/DotPropUtils";
-import { defaultConfig, defaultViewerConfig } from "./Defaults";
+import Immutable from "immutable";
+import {
+  MaxUserInfoCacheSize,
+  UserInfoCacheRemainingPercent,
+} from "./Settings";
+import { UserInfo } from "../type/rust/cache/userInfo/UserInfo";
+import {
+  defaultConfig,
+  defaultUserInfo,
+  defaultViewerConfig,
+} from "./Defaults";
 
 export interface TAppParams {
   windowId: TWindow["windowId"];
@@ -49,18 +59,20 @@ export function getParams(): TAppParams {
   };
 }
 
+export type UserInfoGetter = (uid: string) => UserInfo;
+
 export interface TAppCtx {
   params: TAppParams;
   setViewerId: (viewerId: string) => void;
 
   config: TObjGetAndSet<Config>;
   viewerConfig: TObjGetAndSet<ViewerViewConfig>;
+  getUserInfo: UserInfoGetter;
   path: TAppPath;
 
   giftConfig: TGiftConfig;
   receiverStatus: ReceiverStatus;
   viewerStatus: ViewerStatus;
-  userInfoCache: TUserInfoCache;
 
   eventTarget: AppEventTarget;
 }
@@ -71,12 +83,15 @@ export const appCtx = createContext<TAppCtx>({
 
   config: {} as TObjGetAndSet<Config>,
   viewerConfig: {} as TObjGetAndSet<ViewerViewConfig>,
+  getUserInfo: (uid) => ({
+    ...defaultUserInfo,
+    uid,
+  }),
   path: new AppPath(defaultConfig),
 
   giftConfig: new Map(),
   receiverStatus: "close",
   viewerStatus: "close",
-  userInfoCache: new Map(),
 
   eventTarget: new AppEventTarget(),
 });
@@ -106,7 +121,7 @@ export function AppCtxProvider({ firstConfig, children }: Props) {
   const [receiverStatus, setReceiverStatus] = useState<ReceiverStatus>("close");
   const [viewerStatus, setViewerStatus] = useState<ViewerStatus>("close");
   const [userInfoCache, setUserInfoCache] = useState<TUserInfoCache>(
-    () => new Map()
+    Immutable.Map
   );
   // endregion
 
@@ -131,6 +146,27 @@ export function AppCtxProvider({ firstConfig, children }: Props) {
     },
     [appConstant.eventTarget]
   );
+
+  const updateUserInfo = useCallback((userInfo: UserInfo) => {
+    setUserInfoCache((prev) => {
+      const cache = prev.set(userInfo.uid, {
+        lastUse: Date.now(),
+        userInfo,
+      });
+
+      if (cache.size > MaxUserInfoCacheSize) {
+        const remainingSize = Math.floor(
+          MaxUserInfoCacheSize * UserInfoCacheRemainingPercent
+        );
+
+        return cache
+          .sortBy((it) => it.lastUse)
+          .slice(cache.size - remainingSize, cache.size);
+      }
+
+      return cache;
+    });
+  }, []);
   // endregion
 
   useEffect(() => {
@@ -162,14 +198,13 @@ export function AppCtxProvider({ firstConfig, children }: Props) {
   }, [addListener, removeListener]);
   useEffect(() => {
     function onUserInfoUpdate(event: UserInfoUpdateEvent) {
-      userInfoCache.set(event.userInfo.uid, event.userInfo);
-      setUserInfoCache(userInfoCache);
+      updateUserInfo(event.userInfo);
     }
 
     addListener("userInfoUpdate", onUserInfoUpdate);
 
     return () => removeListener("userInfoUpdate", onUserInfoUpdate);
-  }, [addListener, removeListener, userInfoCache]);
+  }, [addListener, updateUserInfo, removeListener]);
   useEffect(() => {
     function onViewerStatusUpdate(event: ViewerStatusUpdateEvent) {
       setViewerStatus(event.status);
@@ -248,6 +283,24 @@ export function AppCtxProvider({ firstConfig, children }: Props) {
   );
   // endregion
 
+  // region userInfo
+  const getUserInfo = useCallback<UserInfoGetter>(
+    (uid) => {
+      const result = userInfoCache.get(uid);
+      if (result == undefined) {
+        backend.getUserInfo(uid).then((userInfo) => {
+          updateUserInfo(userInfo);
+        });
+
+        return { ...defaultUserInfo, uid };
+      }
+      result.lastUse = Date.now();
+      return result.userInfo;
+    },
+    [updateUserInfo, userInfoCache]
+  );
+  // endregion
+
   // region path
   const getPath = useCallback(() => new AppPath(config), [config]);
 
@@ -273,12 +326,12 @@ export function AppCtxProvider({ firstConfig, children }: Props) {
 
     config: { get: configGet, set: configSet },
     viewerConfig: { get: viewerConfigGet, set: viewerConfigSet },
+    getUserInfo,
     path: { get: pathGet, set: pathSet },
 
     giftConfig,
     receiverStatus,
     viewerStatus,
-    userInfoCache,
 
     eventTarget: appConstant.eventTarget,
   };
