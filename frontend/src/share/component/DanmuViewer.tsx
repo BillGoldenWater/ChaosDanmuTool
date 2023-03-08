@@ -4,7 +4,7 @@
  */
 
 import styled from "styled-components";
-import {padding, paddingValue} from "./ThemeCtx";
+import { padding, paddingValue } from "./ThemeCtx";
 import {
   useContext,
   useEffect,
@@ -12,14 +12,13 @@ import {
   useRef,
   useState,
 } from "react";
-import {appCtx} from "../app/AppCtx";
-import {BiliBiliMessageEvent} from "../event/AppEventTarget";
-import {CommandPacket} from "../type/rust/command/CommandPacket";
-import {DanmuItem} from "./danmuItem/DanmuItem";
-import {motion, MotionValue, useSpring} from "framer-motion";
-import {maxScrollTop} from "../utils/ElementUtils";
-
-const maxSize = 1000;
+import { appCtx } from "../app/AppCtx";
+import { BiliBiliMessageEvent } from "../event/AppEventTarget";
+import { CommandPacket } from "../type/rust/command/CommandPacket";
+import { DanmuItem } from "./danmuItem/DanmuItem";
+import { motion, MotionValue, useSpring } from "framer-motion";
+import { maxScrollTop } from "../utils/ElementUtils";
+import { DanmuViewerMaxSize } from "../app/Settings";
 
 export function DanmuViewer() {
   const ctx = useContext(appCtx);
@@ -46,7 +45,7 @@ export function DanmuViewer() {
     function onDanmuMessage(event: BiliBiliMessageEvent) {
       setMsgList((list) => {
         const limitedList = list.slice(
-          Math.max(list.length - maxSize + 1, 0),
+          Math.max(list.length - DanmuViewerMaxSize + 1, 0),
           list.length
         );
         return [...limitedList, event.message];
@@ -131,7 +130,7 @@ export function DanmuViewer() {
       onHoverStart={setHover.bind(null, true)}
       onHoverEnd={setHover.bind(null, false)}
     >
-      <div/>
+      <div />
       {msgList.map((item, idx, arr) => {
         const prev = idx < arr.length - 1 ? arr[idx + 1] : undefined;
         const next = idx > 0 ? arr[idx - 1] : undefined;
@@ -143,7 +142,7 @@ export function DanmuViewer() {
             <div>
               {idx} - {item.uuid}
             </div>
-            <DanmuItem item={item} prevItem={prev} nextItem={next}/>
+            <DanmuItem item={item} prevItem={prev} nextItem={next} />
           </DanmuItemContainer>
         );
       })}
