@@ -139,9 +139,6 @@ export function DanmuViewer() {
             key={item.uuid}
             ref={idx === arr.length - 1 ? setLatestElement : undefined}
           >
-            <div>
-              {idx} - {item.uuid}
-            </div>
             <DanmuItem item={item} prevItem={prev} nextItem={next} />
           </DanmuItemContainer>
         );
