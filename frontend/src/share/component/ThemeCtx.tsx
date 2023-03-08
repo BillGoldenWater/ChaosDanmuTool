@@ -13,13 +13,14 @@ import {
   useMemo,
   useState,
 } from "react";
-import { appCtx, defaultConfig } from "../app/AppCtx";
+import { appCtx } from "../app/AppCtx";
 import { Config } from "../type/rust/config/Config";
 import Color from "color";
 import { TPropTo } from "../type/TPropTo";
 import { backend } from "../app/BackendApi";
 import { createGlobalStyle, css, ThemeProvider } from "styled-components";
 import { Property } from "csstype";
+import { defaultConfig } from "../app/Defaults";
 
 type ThemeConfig = Config["frontend"]["mainView"]["theme"];
 

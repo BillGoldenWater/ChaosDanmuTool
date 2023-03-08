@@ -15,13 +15,13 @@ import {
   UserInfoUpdateEvent,
   ViewerStatusUpdateEvent,
 } from "../event/AppEventTarget";
-import { defaultConfig } from "./AppCtx";
 import { TPartialRequired } from "../type/TPartialRequired";
 import { CommandPacket } from "../type/rust/command/CommandPacket";
 import { AppCommand } from "../type/rust/command/commandPacket/AppCommand";
 import { BiliBiliCommand } from "../type/rust/command/commandPacket/BiliBiliCommand";
 import { parseGiftConfigResponse } from "../type/TGiftConfig";
 import { backendApiConfigCache } from "./BackendApi";
+import { defaultConfig } from "./Defaults";
 
 type Option = {
   host: string;

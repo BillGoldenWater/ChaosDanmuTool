@@ -6,7 +6,7 @@
 import { invoke } from "@tauri-apps/api";
 import type { Config } from "../type/rust/config/Config";
 import { UserInfo } from "../type/rust/cache/userInfo/UserInfo";
-import { defaultConfig } from "./AppCtx";
+import { defaultConfig } from "./Defaults";
 
 export const backendApiConfigCache = { config: defaultConfig };
 
