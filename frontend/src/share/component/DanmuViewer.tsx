@@ -165,10 +165,6 @@ const DanmuViewerBase = styled(motion.div)`
   }
 
   gap: ${paddingValue.normal};
-
-  & > * {
-    outline: gray solid 2px;
-  }
 `;
 
 const DanmuItemContainer = styled(motion.div)`
