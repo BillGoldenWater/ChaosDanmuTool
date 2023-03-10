@@ -442,13 +442,17 @@ export const radius = {
   `,
 };
 
+export const borderValue = {
+  small: "0.0625rem",
+  normal: "0.125rem",
+};
 export const border = {
   small: css`
-    border-width: 0.0625rem;
+    border-width: ${borderValue.small};
     border-style: solid;
   `,
   normal: css`
-    border-width: 0.125rem;
+    border-width: ${borderValue.normal};
     border-style: solid;
   `,
 };
