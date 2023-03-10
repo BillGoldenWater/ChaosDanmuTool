@@ -104,6 +104,11 @@ opt-level = "s" # Optimize for binary size
 #strip = true  # Automatically strip symbols from the binary.
 incremental = false
 
+[profile.debug-frontend]
+inherits = "dev"
+opt-level = 3
+lto = true
+
 #[patch.crates-io]
 #tauri = { git = "https://github.com/BillGoldenWater/tauri.git", rev = "75a0c79dea39e3e8372097152a0fa82cf6493686" }
 #tao = { git = "https://github.com/BillGoldenWater/tao.git" }

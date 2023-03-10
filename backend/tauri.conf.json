@@ -23,7 +23,7 @@
     "bundle": {
       "active": true,
       "category": "Utility",
-      "copyright": "",
+      "copyright": "Copyright 2021-2023 Golden_Water",
       "identifier": "indi.goldenwater.chaosdanmutool",
       "longDescription": "A tool for process/view Danmu on bilibili",
       "shortDescription": "A tool for process/view Danmu on bilibili",
