@@ -38,6 +38,7 @@ export interface TThemeConstants {
   txt: Color;
   txtSecond: Color;
   txtBlack: Color;
+  txtWhite: Color;
 
   fnInfo: Color;
   fnSuccess: Color;
@@ -93,7 +94,8 @@ export async function genConstants(
 
     txt: wh(1).lightness(95),
     txtSecond: wh(1).lightness(70),
-    txtBlack: bl(1),
+    txtBlack: bl(1).lightness(5),
+    txtWhite: wh(1).lightness(95),
 
     fnInfo: Color([200, 100, 50], "hsl"),
     fnSuccess: Color([145, 100, 42], "hsl"),
@@ -119,7 +121,8 @@ export async function genConstants(
 
       txt: wh(1).lightness(95),
       txtSecond: wh(1).lightness(70),
-      txtBlack: bl(1),
+      txtBlack: bl(1).lightness(5),
+      txtWhite: wh(1).lightness(95),
     };
     if (!vibrancyApplied) {
       themeConstants.bgWindow = themeConstants.bgWindow.alpha(1);
@@ -332,6 +335,7 @@ type ColorFns = {
   txt: ColorFn;
   txtSecond: ColorFn;
   txtBlack: ColorFn;
+  txtWhite: ColorFn;
 
   fnInfo: ColorFn;
   fnSuccess: ColorFn;
@@ -353,6 +357,7 @@ export const color: ColorFns = {
   txt: (p) => p.theme.consts.txt,
   txtSecond: (p) => p.theme.consts.txtSecond,
   txtBlack: (p) => p.theme.consts.txtBlack,
+  txtWhite: (p) => p.theme.consts.txtWhite,
 
   fnInfo: (p) => p.theme.consts.fnInfo,
   fnSuccess: (p) => p.theme.consts.fnSuccess,
