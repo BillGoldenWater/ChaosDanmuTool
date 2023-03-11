@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-export const DanmuViewerMaxSize = 1000;
+export const DanmuViewerMaxSize = 100;
 
 export const MaxUserInfoCacheSize = Math.floor(DanmuViewerMaxSize * 1.2);
 // on hit max size
