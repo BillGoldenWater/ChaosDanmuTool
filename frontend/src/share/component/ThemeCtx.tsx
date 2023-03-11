@@ -429,6 +429,13 @@ export const font = {
 
     font-style: normal;
   `,
+  dmTs: css`
+    font-size: 0.75rem;
+    line-height: 0.75rem;
+    font-weight: 500;
+
+    font-style: normal;
+  `,
   dmContent: css`
     font-size: 1rem;
     line-height: 1rem;
