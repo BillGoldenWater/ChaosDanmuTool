@@ -132,8 +132,8 @@ export function DanmuViewer() {
     >
       <div />
       {msgList.map((item, idx, arr) => {
-        const prev = idx < arr.length - 1 ? arr[idx + 1] : undefined;
-        const next = idx > 0 ? arr[idx - 1] : undefined;
+        const prev = idx > 0 ? arr[idx - 1] : undefined;
+        const next = idx < arr.length - 1 ? arr[idx + 1] : undefined;
         return (
           <DanmuItemContainer
             key={item.uuid}
