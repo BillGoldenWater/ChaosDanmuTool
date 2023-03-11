@@ -3,13 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { PropsWithChildren, useContext, useState } from "react";
+import { PropsWithChildren, useContext } from "react";
 import { appCtx } from "../../app/AppCtx";
 import styled from "styled-components";
 import { UserAvatar } from "../userInfo/UserAvatar";
 import { UserInfo } from "../userInfo/UserInfo";
 import { color, font, paddingValue, radius } from "../ThemeCtx";
-import { motion } from "framer-motion";
 import { formatTime } from "../../utils/FormatUtils";
 
 interface UserMessageProps {
@@ -22,7 +21,6 @@ export function UserMessage(props: PropsWithChildren<UserMessageProps>) {
   const hasPrev = uid == null;
 
   const ctx = useContext(appCtx);
-  const [hover, setHover] = useState(false);
 
   const compact = false;
 
@@ -40,20 +38,12 @@ export function UserMessage(props: PropsWithChildren<UserMessageProps>) {
     );
   } else if (timestamp) {
     const ts = new Date(Number.parseInt(timestamp));
-    sider = (
-      <MessageTimestamp hover={hover}>
-        {formatTime(ts, "{hours}:{minutes}")}
-      </MessageTimestamp>
-    );
+    const timeStr = formatTime(ts, "{hours}:{minutes}");
+    sider = <MessageTimestamp>{timeStr}</MessageTimestamp>;
   }
 
   return (
-    <UserMessageBase
-      onHoverStart={setHover.bind(null, true)}
-      onHoverEnd={setHover.bind(null, false)}
-      hover={hover}
-      hasPrev={hasPrev}
-    >
+    <UserMessageBase hasPrev={hasPrev}>
       {!compact && <MessageSider>{sider}</MessageSider>}
       <MessageMain>
         {msgUserInfo}
@@ -62,21 +52,6 @@ export function UserMessage(props: PropsWithChildren<UserMessageProps>) {
     </UserMessageBase>
   );
 }
-
-const UserMessageBase = styled(motion.div)<{
-  hover: boolean;
-  hasPrev: boolean;
-}>`
-  transition: background-color 0.15s ease-in-out;
-  display: flex;
-  gap: ${paddingValue.small};
-
-  background-color: ${(p) => (p.hover ? color.bgItem : "transparent")};
-  ${radius.small};
-
-  ${(p) =>
-    p.hasPrev ? `margin-top: calc(-0.85 * ${paddingValue.normal});` : ""};
-`;
 
 const MessageSider = styled.div`
   display: flex;
@@ -87,12 +62,8 @@ const MessageSider = styled.div`
   width: 2.5rem;
 `;
 
-const MessageTimestamp = styled.div<{ hover: boolean }>`
-  transition: opacity 0.15s ease-in-out;
-
+const MessageTimestamp = styled.div`
   ${font.dmTs};
-
-  opacity: ${(p) => (p.hover ? 1 : 0)};
 
   color: ${color.txtSecond};
 `;
@@ -107,4 +78,28 @@ const MessageUserInfo = styled.div``;
 
 const MessageContent = styled.div`
   text-shadow: 0 0 0.15rem #000;
+`;
+
+const UserMessageBase = styled.div<{ hasPrev: boolean }>`
+  transition: background-color 0.15s ease-in-out;
+  display: flex;
+  gap: ${paddingValue.small};
+
+  ${radius.small};
+
+  ${(p) =>
+    p.hasPrev ? `margin-top: calc(-0.85 * ${paddingValue.normal});` : ""};
+
+  &:hover {
+    background-color: ${color.bgItem};
+  }
+
+  & ${MessageTimestamp} {
+    transition: opacity 0.15s ease-in-out;
+    opacity: 0;
+  }
+
+  &:hover ${MessageTimestamp} {
+    opacity: 1;
+  }
 `;
