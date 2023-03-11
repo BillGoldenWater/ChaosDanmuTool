@@ -19,6 +19,7 @@ import { DanmuItem } from "./danmuItem/DanmuItem";
 import { motion, MotionValue, useSpring } from "framer-motion";
 import { maxScrollTop } from "../utils/ElementUtils";
 import { DanmuViewerMaxSize } from "../app/Settings";
+import Immutable from "immutable";
 
 export function DanmuViewer() {
   const ctx = useContext(appCtx);
@@ -39,24 +40,40 @@ export function DanmuViewer() {
   // endregion
 
   // region list
-  const [msgList, setMsgList] = useState<CommandPacket[]>([]);
+  const [msgList, setMsgList] = useState<Immutable.List<CommandPacket>>(
+    Immutable.List
+  );
+  const [msgListBuf, setMsgListBuf] = useState<Immutable.List<CommandPacket>>(
+    Immutable.List
+  );
 
   useEffect(() => {
-    function onDanmuMessage(event: BiliBiliMessageEvent) {
-      setMsgList((list) => {
-        const limitedList = list.slice(
-          Math.max(list.length - DanmuViewerMaxSize + 1, 0),
-          list.length
-        );
-        return [...limitedList, event.message];
-      });
+    function onBiliBiliMessage(event: BiliBiliMessageEvent) {
+      setMsgListBuf((list) => list.push(event.message));
     }
 
-    ctx.eventTarget.addEventListener("bilibiliMessage", onDanmuMessage);
+    ctx.eventTarget.addEventListener("bilibiliMessage", onBiliBiliMessage);
 
     return () =>
-      ctx.eventTarget.removeEventListener("bilibiliMessage", onDanmuMessage);
+      ctx.eventTarget.removeEventListener("bilibiliMessage", onBiliBiliMessage);
   }, [ctx.eventTarget]);
+
+  useEffect(() => {
+    if (msgListBuf.size === 0) return;
+
+    const id = window.setTimeout(() => {
+      setMsgList((list) => {
+        let newList = list.push(...msgListBuf);
+        for (let i = 0; i < list.size - DanmuViewerMaxSize; i++) {
+          newList = newList.shift();
+        }
+        setMsgListBuf(msgListBuf.clear());
+        return newList;
+      });
+    }, 10);
+
+    return () => window.clearTimeout(id);
+  }, [msgListBuf]);
   // endregion
 
   // region scroll
@@ -132,12 +149,12 @@ export function DanmuViewer() {
     >
       <div />
       {msgList.map((item, idx, arr) => {
-        const prev = idx > 0 ? arr[idx - 1] : undefined;
-        const next = idx < arr.length - 1 ? arr[idx + 1] : undefined;
+        const prev = idx > 0 ? arr.get(idx - 1) : undefined;
+        const next = idx < arr.size - 1 ? arr.get(idx + 1) : undefined;
         return (
           <DanmuItemContainer
             key={item.uuid}
-            ref={idx === arr.length - 1 ? setLatestElement : undefined}
+            ref={idx === arr.size - 1 ? setLatestElement : undefined}
           >
             <DanmuItem item={item} prevItem={prev} nextItem={next} />
           </DanmuItemContainer>
