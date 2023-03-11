@@ -57,12 +57,12 @@ export function DanmuViewer() {
 
     const id = window.setTimeout(() => {
       setMsgList((list) => {
-        let newList = list.push(...msgListBuf);
-        for (let i = 0; i < list.size - DanmuViewerMaxSize; i++) {
-          newList = newList.shift();
-        }
+        const newList = list.push(...msgListBuf);
         setMsgListBuf(msgListBuf.clear());
-        return newList;
+        return newList.slice(
+          Math.max(newList.size - DanmuViewerMaxSize, 0),
+          newList.size
+        );
       });
     }, 10);
 
