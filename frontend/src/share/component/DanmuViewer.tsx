@@ -5,13 +5,7 @@
 
 import styled from "styled-components";
 import { padding, paddingValue } from "./ThemeCtx";
-import {
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { appCtx } from "../app/AppCtx";
 import { BiliBiliMessageEvent } from "../event/AppEventTarget";
 import { CommandPacket } from "../type/rust/command/CommandPacket";
@@ -89,7 +83,7 @@ export function DanmuViewer() {
   const [latestElement, setLatestElement] = useState<HTMLDivElement | null>(
     null
   );
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!latestElement || !listRef) return;
     if (prevElement.current) {
       const offsetBottom = latestElement.offsetTop + latestElement.offsetHeight;
