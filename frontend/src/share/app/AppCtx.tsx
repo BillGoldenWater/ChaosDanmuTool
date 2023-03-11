@@ -8,6 +8,7 @@ import React, {
   PropsWithChildren,
   useCallback,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import { Config } from "../type/rust/config/Config";
@@ -284,14 +285,19 @@ export function AppCtxProvider({ firstConfig, children }: Props) {
   // endregion
 
   // region userInfo
+  const userInfoPending = useRef<Set<string>>(new Set());
   const getUserInfo = useCallback<UserInfoGetter>(
     (uid) => {
       const result = userInfoCache.get(uid);
       if (result == undefined) {
-        backend.getUserInfo(uid).then((userInfo) => {
-          updateUserInfo(userInfo);
-        });
+        if (!userInfoPending.current.has(uid)) {
+          backend.getUserInfo(uid).then((userInfo) => {
+            updateUserInfo(userInfo);
+            userInfoPending.current.delete(uid);
+          });
 
+          userInfoPending.current.add(uid);
+        }
         return { ...defaultUserInfo, uid };
       }
       result.lastUse = Date.now();
