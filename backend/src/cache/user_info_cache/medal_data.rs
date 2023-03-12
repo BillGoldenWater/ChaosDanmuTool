@@ -33,7 +33,8 @@ impl MedalData {
     }
 
     let medal_info = MedalInfo {
-      anchor_roomid: raw[3].as_u64().unwrap_or(0) as u32,
+      target_id: raw[12].as_u64().map_or(String::new(), |it| it.to_string()),
+      anchor_roomid: raw[3].as_u64().map(|it| it as u32),
       anchor_name: raw[2].as_str().map(|it| it.to_string()),
       medal_name: raw[1].as_str().map(|it| it.to_string()),
     };
@@ -65,6 +66,7 @@ impl MedalData {
       is_lighted,
       guard_level,
       level,
+
       color,
       color_border,
       color_start,

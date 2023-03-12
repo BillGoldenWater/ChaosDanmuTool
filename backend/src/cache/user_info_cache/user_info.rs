@@ -76,9 +76,9 @@ impl UserInfo {
       name_color
     ];
 
-    if let Some(medal) = &mut self.medal {
+    modified |= if let Some(medal) = &mut self.medal {
       // self some
-      modified |= if let Some(other) = other.medal {
+      if let Some(other) = other.medal {
         // other some
         medal.apply_update(other)
       } else {
@@ -89,8 +89,11 @@ impl UserInfo {
     } else if other.medal.is_some() {
       // self none, other some
       self.medal = other.medal;
-      modified = true;
-    }
+      true
+    } else {
+      // self none, other none
+      false
+    };
 
     modified
   }

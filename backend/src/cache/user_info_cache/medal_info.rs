@@ -9,7 +9,9 @@ use crate::user_info_apply_updates;
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "../frontend/src/share/type/rust/cache/userInfo/")]
 pub struct MedalInfo {
-  pub anchor_roomid: u32,
+  pub target_id: String,
+  #[serde(default)]
+  pub anchor_roomid: Option<u32>,
   #[serde(default)]
   pub anchor_name: Option<String>,
   #[serde(default)]
@@ -20,13 +22,14 @@ impl MedalInfo {
   pub fn apply_update(&mut self, other: Self) -> bool {
     let mut modified = false;
 
-    if self.anchor_roomid != other.anchor_roomid {
-      self.anchor_roomid = other.anchor_roomid;
+    if self.target_id != other.target_id {
+      self.target_id = other.target_id;
       modified = true;
     }
 
     user_info_apply_updates![
       other => self, modified;
+      anchor_roomid,
       anchor_name,
       medal_name
     ];
