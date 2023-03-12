@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+use std::collections::HashMap;
+
 use log::error;
 use serde_json::Value;
 use static_object::StaticObject;
@@ -10,7 +12,11 @@ use static_object::StaticObject;
 use crate::cache::user_info_cache::medal_data::{FromRawError, MedalData};
 use crate::cache::user_info_cache::user_info::UserInfo;
 use crate::cache::user_info_cache::UserInfoCache;
+use crate::command::command_packet::bilibili_command::danmu_message::extra::Extra;
 use crate::types::bilibili::emoji_data::EmojiData;
+use crate::types::bilibili::emot::Emot;
+
+pub mod extra;
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Eq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -27,6 +33,7 @@ pub struct DanmuMessage {
   timestamp: String,
   danmu_type: DanmuType,
   emoji_data: Option<EmojiData>,
+  emots: HashMap<String, Emot>,
 
   content: String,
 
@@ -45,6 +52,7 @@ impl DanmuMessage {
       timestamp: "".to_string(),
       danmu_type: DanmuType::default(),
       emoji_data: None,
+      emots: HashMap::new(),
       content: "".to_string(),
       uid: "".to_string(),
       is_history: false,
@@ -91,13 +99,29 @@ impl DanmuMessage {
       self.emoji_data = EmojiData::from_raw(&meta[13]).map_or_else(
         |err| {
           error!(
-            "unable to parse emoji_data \n{data}\n{err:?}",
+            "unable to parse emoji_data \n{data}\n\n{err:?}",
             data = meta[13]
           );
           None
         },
         Some,
       );
+    }
+    if meta[15]["extra"].is_string() {
+      self.emots = meta[15]["extra"]
+        .as_str()
+        .map_or_else(|| Ok(Default::default()), serde_json::from_str::<Extra>)
+        .map_or_else(
+          |err| {
+            error!(
+              "unable to parse extra \n{data:?}\n\n{err:?}",
+              data = meta[15]["extra"].as_str()
+            );
+            Default::default()
+          },
+          |it| it.emots,
+        )
+        .unwrap_or_default();
     }
   }
 

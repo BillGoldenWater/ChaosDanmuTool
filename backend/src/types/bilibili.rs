@@ -4,4 +4,5 @@
  */
 
 pub mod emoji_data;
+pub mod emot;
 pub mod user_info;
