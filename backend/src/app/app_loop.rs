@@ -15,6 +15,7 @@ use tokio::{
 use crate::config::config_manager::ConfigManager;
 use crate::network::command_broadcast_server::CommandBroadcastServer;
 use crate::network::danmu_receiver::danmu_receiver::DanmuReceiver;
+use crate::utils::process_utils::set_nap;
 
 type Sender = UnboundedSender<()>;
 type Receiver = UnboundedReceiver<()>;
@@ -58,6 +59,11 @@ impl AppLoop {
   }
 
   async fn run_loop(&mut self) {
+    set_nap(
+      false,
+      "communicating with bilibili server and danmu viewer clients",
+    );
+
     loop {
       // detect stop signal
       let recv = self.stop_rx.try_recv();
@@ -78,6 +84,8 @@ impl AppLoop {
         warn!("last tick takes {elapsed:.3}s, it's more than expected({LOOP_MIN_INTERVAL_SECS:.3})\n detail: \n{loop_cost:#?}")
       }
     }
+
+    set_nap(true, "");
 
     // send stopped signal
     let result = self.ret_tx.send(());
