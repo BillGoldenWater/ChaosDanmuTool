@@ -54,6 +54,13 @@ export function DanmuViewer() {
 
     const id = window.setTimeout(() => {
       setMsgList(([list, buf]) => {
+        if (document.hidden) {
+          return [
+            list,
+            buf.slice(Math.max(buf.size - DanmuViewerMaxSize, 0), buf.size),
+          ];
+        }
+
         const newList = list.merge(buf);
         return [
           newList.slice(
