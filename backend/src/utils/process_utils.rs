@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-use std::sync::Mutex;
-
 #[cfg(target_os = "macos")]
 #[allow(non_snake_case)]
 #[repr(C)]
@@ -67,6 +65,7 @@ pub fn set_nap(enable: bool, reason: &str) {
     use objc::{runtime::Object, *};
     use objc_id::Id;
     use once_cell::sync::Lazy;
+    use std::sync::Mutex;
 
     const NSActivityIdleSystemSleepDisabled: u64 = 1u64 << 20;
     const NSActivitySuddenTerminationDisabled: u64 = 1u64 << 14;
