@@ -119,6 +119,8 @@ impl Default for UserInfo {
 #[test]
 fn write_default_user_info() {
   let default_user_info = serde_json::to_string(&UserInfo::default()).unwrap();
+  std::fs::create_dir_all("../frontend/src/share/type/rust/cache/userInfo")
+    .expect("Failed create dir for user info.");
   std::fs::write(
     "../frontend/src/share/type/rust/cache/userInfo/defaultUserInfo.json",
     default_user_info,
