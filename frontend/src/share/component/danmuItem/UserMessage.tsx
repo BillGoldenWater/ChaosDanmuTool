@@ -78,6 +78,8 @@ const MessageUserInfo = styled.div``;
 
 const MessageContent = styled.div`
   text-shadow: 0 0 0.15rem #000;
+  word-wrap: anywhere;
+  word-break: break-all;
 `;
 
 const UserMessageBase = styled.div<{ hasPrev: boolean }>`
