@@ -78,11 +78,11 @@ export function DanmuViewer() {
   });
 
   const prevElement = useRef<HTMLDivElement>();
-  const prevScrollHeight = useRef(0);
   const prevHover = useRef(false);
   const [latestElement, setLatestElement] = useState<HTMLDivElement | null>(
     null
   );
+  const msgListReachedMaxSize = msgList.size === DanmuViewerMaxSize;
   useEffect(() => {
     if (!latestElement || !listRef) return;
     if (prevElement.current) {
@@ -90,10 +90,6 @@ export function DanmuViewer() {
       const prevOffsetBottom =
         prevElement.current.offsetTop + prevElement.current.offsetHeight;
       const heightAppended = offsetBottom - prevOffsetBottom;
-
-      const isMaxSizeReached =
-        listRef.scrollHeight === prevScrollHeight.current &&
-        listRef.scrollHeight !== listRef.clientHeight;
 
       const isHoverChanged = prevHover.current !== hover;
 
@@ -103,7 +99,7 @@ export function DanmuViewer() {
       } else {
         const currentScrollBottom = maxScrollTop(listRef) - listRef.scrollTop;
 
-        if (isMaxSizeReached) {
+        if (msgListReachedMaxSize) {
           const newScrollBottom = Math.min(
             currentScrollBottom + heightAppended,
             listRef.scrollHeight
@@ -121,9 +117,8 @@ export function DanmuViewer() {
     }
 
     prevHover.current = hover;
-    prevScrollHeight.current = listRef.scrollHeight;
     prevElement.current = latestElement;
-  }, [hover, latestElement, listRef, listScroll]);
+  }, [hover, latestElement, listRef, listScroll, msgListReachedMaxSize]);
 
   useEffect(() => {
     if (!listRef) return;
