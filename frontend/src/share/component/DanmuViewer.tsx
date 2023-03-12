@@ -34,16 +34,13 @@ export function DanmuViewer() {
   // endregion
 
   // region list
-  const [msgList, setMsgList] = useState<Immutable.List<CommandPacket>>(
-    Immutable.List
-  );
-  const [msgListBuf, setMsgListBuf] = useState<Immutable.List<CommandPacket>>(
-    Immutable.List
-  );
+  const [[msgList, msgListBuf], setMsgList] = useState<
+    [Immutable.List<CommandPacket>, Immutable.List<CommandPacket>]
+  >(() => [Immutable.List(), Immutable.List()]);
 
   useEffect(() => {
     function onBiliBiliMessage(event: BiliBiliMessageEvent) {
-      setMsgListBuf((list) => list.push(event.message));
+      setMsgList(([list, buf]) => [list, buf.push(event.message)]);
     }
 
     ctx.eventTarget.addEventListener("bilibiliMessage", onBiliBiliMessage);
@@ -56,13 +53,15 @@ export function DanmuViewer() {
     if (msgListBuf.size === 0) return;
 
     const id = window.setTimeout(() => {
-      setMsgList((list) => {
-        const newList = list.push(...msgListBuf);
-        setMsgListBuf(msgListBuf.clear());
-        return newList.slice(
-          Math.max(newList.size - DanmuViewerMaxSize, 0),
-          newList.size
-        );
+      setMsgList(([list, buf]) => {
+        const newList = list.merge(buf);
+        return [
+          newList.slice(
+            Math.max(newList.size - DanmuViewerMaxSize, 0),
+            newList.size
+          ),
+          buf.clear(),
+        ];
       });
     }, 10);
 
