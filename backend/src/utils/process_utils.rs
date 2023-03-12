@@ -57,47 +57,50 @@ pub fn is_running_under_rosetta() -> std::io::Result<bool> {
   }
 }
 
-#[allow(non_upper_case_globals)]
-#[cfg(target_os = "macos")]
+#[allow(unused_variables)]
 pub fn set_nap(enable: bool, reason: &str) {
-  use cocoa::base::nil;
-  use cocoa::foundation::{NSProcessInfo, NSString};
-  use objc::{runtime::Object, *};
-  use objc_id::Id;
-  use once_cell::sync::Lazy;
+  #[allow(non_upper_case_globals)]
+  #[cfg(target_os = "macos")]
+  {
+    use cocoa::base::nil;
+    use cocoa::foundation::{NSProcessInfo, NSString};
+    use objc::{runtime::Object, *};
+    use objc_id::Id;
+    use once_cell::sync::Lazy;
 
-  const NSActivityIdleSystemSleepDisabled: u64 = 1u64 << 20;
-  const NSActivitySuddenTerminationDisabled: u64 = 1u64 << 14;
-  const NSActivityAutomaticTerminationDisabled: u64 = 1u64 << 15;
-  const NSActivityUserInitiated: u64 = 0x00FFFFFFu64 | NSActivityIdleSystemSleepDisabled;
-  const NSActivityLatencyCritical: u64 = 0xFF00000000u64;
+    const NSActivityIdleSystemSleepDisabled: u64 = 1u64 << 20;
+    const NSActivitySuddenTerminationDisabled: u64 = 1u64 << 14;
+    const NSActivityAutomaticTerminationDisabled: u64 = 1u64 << 15;
+    const NSActivityUserInitiated: u64 = 0x00FFFFFFu64 | NSActivityIdleSystemSleepDisabled;
+    const NSActivityLatencyCritical: u64 = 0xFF00000000u64;
 
-  const options: u64 = NSActivityIdleSystemSleepDisabled
-    | NSActivitySuddenTerminationDisabled
-    | NSActivityAutomaticTerminationDisabled
-    | NSActivityUserInitiated
-    | NSActivityLatencyCritical;
+    const options: u64 = NSActivityIdleSystemSleepDisabled
+      | NSActivitySuddenTerminationDisabled
+      | NSActivityAutomaticTerminationDisabled
+      | NSActivityUserInitiated
+      | NSActivityLatencyCritical;
 
-  static ACTIVITY_ID: Lazy<Mutex<Option<Id<Object>>>> = Lazy::new(|| Mutex::new(None));
+    static ACTIVITY_ID: Lazy<Mutex<Option<Id<Object>>>> = Lazy::new(|| Mutex::new(None));
 
-  let process_info = unsafe { NSProcessInfo::processInfo(nil) };
+    let process_info = unsafe { NSProcessInfo::processInfo(nil) };
 
-  if enable {
-    if let Some(activity_id) = ACTIVITY_ID.lock().unwrap().take() {
-      unsafe {
-        let _: () = msg_send![process_info, endActivity: activity_id];
+    if enable {
+      if let Some(activity_id) = ACTIVITY_ID.lock().unwrap().take() {
+        unsafe {
+          let _: () = msg_send![process_info, endActivity: activity_id];
+        }
       }
-    }
-  } else {
-    if ACTIVITY_ID.lock().unwrap().is_some() {
-      set_nap(true, "");
-    }
+    } else {
+      if ACTIVITY_ID.lock().unwrap().is_some() {
+        set_nap(true, "");
+      }
 
-    let activity_id: Id<Object> = unsafe {
-      let reason = NSString::alloc(nil).init_str(if reason.is_empty() { "none" } else { reason });
-      msg_send![process_info, beginActivityWithOptions:options reason:reason]
-    };
+      let activity_id: Id<Object> = unsafe {
+        let reason = NSString::alloc(nil).init_str(if reason.is_empty() { "none" } else { reason });
+        msg_send![process_info, beginActivityWithOptions:options reason:reason]
+      };
 
-    *ACTIVITY_ID.lock().unwrap() = Some(activity_id);
+      *ACTIVITY_ID.lock().unwrap() = Some(activity_id);
+    }
   }
 }
