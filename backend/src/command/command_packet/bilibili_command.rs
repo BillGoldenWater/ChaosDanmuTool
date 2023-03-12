@@ -89,3 +89,32 @@ pub fn from_danmu_message(danmu_message: DanmuMessage) -> BiliBiliCommand {
     data: Box::new(danmu_message),
   }
 }
+
+#[derive(thiserror::Error, Debug)]
+pub enum CommandParseError {
+  #[error("failed to get command type(cmd field)")]
+  UnableGetCommandType,
+  #[error("unexpected command type: {0}")]
+  WrongCommandType(String),
+}
+
+pub type CommandParseResult<T> = Result<T, CommandParseError>;
+
+#[async_trait::async_trait]
+pub trait CommandParser {
+  async fn check_cmd_type(&mut self, raw: &Value, r#type: &str) -> CommandParseResult<()> {
+    if let Some(cmd) = raw["cmd"].as_str() {
+      if cmd.eq(r#type) {
+        Ok(())
+      } else {
+        Err(CommandParseError::WrongCommandType(cmd.to_string()))
+      }
+    } else {
+      Err(CommandParseError::UnableGetCommandType)
+    }
+  }
+
+  async fn from_raw(raw: &Value) -> CommandParseResult<Self>
+  where
+    Self: Sized;
+}

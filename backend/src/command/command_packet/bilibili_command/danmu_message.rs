@@ -13,6 +13,9 @@ use crate::cache::user_info_cache::medal_data::{FromRawError, MedalData};
 use crate::cache::user_info_cache::user_info::UserInfo;
 use crate::cache::user_info_cache::UserInfoCache;
 use crate::command::command_packet::bilibili_command::danmu_message::extra::Extra;
+use crate::command::command_packet::bilibili_command::{
+  CommandParseError, CommandParseResult, CommandParser,
+};
 use crate::types::bilibili::emoji_data::EmojiData;
 use crate::types::bilibili::emot::Emot;
 
@@ -44,9 +47,42 @@ pub struct DanmuMessage {
   count: i32,
 }
 
-impl DanmuMessage {
-  pub fn empty() -> DanmuMessage {
-    DanmuMessage {
+#[async_trait::async_trait]
+impl CommandParser for DanmuMessage {
+  async fn check_cmd_type(&mut self, raw: &Value, r#type: &str) -> CommandParseResult<()> {
+    if let Some(cmd) = raw["cmd"].as_str() {
+      if !cmd.starts_with(r#type) {
+        return Err(CommandParseError::WrongCommandType(cmd.to_string()));
+      } else if !cmd.eq(r#type) {
+        self.is_special_type = true;
+      }
+      Ok(())
+    } else {
+      Err(CommandParseError::UnableGetCommandType)
+    }
+  }
+
+  async fn from_raw(raw: &Value) -> CommandParseResult<Self>
+  where
+    Self: Sized,
+  {
+    let mut result = DanmuMessage::default();
+
+    result.check_cmd_type(raw, "DANMU_MSG").await?;
+
+    let parser = DanmuMessageParser {
+      info: &raw["info"],
+      result,
+      user_info: Default::default(),
+    };
+
+    Ok(parser.parse().await)
+  }
+}
+
+impl Default for DanmuMessage {
+  fn default() -> Self {
+    Self {
       fontsize: 0,
       color: 0,
       timestamp: "".to_string(),
@@ -60,43 +96,36 @@ impl DanmuMessage {
       count: 1,
     }
   }
+}
 
-  pub async fn from_raw(raw: &Value) -> Result<DanmuMessage, DanmuMessageParseError> {
-    let mut result = DanmuMessage::empty();
+pub struct DanmuMessageParser<'info> {
+  info: &'info Value,
+  result: DanmuMessage,
+  user_info: UserInfo,
+}
 
-    if let Some(cmd) = raw["cmd"].as_str() {
-      if !cmd.starts_with("DANMU_MSG") {
-        return Err(DanmuMessageParseError::WrongCommandType(cmd.to_string()));
-      }
-      if !cmd.eq("DANMU_MSG") {
-        result.is_special_type = true;
-      }
-    } else {
-      return Err(DanmuMessageParseError::UnableGetCommandType);
-    }
-
-    let info = &raw["info"];
-
-    result.parse_meta(&info[0]);
-    result.content = info[1].as_str().unwrap_or("").to_string();
-
-    let mut user_info = result.parse_user_data(&info[2]);
-    result.parse_medal(&info[3], &mut user_info);
-    result.parse_level_info(&info[4], &mut user_info);
-    result.parse_title_info(&info[5], &mut user_info);
-    result.uid = user_info.uid.clone();
-    UserInfoCache::i().update(user_info).await;
-
-    Ok(result)
+impl<'info> DanmuMessageParser<'info> {
+  async fn parse(self) -> DanmuMessage {
+    self
+      .parse_meta()
+      .parse_content()
+      .parse_user_data()
+      .parse_medal()
+      .parse_level_info()
+      .parse_title_info()
+      .finish()
+      .await
   }
 
-  fn parse_meta(&mut self, meta: &Value) {
-    self.fontsize = meta[2].as_i64().unwrap_or(0) as i32;
-    self.color = meta[3].as_i64().unwrap_or(0) as i32;
-    self.timestamp = meta[4].as_u64().unwrap_or(0).to_string();
-    self.danmu_type = DanmuType::from_u32(meta[12].as_u64().unwrap_or(0) as u32);
+  fn parse_meta(mut self) -> Self {
+    let meta = &self.info[0];
+
+    self.result.fontsize = meta[2].as_i64().unwrap_or(0) as i32;
+    self.result.color = meta[3].as_i64().unwrap_or(0) as i32;
+    self.result.timestamp = meta[4].as_u64().unwrap_or(0).to_string();
+    self.result.danmu_type = DanmuType::from_u32(meta[12].as_u64().unwrap_or(0) as u32);
     if !meta[13].is_string() {
-      self.emoji_data = EmojiData::from_raw(&meta[13]).map_or_else(
+      self.result.emoji_data = EmojiData::from_raw(&meta[13]).map_or_else(
         |err| {
           error!(
             "unable to parse emoji_data \n{data}\n\n{err:?}",
@@ -108,7 +137,7 @@ impl DanmuMessage {
       );
     }
     if meta[15]["extra"].is_string() {
-      self.emots = meta[15]["extra"]
+      self.result.emots = meta[15]["extra"]
         .as_str()
         .map_or_else(|| Ok(Default::default()), serde_json::from_str::<Extra>)
         .map_or_else(
@@ -123,21 +152,36 @@ impl DanmuMessage {
         )
         .unwrap_or_default();
     }
+
+    self
   }
 
-  fn parse_user_data(&mut self, user_data: &Value) -> UserInfo {
-    UserInfo {
-      uid: user_data[0].as_u64().unwrap_or(0).to_string(),
-      name: user_data[1].as_str().map(|it| it.to_string()),
-      is_manager: user_data[2].as_u64().map(|it| it != 0),
-      is_vip: user_data[3].as_u64().map(|it| it != 0),
-      is_svip: user_data[4].as_u64().map(|it| it != 0),
-      ..Default::default()
-    }
+  fn parse_content(mut self) -> Self {
+    let content = &self.info[1];
+
+    self.result.content = content.as_str().unwrap_or("").to_string();
+
+    self
   }
 
-  fn parse_medal(&mut self, medal_data: &Value, result: &mut UserInfo) {
-    result.medal = MedalData::from_raw(medal_data).map_or_else(
+  fn parse_user_data(mut self) -> Self {
+    let user_data = &self.info[2];
+
+    self.user_info.uid = user_data[0].as_u64().unwrap_or(0).to_string();
+    self.user_info.name = user_data[1].as_str().map(|it| it.to_string());
+    self.user_info.is_manager = user_data[2].as_u64().map(|it| it != 0);
+    self.user_info.is_vip = user_data[3].as_u64().map(|it| it != 0);
+    self.user_info.is_svip = user_data[4].as_u64().map(|it| it != 0);
+
+    self.result.uid = self.user_info.uid.clone();
+
+    self
+  }
+
+  fn parse_medal(mut self) -> Self {
+    let medal_data = &self.info[3];
+
+    self.user_info.medal = MedalData::from_raw(medal_data).map_or_else(
       |err| {
         if err != FromRawError::EmptyInput {
           error!("unable to parse medal \n{medal_data}\n{err:?}");
@@ -145,24 +189,32 @@ impl DanmuMessage {
         None
       },
       Some,
-    )
+    );
+
+    self
   }
 
-  fn parse_level_info(&mut self, level_info: &Value, result: &mut UserInfo) {
-    result.user_level = level_info[0].as_u64().map(|it| it as u32)
+  fn parse_level_info(mut self) -> Self {
+    let level_info = &self.info[4];
+
+    self.user_info.user_level = level_info[0].as_u64().map(|it| it as u32);
+
+    self
   }
 
-  fn parse_title_info(&mut self, title_info: &Value, result: &mut UserInfo) {
-    result.title = title_info[0].as_str().map(|it| it.to_string())
-  }
-}
+  fn parse_title_info(mut self) -> Self {
+    let title_info = &self.info[5];
 
-#[derive(thiserror::Error, Debug)]
-pub enum DanmuMessageParseError {
-  #[error("failed to get command type(cmd field)")]
-  UnableGetCommandType,
-  #[error("unexpected command type: {0}")]
-  WrongCommandType(String),
+    self.user_info.title = title_info[1].as_str().map(|it| it.to_string());
+
+    self
+  }
+
+  async fn finish(self) -> DanmuMessage {
+    UserInfoCache::i().update(self.user_info).await;
+
+    self.result
+  }
 }
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, Default, PartialEq, Eq, Debug, Clone)]
