@@ -14,10 +14,11 @@ import { formatTime } from "../../utils/FormatUtils";
 interface UserMessageProps {
   uid?: string;
   timestamp?: string;
+  highlight?: boolean;
 }
 
 export function UserMessage(props: PropsWithChildren<UserMessageProps>) {
-  const { children, uid, timestamp } = props;
+  const { children, uid, timestamp, highlight } = props;
   const hasPrev = uid == null;
 
   const ctx = useContext(appCtx);
@@ -43,7 +44,7 @@ export function UserMessage(props: PropsWithChildren<UserMessageProps>) {
   }
 
   return (
-    <UserMessageBase hasPrev={hasPrev}>
+    <UserMessageBase hasPrev={hasPrev} highlight={highlight === true}>
       {!compact && <MessageSider isAvatar={uid != null}>{sider}</MessageSider>}
       <MessageMain>
         {msgUserInfo}
@@ -82,7 +83,12 @@ const MessageContent = styled.div`
   word-break: break-all;
 `;
 
-const UserMessageBase = styled.div<{ hasPrev: boolean }>`
+interface UserMessageBaseProps {
+  hasPrev: boolean;
+  highlight: boolean;
+}
+
+const UserMessageBase = styled.div<UserMessageBaseProps>`
   transition: background-color 0.15s ease-in-out;
   display: flex;
   gap: ${paddingValue.small};
@@ -92,8 +98,10 @@ const UserMessageBase = styled.div<{ hasPrev: boolean }>`
   ${(p) =>
     p.hasPrev ? `margin-top: calc(-0.85 * ${paddingValue.normal});` : ""};
 
+  background-color: ${(p) => (p.highlight ? color.bgTheme : "transparent")};
+
   &:hover {
-    background-color: ${color.bgItem};
+    background-color: ${(p) => (p.highlight ? color.bgThHover : color.bgItem)};
   }
 
   & ${MessageTimestamp} {
