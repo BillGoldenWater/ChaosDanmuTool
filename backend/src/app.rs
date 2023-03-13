@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-use const_format::formatcp;
-use log::{info, warn};
+use log::info;
 use tauri::{App, Assets, Context};
 
 use crate::app::event::{on_exit, on_init, on_ready, on_setup};
@@ -73,6 +72,7 @@ fn print_env_info() {
   #[cfg(target_os = "macos")]
   {
     use crate::utils::process_utils::is_running_under_rosetta;
+    use log::warn;
 
     if std::env::consts::ARCH == "x86_64" {
       match is_running_under_rosetta() {
@@ -90,6 +90,8 @@ fn print_env_info() {
 }
 
 fn build_info() -> &'static str {
+  use const_format::formatcp;
+
   const VERSION: &str = concat!(env!("CARGO_PKG_NAME"), "-", env!("CARGO_PKG_VERSION"));
   const TARGET: &str = formatcp!("{}-{}", std::env::consts::OS, std::env::consts::ARCH);
   const DEBUG: &str = if cfg!(debug_assertions) {
