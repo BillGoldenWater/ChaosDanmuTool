@@ -13,7 +13,7 @@ pub fn gen_options(file_name: PathBuf) -> SqliteConnectOptions {
   let mut options = SqliteConnectOptions::new()
     .filename(file_name)
     .create_if_missing(true);
-  options.log_statements(LevelFilter::Debug);
+  options.log_statements(LevelFilter::Trace);
   options
 }
 
