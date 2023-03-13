@@ -56,7 +56,15 @@ export function DanmuMessage(props: TDanmuItemProps) {
   content = content.map((v, idx) => <span key={idx}>{v}</span>);
 
   if (dm.emojiData) {
-    content = <Emoji src={dm.emojiData.url} alt={dm.emojiData.text} />;
+    content = (
+      <Emoji
+        src={dm.emojiData.url}
+        alt={dm.emojiData.text}
+        style={{
+          height: `calc( 4rem * ${dm.emojiData.height / dm.emojiData.width} )`,
+        }}
+      />
+    );
   }
 
   return (
@@ -79,5 +87,5 @@ const Emoji = styled.img`
 `;
 
 const Emot = styled.img`
-  max-width: 1.5rem;
+  height: 1.5rem;
 `;
