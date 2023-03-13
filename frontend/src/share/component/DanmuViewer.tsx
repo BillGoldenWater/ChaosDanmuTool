@@ -5,7 +5,7 @@
 
 import styled from "styled-components";
 import { padding, paddingValue } from "./ThemeCtx";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { appCtx } from "../app/AppCtx";
 import { BiliBiliMessageEvent } from "../event/AppEventTarget";
 import { CommandPacket } from "../type/rust/command/CommandPacket";
@@ -14,67 +14,11 @@ import { motion, MotionValue, useSpring } from "framer-motion";
 import { maxScrollTop } from "../utils/ElementUtils";
 import { DanmuViewerMaxSize } from "../app/Settings";
 import Immutable from "immutable";
+import { useHoverState } from "../hook/useHoverState";
 
 export function DanmuViewer() {
-  const ctx = useContext(appCtx);
-
-  // region hover
-  const [hover, setHover] = useState(false);
-  useEffect(() => {
-    function onWindowBlur() {
-      setHover(false);
-    }
-
-    window.addEventListener("blur", onWindowBlur);
-
-    return () => {
-      window.removeEventListener("blur", onWindowBlur);
-    };
-  }, [hover]);
-  // endregion
-
-  // region list
-  const [[msgList, msgListBuf], setMsgList] = useState<
-    [Immutable.List<CommandPacket>, Immutable.List<CommandPacket>]
-  >(() => [Immutable.List(), Immutable.List()]);
-
-  useEffect(() => {
-    function onBiliBiliMessage(event: BiliBiliMessageEvent) {
-      setMsgList(([list, buf]) => [list, buf.push(event.message)]);
-    }
-
-    ctx.eventTarget.addEventListener("bilibiliMessage", onBiliBiliMessage);
-
-    return () =>
-      ctx.eventTarget.removeEventListener("bilibiliMessage", onBiliBiliMessage);
-  }, [ctx.eventTarget]);
-
-  useEffect(() => {
-    if (msgListBuf.size === 0) return;
-
-    const id = window.setTimeout(() => {
-      setMsgList(([list, buf]) => {
-        if (document.hidden) {
-          return [
-            list,
-            buf.slice(Math.max(buf.size - DanmuViewerMaxSize, 0), buf.size),
-          ];
-        }
-
-        const newList = list.merge(buf);
-        return [
-          newList.slice(
-            Math.max(newList.size - DanmuViewerMaxSize, 0),
-            newList.size
-          ),
-          buf.clear(),
-        ];
-      });
-    }, 10);
-
-    return () => window.clearTimeout(id);
-  }, [msgListBuf]);
-  // endregion
+  const [hover, setHover] = useHoverState();
+  const msgList = useMsgList();
 
   // region scroll
   const [listRef, setListRef] = useState<HTMLDivElement | null>(null);
@@ -182,3 +126,83 @@ const DanmuViewerBase = styled(motion.div)`
 const DanmuItemContainer = styled(motion.div)`
   position: relative;
 `;
+
+function useMsgList() {
+  const ctx = useContext(appCtx);
+
+  const [[msgList, msgListBuf], setMsgList] = useState<
+    [Immutable.List<CommandPacket>, Immutable.List<CommandPacket>]
+  >(() => [Immutable.List(), Immutable.List()]);
+
+  useEffect(() => {
+    function onBiliBiliMessage(event: BiliBiliMessageEvent) {
+      setMsgList(([list, buf]) => {
+        if (
+          document.visibilityState !== "visible" &&
+          buf.size > DanmuViewerMaxSize
+        ) {
+          return [
+            list,
+            buf
+              .push(event.message)
+              .slice(Math.max(buf.size - DanmuViewerMaxSize, 0), buf.size),
+          ];
+        } else {
+          return [list, buf.push(event.message)];
+        }
+      });
+    }
+
+    ctx.eventTarget.addEventListener("bilibiliMessage", onBiliBiliMessage);
+
+    return () =>
+      ctx.eventTarget.removeEventListener("bilibiliMessage", onBiliBiliMessage);
+  }, [ctx.eventTarget]);
+
+  const processBuf = useCallback(() => {
+    setMsgList((prev) => {
+      if (document.visibilityState !== "visible") {
+        return prev;
+      }
+
+      const [list, buf] = prev;
+
+      const newList = list.merge(buf);
+      return [
+        newList.slice(
+          Math.max(newList.size - DanmuViewerMaxSize, 0),
+          newList.size
+        ),
+        buf.clear(),
+      ];
+    });
+  }, []);
+
+  const bufUpdateIdRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (
+      msgListBuf.size === 0 ||
+      bufUpdateIdRef.current != null ||
+      document.visibilityState !== "visible"
+    )
+      return;
+
+    bufUpdateIdRef.current = window.setTimeout(() => {
+      processBuf();
+      bufUpdateIdRef.current = null;
+    }, 50);
+  }, [msgListBuf.size, processBuf]);
+
+  useEffect(() => {
+    function onVisibilityChange() {
+      if (document.visibilityState === "visible") processBuf();
+    }
+
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    return () =>
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+  }, [processBuf]);
+
+  return msgList;
+}
