@@ -4,7 +4,7 @@
  */
 
 import styled from "styled-components";
-import { padding, paddingValue } from "./ThemeCtx";
+import {padding, paddingValue} from "./ThemeCtx";
 import {
   Dispatch,
   SetStateAction,
@@ -14,21 +14,21 @@ import {
   useRef,
   useState,
 } from "react";
-import { appCtx } from "../app/AppCtx";
-import { BiliBiliMessageEvent } from "../event/AppEventTarget";
-import { CommandPacket } from "../type/rust/command/CommandPacket";
-import { DanmuItem } from "./danmuItem/DanmuItem";
-import { motion, MotionValue, useSpring } from "framer-motion";
-import { maxScrollTop } from "../utils/ElementUtils";
-import { DanmuViewerMaxSize } from "../app/Settings";
+import {appCtx} from "../app/AppCtx";
+import {BiliBiliMessageEvent} from "../event/AppEventTarget";
+import {CommandPacket} from "../type/rust/command/CommandPacket";
+import {DanmuItem} from "./danmuItem/DanmuItem";
+import {motion, MotionValue, useSpring} from "framer-motion";
+import {maxScrollTop} from "../utils/ElementUtils";
+import {DanmuViewerMaxSize} from "../app/Settings";
 import Immutable from "immutable";
-import { useHoverState } from "../hook/useHoverState";
+import {useHoverState} from "../hook/useHoverState";
 
 export function DanmuViewer() {
   const scrollAnimation = true;
 
   const [hover, setHover] = useHoverState();
-  const msgList = useMsgList();
+  const msgList = useMsgList(hover);
   const [setListRef, setLatestElement] = useAutoScroll(
     msgList.size === DanmuViewerMaxSize,
     hover,
@@ -41,7 +41,7 @@ export function DanmuViewer() {
       onHoverStart={setHover.bind(null, true)}
       onHoverEnd={setHover.bind(null, false)}
     >
-      <div />
+      <div/>
       {msgList.map((item, idx, arr) => {
         const prev = idx > 0 ? arr.get(idx - 1) : undefined;
         const next = idx < arr.size - 1 ? arr.get(idx + 1) : undefined;
@@ -50,7 +50,7 @@ export function DanmuViewer() {
             key={item.uuid}
             ref={idx === arr.size - 1 ? setLatestElement : undefined}
           >
-            <DanmuItem item={item} prevItem={prev} nextItem={next} />
+            <DanmuItem item={item} prevItem={prev} nextItem={next}/>
           </DanmuItemContainer>
         );
       })}
@@ -82,8 +82,13 @@ const DanmuItemContainer = styled(motion.div)`
   position: relative;
 `;
 
-function useMsgList() {
+function useMsgList(hover: boolean) {
   const ctx = useContext(appCtx);
+
+  const [visible, setVisible] = useState(
+    document.visibilityState === "visible"
+  );
+  const shouldProcessBuf = !hover && visible;
 
   const [[msgList, msgListBuf], setMsgList] = useState<
     [Immutable.List<CommandPacket>, Immutable.List<CommandPacket>]
@@ -92,10 +97,7 @@ function useMsgList() {
   useEffect(() => {
     function onBiliBiliMessage(event: BiliBiliMessageEvent) {
       setMsgList(([list, buf]) => {
-        if (
-          document.visibilityState !== "visible" &&
-          buf.size > DanmuViewerMaxSize
-        ) {
+        if (!shouldProcessBuf && buf.size > DanmuViewerMaxSize) {
           return [
             list,
             buf
@@ -112,11 +114,11 @@ function useMsgList() {
 
     return () =>
       ctx.eventTarget.removeEventListener("bilibiliMessage", onBiliBiliMessage);
-  }, [ctx.eventTarget]);
+  }, [ctx.eventTarget, shouldProcessBuf]);
 
   const processBuf = useCallback(() => {
     setMsgList((prev) => {
-      if (document.visibilityState !== "visible") {
+      if (!shouldProcessBuf) {
         return prev;
       }
 
@@ -131,14 +133,14 @@ function useMsgList() {
         buf.clear(),
       ];
     });
-  }, []);
+  }, [shouldProcessBuf]);
 
   const bufUpdateIdRef = useRef<number | null>(null);
   useEffect(() => {
     if (
       msgListBuf.size === 0 ||
       bufUpdateIdRef.current != null ||
-      document.visibilityState !== "visible"
+      !shouldProcessBuf
     )
       return;
 
@@ -146,11 +148,16 @@ function useMsgList() {
       processBuf();
       bufUpdateIdRef.current = null;
     }, 50);
-  }, [msgListBuf.size, processBuf]);
+  }, [msgListBuf.size, processBuf, shouldProcessBuf]);
 
   useEffect(() => {
     function onVisibilityChange() {
-      if (document.visibilityState === "visible") processBuf();
+      if (document.visibilityState === "visible") {
+        setVisible(true);
+        processBuf();
+      } else {
+        setVisible(false);
+      }
     }
 
     document.addEventListener("visibilitychange", onVisibilityChange);
@@ -183,7 +190,6 @@ function useAutoScroll(
   );
   useEffect(() => {
     if (!latestElement || !listRef) return;
-    const isHoverChanged = prevHover.current !== hover;
 
     function scrollTo(value: number) {
       if (!listRef) return;
@@ -193,14 +199,12 @@ function useAutoScroll(
       });
     }
 
-    function scroll(jump?: number, set?: number) {
+    function scroll(jump: number, set?: number) {
       if (animation) {
-        if (jump != null) listScroll.jump(jump);
+        listScroll.jump(jump);
         if (set != null) listScroll.set(set);
       } else {
-        if (jump != null && set != null) scrollTo(set);
-        else if (jump != null) scrollTo(jump);
-        else if (set != null) scrollTo(set);
+        if (set != null) scrollTo(set);
       }
     }
 
@@ -210,38 +214,20 @@ function useAutoScroll(
         prevElement.current.offsetTop + prevElement.current.offsetHeight;
       const heightAppended = offsetBottom - prevOffsetBottom;
 
-      if (!hover && !isHoverChanged) {
-        scroll(listScroll.get() + heightAppended, 0);
-      } else {
-        const currentScrollBottom = maxScrollTop(listRef) - listRef.scrollTop;
-
-        if (msgListReachedMaxSize) {
-          const newScrollBottom = Math.min(
-            currentScrollBottom + heightAppended,
-            listRef.scrollHeight
-          );
-
-          scroll(newScrollBottom);
+      if (!hover) {
+        if (prevHover.current) {
+          scroll(maxScrollTop(listRef) - listRef.scrollTop, 0);
         } else {
-          scroll(currentScrollBottom);
+          scroll(listScroll.get() + heightAppended, 0);
         }
-
-        if (isHoverChanged && !hover) {
-          scroll(undefined, 0);
-        }
+      } else {
+        scroll(maxScrollTop(listRef) - listRef.scrollTop);
       }
     }
 
     prevHover.current = hover;
     prevElement.current = latestElement;
-  }, [
-    animation,
-    hover,
-    latestElement,
-    listRef,
-    listScroll,
-    msgListReachedMaxSize,
-  ]);
+  }, [animation, hover, latestElement, listRef, listScroll]);
 
   useEffect(() => {
     if (!listRef) return;
