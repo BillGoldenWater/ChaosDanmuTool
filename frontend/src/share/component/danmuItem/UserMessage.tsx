@@ -78,6 +78,7 @@ const MessageMain = styled.div`
 const MessageUserInfo = styled.div``;
 
 const MessageContent = styled.div`
+  ${font.dmContent};
   text-shadow: 0 0 0.15rem #000;
   word-wrap: anywhere;
   word-break: break-all;
