@@ -68,6 +68,7 @@ argh = "0.1.10"
 os_type = "2.6.0"
 toml = "0.7.2"
 once_cell = "1.17.1"
+const_format = "0.2.30"
 ts-rs = "6.2.1"
 # live template: tss
 # #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Debug, Clone)]

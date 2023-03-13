@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-use log::info;
+use const_format::formatcp;
+use log::{info, warn};
 use tauri::{App, Assets, Context};
 
 use crate::app::event::{on_exit, on_init, on_ready, on_setup};
@@ -18,7 +19,7 @@ pub async fn run() {
   let context = tauri::generate_context!();
   on_init(&context);
 
-  print_build_info();
+  print_env_info();
 
   let app = build_tauri_app(context);
 
@@ -67,17 +68,36 @@ fn run_tauri_app(app: App) {
   });
 }
 
-fn print_build_info() {
-  info!(
-    "build info: {}-{} {}-{} ({} build)",
-    env!("CARGO_PKG_NAME"),
-    env!("CARGO_PKG_VERSION"),
-    std::env::consts::OS,
-    std::env::consts::ARCH,
-    if cfg!(debug_assertions) {
-      "debug"
-    } else {
-      "release"
+fn print_env_info() {
+  info!("build info: {}", build_info());
+  #[cfg(target_os = "macos")]
+  {
+    use crate::utils::process_utils::is_running_under_rosetta;
+
+    if std::env::consts::ARCH == "x86_64" {
+      match is_running_under_rosetta() {
+        Ok(under_rosetta) => {
+          if under_rosetta {
+            info!("under rosetta: true");
+          }
+        }
+        Err(err) => {
+          warn!("under rosetta: {err:?}");
+        }
+      }
     }
-  );
+  }
+}
+
+fn build_info() -> &'static str {
+  const VERSION: &str = concat!(env!("CARGO_PKG_NAME"), "-", env!("CARGO_PKG_VERSION"));
+  const TARGET: &str = formatcp!("{}-{}", std::env::consts::OS, std::env::consts::ARCH);
+  const DEBUG: &str = if cfg!(debug_assertions) {
+    "debug_assertions"
+  } else {
+    ""
+  };
+  const TAURI_DEV: &str = if cfg!(dev) { "dev_mode" } else { "" };
+
+  formatcp!("{VERSION} {TARGET} {DEBUG} {TAURI_DEV}")
 }
