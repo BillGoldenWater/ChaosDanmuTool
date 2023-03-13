@@ -5,7 +5,15 @@
 
 import styled from "styled-components";
 import { padding, paddingValue } from "./ThemeCtx";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { appCtx } from "../app/AppCtx";
 import { BiliBiliMessageEvent } from "../event/AppEventTarget";
 import { CommandPacket } from "../type/rust/command/CommandPacket";
@@ -17,68 +25,15 @@ import Immutable from "immutable";
 import { useHoverState } from "../hook/useHoverState";
 
 export function DanmuViewer() {
+  const scrollAnimation = true;
+
   const [hover, setHover] = useHoverState();
   const msgList = useMsgList();
-
-  // region scroll
-  const [listRef, setListRef] = useState<HTMLDivElement | null>(null);
-  const listScroll: MotionValue<number> = useSpring(0, {
-    stiffness: 120,
-    damping: 20,
-  });
-
-  const prevElement = useRef<HTMLDivElement>();
-  const prevHover = useRef(false);
-  const [latestElement, setLatestElement] = useState<HTMLDivElement | null>(
-    null
+  const [setListRef, setLatestElement] = useAutoScroll(
+    msgList.size === DanmuViewerMaxSize,
+    hover,
+    scrollAnimation
   );
-  const msgListReachedMaxSize = msgList.size === DanmuViewerMaxSize;
-  useEffect(() => {
-    if (!latestElement || !listRef) return;
-    if (prevElement.current) {
-      const offsetBottom = latestElement.offsetTop + latestElement.offsetHeight;
-      const prevOffsetBottom =
-        prevElement.current.offsetTop + prevElement.current.offsetHeight;
-      const heightAppended = offsetBottom - prevOffsetBottom;
-
-      const isHoverChanged = prevHover.current !== hover;
-
-      if (!hover && !isHoverChanged) {
-        listScroll.jump(listScroll.get() + heightAppended);
-        listScroll.set(0);
-      } else {
-        const currentScrollBottom = maxScrollTop(listRef) - listRef.scrollTop;
-
-        if (msgListReachedMaxSize) {
-          const newScrollBottom = Math.min(
-            currentScrollBottom + heightAppended,
-            listRef.scrollHeight
-          );
-
-          listScroll.jump(newScrollBottom);
-        } else {
-          listScroll.jump(currentScrollBottom);
-        }
-
-        if (isHoverChanged && !hover) {
-          listScroll.set(0);
-        }
-      }
-    }
-
-    prevHover.current = hover;
-    prevElement.current = latestElement;
-  }, [hover, latestElement, listRef, listScroll, msgListReachedMaxSize]);
-
-  useEffect(() => {
-    if (!listRef) return;
-    return listScroll.on("change", (value) => {
-      listRef.scrollTo({
-        top: maxScrollTop(listRef) - value,
-      });
-    });
-  }, [listRef, listScroll]);
-  // endregion
 
   return (
     <DanmuViewerBase
@@ -205,4 +160,97 @@ function useMsgList() {
   }, [processBuf]);
 
   return msgList;
+}
+
+function useAutoScroll(
+  msgListReachedMaxSize: boolean,
+  hover: boolean,
+  animation: boolean
+): [
+  Dispatch<SetStateAction<HTMLDivElement | null>>,
+  Dispatch<SetStateAction<HTMLDivElement | null>>
+] {
+  const [listRef, setListRef] = useState<HTMLDivElement | null>(null);
+  const listScroll: MotionValue<number> = useSpring(0, {
+    stiffness: 120,
+    damping: 20,
+  });
+
+  const prevElement = useRef<HTMLDivElement>();
+  const prevHover = useRef(false);
+  const [latestElement, setLatestElement] = useState<HTMLDivElement | null>(
+    null
+  );
+  useEffect(() => {
+    if (!latestElement || !listRef) return;
+    const isHoverChanged = prevHover.current !== hover;
+
+    function scrollTo(value: number) {
+      if (!listRef) return;
+
+      listRef.scrollTo({
+        top: maxScrollTop(listRef) - value,
+      });
+    }
+
+    function scroll(jump?: number, set?: number) {
+      if (animation) {
+        if (jump != null) listScroll.jump(jump);
+        if (set != null) listScroll.set(set);
+      } else {
+        if (jump != null && set != null) scrollTo(set);
+        else if (jump != null) scrollTo(jump);
+        else if (set != null) scrollTo(set);
+      }
+    }
+
+    if (prevElement.current) {
+      const offsetBottom = latestElement.offsetTop + latestElement.offsetHeight;
+      const prevOffsetBottom =
+        prevElement.current.offsetTop + prevElement.current.offsetHeight;
+      const heightAppended = offsetBottom - prevOffsetBottom;
+
+      if (!hover && !isHoverChanged) {
+        scroll(listScroll.get() + heightAppended, 0);
+      } else {
+        const currentScrollBottom = maxScrollTop(listRef) - listRef.scrollTop;
+
+        if (msgListReachedMaxSize) {
+          const newScrollBottom = Math.min(
+            currentScrollBottom + heightAppended,
+            listRef.scrollHeight
+          );
+
+          scroll(newScrollBottom);
+        } else {
+          scroll(currentScrollBottom);
+        }
+
+        if (isHoverChanged && !hover) {
+          scroll(undefined, 0);
+        }
+      }
+    }
+
+    prevHover.current = hover;
+    prevElement.current = latestElement;
+  }, [
+    animation,
+    hover,
+    latestElement,
+    listRef,
+    listScroll,
+    msgListReachedMaxSize,
+  ]);
+
+  useEffect(() => {
+    if (!listRef) return;
+    return listScroll.on("change", (value) => {
+      listRef.scrollTo({
+        top: maxScrollTop(listRef) - value,
+      });
+    });
+  }, [listRef, listScroll]);
+
+  return [setListRef, setLatestElement];
 }
