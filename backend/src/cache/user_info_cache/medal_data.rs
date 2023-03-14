@@ -7,6 +7,7 @@ use log::error;
 use serde_json::Value;
 
 use crate::cache::user_info_cache::medal_info::MedalInfo;
+use crate::types::bilibili::user_info::medal_info::MedalInfo as BiliBiliMedalInfo;
 use crate::user_info_apply_updates;
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, Default, PartialEq, Eq, Debug, Clone)]
@@ -25,7 +26,7 @@ pub struct MedalData {
 }
 
 impl MedalData {
-  pub fn from_raw(raw: &Value) -> Result<Self, FromRawError> {
+  pub fn from_danmu_raw(raw: &Value) -> Result<Self, FromRawError> {
     if let Some(arr) = raw.as_array() {
       if arr.is_empty() {
         return Err(FromRawError::EmptyInput);
@@ -83,4 +84,25 @@ pub enum FromRawError {
   NoneAnchorRoomid,
   #[error("empty input")]
   EmptyInput,
+}
+
+impl From<BiliBiliMedalInfo> for MedalData {
+  fn from(value: BiliBiliMedalInfo) -> Self {
+    Self {
+      info: MedalInfo {
+        target_id: value.target_id.to_string(),
+        anchor_roomid: Some(value.anchor_roomid),
+        anchor_name: Some(value.anchor_uname),
+        medal_name: Some(value.medal_name),
+      },
+
+      is_lighted: Some(value.is_lighted == 1),
+      guard_level: Some(value.guard_level),
+      level: Some(value.medal_level),
+      color: Some(value.medal_color as u32),
+      color_border: Some(value.medal_color_border as u32),
+      color_start: Some(value.medal_color_start as u32),
+      color_end: Some(value.medal_color_end as u32),
+    }
+  }
 }

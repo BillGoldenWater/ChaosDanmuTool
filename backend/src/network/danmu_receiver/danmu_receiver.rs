@@ -8,19 +8,20 @@ use std::str::FromStr;
 use std::time::Instant;
 
 use log::{error, info, warn};
+use serde::Deserialize;
 use serde_json::Value;
 use static_object::StaticObject;
 use tokio_tungstenite::tungstenite::protocol::frame::coding::CloseCode;
 use tokio_tungstenite::tungstenite::protocol::CloseFrame;
 use tokio_tungstenite::tungstenite::Message;
 
+use crate::app_context::AppContext;
 use crate::command::command_packet::app_command::bilibili_packet_parse_error::BiliBiliPacketParseError;
 use crate::command::command_packet::app_command::receiver_status_update::{
   ReceiverStatus, ReceiverStatusUpdate,
 };
 use crate::command::command_packet::bilibili_command::activity_update::ActivityUpdate;
-use crate::command::command_packet::bilibili_command::danmu_message::DanmuMessage;
-use crate::command::command_packet::bilibili_command::{BiliBiliCommand, CommandParser};
+use crate::command::command_packet::bilibili_command::BiliBiliCommand;
 use crate::command::command_packet::CommandPacket;
 use crate::config::config::backend_config::danmu_receiver_config::DanmuReceiverConfig;
 use crate::config::config_manager::{modify_cfg, ConfigManager};
@@ -36,6 +37,7 @@ use crate::network::danmu_receiver::op_code::OpCode;
 use crate::network::danmu_receiver::packet::{JoinPacketInfo, Packet};
 use crate::network::websocket::websocket_connection::WebSocketConnectError;
 use crate::network::websocket::websocket_connection_reusable::WebSocketConnectionReusable;
+use crate::types::bilibili::bilibili_message::BiliBiliMessage;
 use crate::utils::bytes_utils::bytes_to_hex;
 use crate::utils::immutable_utils::Immutable;
 use crate::utils::trace_utils::print_trace;
@@ -391,11 +393,13 @@ impl DanmuReceiver {
   async fn parse_danmu_message(&mut self, buf: &mut Vec<CommandPacket>, packet: Packet) {
     // region check data type
     if packet.data_type != DataType::Json {
-      let message = format!(
-        "unexpect data_type {:?} when OpCode::Message",
-        packet.data_type
+      self.push_parse_error(
+        buf,
+        format!(
+          "unexpect data_type {:?} when OpCode::Message",
+          packet.data_type
+        ),
       );
-      self.push_parse_error(buf, message);
       return;
     }
     // endregion
@@ -406,45 +410,47 @@ impl DanmuReceiver {
     let raw = match serde_json::from_str::<Value>(&msg_str) {
       Ok(raw) => raw,
       Err(err) => {
-        let msg = format!(
-          "unable to parse json string\n{err}\n{msg_str}\n{hex}",
-          hex = bytes_to_hex(&packet.body.as_slice())
+        self.push_parse_error(
+          buf,
+          format!(
+            "unable to parse json string\n{err}\n{msg_str}\n{hex}",
+            hex = bytes_to_hex(&packet.body.as_slice())
+          ),
         );
-        error!("{msg}");
-        buf.push(BiliBiliCommand::new_parse_failed(msg_str.to_string(), msg).into());
         return;
       }
     };
     // endregion
 
-    self.parse_raw(buf, raw).await;
-  }
+    let bilibili_message = match BiliBiliMessage::deserialize(&raw) {
+      Ok(bilibili_message) => bilibili_message,
+      Err(err) => {
+        self.push_parse_error(
+          buf,
+          format!("unable to parse json object into BilibiliMessage\n\n{err}\n\n{raw:?}"),
+        );
+        return;
+      }
+    };
 
-  ///
-  /// returns: (BiliBiliCommand, Option<Value>) second is raw for backup if needed
-  ///
-  async fn parse_raw(&mut self, buf: &mut Vec<CommandPacket>, raw: Value) {
-    let cmd = raw["cmd"].as_str().unwrap_or("");
-
-    if cmd.starts_with("DANMU_MSG") {
-      let dm_result = DanmuMessage::from_raw(&raw).await;
-
-      let dm = match dm_result {
-        Ok(dm) => dm,
-        Err(err) => {
-          let msg = format!("failed to parse danmuMessage\n{err:?}");
-          error!("{msg}");
-          buf.push(
-            BiliBiliCommand::new_parse_failed(serde_json::to_string(&raw).unwrap(), msg).into(),
-          );
-          return;
+    let cmd = BiliBiliCommand::from_bilibili_message(bilibili_message).await;
+    if AppContext::i().args.store_raw_msg {
+      match cmd {
+        BiliBiliCommand::Raw { .. } | BiliBiliCommand::ParseFailed { .. } => {
+          buf.push(cmd.into());
         }
-      };
-
-      buf.push(BiliBiliCommand::from(dm).into());
-      buf.push(BiliBiliCommand::new_raw(raw, true).into());
+        _ => {
+          buf.push(cmd.into());
+          buf.push(BiliBiliCommand::new_raw(raw).into())
+        }
+      }
     } else {
-      buf.push(BiliBiliCommand::new_raw(raw, false).into());
+      match cmd {
+        BiliBiliCommand::Raw { .. } => {}
+        _ => {
+          buf.push(cmd.into());
+        }
+      }
     }
   }
 

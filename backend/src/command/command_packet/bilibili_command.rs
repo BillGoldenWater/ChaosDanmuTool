@@ -7,9 +7,12 @@ use serde_json::Value;
 
 use crate::command::command_packet::bilibili_command::activity_update::ActivityUpdate;
 use crate::command::command_packet::bilibili_command::danmu_message::DanmuMessage;
+use crate::command::command_packet::bilibili_command::gift_message::GiftMessage;
+use crate::types::bilibili::bilibili_message::BiliBiliMessage;
 
 pub mod activity_update;
 pub mod danmu_message;
+pub mod gift_message;
 
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, PartialEq, Eq, Debug, Clone)]
 #[serde(rename_all = "camelCase", tag = "cmd")]
@@ -21,13 +24,17 @@ pub enum BiliBiliCommand {
   ActivityUpdate {
     data: ActivityUpdate,
   },
+
   DanmuMessage {
     data: Box<DanmuMessage>,
   },
+  GiftMessage {
+    data: GiftMessage,
+  },
+
   Raw {
     #[ts(type = "unknown")]
     data: Value,
-    is_backup: bool,
   },
   ParseFailed {
     data: String,
@@ -40,26 +47,32 @@ impl BiliBiliCommand {
     Self::ParseFailed { data, message }
   }
 
-  pub fn new_raw(raw: Value, is_backup: bool) -> BiliBiliCommand {
-    Self::Raw {
-      data: raw,
-      is_backup,
-    }
+  pub fn new_raw(raw: Value) -> BiliBiliCommand {
+    Self::Raw { data: raw }
   }
 
   pub fn command(&self) -> String {
     match self {
       Self::ActivityUpdate { .. } => "activityUpdate".to_string(),
       Self::DanmuMessage { .. } => "danmuMessage".to_string(),
-      Self::Raw { data, is_backup } => {
+      Self::GiftMessage { .. } => "giftMessage".to_string(),
+      Self::Raw { data } => {
         let cmd = data["cmd"].as_str().unwrap_or("unknown");
-        if *is_backup {
-          format!("rawBackup.{cmd}")
-        } else {
-          format!("raw.{cmd}")
-        }
+        format!("raw.{cmd}")
       }
       Self::ParseFailed { .. } => "parseFailed".to_string(),
+    }
+  }
+
+  pub async fn from_bilibili_message(bilibili_message: BiliBiliMessage) -> Self {
+    match bilibili_message {
+      BiliBiliMessage::DanmuMsg(danmu_msg) => {
+        Self::from(DanmuMessage::from_raw_command(danmu_msg).await)
+      }
+      BiliBiliMessage::SendGift(send_gift) => {
+        Self::from(GiftMessage::from_raw_command(*send_gift).await)
+      }
+      BiliBiliMessage::Raw(raw) => Self::new_raw(raw),
     }
   }
 }
@@ -78,6 +91,12 @@ impl From<DanmuMessage> for BiliBiliCommand {
   }
 }
 
+impl From<GiftMessage> for BiliBiliCommand {
+  fn from(value: GiftMessage) -> Self {
+    Self::GiftMessage { data: value }
+  }
+}
+
 pub fn from_activity_update(activity_update: ActivityUpdate) -> BiliBiliCommand {
   BiliBiliCommand::ActivityUpdate {
     data: activity_update,
@@ -90,31 +109,9 @@ pub fn from_danmu_message(danmu_message: DanmuMessage) -> BiliBiliCommand {
   }
 }
 
-#[derive(thiserror::Error, Debug)]
-pub enum CommandParseError {
-  #[error("failed to get command type(cmd field)")]
-  UnableGetCommandType,
-  #[error("unexpected command type: {0}")]
-  WrongCommandType(String),
-}
-
-pub type CommandParseResult<T> = Result<T, CommandParseError>;
-
 #[async_trait::async_trait]
-pub trait CommandParser {
-  async fn check_cmd_type(&mut self, raw: &Value, r#type: &str) -> CommandParseResult<()> {
-    if let Some(cmd) = raw["cmd"].as_str() {
-      if cmd.eq(r#type) {
-        Ok(())
-      } else {
-        Err(CommandParseError::WrongCommandType(cmd.to_string()))
-      }
-    } else {
-      Err(CommandParseError::UnableGetCommandType)
-    }
-  }
-
-  async fn from_raw(raw: &Value) -> CommandParseResult<Self>
+pub trait FromRawCommand<T> {
+  async fn from_raw_command(raw: T) -> Self
   where
     Self: Sized;
 }

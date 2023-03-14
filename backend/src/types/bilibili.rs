@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+pub mod bilibili_message;
 pub mod emoji_data;
 pub mod emot;
 pub mod user_info;
