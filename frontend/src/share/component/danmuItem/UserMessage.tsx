@@ -97,7 +97,7 @@ const UserMessageBase = styled.div<UserMessageBaseProps>`
   ${radius.small};
 
   ${(p) =>
-    p.hasPrev ? `margin-top: calc(-0.85 * ${paddingValue.normal});` : ""};
+    p.hasPrev ? `margin-top: calc(-0.5 * ${paddingValue.normal});` : ""};
 
   background-color: ${(p) => (p.highlight ? color.bgTheme : "transparent")};
 
