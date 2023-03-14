@@ -103,9 +103,9 @@ impl Default for UserInfo {
   fn default() -> Self {
     Self {
       uid: "".to_string(),
-      name: Some("\u{200B}".to_string()), // Zero-width space
+      name: None,
       user_level: None,
-      face: Some("https://i0.hdslb.com/bfs/face/member/noface.jpg".to_string()),
+      face: None,
       face_frame: None,
       is_vip: None,
       is_svip: None,
@@ -121,7 +121,23 @@ impl Default for UserInfo {
 
 #[test]
 fn write_default_user_info() {
-  let default_user_info = serde_json::to_string(&UserInfo::default()).unwrap();
+  let default = UserInfo {
+    uid: "".to_string(),
+    name: Some("\u{200B}".to_string()), // Zero-width space
+    user_level: None,
+    face: Some("https://i0.hdslb.com/bfs/face/member/noface.jpg".to_string()),
+    face_frame: None,
+    is_vip: None,
+    is_svip: None,
+    is_main_vip: None,
+    is_manager: None,
+    title: None,
+    level_color: None,
+    name_color: None,
+    medal: None,
+  };
+
+  let default_user_info = serde_json::to_string(&default).unwrap();
   std::fs::create_dir_all("../frontend/src/share/type/rust/cache/userInfo")
     .expect("Failed create dir for user info.");
   std::fs::write(
