@@ -3,28 +3,29 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-#[derive(serde::Serialize, serde::Deserialize, Default, PartialEq, Eq, Debug, Clone)]
+#[derive(serde::Deserialize, Default, PartialEq, Eq, Debug, Clone)]
 pub struct MedalInfo {
-  is_lighted: u8,
+  pub is_lighted: u8,
 
-  anchor_roomid: u32,
+  pub anchor_roomid: u32,
   #[serde(default)]
-  anchor_uname: String,
+  pub anchor_uname: String,
 
-  guard_level: u8,
+  pub guard_level: u8,
 
-  medal_color: i32,
-  medal_color_border: i32,
-  medal_color_end: i32,
-  medal_color_start: i32,
+  pub medal_color: i32,
+  pub medal_color_border: i32,
+  pub medal_color_end: i32,
+  pub medal_color_start: i32,
 
-  medal_level: u16,
-  medal_name: String,
+  pub medal_level: u32,
+  pub medal_name: String,
+
+  /// anchor user uid
+  pub target_id: i32,
   // unknown
   // icon_id: i32,
-  // score: i32,
   // special: String,
-  // target_id: i32,
 }
 
 impl MedalInfo {
