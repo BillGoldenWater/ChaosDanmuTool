@@ -59,15 +59,19 @@ export function DanmuMessage(props: TDanmuItemProps) {
     const emoji = dm.emojiData;
     const emojiHeight = `calc( 4rem * ${emoji.height / emoji.width} )`;
 
-    content = (
-      <Emoji
-        src={emoji.url}
-        alt={emoji.text}
-        style={{
-          height: emojiHeight,
-        }}
-      />
-    );
+    if (emoji.url.indexOf("http") === 0) {
+      content = (
+        <Emoji
+          src={emoji.url}
+          alt={emoji.text}
+          style={{
+            height: emojiHeight,
+          }}
+        />
+      );
+    } else {
+      content = [emoji.url];
+    }
   }
 
   return (
