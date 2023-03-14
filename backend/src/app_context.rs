@@ -105,4 +105,7 @@ pub struct Args {
   /// connect room on startup
   #[argh(option, short = 'C')]
   pub connect: Option<u32>,
+  /// store raw message for analysis
+  #[argh(switch)]
+  pub store_raw_msg: bool,
 }
