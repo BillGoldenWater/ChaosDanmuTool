@@ -89,7 +89,7 @@ const MessageSider = styled.div<{ isAvatar: boolean }>`
     p.isAvatar ? "align-items: flex-start;" : "align-items: flex-end;"};
   justify-content: ${(p) => (p.isAvatar ? "start" : "center")};
 
-  width: 2.5rem;
+  min-width: 2.5rem;
 `;
 
 const MessageTimestamp = styled.div`
