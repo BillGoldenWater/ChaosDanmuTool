@@ -41,7 +41,13 @@ export function UserMessage(props: PropsWithChildren<UserMessageProps>) {
     medal.isLighted &&
     medal.guardLevel > 0
   ) {
-    highlight = [color.bgTheme, color.bgThHover];
+    const roomid = ctx.config
+      .get("backend.danmuReceiver.actualRoomidCache")
+      .split("|")[1];
+
+    if (roomid != null && medal.info.anchorRoomid === Number.parseInt(roomid)) {
+      highlight = [color.bgTheme, color.bgThHover];
+    }
   }
 
   if (showUserInfo) {
