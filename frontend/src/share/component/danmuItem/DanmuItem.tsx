@@ -5,6 +5,7 @@
 
 import { CommandPacket } from "../../type/rust/command/CommandPacket";
 import { DanmuMessage } from "./DanmuMessage";
+import { GiftMessage } from "./GiftMessage";
 
 export interface TDanmuItemProps {
   item: CommandPacket;
@@ -21,6 +22,9 @@ export function DanmuItem(props: TDanmuItemProps) {
     switch (cmd.cmd) {
       case "danmuMessage": {
         return <DanmuMessage {...props} />;
+      }
+      case "giftMessage": {
+        return <GiftMessage {...props} />;
       }
       default:
         return <div>Error: {cmd.cmd} is not implemented</div>;

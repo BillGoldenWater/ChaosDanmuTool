@@ -5,15 +5,11 @@
 
 import { TDanmuItemProps } from "./DanmuItem";
 import { DanmuMessage } from "../../type/rust/command/commandPacket/bilibiliCommand/DanmuMessage";
-import { UserMessage } from "./UserMessage";
+import { checkUidEq, UserMessage } from "./UserMessage";
 import styled from "styled-components";
-import { appCtx } from "../../app/AppCtx";
-import { useContext } from "react";
 
 export function DanmuMessage(props: TDanmuItemProps) {
   const { item, prevItem } = props;
-
-  const ctx = useContext(appCtx);
 
   const dm = item.data.data as DanmuMessage;
   const showSpecial = false; // todo config
@@ -22,17 +18,7 @@ export function DanmuMessage(props: TDanmuItemProps) {
     return null;
   }
 
-  const userInfo = ctx.getUserInfo(dm.uid);
-  let uid: string | undefined = dm.uid;
-
-  if (
-    prevItem &&
-    prevItem.cmd === "biliBiliCommand" &&
-    prevItem.data.cmd === "danmuMessage" &&
-    prevItem.data.data.uid === uid
-  ) {
-    uid = undefined;
-  }
+  const uid = dm.uid;
 
   let content: JSX.Element | (JSX.Element | string)[] = [dm.content];
 
@@ -77,12 +63,8 @@ export function DanmuMessage(props: TDanmuItemProps) {
   return (
     <UserMessage
       uid={uid}
+      showUserInfo={!checkUidEq(prevItem, uid)}
       timestamp={dm.timestamp}
-      highlight={
-        userInfo.medal && userInfo.medal.guardLevel
-          ? userInfo.medal.guardLevel > 0
-          : false
-      }
     >
       {content}
     </UserMessage>

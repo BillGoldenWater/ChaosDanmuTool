@@ -8,17 +8,19 @@ import { appCtx } from "../../app/AppCtx";
 import styled from "styled-components";
 import { UserAvatar } from "../userInfo/UserAvatar";
 import { UserInfo } from "../userInfo/UserInfo";
-import { color, font, paddingValue, radius } from "../ThemeCtx";
+import { color, ColorFn, font, paddingValue, radius } from "../ThemeCtx";
 import { formatTime } from "../../utils/FormatUtils";
+import { CommandPacket } from "../../type/rust/command/CommandPacket";
 
-interface UserMessageProps {
-  uid?: string;
+export interface UserMessageProps {
+  uid: string;
+  showUserInfo?: boolean;
   timestamp?: string;
-  highlight?: boolean;
+  forceHighlight?: [ColorFn, ColorFn];
 }
 
 export function UserMessage(props: PropsWithChildren<UserMessageProps>) {
-  const { children, uid, timestamp, highlight } = props;
+  const { children, uid, timestamp, showUserInfo, forceHighlight } = props;
   const hasPrev = uid == null;
 
   const ctx = useContext(appCtx);
@@ -27,10 +29,22 @@ export function UserMessage(props: PropsWithChildren<UserMessageProps>) {
 
   let sider = <></>;
   let msgUserInfo = <></>;
+  let highlight = forceHighlight;
 
-  if (uid) {
-    const userInfo = ctx.getUserInfo(uid);
+  const userInfo = ctx.getUserInfo(uid);
+  const medal = userInfo.medal;
 
+  if (
+    highlight == null &&
+    medal &&
+    medal.guardLevel != null &&
+    medal.isLighted &&
+    medal.guardLevel > 0
+  ) {
+    highlight = [color.bgTheme, color.bgThHover];
+  }
+
+  if (showUserInfo) {
     sider = <UserAvatar userInfo={userInfo} size={"2.25rem"} />;
     msgUserInfo = (
       <MessageUserInfo>
@@ -44,7 +58,7 @@ export function UserMessage(props: PropsWithChildren<UserMessageProps>) {
   }
 
   return (
-    <UserMessageBase hasPrev={hasPrev} highlight={highlight === true}>
+    <UserMessageBase hasPrev={hasPrev} highlight={highlight}>
       {!compact && <MessageSider isAvatar={uid != null}>{sider}</MessageSider>}
       <MessageMain>
         {msgUserInfo}
@@ -86,7 +100,7 @@ const MessageContent = styled.div`
 
 interface UserMessageBaseProps {
   hasPrev: boolean;
-  highlight: boolean;
+  highlight?: [ColorFn, ColorFn];
 }
 
 const UserMessageBase = styled.div<UserMessageBaseProps>`
@@ -94,15 +108,15 @@ const UserMessageBase = styled.div<UserMessageBaseProps>`
   display: flex;
   gap: ${paddingValue.small};
 
-  ${radius.small};
+  ${radius.normal};
 
   ${(p) =>
     p.hasPrev ? `margin-top: calc(-0.5 * ${paddingValue.normal});` : ""};
 
-  background-color: ${(p) => (p.highlight ? color.bgTheme : "transparent")};
+  background-color: ${(p) => (p.highlight ? p.highlight[0] : "transparent")};
 
   &:hover {
-    background-color: ${(p) => (p.highlight ? color.bgThHover : color.bgItem)};
+    background-color: ${(p) => (p.highlight ? p.highlight[1] : color.bgItem)};
   }
 
   & ${MessageTimestamp} {
@@ -114,3 +128,16 @@ const UserMessageBase = styled.div<UserMessageBaseProps>`
     opacity: 1;
   }
 `;
+
+export function checkUidEq(prev?: CommandPacket, uid?: string): boolean {
+  if (prev == null || uid == null) return false;
+
+  if (prev.cmd != "biliBiliCommand") return false;
+  switch (prev.data.cmd) {
+    case "danmuMessage":
+    case "giftMessage":
+      return prev.data.data.uid === uid;
+    default:
+      return false;
+  }
+}
