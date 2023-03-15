@@ -320,28 +320,8 @@ declare global {
 
 type StyleFnProps = { theme: TThemeCtx };
 
-type ColorFn = (p: StyleFnProps) => Property.Color;
-type ColorFns = {
-  theme: ColorFn;
-  thHover: ColorFn;
-
-  bgWindow: ColorFn;
-  bgContent: ColorFn;
-  bgItem: ColorFn;
-  bgHover: ColorFn;
-  bgTheme: ColorFn;
-  bgThHover: ColorFn;
-
-  txt: ColorFn;
-  txtSecond: ColorFn;
-  txtBlack: ColorFn;
-  txtWhite: ColorFn;
-
-  fnInfo: ColorFn;
-  fnSuccess: ColorFn;
-  fnWarn: ColorFn;
-  fnErr: ColorFn;
-};
+export type ColorFn = (p: StyleFnProps) => Property.Color;
+type ColorFns = TPropTo<TThemeConstants, ColorFn>;
 
 export const color: ColorFns = {
   theme: (p) => p.theme.consts.theme,
