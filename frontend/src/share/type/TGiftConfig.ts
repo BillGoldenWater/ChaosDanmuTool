@@ -3,7 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import Immutable from "immutable";
+
 export type TGiftConfig = Map<number, TGiftConfigItem>;
+export type TGiftConfigState = Immutable.Map<number, TGiftConfigItem>;
 
 interface TGiftCountMap {
   num: number;

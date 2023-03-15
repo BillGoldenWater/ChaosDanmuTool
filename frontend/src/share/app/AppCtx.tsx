@@ -14,7 +14,7 @@ import React, {
 import { Config } from "../type/rust/config/Config";
 import { ViewerViewConfig } from "../type/rust/config/frontendConfig/ViewerViewConfig";
 import { getParam } from "../utils/UrlUtils";
-import { TGiftConfig } from "../type/TGiftConfig";
+import { TGiftConfigState } from "../type/TGiftConfig";
 import { ReceiverStatus } from "../type/rust/command/commandPacket/appCommand/receiverStatusUpdate/ReceiverStatus";
 import { ViewerStatus } from "../type/rust/command/commandPacket/appCommand/viewerStatusUpdate/ViewerStatus";
 import {
@@ -71,7 +71,7 @@ export interface TAppCtx {
   getUserInfo: UserInfoGetter;
   path: TAppPath;
 
-  giftConfig: TGiftConfig;
+  giftConfig: TGiftConfigState;
   receiverStatus: ReceiverStatus;
   viewerStatus: ViewerStatus;
 
@@ -90,7 +90,7 @@ export const appCtx = createContext<TAppCtx>({
   }),
   path: new AppPath(defaultConfig),
 
-  giftConfig: new Map(),
+  giftConfig: Immutable.Map(),
   receiverStatus: "close",
   viewerStatus: "close",
 
@@ -118,7 +118,7 @@ export function AppCtxProvider({ firstConfig, children }: Props) {
 
   const [config, setConfig] = useState<Config>(firstConfig);
 
-  const [giftConfig, setGiftConfig] = useState<TGiftConfig>(() => new Map());
+  const [giftConfig, setGiftConfig] = useState<TGiftConfigState>(Immutable.Map);
   const [receiverStatus, setReceiverStatus] = useState<ReceiverStatus>("close");
   const [viewerStatus, setViewerStatus] = useState<ViewerStatus>("close");
   const [userInfoCache, setUserInfoCache] = useState<TUserInfoCache>(
@@ -181,7 +181,7 @@ export function AppCtxProvider({ firstConfig, children }: Props) {
   }, [addListener, removeListener]);
   useEffect(() => {
     function onGiftConfigUpdate(event: GiftConfigUpdateEvent) {
-      setGiftConfig(event.giftConfig);
+      setGiftConfig(Immutable.Map(event.giftConfig));
     }
 
     addListener("giftConfigUpdate", onGiftConfigUpdate);
