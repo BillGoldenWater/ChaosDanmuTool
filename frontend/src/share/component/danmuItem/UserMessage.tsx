@@ -21,7 +21,6 @@ export interface UserMessageProps {
 
 export function UserMessage(props: PropsWithChildren<UserMessageProps>) {
   const { children, uid, timestamp, showUserInfo, forceHighlight } = props;
-  const hasPrev = uid == null;
 
   const ctx = useContext(appCtx);
 
@@ -64,7 +63,7 @@ export function UserMessage(props: PropsWithChildren<UserMessageProps>) {
   }
 
   return (
-    <UserMessageBase hasPrev={hasPrev} highlight={highlight}>
+    <UserMessageBase hasPrev={!showUserInfo} highlight={highlight}>
       {!compact && (
         <MessageSider isAvatar={showUserInfo === true}>{sider}</MessageSider>
       )}
@@ -123,8 +122,7 @@ const UserMessageBase = styled.div<UserMessageBaseProps>`
 
   ${radius.normal};
 
-  ${(p) =>
-    p.hasPrev ? `margin-top: calc(-0.5 * ${paddingValue.normal});` : ""};
+  ${(p) => (p.hasPrev ? "" : `margin-top: ${paddingValue.normal};`)};
 
   background-color: ${(p) => (p.highlight ? p.highlight[0] : "transparent")};
 

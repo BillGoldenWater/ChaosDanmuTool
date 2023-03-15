@@ -4,7 +4,7 @@
  */
 
 import styled from "styled-components";
-import { padding, paddingValue } from "./ThemeCtx";
+import { padding } from "./ThemeCtx";
 import {
   Dispatch,
   SetStateAction,
@@ -74,8 +74,6 @@ const DanmuViewerBase = styled(motion.div)`
   &:hover {
     overflow-y: scroll;
   }
-
-  gap: ${paddingValue.normal};
 `;
 
 const DanmuItemContainer = styled(motion.div)`
