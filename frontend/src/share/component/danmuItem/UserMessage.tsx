@@ -8,7 +8,14 @@ import { appCtx } from "../../app/AppCtx";
 import styled from "styled-components";
 import { UserAvatar } from "../userInfo/UserAvatar";
 import { UserInfo } from "../userInfo/UserInfo";
-import { color, ColorFn, font, paddingValue, radius } from "../ThemeCtx";
+import {
+  color,
+  ColorFn,
+  font,
+  padding,
+  paddingValue,
+  radius,
+} from "../ThemeCtx";
 import { formatTime } from "../../utils/FormatUtils";
 import { CommandPacket } from "../../type/rust/command/CommandPacket";
 
@@ -121,6 +128,7 @@ const UserMessageBase = styled.div<UserMessageBaseProps>`
   gap: ${paddingValue.small};
 
   ${radius.normal};
+  ${padding.small};
 
   ${(p) => (p.hasPrev ? "" : `margin-top: ${paddingValue.normal};`)};
 
