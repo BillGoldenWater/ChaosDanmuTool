@@ -331,6 +331,17 @@ type StyleFnProps = { theme: TThemeCtx };
 export type ColorFn = (p: StyleFnProps) => Property.Color;
 type ColorFns = TPropTo<TThemeConstants, ColorFn>;
 
+export function genColorFn(color: string) {
+  return () => color;
+}
+
+export function genBgAndHover(color: Color) {
+  return [
+    genColorFn(color.hsl().string()),
+    genColorFn(color.lighten(0.5).hsl().string()),
+  ];
+}
+
 export const color: ColorFns = {
   theme: (p) => p.theme.consts.theme,
   thHover: (p) => p.theme.consts.thHover,
