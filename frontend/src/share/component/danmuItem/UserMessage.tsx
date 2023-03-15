@@ -65,7 +65,9 @@ export function UserMessage(props: PropsWithChildren<UserMessageProps>) {
 
   return (
     <UserMessageBase hasPrev={hasPrev} highlight={highlight}>
-      {!compact && <MessageSider isAvatar={uid != null}>{sider}</MessageSider>}
+      {!compact && (
+        <MessageSider isAvatar={showUserInfo === true}>{sider}</MessageSider>
+      )}
       <MessageMain>
         {msgUserInfo}
         <MessageContent>{children}</MessageContent>
@@ -77,7 +79,8 @@ export function UserMessage(props: PropsWithChildren<UserMessageProps>) {
 const MessageSider = styled.div<{ isAvatar: boolean }>`
   display: flex;
 
-  ${(p) => (p.isAvatar ? "" : "align-items: center;")};
+  ${(p) =>
+    p.isAvatar ? "align-items: flex-start;" : "align-items: flex-end;"};
   justify-content: center;
 
   width: 2.5rem;
@@ -85,8 +88,12 @@ const MessageSider = styled.div<{ isAvatar: boolean }>`
 
 const MessageTimestamp = styled.div`
   ${font.dmTs};
+  display: flex;
+  align-items: center;
 
   color: ${color.txtSecond};
+
+  height: 1.5rem;
 `;
 
 const MessageMain = styled.div`
