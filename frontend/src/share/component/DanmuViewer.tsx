@@ -4,7 +4,7 @@
  */
 
 import styled from "styled-components";
-import {padding, paddingValue} from "./ThemeCtx";
+import { padding, paddingValue } from "./ThemeCtx";
 import {
   Dispatch,
   SetStateAction,
@@ -14,15 +14,15 @@ import {
   useRef,
   useState,
 } from "react";
-import {appCtx} from "../app/AppCtx";
-import {BiliBiliMessageEvent} from "../event/AppEventTarget";
-import {CommandPacket} from "../type/rust/command/CommandPacket";
-import {DanmuItem} from "./danmuItem/DanmuItem";
-import {motion, MotionValue, useSpring} from "framer-motion";
-import {maxScrollTop} from "../utils/ElementUtils";
-import {DanmuViewerMaxSize} from "../app/Settings";
+import { appCtx } from "../app/AppCtx";
+import { BiliBiliMessageEvent } from "../event/AppEventTarget";
+import { CommandPacket } from "../type/rust/command/CommandPacket";
+import { DanmuItem } from "./danmuItem/DanmuItem";
+import { motion, MotionValue, useSpring } from "framer-motion";
+import { maxScrollTop } from "../utils/ElementUtils";
+import { DanmuViewerMaxSize } from "../app/Settings";
 import Immutable from "immutable";
-import {useHoverState} from "../hook/useHoverState";
+import { useHoverState } from "../hook/useHoverState";
 
 export function DanmuViewer() {
   const scrollAnimation = true;
@@ -41,7 +41,7 @@ export function DanmuViewer() {
       onHoverStart={setHover.bind(null, true)}
       onHoverEnd={setHover.bind(null, false)}
     >
-      <div/>
+      <div />
       {msgList.map((item, idx, arr) => {
         const prev = idx > 0 ? arr.get(idx - 1) : undefined;
         const next = idx < arr.size - 1 ? arr.get(idx + 1) : undefined;
@@ -50,7 +50,7 @@ export function DanmuViewer() {
             key={item.uuid}
             ref={idx === arr.size - 1 ? setLatestElement : undefined}
           >
-            <DanmuItem item={item} prevItem={prev} nextItem={next}/>
+            <DanmuItem item={item} prevItem={prev} nextItem={next} />
           </DanmuItemContainer>
         );
       })}
