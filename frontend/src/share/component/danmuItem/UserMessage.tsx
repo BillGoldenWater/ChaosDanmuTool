@@ -50,7 +50,7 @@ export function UserMessage(props: PropsWithChildren<UserMessageProps>) {
   }
 
   if (showUserInfo) {
-    sider = <UserAvatar userInfo={userInfo} size={"2.25rem"} />;
+    sider = <UserAvatar userInfo={userInfo} size={"2.5rem"} />;
     msgUserInfo = (
       <MessageUserInfo>
         <UserInfo userInfo={userInfo} showAvatar={compact} />
@@ -80,7 +80,7 @@ const MessageSider = styled.div<{ isAvatar: boolean }>`
 
   ${(p) =>
     p.isAvatar ? "align-items: flex-start;" : "align-items: flex-end;"};
-  justify-content: center;
+  justify-content: ${(p) => (p.isAvatar ? "start" : "center")};
 
   width: 2.5rem;
 `;
@@ -92,7 +92,7 @@ const MessageTimestamp = styled.div`
 
   color: ${color.txtSecond};
 
-  height: 1.5rem;
+  height: min(1rem, 100%);
 `;
 
 const MessageMain = styled.div`
