@@ -12,7 +12,8 @@ use sqlx::{ConnectOptions, Connection, SqliteConnection};
 pub fn gen_options(file_name: PathBuf) -> SqliteConnectOptions {
   let mut options = SqliteConnectOptions::new()
     .filename(file_name)
-    .create_if_missing(true);
+    .create_if_missing(true)
+    .foreign_keys(true);
   options.log_statements(LevelFilter::Trace);
   options
 }
