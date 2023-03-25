@@ -8,7 +8,6 @@ create table if not exists user_info
   uid        text not null
     constraint user_info_pk
       primary key,
-  foreign key (uid) references medal_data (uid),
   name       text,
   userLevel  integer,
 
@@ -24,7 +23,9 @@ create table if not exists user_info
   levelColor text,
   nameColor  text,
 
-  hasMedal   integer
+  hasMedal   integer,
+  
+  foreign key (uid) references medal_data (uid)
 );
 
 create table if not exists medal_info
@@ -44,7 +45,6 @@ create table if not exists medal_data
     constraint medal_data_pk
       primary key,
   targetId    text not null,
-  foreign key (targetId) references medal_info (targetId),
 
   isLighted   integer default 0,
   guardLevel  integer,
@@ -53,5 +53,7 @@ create table if not exists medal_data
   color       integer,
   colorBorder integer,
   colorEnd    integer,
-  colorStart  integer
+  colorStart  integer,
+
+  foreign key (targetId) references medal_info (targetId)
 );
