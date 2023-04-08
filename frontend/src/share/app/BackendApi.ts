@@ -6,7 +6,7 @@
 import { invoke } from "@tauri-apps/api";
 import type { Config } from "../type/rust/config/Config";
 import { UserInfo } from "../type/rust/cache/userInfo/UserInfo";
-import { defaultConfig } from "./Defaults";
+import { defaultConfig, defaultUserInfo } from "./Defaults";
 
 export const backendApiConfigCache = { config: defaultConfig };
 
@@ -77,7 +77,7 @@ export class BackendApi {
 
   async getUserInfo(uid: string): Promise<UserInfo> {
     if (this.isInTauri) {
-      return await invoke("get_user_info", { uid: uid });
+      return (await invoke("get_user_info", { uid: uid })) || defaultUserInfo;
     } else {
       const host = window.location.hostname;
       const port = backendApiConfigCache.config.backend.httpServer.port;
