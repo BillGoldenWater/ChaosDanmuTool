@@ -28,6 +28,7 @@ pub mod extra;
 pub struct DanmuMessage {
   fontsize: i32,
   color: i32,
+  bubble_color: String,
   /// millisecond
   timestamp: String,
   danmu_type: DanmuType,
@@ -58,12 +59,13 @@ impl Default for DanmuMessage {
     Self {
       fontsize: 0,
       color: 0,
-      timestamp: "".to_string(),
+      bubble_color: String::new(),
+      timestamp: String::new(),
       danmu_type: DanmuType::default(),
       emoji_data: None,
       emots: HashMap::new(),
-      content: "".to_string(),
-      uid: "".to_string(),
+      content: String::new(),
+      uid: String::new(),
       is_history: false,
       is_special_type: false,
       count: 1,
@@ -111,6 +113,7 @@ impl DanmuMessageParser {
     self.result.fontsize = meta[2].as_i64().unwrap_or(0) as i32;
     self.result.color = meta[3].as_i64().unwrap_or(0) as i32;
     self.result.timestamp = meta[4].as_u64().unwrap_or(0).to_string();
+    self.result.bubble_color = parse_bubble_color(meta[11].as_str().unwrap_or(""));
     self.result.danmu_type = DanmuType::from_u32(meta[12].as_u64().unwrap_or(0) as u32);
     if !meta[13].is_string() {
       self.result.emoji_data = EmojiData::from_raw(&meta[13]).map_or_else(
@@ -225,5 +228,57 @@ impl DanmuType {
       1 => DanmuType::Emoji,
       _ => DanmuType::Unknown,
     }
+  }
+}
+
+fn parse_bubble_color(raw: &str) -> String {
+  if raw.is_empty() {
+    String::new()
+  } else {
+    raw
+      .split(',')
+      .next()
+      .map_or(Some(""), |it| it.strip_prefix('#'))
+      .map_or(Ok(u64::MAX), |it| u64::from_str_radix(it, 16))
+      .ok()
+      .map_or_else(String::new, |it| {
+        if it == u64::MAX {
+          String::new()
+        } else {
+          // argb to rgba
+          format!("#{:08X}", ((it & 0xFFFFFF) << 8) | (it >> 24))
+        }
+      })
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use crate::command::command_packet::bilibili_command::danmu_message::parse_bubble_color;
+
+  #[test]
+  fn test_parse_empty_bubble_color() {
+    assert_eq!("".to_string(), parse_bubble_color(""));
+  }
+
+  #[test]
+  fn test_parse_unknown_bubble_color() {
+    assert_eq!(
+      "".to_string(),
+      parse_bubble_color("#------,#------,#------")
+    );
+    assert_eq!(
+      "".to_string(),
+      parse_bubble_color("12345678,12345678,12345678")
+    );
+  }
+
+  #[test]
+  fn test_parse_correct_bubble_color() {
+    assert_eq!("#34567812".to_string(), parse_bubble_color("#12345678"));
+    assert_eq!(
+      "#34567812".to_string(),
+      parse_bubble_color("#12345678,#22345678,#32345678")
+    );
   }
 }
