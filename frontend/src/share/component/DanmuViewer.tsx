@@ -17,10 +17,13 @@ import {
 import { appCtx } from "../app/AppCtx";
 import { BiliBiliMessageEvent } from "../event/AppEventTarget";
 import { CommandPacket } from "../type/rust/command/CommandPacket";
-import { DanmuItem } from "./danmuItem/DanmuItem";
+import { DanmuItem, TDanmuItemInfo } from "./danmuItem/DanmuItem";
 import { motion, MotionValue, useSpring } from "framer-motion";
 import { maxScrollTop } from "../utils/ElementUtils";
-import { DanmuViewerMaxSize } from "../app/Settings";
+import {
+  DanmuViewerMaxSize,
+  GiftMergeIntervalInSeconds,
+} from "../app/Settings";
 import Immutable from "immutable";
 import { useHoverState } from "../hook/useHoverState";
 
@@ -29,6 +32,7 @@ export function DanmuViewer() {
 
   const [hover, setHover] = useHoverState();
   const msgList = useMsgList(hover);
+  const { dmList } = useMsgPreProcess(msgList);
   const [setListRef, setLatestElement] = useAutoScroll(
     msgList.size === DanmuViewerMaxSize,
     hover,
@@ -42,15 +46,13 @@ export function DanmuViewer() {
       onHoverEnd={setHover.bind(null, false)}
     >
       <div />
-      {msgList.map((item, idx, arr) => {
-        const prev = idx > 0 ? arr.get(idx - 1) : undefined;
-        const next = idx < arr.size - 1 ? arr.get(idx + 1) : undefined;
+      {dmList.map((info, idx, arr) => {
         return (
           <DanmuItemContainer
-            key={item.uuid}
+            key={info.item.uuid}
             ref={idx === arr.size - 1 ? setLatestElement : undefined}
           >
-            <DanmuItem item={item} prevItem={prev} nextItem={next} />
+            <DanmuItem info={info} />
           </DanmuItemContainer>
         );
       })}
@@ -237,4 +239,133 @@ function useAutoScroll(
   }, [listRef, listScroll]);
 
   return [setListRef, setLatestElement];
+}
+
+function useMsgPreProcess(msgList: Immutable.List<CommandPacket>): {
+  dmList: Immutable.List<TDanmuItemInfo>;
+  activity: number;
+} {
+  const [dmList, setDmList] = useState(Immutable.List<TDanmuItemInfo>);
+  const [activity, setActivity] = useState(0);
+
+  useEffect(() => {
+    const list: TPreProcessMsgItem[] = [];
+
+    // region count gift, check color and process command
+    const giftCounter = new Map<
+      string,
+      { ts: number; prev: TPreProcessMsgItem }
+    >();
+
+    interface TPreProcessMsgItem {
+      info: TDanmuItemInfo | null;
+      uid: string;
+      hasColor: boolean;
+    }
+
+    msgList.forEach((it) => {
+      if (it.cmd !== "biliBiliCommand") return;
+
+      switch (it.data.cmd) {
+        case "danmuMessage": {
+          const dmMsg = it.data.data;
+          const dmInfo = {
+            item: it,
+            mergeNext: false,
+            mergePrev: false,
+            giftNumSum: 0,
+          };
+
+          list.push({
+            info: dmInfo,
+            uid: dmMsg.uid,
+            hasColor: dmMsg.bubbleColor !== "",
+          });
+          break;
+        }
+        case "giftMessage": {
+          const giftMsg = it.data.data;
+          const dmInfo = {
+            item: it,
+            mergeNext: false,
+            mergePrev: false,
+            giftNumSum: giftMsg.num,
+          };
+          const item: TPreProcessMsgItem = {
+            info: dmInfo,
+            uid: giftMsg.uid,
+            hasColor: giftMsg.coinType === "gold",
+          };
+
+          const giftIdentifier = `${giftMsg.uid}:${giftMsg.giftId}`;
+          const ts = Number.parseInt(giftMsg.timestamp);
+
+          const prevGift = giftCounter.get(giftIdentifier);
+          if (prevGift) {
+            if (prevGift.ts > ts - GiftMergeIntervalInSeconds) {
+              // in the interval
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              prevGift.prev.info!.giftNumSum += dmInfo.giftNumSum;
+              item.info = null;
+            }
+            prevGift.ts = ts;
+          } else {
+            giftCounter.set(giftIdentifier, { ts, prev: item });
+          }
+
+          list.push(item);
+          break;
+        }
+        case "activityUpdate": {
+          const activity = it.data.data.activity;
+          setActivity((prev) => (prev !== activity ? activity : prev));
+          break;
+        }
+        case "raw": {
+          list.push({
+            info: {
+              item: it,
+              mergeNext: false,
+              mergePrev: false,
+              giftNumSum: 0,
+            },
+            uid: "",
+            hasColor: false,
+          });
+          break;
+        }
+      }
+    });
+    // endregion
+
+    // region apply merge and unwrap
+    const dmList = list
+      .filter((it) => it.info != null)
+      .map((item, idx, arr) => {
+        if (idx > 0) {
+          const prevItem = arr[idx - 1];
+          if (prevItem.hasColor === item.hasColor && prevItem.uid == item.uid) {
+            if (prevItem.info) prevItem.info.mergeNext = true;
+            if (item.info) item.info.mergePrev = true;
+          }
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          return item.info!;
+        } else {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          return item.info!;
+        }
+      });
+    // endregion
+
+    setDmList((prevList) => {
+      const immutableList = Immutable.List(dmList);
+      if (immutableList.equals(prevList)) {
+        return prevList;
+      } else {
+        return immutableList;
+      }
+    });
+  }, [msgList]);
+
+  return { dmList, activity };
 }

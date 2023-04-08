@@ -5,29 +5,30 @@
 
 import { PropsWithChildren, useContext } from "react";
 import { appCtx } from "../../app/AppCtx";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { UserAvatar } from "../userInfo/UserAvatar";
 import { UserInfo } from "../userInfo/UserInfo";
 import {
+  border,
   color,
-  ColorFn,
   font,
   padding,
   paddingValue,
   radius,
 } from "../ThemeCtx";
 import { formatTime } from "../../utils/FormatUtils";
-import { CommandPacket } from "../../type/rust/command/CommandPacket";
 
 export interface UserMessageProps {
   uid: string;
-  showUserInfo?: boolean;
+  mergePrev: boolean;
+  mergeNext: boolean;
   timestamp?: string;
-  forceHighlight?: [ColorFn, ColorFn];
+  highlightColor: string;
 }
 
 export function UserMessage(props: PropsWithChildren<UserMessageProps>) {
-  const { children, uid, timestamp, showUserInfo, forceHighlight } = props;
+  const { children, uid, timestamp, mergePrev, mergeNext, highlightColor } =
+    props;
 
   const ctx = useContext(appCtx);
 
@@ -35,28 +36,10 @@ export function UserMessage(props: PropsWithChildren<UserMessageProps>) {
 
   let sider = <></>;
   let msgUserInfo = <></>;
-  let highlight = forceHighlight;
 
   const userInfo = ctx.getUserInfo(uid);
-  const medal = userInfo.medal;
 
-  if (
-    highlight == null &&
-    medal &&
-    medal.guardLevel != null &&
-    medal.isLighted &&
-    medal.guardLevel > 0
-  ) {
-    const roomid = ctx.config
-      .get("backend.danmuReceiver.actualRoomidCache")
-      .split("|")[1];
-
-    if (roomid != null && medal.info.anchorRoomid === Number.parseInt(roomid)) {
-      highlight = [color.bgTheme, color.bgThHover];
-    }
-  }
-
-  if (showUserInfo) {
+  if (!mergePrev) {
     sider = <UserAvatar userInfo={userInfo} size={"2.5rem"} />;
     msgUserInfo = (
       <MessageUserInfo>
@@ -70,10 +53,12 @@ export function UserMessage(props: PropsWithChildren<UserMessageProps>) {
   }
 
   return (
-    <UserMessageBase hasPrev={!showUserInfo} highlight={highlight}>
-      {!compact && (
-        <MessageSider isAvatar={showUserInfo === true}>{sider}</MessageSider>
-      )}
+    <UserMessageBase
+      mergePrev={mergePrev}
+      mergeNext={mergeNext}
+      highlightColor={highlightColor}
+    >
+      {!compact && <MessageSider isAvatar={!mergePrev}>{sider}</MessageSider>}
       <MessageMain>
         {msgUserInfo}
         <MessageContent>{children}</MessageContent>
@@ -118,8 +103,9 @@ const MessageContent = styled.div`
 `;
 
 interface UserMessageBaseProps {
-  hasPrev: boolean;
-  highlight?: [ColorFn, ColorFn];
+  mergePrev: boolean;
+  mergeNext: boolean;
+  highlightColor: string;
 }
 
 const UserMessageBase = styled.div<UserMessageBaseProps>`
@@ -128,14 +114,37 @@ const UserMessageBase = styled.div<UserMessageBaseProps>`
   gap: ${paddingValue.small};
 
   ${radius.normal};
+  ${border.normal};
   ${padding.small};
 
-  ${(p) => (p.hasPrev ? "" : `margin-top: ${paddingValue.normal};`)};
+  border-color: ${(p) => p.highlightColor};
+  ${(p) => {
+    if (p.mergePrev) {
+      return css`
+        border-top-width: 0;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+      `;
+    } else {
+      return `margin-top: ${paddingValue.small};`;
+    }
+  }};
+  ${(p) => {
+    if (p.mergeNext) {
+      return css`
+        border-bottom-width: 0;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+      `;
+    } else {
+      return "";
+    }
+  }};
 
-  background-color: ${(p) => (p.highlight ? p.highlight[0] : "transparent")};
+  background-color: transparent;
 
   &:hover {
-    background-color: ${(p) => (p.highlight ? p.highlight[1] : color.bgItem)};
+    background-color: ${color.bgItem};
   }
 
   & ${MessageTimestamp} {
@@ -147,16 +156,3 @@ const UserMessageBase = styled.div<UserMessageBaseProps>`
     opacity: 1;
   }
 `;
-
-export function checkUidEq(prev?: CommandPacket, uid?: string): boolean {
-  if (prev == null || uid == null) return false;
-
-  if (prev.cmd != "biliBiliCommand") return false;
-  switch (prev.data.cmd) {
-    case "danmuMessage":
-    case "giftMessage":
-      return prev.data.data.uid === uid;
-    default:
-      return false;
-  }
-}

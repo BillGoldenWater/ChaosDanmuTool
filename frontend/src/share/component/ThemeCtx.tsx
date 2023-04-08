@@ -34,8 +34,6 @@ export interface TThemeConstants {
   bgHover: Color;
   bgTheme: Color;
   bgThHover: Color;
-  bgWarn: Color;
-  bgWarnHover: Color;
 
   txt: Color;
   txtSecond: Color;
@@ -97,8 +95,6 @@ export async function genConstants(
     bgHover: th(1).saturationl(1).lightness(25),
     bgTheme: th(1).saturationl(100).lightness(20),
     bgThHover: th(1).saturationl(100).lightness(30),
-    bgWarn: fnWarn(1).saturationl(100).lightness(20),
-    bgWarnHover: fnWarn(1).saturationl(100).lightness(30),
 
     txt: wh(1).lightness(95),
     txtSecond: wh(1).lightness(70),
@@ -352,8 +348,6 @@ export const color: ColorFns = {
   bgHover: (p) => p.theme.consts.bgHover,
   bgTheme: (p) => p.theme.consts.bgTheme,
   bgThHover: (p) => p.theme.consts.bgThHover,
-  bgWarn: (p) => p.theme.consts.bgWarn,
-  bgWarnHover: (p) => p.theme.consts.bgWarnHover,
 
   txt: (p) => p.theme.consts.txt,
   txtSecond: (p) => p.theme.consts.txtSecond,

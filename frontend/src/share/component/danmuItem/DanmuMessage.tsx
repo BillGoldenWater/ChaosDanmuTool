@@ -5,11 +5,13 @@
 
 import { TDanmuItemProps } from "./DanmuItem";
 import { DanmuMessage } from "../../type/rust/command/commandPacket/bilibiliCommand/DanmuMessage";
-import { checkUidEq, UserMessage } from "./UserMessage";
+import { UserMessage } from "./UserMessage";
 import styled from "styled-components";
 
 export function DanmuMessage(props: TDanmuItemProps) {
-  const { item, prevItem } = props;
+  const {
+    info: { item, mergePrev, mergeNext },
+  } = props;
 
   const dm = item.data.data as DanmuMessage;
   const showSpecial = false; // todo config
@@ -63,8 +65,12 @@ export function DanmuMessage(props: TDanmuItemProps) {
   return (
     <UserMessage
       uid={uid}
-      showUserInfo={!checkUidEq(prevItem, uid)}
+      mergePrev={mergePrev}
+      mergeNext={mergeNext}
       timestamp={dm.timestamp}
+      highlightColor={
+        dm.bubbleColor !== "" ? dm.bubbleColor.slice(0, -2) : "#00000000"
+      }
     >
       {content}
     </UserMessage>

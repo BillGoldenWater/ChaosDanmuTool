@@ -8,30 +8,31 @@ import { TDanmuItemProps } from "./DanmuItem";
 import { useContext } from "react";
 import { appCtx } from "../../app/AppCtx";
 import { GiftMessage } from "../../type/rust/command/commandPacket/bilibiliCommand/GiftMessage";
-import { checkUidEq, UserMessage, UserMessageProps } from "./UserMessage";
-import { color } from "../ThemeCtx";
+import { UserMessage, UserMessageProps } from "./UserMessage";
 
 export function GiftMessage(props: TDanmuItemProps) {
-  const { item, prevItem } = props;
+  const {
+    info: { item, mergePrev, mergeNext, giftNumSum },
+  } = props;
 
   const ctx = useContext(appCtx);
 
-  const { action, coinType, giftId, giftName, num, price, timestamp, uid } =
-    item.data.data as GiftMessage;
+  const { action, coinType, giftId, giftName, price, timestamp, uid } = item
+    .data.data as GiftMessage;
 
   const giftInfo = ctx.giftConfig.get(giftId);
 
   const icon = giftInfo ? <GiftIcon src={giftInfo.webp} alt={""} /> : <></>;
 
-  let highlight: UserMessageProps["forceHighlight"] = undefined;
+  let highlight: UserMessageProps["highlightColor"] = "#00000000";
   if (coinType === "gold") {
-    highlight = [color.bgWarn, color.bgWarnHover];
+    highlight = "#ffc800";
   }
 
   const priceText =
     coinType === "gold" ? (
       <>
-        ({(price / 100) * num}
+        ({(price / 100) * giftNumSum}
         <CoinGoldIcon />)
       </>
     ) : (
@@ -41,12 +42,12 @@ export function GiftMessage(props: TDanmuItemProps) {
   return (
     <UserMessage
       uid={uid}
-      showUserInfo={!checkUidEq(prevItem, uid)}
+      mergePrev={mergePrev}
+      mergeNext={mergeNext}
       timestamp={timestamp}
-      forceHighlight={highlight}
+      highlightColor={highlight}
     >
-      {action} {icon}
-      {giftName} 共 {num} 个 {priceText}
+      {action} {icon} {giftName} 共 {giftNumSum} 个 {priceText}
     </UserMessage>
   );
 }

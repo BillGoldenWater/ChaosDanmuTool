@@ -7,24 +7,32 @@ import { CommandPacket } from "../../type/rust/command/CommandPacket";
 import { DanmuMessage } from "./DanmuMessage";
 import { GiftMessage } from "./GiftMessage";
 
-export interface TDanmuItemProps {
+export interface TDanmuItemInfo {
   item: CommandPacket;
-  prevItem?: CommandPacket;
-  nextItem?: CommandPacket;
+  mergePrev: boolean;
+  mergeNext: boolean;
+  giftNumSum: number;
+}
+
+export interface TDanmuItemProps {
+  info: TDanmuItemInfo;
 }
 
 export function DanmuItem(props: TDanmuItemProps) {
-  const { item } = props;
+  const {
+    info,
+    info: { item },
+  } = props;
 
   if (item.cmd === "biliBiliCommand") {
     const cmd = item.data;
 
     switch (cmd.cmd) {
       case "danmuMessage": {
-        return <DanmuMessage {...props} />;
+        return <DanmuMessage info={info} />;
       }
       case "giftMessage": {
-        return <GiftMessage {...props} />;
+        return <GiftMessage info={info} />;
       }
       default:
         return <div>Error: {cmd.cmd} is not implemented</div>;

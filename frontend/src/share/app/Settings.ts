@@ -4,6 +4,7 @@
  */
 
 export const DanmuViewerMaxSize = 100;
+export const GiftMergeIntervalInSeconds = 5;
 
 export const MaxUserInfoCacheSize = Math.floor(DanmuViewerMaxSize * 1.2);
 // on hit max size
