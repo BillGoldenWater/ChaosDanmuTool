@@ -7,11 +7,11 @@ use static_object::StaticObject;
 use tauri::{App, AppHandle, Assets, Context, Wry};
 
 use crate::app::app_loop::AppLoop;
+use crate::app::config_manager::ConfigManager;
 use crate::app::internal_api::window::show_main_window;
 use crate::app_context::AppContext;
 use crate::cache::user_info_cache::UserInfoCache;
 use crate::command::command_history_manager::CommandHistoryManager;
-use crate::config::config_manager::ConfigManager;
 use crate::get_cfg;
 use crate::network::command_broadcast_server::CommandBroadcastServer;
 use crate::network::danmu_receiver::danmu_receiver::DanmuReceiver;

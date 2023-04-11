@@ -7,7 +7,7 @@ use chrono::{DateTime, TimeZone, Utc};
 
 use crate::command::command_packet::app_command::AppCommand;
 use crate::command::command_packet::bilibili_command::BiliBiliCommand;
-use crate::config::config::serialize_config;
+use crate::config::serialize_config;
 use crate::utils::brotli_utils;
 
 pub mod app_command;

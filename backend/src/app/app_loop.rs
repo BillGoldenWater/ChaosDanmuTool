@@ -12,7 +12,7 @@ use tokio::{
   time::{sleep, Instant},
 };
 
-use crate::config::config_manager::ConfigManager;
+use crate::app::config_manager::ConfigManager;
 use crate::network::command_broadcast_server::CommandBroadcastServer;
 use crate::network::danmu_receiver::danmu_receiver::DanmuReceiver;
 use crate::utils::process_utils::set_nap;

@@ -24,8 +24,8 @@ use tokio_tungstenite::tungstenite::handshake::derive_accept_key;
 use tokio_tungstenite::tungstenite::protocol::Role;
 use tokio_tungstenite::{MaybeTlsStream, WebSocketStream};
 
+use crate::app::config_manager::modify_cfg;
 use crate::app::internal_api::cache::get_user_info;
-use crate::config::config_manager::modify_cfg;
 use crate::network::command_broadcast_server::CommandBroadcastServer;
 use crate::{dialog_ask, dialog_notice, location_info};
 

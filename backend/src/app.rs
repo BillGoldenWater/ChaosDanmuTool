@@ -11,6 +11,7 @@ use crate::app::internal_api::invoke_handler;
 use crate::utils::async_utils::run_blocking;
 
 pub mod app_loop;
+pub mod config_manager;
 pub mod event;
 pub mod internal_api;
 
