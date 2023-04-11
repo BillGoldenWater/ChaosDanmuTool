@@ -141,7 +141,10 @@ impl DanmuMessageParser {
           },
           |it| it.emots,
         )
-        .unwrap_or_default();
+        .unwrap_or_default()
+        .into_iter()
+        .map(|(k, v)| (k, v.to_https()))
+        .collect();
     }
 
     self

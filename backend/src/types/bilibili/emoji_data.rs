@@ -5,6 +5,8 @@
 
 use serde_json::Value;
 
+use crate::utils::url_utils::url_http_to_https;
+
 #[derive(serde::Serialize, serde::Deserialize, ts_rs::TS, Default, PartialEq, Eq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "../frontend/src/share/type/rust/bilibili/")]
@@ -29,10 +31,15 @@ pub struct EmojiData {
 
 impl EmojiData {
   pub fn parse(str: &str) -> Result<Self, serde_json::Error> {
-    serde_json::from_str(str)
+    serde_json::from_str(str).map(Self::to_https)
   }
 
   pub fn from_raw(raw: &Value) -> Result<Self, serde_json::Error> {
-    serde_json::from_value(raw.clone())
+    serde_json::from_value::<Self>(raw.clone()).map(Self::to_https)
+  }
+
+  pub fn to_https(mut self) -> Self {
+    self.url = url_http_to_https(&self.url);
+    self
   }
 }

@@ -89,6 +89,9 @@ export function parseGiftConfigResponse(response: unknown): TGiftConfig {
   const result: TGiftConfig = new Map();
 
   for (const item of res.list) {
+    if (!item.webp.startsWith("https")) {
+      item.webp = item.webp.replace("http", "https");
+    }
     result.set(item.id, item);
   }
 

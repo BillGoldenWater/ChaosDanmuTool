@@ -17,6 +17,7 @@ use crate::network::command_broadcast_server::CommandBroadcastServer;
 use crate::utils::async_utils::run_blocking;
 use crate::utils::db_utils::create_db;
 use crate::utils::mutex_utils::a_lock;
+use crate::utils::url_utils::url_http_to_https;
 
 pub mod medal_data;
 pub mod medal_info;
@@ -129,8 +130,8 @@ impl UserInfoCache {
           uid,
           name: row.try_get("name").ok(),
           user_level: row.try_get("userLevel").ok(),
-          face: row.try_get("face").ok(),
-          face_frame: row.try_get("faceFrame").ok(),
+          face: row.try_get("face").ok().map(url_http_to_https),
+          face_frame: row.try_get("faceFrame").ok().map(url_http_to_https),
           is_vip: row.try_get("isVip").ok(),
           is_svip: row.try_get("isSvip").ok(),
           is_main_vip: row.try_get("isMainVip").ok(),
