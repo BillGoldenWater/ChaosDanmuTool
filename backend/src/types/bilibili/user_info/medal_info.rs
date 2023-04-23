@@ -22,7 +22,7 @@ pub struct MedalInfo {
   pub medal_name: String,
 
   /// anchor user uid
-  pub target_id: i32,
+  pub target_id: u64,
   // unknown
   // icon_id: i32,
   // special: String,
