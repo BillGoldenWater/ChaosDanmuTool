@@ -23,9 +23,7 @@ create table if not exists user_info
   levelColor text,
   nameColor  text,
 
-  hasMedal   integer,
-  
-  foreign key (uid) references medal_data (uid)
+  hasMedal   integer
 );
 
 create table if not exists medal_info
@@ -53,7 +51,5 @@ create table if not exists medal_data
   color       integer,
   colorBorder integer,
   colorEnd    integer,
-  colorStart  integer,
-
-  foreign key (targetId) references medal_info (targetId)
+  colorStart  integer
 );
