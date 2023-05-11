@@ -4,7 +4,7 @@
  */
 
 import styled from "styled-components";
-import { UserInfo } from "../../type/rust/cache/userInfo/UserInfo";
+import { UserInfo } from "../../type/rust/types/user_info";
 import { defaultUserInfo } from "../../app/Defaults";
 
 interface UserAvatarProps {

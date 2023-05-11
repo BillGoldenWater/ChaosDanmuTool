@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Config } from "../type/rust/config/Config";
+import { Config } from "../type/rust/config";
 
 export interface TAppPathSet {
   set<T>(key: string, value: T): void | Promise<void>;

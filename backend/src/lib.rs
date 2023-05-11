@@ -7,14 +7,11 @@
 #![allow(clippy::new_without_default)]
 
 #[macro_use]
-extern crate lazy_static;
 extern crate core;
 
 pub mod app;
 pub mod app_context;
 pub mod cache;
 pub mod command;
-pub mod config;
 pub mod network;
-pub mod types;
 pub mod utils;

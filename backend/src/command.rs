@@ -4,4 +4,3 @@
  */
 
 pub mod command_history_manager;
-pub mod command_packet;

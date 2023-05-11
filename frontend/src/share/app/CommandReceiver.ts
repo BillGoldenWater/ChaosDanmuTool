@@ -16,12 +16,13 @@ import {
   ViewerStatusUpdateEvent,
 } from "../event/AppEventTarget";
 import { TPartialRequired } from "../type/TPartialRequired";
-import { CommandPacket } from "../type/rust/command/CommandPacket";
-import { AppCommand } from "../type/rust/command/commandPacket/AppCommand";
-import { BiliBiliCommand } from "../type/rust/command/commandPacket/BiliBiliCommand";
+import { CommandPacket } from "../type/rust/command_packet";
+import { AppCommand } from "../type/rust/command_packet/app_command";
+import { BiliBiliCommand } from "../type/rust/command_packet/bilibili_command";
 import { parseGiftConfigResponse } from "../type/TGiftConfig";
 import { backendApiConfigCache } from "./BackendApi";
 import { defaultConfig } from "./Defaults";
+import { deserialize_command_packet } from "chaos_danmu_tool_share";
 
 type Option = {
   host: string;
@@ -128,7 +129,7 @@ export class CommandReceiver {
     const de = this.option.eventTarget.dispatchEvent.bind(
       this.option.eventTarget
     );
-    const commandPack: CommandPacket = JSON.parse(event.data);
+    const commandPack: CommandPacket = deserialize_command_packet(event.data);
 
     switch (commandPack.cmd) {
       case "appCommand": {

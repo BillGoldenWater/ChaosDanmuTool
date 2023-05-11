@@ -3,14 +3,17 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Config } from "../type/rust/config/Config";
-import defaultConfigSource from "../type/rust/config/defaultConfig.json";
-import { ViewerViewConfig } from "../type/rust/config/frontendConfig/ViewerViewConfig";
-import defaultViewerConfigSource from "../type/rust/config/defaultViewerConfig.json";
-import { UserInfo } from "../type/rust/cache/userInfo/UserInfo";
-import defaultUserInfoSource from "../type/rust/cache/userInfo/defaultUserInfo.json";
+import { Config } from "../type/rust/config";
+import {
+  deserialize_config,
+  deserialize_viewer_config,
+  get_default_user_info,
+} from "chaos_danmu_tool_share";
+import { ViewerViewConfig } from "../type/rust/config/frontend_config/viewer_view_config";
+import { UserInfo } from "../type/rust/types/user_info";
 
-export const defaultConfig: Config = defaultConfigSource as Config;
-export const defaultViewerConfig: ViewerViewConfig =
-  defaultViewerConfigSource as ViewerViewConfig;
-export const defaultUserInfo: UserInfo = defaultUserInfoSource as UserInfo;
+export const defaultConfig: Config = deserialize_config("{}") as Config;
+export const defaultViewerConfig: ViewerViewConfig = deserialize_viewer_config(
+  "{}"
+) as ViewerViewConfig;
+export const defaultUserInfo: UserInfo = get_default_user_info() as UserInfo;

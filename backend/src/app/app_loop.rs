@@ -14,7 +14,7 @@ use tokio::{
 
 use crate::app::config_manager::ConfigManager;
 use crate::network::command_broadcast_server::CommandBroadcastServer;
-use crate::network::danmu_receiver::danmu_receiver::DanmuReceiver;
+use crate::network::danmu_receiver::DanmuReceiver;
 use crate::utils::process_utils::set_nap;
 
 type Sender = UnboundedSender<()>;

@@ -7,8 +7,8 @@ import styled from "styled-components";
 import { TDanmuItemProps } from "./DanmuItem";
 import { useContext } from "react";
 import { appCtx } from "../../app/AppCtx";
-import { GiftMessage } from "../../type/rust/command/commandPacket/bilibiliCommand/GiftMessage";
 import { UserMessage, UserMessageProps } from "./UserMessage";
+import { GiftMessage } from "../../type/rust/command_packet/bilibili_command/gift_message";
 
 export function GiftMessage(props: TDanmuItemProps) {
   const {

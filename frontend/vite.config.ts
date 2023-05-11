@@ -1,5 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
+import wasm from "vite-plugin-wasm";
+import topLevelAwait from "vite-plugin-top-level-await";
 
 // https://vitejs.dev/config/
 // noinspection JSUnusedGlobalSymbols
@@ -10,6 +12,8 @@ export default defineConfig(async () => {
   return {
     plugins: [
       react(),
+      wasm(),
+      topLevelAwait(),
       {
         name: "add react-devtools",
         transformIndexHtml(html) {
@@ -26,6 +30,9 @@ export default defineConfig(async () => {
         },
       },
     ],
+    optimizeDeps: {
+      exclude: ["chaos_danmu_tool_share"],
+    },
 
     build: {
       // Tauri supports es2021

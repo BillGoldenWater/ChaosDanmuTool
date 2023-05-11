@@ -6,10 +6,10 @@
 use crate::b_get;
 use bytes::{BufMut, BytesMut};
 use log::info;
+use chaos_danmu_tool_share::utils::brotli_utils::brotli_decompress;
 
 use crate::network::danmu_receiver::data_type::DataType;
 use crate::network::danmu_receiver::op_code::OpCode;
-use crate::utils::brotli_utils::brotli_decompress;
 
 #[derive(Debug)]
 pub struct Packet {

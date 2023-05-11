@@ -4,9 +4,10 @@
  */
 
 import { TDanmuItemProps } from "./DanmuItem";
-import { DanmuMessage } from "../../type/rust/command/commandPacket/bilibiliCommand/DanmuMessage";
+
 import { UserMessage } from "./UserMessage";
 import styled from "styled-components";
+import { DanmuMessage } from "../../type/rust/command_packet/bilibili_command/danmu_message";
 
 export function DanmuMessage(props: TDanmuItemProps) {
   const {
@@ -24,8 +25,7 @@ export function DanmuMessage(props: TDanmuItemProps) {
 
   let content: JSX.Element | (JSX.Element | string)[] = [dm.content];
 
-  for (const emotKey in dm.emots) {
-    const emot = dm.emots[emotKey];
+  for (const emot of dm.emots.values()) {
     content = content.flatMap((it) => {
       if (typeof it === "string") {
         return it

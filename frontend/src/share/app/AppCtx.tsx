@@ -11,12 +11,10 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { Config } from "../type/rust/config/Config";
-import { ViewerViewConfig } from "../type/rust/config/frontendConfig/ViewerViewConfig";
+import { Config } from "../type/rust/config";
+import { ViewerViewConfig } from "../type/rust/config/frontend_config/viewer_view_config";
 import { getParam } from "../utils/UrlUtils";
 import { TGiftConfigState } from "../type/TGiftConfig";
-import { ReceiverStatus } from "../type/rust/command/commandPacket/appCommand/receiverStatusUpdate/ReceiverStatus";
-import { ViewerStatus } from "../type/rust/command/commandPacket/appCommand/viewerStatusUpdate/ViewerStatus";
 import {
   AppEventMap,
   AppEventTarget,
@@ -38,12 +36,14 @@ import {
   MaxUserInfoCacheSize,
   UserInfoCacheRemainingPercent,
 } from "./Settings";
-import { UserInfo } from "../type/rust/cache/userInfo/UserInfo";
 import {
   defaultConfig,
   defaultUserInfo,
   defaultViewerConfig,
 } from "./Defaults";
+import { ReceiverStatus } from "../type/rust/command_packet/app_command/receiver_status_update";
+import { ViewerStatus } from "../type/rust/command_packet/app_command/viewer_status_update";
+import { UserInfo } from "../type/rust/types/user_info";
 
 export interface TAppParams {
   windowId: TWindow["windowId"];
@@ -265,7 +265,7 @@ export function AppCtxProvider({ firstConfig, children }: Props) {
       console.error("fallback to defaultViewerConfig");
       result = defaultViewerConfig;
     }
-    return result;
+    return result as ViewerViewConfig;
   }, [config.frontend.viewerView, params.viewerId]);
 
   const viewerConfigGet: TObjGet<ViewerViewConfig> = useCallback(

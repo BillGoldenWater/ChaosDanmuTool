@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { CommandPacket } from "../../type/rust/command/CommandPacket";
 import { DanmuMessage } from "./DanmuMessage";
 import { GiftMessage } from "./GiftMessage";
+import { CommandPacket } from "../../type/rust/command_packet";
 
 export interface TDanmuItemInfo {
   item: CommandPacket;

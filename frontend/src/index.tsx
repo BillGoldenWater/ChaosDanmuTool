@@ -12,6 +12,9 @@ import { backend } from "./share/app/BackendApi";
 import { AppCtxProvider } from "./share/app/AppCtx";
 import { GlobalStyle, ThemeCtxProvider } from "./share/component/ThemeCtx";
 import React, { StrictMode } from "react";
+import { wasm_init } from "chaos_danmu_tool_share";
+
+wasm_init();
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const root = ReactDOM.createRoot(document.getElementById("root")!);

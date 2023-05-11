@@ -6,7 +6,8 @@
 use static_object::StaticObject;
 use tauri::command;
 
-use crate::cache::user_info_cache::user_info::UserInfo;
+use chaos_danmu_tool_share::types::user_info::UserInfo;
+
 use crate::cache::user_info_cache::UserInfoCache;
 
 #[command]

@@ -16,7 +16,7 @@ import {
 } from "react";
 import { appCtx } from "../app/AppCtx";
 import { BiliBiliMessageEvent } from "../event/AppEventTarget";
-import { CommandPacket } from "../type/rust/command/CommandPacket";
+import { CommandPacket } from "../type/rust/command_packet";
 import { DanmuItem, TDanmuItemInfo } from "./danmuItem/DanmuItem";
 import { motion, MotionValue, useSpring } from "framer-motion";
 import { maxScrollTop } from "../utils/ElementUtils";

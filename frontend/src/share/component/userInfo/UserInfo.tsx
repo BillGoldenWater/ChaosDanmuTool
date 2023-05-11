@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { UserInfo } from "../../type/rust/cache/userInfo/UserInfo";
+import { UserInfo } from "../../type/rust/types/user_info";
 import styled from "styled-components";
 import { UserAvatar } from "./UserAvatar";
 import { color, font, paddingValue } from "../ThemeCtx";

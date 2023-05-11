@@ -45,6 +45,7 @@
     "@iconscout/react-unicons": "1.1.6",
     "@popperjs/core": "2.11.6",
     "@tauri-apps/api": "1.2.0",
+    "chaos_danmu_tool_share": "file:../share/pkg",
     "color": "4.2.3",
     "dot-prop": "7.2.0",
     "framer-motion": "10.0.0",
@@ -83,6 +84,8 @@
     "tslib": "2.5.0",
     "type-fest": "3.6.0",
     "typescript": "4.9.5",
-    "vite": "4.1.4"
+    "vite": "4.1.4",
+    "vite-plugin-top-level-await": "^1.3.0",
+    "vite-plugin-wasm": "^3.2.2"
   }
 }

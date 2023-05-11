@@ -6,12 +6,11 @@
 use tauri::command;
 
 use crate::app::config_manager::{modify_cfg, ConfigManager};
-use crate::config::serialize_config;
 use crate::get_cfg;
 
 #[command]
 pub async fn get_config() -> String {
-  serialize_config(&*get_cfg!(), false)
+  serde_json::to_string(&*get_cfg!()).unwrap()
 }
 
 #[command]

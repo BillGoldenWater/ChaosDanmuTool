@@ -14,7 +14,7 @@ import {
   useState,
 } from "react";
 import { appCtx } from "../app/AppCtx";
-import { Config } from "../type/rust/config/Config";
+import { Config } from "../type/rust/config";
 import Color from "color";
 import { TPropTo } from "../type/TPropTo";
 import { backend } from "../app/BackendApi";

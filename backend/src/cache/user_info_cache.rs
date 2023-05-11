@@ -7,21 +7,17 @@ use log::error;
 use sqlx::{Row, SqliteConnection};
 use static_object::StaticObject;
 use tokio::sync::Mutex;
+use chaos_danmu_tool_share::command_packet::app_command::user_info_update::UserInfoUpdate;
+use chaos_danmu_tool_share::types::user_info::medal_data::MedalData;
+use chaos_danmu_tool_share::types::user_info::medal_info::MedalInfo;
+use chaos_danmu_tool_share::types::user_info::UserInfo;
+use chaos_danmu_tool_share::utils::url_utils::url_http_to_https;
 
 use crate::app_context::AppContext;
-use crate::cache::user_info_cache::medal_data::MedalData;
-use crate::cache::user_info_cache::medal_info::MedalInfo;
-use crate::cache::user_info_cache::user_info::UserInfo;
-use crate::command::command_packet::app_command::user_info_update::UserInfoUpdate;
 use crate::network::command_broadcast_server::CommandBroadcastServer;
 use crate::utils::async_utils::run_blocking;
 use crate::utils::db_utils::create_db;
 use crate::utils::mutex_utils::a_lock;
-use crate::utils::url_utils::url_http_to_https;
-
-pub mod medal_data;
-pub mod medal_info;
-pub mod user_info;
 
 static FILE_NAME: &str = "userInfo.sqlite";
 

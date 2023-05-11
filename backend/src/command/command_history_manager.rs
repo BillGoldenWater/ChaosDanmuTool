@@ -5,12 +5,13 @@
 
 use chrono::Utc;
 use log::error;
+use sqlx::sqlite::SqliteRow;
 use sqlx::{QueryBuilder, Row, SqliteConnection};
 use tokio::sync::Mutex;
+use chaos_danmu_tool_share::command_packet;
+use chaos_danmu_tool_share::command_packet::CommandPacket;
 
 use crate::app_context::AppContext;
-use crate::command::command_packet;
-use crate::command::command_packet::CommandPacket;
 use crate::utils::async_utils::run_blocking;
 use crate::utils::db_utils::create_db;
 use crate::utils::mutex_utils::a_lock;
@@ -180,7 +181,7 @@ create index if not exists command_history_timestamp_index
     // endregion
 
     let result = query
-      .map(|row| {
+      .map(|row: SqliteRow| {
         let item: sqlx::Result<&str> = row.try_get::<&str, &str>("content");
         if let Ok(item) = item {
           let item: serde_json::Result<CommandPacket> = serde_json::from_str(item);

@@ -4,9 +4,10 @@
  */
 
 import { invoke } from "@tauri-apps/api";
-import type { Config } from "../type/rust/config/Config";
-import { UserInfo } from "../type/rust/cache/userInfo/UserInfo";
+import type { Config } from "../type/rust/config";
+import { UserInfo } from "../type/rust/types/user_info";
 import { defaultConfig, defaultUserInfo } from "./Defaults";
+import { deserialize_config } from "chaos_danmu_tool_share";
 
 export const backendApiConfigCache = { config: defaultConfig };
 
@@ -41,7 +42,7 @@ export class BackendApi {
 
   async getConfig() {
     if (this.isInTauri) {
-      return JSON.parse(await invoke("get_config")) as Config;
+      return deserialize_config(await invoke("get_config"));
     } else {
       return defaultConfig;
     }

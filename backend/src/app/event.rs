@@ -14,7 +14,7 @@ use crate::cache::user_info_cache::UserInfoCache;
 use crate::command::command_history_manager::CommandHistoryManager;
 use crate::get_cfg;
 use crate::network::command_broadcast_server::CommandBroadcastServer;
-use crate::network::danmu_receiver::danmu_receiver::DanmuReceiver;
+use crate::network::danmu_receiver::DanmuReceiver;
 use crate::network::http_server::HttpServer;
 use crate::utils::debug_utils::init_logger;
 use crate::utils::panic_utils::setup_panic_hook;

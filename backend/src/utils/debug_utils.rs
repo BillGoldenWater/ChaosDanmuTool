@@ -11,6 +11,7 @@ use std::path::PathBuf;
 use fern::colors::ColoredLevelConfig;
 use fern::FormatCallback;
 use log::{LevelFilter, Record};
+use once_cell::sync::Lazy;
 
 use crate::app_context::AppContext;
 use crate::utils::gen_utils::gen_time_with_uuid;
@@ -70,9 +71,7 @@ fn create_file_dispatch(file: File) -> fern::Dispatch {
     .chain(file)
 }
 
-lazy_static! {
-  static ref LOG_COLORS: ColoredLevelConfig = ColoredLevelConfig::default();
-}
+static LOG_COLORS: Lazy<ColoredLevelConfig> = Lazy::new(ColoredLevelConfig::default);
 
 fn format_log(out: FormatCallback, message: &Arguments, record: &Record, target: LogTarget) {
   let prefix = format!(

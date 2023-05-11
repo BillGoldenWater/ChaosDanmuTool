@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { MedalData } from "../../type/rust/cache/userInfo/MedalData";
+import { MedalData } from "../../type/rust/types/user_info/medal_data";
 import styled, { css } from "styled-components";
 import { borderValue, color, font, radius, themeCtx } from "../ThemeCtx";
 import { Property } from "csstype";

@@ -7,7 +7,7 @@ use static_object::StaticObject;
 use tauri::command;
 
 use crate::dialog_notice;
-use crate::network::danmu_receiver::danmu_receiver::DanmuReceiver;
+use crate::network::danmu_receiver::DanmuReceiver;
 
 #[command]
 pub async fn connect_room() {

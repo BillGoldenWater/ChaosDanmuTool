@@ -12,10 +12,10 @@ use log::{error, info};
 use static_object::StaticObject;
 use tauri::api::file::read_string;
 use tokio::sync::{Mutex, MutexGuard};
+use chaos_danmu_tool_share::command_packet::app_command::config_update::ConfigUpdate;
+use chaos_danmu_tool_share::config::Config;
 
 use crate::app_context::AppContext;
-use crate::command::command_packet::app_command::config_update::ConfigUpdate;
-use crate::config::{serialize_config, Config};
 use crate::network::command_broadcast_server::CommandBroadcastServer;
 use crate::utils::async_utils::run_blocking;
 use crate::utils::immutable_utils::Immutable;
@@ -83,7 +83,7 @@ impl ConfigManager {
     info!("save config");
     let result = fs::write(
       self.config_file_path.as_path(),
-      serialize_config(&*a_lock(&self.config).await, true),
+      a_lock(&self.config).await.to_string(),
     );
     if let Err(err) = result {
       error!("failed to write config file\n{:#?}", err);

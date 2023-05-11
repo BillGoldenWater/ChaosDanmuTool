@@ -6,6 +6,7 @@
 use std::time::Duration;
 
 use log::error;
+use once_cell::sync::Lazy;
 use tokio::{
   sync::{Mutex, MutexGuard},
   time::timeout,
@@ -15,9 +16,7 @@ use crate::app_context::AppContext;
 use crate::utils::async_utils::run_blocking;
 use crate::utils::trace_utils::print_trace;
 
-lazy_static! {
-  static ref TIMEOUT_MILLIS: u64 = AppContext::i().args.lock_timeout_millis;
-}
+static TIMEOUT_MILLIS: Lazy<u64> = Lazy::new(|| AppContext::i().args.lock_timeout_millis);
 
 pub fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
   lock_custom_timeout(mutex, *TIMEOUT_MILLIS)
