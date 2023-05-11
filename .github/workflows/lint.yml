@@ -6,6 +6,10 @@ on:
       - dev
   workflow_dispatch:
 
+concurrency:
+  group: "lint"
+  cancel-in-progress: true
+
 jobs:
   lint:
     strategy:
