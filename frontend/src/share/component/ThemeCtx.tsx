@@ -18,7 +18,12 @@ import { Config } from "../type/rust/config";
 import Color from "color";
 import { TPropTo } from "../type/TPropTo";
 import { backend } from "../app/BackendApi";
-import { createGlobalStyle, css, ThemeProvider } from "styled-components";
+import {
+  createGlobalStyle,
+  css,
+  ExecutionContext,
+  ThemeProvider,
+} from "styled-components";
 import { Property } from "csstype";
 import { defaultConfig } from "../app/Defaults";
 
@@ -322,7 +327,12 @@ declare global {
   }
 }
 
-type StyleFnProps = { theme: TThemeCtx };
+type StyleFnProps = ExecutionContext & {
+  theme: {
+    [key: string]: unknown;
+    consts?: TThemeCtx["consts"];
+  };
+};
 
 export type ColorFn = (p: StyleFnProps) => Property.Color;
 type ColorFns = TPropTo<TThemeConstants, ColorFn>;
@@ -338,27 +348,29 @@ export function genBgAndHover(color: Color) {
   ];
 }
 
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 export const color: ColorFns = {
-  theme: (p) => p.theme.consts.theme,
-  thHover: (p) => p.theme.consts.thHover,
+  theme: (p) => p.theme.consts!.theme,
+  thHover: (p) => p.theme.consts!.thHover,
 
-  bgWindow: (p) => p.theme.consts.bgWindow,
-  bgContent: (p) => p.theme.consts.bgContent,
-  bgItem: (p) => p.theme.consts.bgItem,
-  bgHover: (p) => p.theme.consts.bgHover,
-  bgTheme: (p) => p.theme.consts.bgTheme,
-  bgThHover: (p) => p.theme.consts.bgThHover,
+  bgWindow: (p) => p.theme.consts!.bgWindow,
+  bgContent: (p) => p.theme.consts!.bgContent,
+  bgItem: (p) => p.theme.consts!.bgItem,
+  bgHover: (p) => p.theme.consts!.bgHover,
+  bgTheme: (p) => p.theme.consts!.bgTheme,
+  bgThHover: (p) => p.theme.consts!.bgThHover,
 
-  txt: (p) => p.theme.consts.txt,
-  txtSecond: (p) => p.theme.consts.txtSecond,
-  txtBlack: (p) => p.theme.consts.txtBlack,
-  txtWhite: (p) => p.theme.consts.txtWhite,
+  txt: (p) => p.theme.consts!.txt,
+  txtSecond: (p) => p.theme.consts!.txtSecond,
+  txtBlack: (p) => p.theme.consts!.txtBlack,
+  txtWhite: (p) => p.theme.consts!.txtWhite,
 
-  fnInfo: (p) => p.theme.consts.fnInfo,
-  fnSuccess: (p) => p.theme.consts.fnSuccess,
-  fnWarn: (p) => p.theme.consts.fnWarn,
-  fnErr: (p) => p.theme.consts.fnErr,
+  fnInfo: (p) => p.theme.consts!.fnInfo,
+  fnSuccess: (p) => p.theme.consts!.fnSuccess,
+  fnWarn: (p) => p.theme.consts!.fnWarn,
+  fnErr: (p) => p.theme.consts!.fnErr,
 };
+/* eslint-enable @typescript-eslint/no-non-null-assertion */
 
 const shadowTransition = css`
   transition: box-shadow 0.1s ease-out;
