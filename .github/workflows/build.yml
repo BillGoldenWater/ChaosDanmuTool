@@ -20,10 +20,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: before build
-        if: success()
-        run: node scripts/beforeBuild.mjs
-
       - name: build
         if: success()
         env:
@@ -32,7 +28,7 @@ jobs:
           APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
           APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-        run: node scripts/build.mjs
+        run: cargo make ci-build
 
       - name: copyArtifacts.mjs
         if: success()

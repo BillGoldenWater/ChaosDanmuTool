@@ -5,10 +5,6 @@ inputs:
     description: "require cache or not"
     required: false
     default: "true"
-  rust:
-    description: "init rust toolchain"
-    required: false
-    default: "true"
 
 runs:
   using: "composite"
@@ -22,23 +18,12 @@ runs:
       uses: ./.github/actions/doCache
       if: inputs.requireCache == 'true'
 
-    - name: install Rust stable
-      uses: actions-rs/toolchain@v1
-      if: inputs.rust == 'true'
-      with:
-        toolchain: stable
-
     - name: install dependencies (ubuntu only)
       uses: awalsh128/cache-apt-pkgs-action@latest
-      if: (matrix.platform == 'ubuntu-latest') && (inputs.rust == 'true')
+      if: (matrix.platform == 'ubuntu-latest') && (inputs.requireCache == 'true')
       with:
         packages: libgtk-3-dev webkit2gtk-4.0 libappindicator3-dev librsvg2-dev patchelf
         version: 1.0
 
-    - name: yarn install
-      run: cd frontend && yarn install
-      shell: "bash"
-
-    - name: mkdir dist
-      run: mkdir frontend/dist
-      shell: "bash"
+    - uses: davidB/rust-cargo-make@v1
+      if: inputs.requireCache == 'true'

@@ -1,0 +1,149 @@
+[env]
+CARGO_MAKE_EXTEND_WORKSPACE_MAKEFILE = true
+CARGO_REGISTRIES_CRATES_IO_PROTOCOL = "sparse"
+
+[config]
+default_to_workspace = false
+skip_core_tasks = true
+
+# region setup
+[tasks.setup]
+dependencies = ["setup-rustup-target", "setup-rustup-target-wasm", "setup-rustup-toolchain-nightly"]
+
+[tasks.setup-rustup-toolchain-nightly]
+command = "rustup"
+args = ["toolchain", "install", "nightly"]
+
+[tasks.setup-rustup-target.mac]
+command = "rustup"
+args = ["target", "add", "x86_64-apple-darwin", "aarch64-apple-darwin"]
+
+[tasks.setup-rustup-target.linux]
+command = "rustup"
+args = ["target", "add", "x86_64-unknown-linux-gnu"]
+
+[tasks.setup-rustup-target.windows]
+command = "rustup"
+args = ["target", "add", "x86_64-pc-windows-msvc"]
+
+[tasks.setup-rustup-target-wasm]
+command = "rustup"
+args = ["target", "add", "wasm32-unknown-unknown"]
+# endregion
+
+# region frontend
+[tasks.build-frontend]
+cwd = "./frontend"
+script_runner = "@shell"
+script = """
+yarn build
+"""
+
+[tasks.init-frontend]
+dependencies = ["clean-frontend"]
+cwd = "./frontend"
+script_runner = "@shell"
+script = """
+yarn --check-files
+mkdir dist
+"""
+
+[tasks.clean-frontend]
+cwd = "./frontend"
+ignore_errors = true
+script_runner = "@shell"
+script = """
+rm -rf node_modules
+rm -rf dist
+"""
+# endregion
+
+# region share
+[tasks.build-share]
+dependencies = ["clean-share"]
+install_crate = { crate_name = "wasm-pack", binary = "wasm-pack", test_arg = ["--help"] }
+install_crate_args = ["--no-default-features"]
+cwd = "./share"
+command = "wasm-pack"
+args = ["build"]
+
+[tasks.clean-share]
+ignore_errors = true
+cwd = "./share"
+script_runner = "@shell"
+script = """
+rm -rf pkg
+"""
+# endregion
+
+# region ts-binding
+[tasks.gen-ts-binding]
+dependencies = ["clean-ts-binding"]
+install_crate = { crate_name = "type_exporter", binary = "type_exporter", install_command = "+nightly", test_arg = ["--help"], force = false }
+install_crate_args = ["install", "--git", "https://github.com/BillGoldenWater/type_exporter"]
+env = { "RUST_LOG" = "info" }
+command = "type_exporter"
+args = ["-i", "share", "-o", "frontend/src/share/type/rust"]
+
+[tasks.clean-ts-binding]
+ignore_errors = true
+script_runner = "@shell"
+script = """
+rm -rf frontend/src/share/type/rust
+mkdir frontend/src/share/type/rust
+"""
+# endregion
+
+# region ci
+# region lint
+[tasks.ci-lint]
+dependencies = ["setup", "build-share", "init-frontend", "gen-ts-binding", "build-frontend", "ci-lint-clippy"]
+
+[tasks.ci-lint-clippy.mac]
+command = "cargo"
+args = ["clippy", "-r", "--target", "x86_64-apple-darwin", "--", "-Dwarnings"]
+
+[tasks.ci-lint-clippy.linux]
+command = "cargo"
+args = ["clippy", "-r", "--target", "x86_64-unknown-linux-gnu", "--", "-Dwarnings"]
+
+[tasks.ci-lint-clippy.windows]
+command = "cargo"
+args = ["clippy", "-r", "--target", "x86_64-pc-windows-msvc", "--", "-Dwarnings"]
+# endregion
+
+# region build
+[tasks.ci-build]
+dependencies = ["setup", "build-share", "init-frontend", "gen-ts-binding"]
+install_crate = "tauri-cli"
+run_task = [{ name = "ci-build-x86" }]
+
+[tasks.ci-build.mac]
+run_task = [{ name = "ci-build-x86" }, { name = "ci-build-arm" }]
+
+[tasks.ci-build-x86.mac]
+command = "cargo"
+args = ["tauri", "build", "-t", "x86_64-apple-darwin"]
+
+[tasks.ci-build-arm.mac]
+command = "cargo"
+args = ["tauri", "build", "-t", "aarch64-apple-darwin"]
+
+[tasks.ci-build-x86.linux]
+command = "cargo"
+args = ["tauri", "build", "-t", "x86_64-unknown-linux-gnu"]
+
+[tasks.ci-build-x86.windows]
+command = "cargo"
+args = ["tauri", "build", "-t", "x86_64-pc-windows-msvc", "-b nsis"]
+# endregion
+# endregion
+
+# region clean
+[tasks.clean]
+dependencies = ["clean-share", "clean-frontend", "clean-ts-binding", "clean-cargo"]
+
+[tasks.clean-cargo]
+command = "cargo"
+args = ["clean"]
+# endregion

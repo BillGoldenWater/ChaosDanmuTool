@@ -115,19 +115,11 @@ async function main() {
       break;
     }
     case "win32": {
-      const tauriConfig = JSON.parse(
-        (
-          await fs.readFile(path.join(settings.backendDir, "tauri.conf.json"))
-        ).toString()
-      );
-      // noinspection JSUnresolvedVariable
-      const wL = tauriConfig?.tauri?.bundle?.windows?.wix?.language || "en-US";
-
       await copy("windows", [
         {
           versionInfo: `x86_64-pc-windows-msvc|windows-x86_64|${version}`,
-          pkgFile: `msi/Chaos Danmu Tool_${version}_x64_${wL}.msi|msi`,
-          updatePkgFile: `msi/Chaos Danmu Tool_${version}_x64_${wL}.msi.zip|zip`,
+          pkgFile: `nsis/Chaos Danmu Tool_${version}_x64-setup.exe|exe`,
+          updatePkgFile: `nsis/Chaos Danmu Tool_${version}_x64-setup.nsis.zip|zip`,
         },
       ]);
       break;

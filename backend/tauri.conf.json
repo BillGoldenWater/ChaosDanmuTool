@@ -42,6 +42,10 @@
         "wix": {
           "language": "zh-CN",
           "license": "../COPYING"
+        },
+        "nsis": {
+          "displayLanguageSelector": true,
+          "license": "../COPYING"
         }
       },
       "deb": {

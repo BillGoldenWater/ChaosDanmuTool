@@ -22,10 +22,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      #      - name: test build frontend
-      #        if: success()
-      #        run: cd frontend && yarn build
-
-      - name: backend lint
+      - name: lint
         if: success()
-        run: node scripts/backendLint.mjs
+        run: cargo make ci-lint

@@ -144,16 +144,16 @@ export function gen() {
   const yarnPath = execCommand("yarn cache dir").toString().trim();
 
   const yarnHash = getHash("frontend/yarn.lock");
-  const cargoLockHash = getHash("backend/Cargo.lock");
+  const cargoLockHash = getHash("Cargo.lock");
 
   const cargoBinHash = getHash(
     `${os.homedir()}/.cargo/.crates.toml`,
     `${os.homedir()}/.cargo/.crates2.json`
   );
 
-  purgeTarget("backend/target");
+  purgeTarget("target");
   const backendHash = getHashDir("backend/src");
-  const cargoTargetSize = dirSize("backend/target");
+  const cargoTargetSize = dirSize("target");
 
   const { platform } = process;
 
@@ -190,7 +190,7 @@ export function gen() {
     },
     {
       id: "cargo-target",
-      paths: ["backend/target/"],
+      paths: ["target/"],
       ...genKeys(
         "cargo-target",
         platform,
