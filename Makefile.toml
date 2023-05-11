@@ -1,6 +1,7 @@
 [env]
 CARGO_MAKE_EXTEND_WORKSPACE_MAKEFILE = true
 CARGO_REGISTRIES_CRATES_IO_PROTOCOL = "sparse"
+CARGO_TERM_COLOR = "always"
 
 [config]
 default_to_workspace = false
