@@ -25,9 +25,6 @@ app-icon.png
 backend/target
 share/target
 
-# cargo lock
-**/Cargo.lock
-
 # generated code
 frontend/src/share/type/rust
 share/pkg
