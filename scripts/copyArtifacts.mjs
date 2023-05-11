@@ -32,13 +32,7 @@ async function copy(platform, buildInfos) {
     // endregion
 
     // region construct path
-    const bundleDirPath = path.join(
-      "backend",
-      "target",
-      target,
-      "release",
-      "bundle"
-    );
+    const bundleDirPath = path.join("target", target, "release", "bundle");
 
     const pkgPath = path.join(bundleDirPath, ...pkgFilePath.split("/"));
     const updatePkgPath = path.join(
