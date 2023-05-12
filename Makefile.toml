@@ -122,9 +122,8 @@ args = ["clippy", "-r", "--target", "x86_64-pc-windows-msvc", "--", "-Dwarnings"
 
 # region build
 [tasks.ci-build]
-dependencies = ["setup", "build-share", "init-frontend", "gen-ts-binding"]
+dependencies = ["setup", "build-share", "init-frontend", "gen-ts-binding", "ci-build-x86", "ci-build-arm"]
 install_crate = { crate_name = "tauri-cli", force = false }
-run_task = [{ name = "ci-build-x86" }, { name = "ci-build-arm" }]
 
 [tasks.ci-build-x86.mac]
 command = "cargo"
