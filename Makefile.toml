@@ -117,9 +117,6 @@ args = ["clippy", "-r", "--target", "x86_64-pc-windows-msvc", "--", "-Dwarnings"
 [tasks.ci-build]
 dependencies = ["setup", "build-share", "init-frontend", "gen-ts-binding"]
 install_crate = "tauri-cli"
-run_task = [{ name = "ci-build-x86" }]
-
-[tasks.ci-build.mac]
 run_task = [{ name = "ci-build-x86" }, { name = "ci-build-arm" }]
 
 [tasks.ci-build-x86.mac]
@@ -134,9 +131,13 @@ args = ["tauri", "build", "-t", "aarch64-apple-darwin"]
 command = "cargo"
 args = ["tauri", "build", "-t", "x86_64-unknown-linux-gnu"]
 
+[tasks.ci-build-arm.linux]
+
 [tasks.ci-build-x86.windows]
 command = "cargo"
-args = ["tauri", "build", "-t", "x86_64-pc-windows-msvc", "-b nsis"]
+args = ["tauri", "build", "-t", "x86_64-pc-windows-msvc", "-b", "nsis"]
+
+[tasks.ci-build-arm.windows]
 # endregion
 # endregion
 
