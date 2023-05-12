@@ -135,7 +135,7 @@ args = ["tauri", "build", "-t", "x86_64-unknown-linux-gnu"]
 
 [tasks.ci-build-x86.windows]
 command = "cargo"
-args = ["tauri", "build", "-t", "x86_64-pc-windows-msvc", "-b", "nsis"]
+args = ["tauri", "build", "-t", "x86_64-pc-windows-msvc", "-b", "nsis,updater"]
 
 [tasks.ci-build-arm.windows]
 # endregion
