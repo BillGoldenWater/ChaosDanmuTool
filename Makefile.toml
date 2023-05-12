@@ -16,7 +16,7 @@ skip_crate_env_info = true
 
 # region setup
 [tasks.setup]
-dependencies = ["setup-rustup-target", "setup-rustup-target-wasm"]
+dependencies = ["setup-rustup-toolchain-nightly", "setup-rustup-target", "setup-rustup-target-wasm"]
 
 [tasks.setup-rustup-toolchain-nightly]
 command = "rustup"
