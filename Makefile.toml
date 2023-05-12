@@ -9,7 +9,7 @@ skip_core_tasks = true
 
 # region setup
 [tasks.setup]
-dependencies = ["setup-rustup-target", "setup-rustup-target-wasm", "setup-rustup-toolchain-nightly"]
+dependencies = ["setup-rustup-target", "setup-rustup-target-wasm"]
 
 [tasks.setup-rustup-toolchain-nightly]
 command = "rustup"
