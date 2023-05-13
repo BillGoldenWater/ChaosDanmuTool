@@ -149,9 +149,12 @@ args = ["tauri", "build", "-t", "x86_64-pc-windows-msvc", "-b", "nsis,updater"]
 
 # region clean
 [tasks.clean]
-dependencies = ["clean-share", "clean-frontend", "clean-ts-binding", "clean-cargo"]
+dependencies = ["clean-other", "clean-cargo"]
 
 [tasks.clean-cargo]
 command = "cargo"
 args = ["clean"]
+
+[tasks.clean-other]
+dependencies = ["clean-share", "clean-frontend", "clean-ts-binding"]
 # endregion
