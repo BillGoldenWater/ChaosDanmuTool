@@ -102,6 +102,18 @@ mkdir frontend/src/share/type/rust
 """
 # endregion
 
+# region clean
+[tasks.clean]
+dependencies = ["clean-other", "clean-cargo"]
+
+[tasks.clean-cargo]
+command = "cargo"
+args = ["clean"]
+
+[tasks.clean-other]
+dependencies = ["clean-share", "clean-frontend", "clean-ts-binding"]
+# endregion
+
 # region ci
 # region lint
 [tasks.ci-lint]
@@ -145,16 +157,4 @@ args = ["tauri", "build", "-t", "x86_64-pc-windows-msvc", "-b", "nsis,updater"]
 
 [tasks.ci-build-arm.windows]
 # endregion
-# endregion
-
-# region clean
-[tasks.clean]
-dependencies = ["clean-other", "clean-cargo"]
-
-[tasks.clean-cargo]
-command = "cargo"
-args = ["clean"]
-
-[tasks.clean-other]
-dependencies = ["clean-share", "clean-frontend", "clean-ts-binding"]
 # endregion
