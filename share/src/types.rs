@@ -3,5 +3,5 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-pub mod user_info;
 pub mod bilibili;
+pub mod user_info;

@@ -3,15 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-use log::error;
-use sqlx::{Row, SqliteConnection};
-use static_object::StaticObject;
-use tokio::sync::Mutex;
 use chaos_danmu_tool_share::command_packet::app_command::user_info_update::UserInfoUpdate;
 use chaos_danmu_tool_share::types::user_info::medal_data::MedalData;
 use chaos_danmu_tool_share::types::user_info::medal_info::MedalInfo;
 use chaos_danmu_tool_share::types::user_info::UserInfo;
 use chaos_danmu_tool_share::utils::url_utils::url_http_to_https;
+use log::error;
+use sqlx::{Row, SqliteConnection};
+use static_object::StaticObject;
+use tokio::sync::Mutex;
 
 use crate::app_context::AppContext;
 use crate::network::command_broadcast_server::CommandBroadcastServer;

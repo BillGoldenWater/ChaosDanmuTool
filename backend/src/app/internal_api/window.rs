@@ -3,10 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+use chaos_danmu_tool_share::command_packet::app_command::viewer_status_update::{
+  ViewerStatus, ViewerStatusUpdate,
+};
 use static_object::StaticObject;
 use tauri::{command, Manager, WindowEvent, Wry};
 use tokio::sync::RwLock;
-use chaos_danmu_tool_share::command_packet::app_command::viewer_status_update::{ViewerStatusUpdate, ViewerStatus};
 
 use crate::app::config_manager::{modify_cfg, ConfigManager};
 use crate::get_cfg;

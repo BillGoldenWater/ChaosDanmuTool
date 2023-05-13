@@ -6,8 +6,8 @@
 use log::error;
 use serde_json::Value;
 
-use crate::types::user_info::medal_info::MedalInfo;
 use crate::types::bilibili::user_info::medal_info::MedalInfo as BiliBiliMedalInfo;
+use crate::types::user_info::medal_info::MedalInfo;
 use crate::user_info_apply_updates;
 
 #[derive(serde::Serialize, serde::Deserialize, Default, PartialEq, Eq, Debug, Clone)]
