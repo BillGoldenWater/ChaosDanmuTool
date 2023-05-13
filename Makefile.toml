@@ -75,6 +75,14 @@ cwd = "./share"
 command = "wasm-pack"
 args = ["build"]
 
+[tasks.build-share-update]
+dependencies = ["build-share"]
+cwd = "./frontend"
+script_runner = "@shell"
+script = """
+yarn upgrade chaos_danmu_tool_share
+"""
+
 [tasks.clean-share]
 ignore_errors = true
 cwd = "./share"
