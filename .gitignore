@@ -17,7 +17,7 @@ dist-ssr
 .ChaosDanmuToolOld
 
 # dev file
-devHome
+devHome*
 test.sqlite
 app-icon.png
 
