@@ -1,0 +1,7 @@
+message DMv2 {
+  optional UserInfo user_info = 20;
+}
+
+message UserInfo {
+  optional string face_url = 4;
+}

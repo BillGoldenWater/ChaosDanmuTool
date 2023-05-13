@@ -405,6 +405,7 @@ dependencies = [
 name = "chaos_danmu_tool_share"
 version = "0.10.0"
 dependencies = [
+ "base64 0.21.0",
  "brotli",
  "chrono",
  "console_error_panic_hook",
@@ -412,6 +413,7 @@ dependencies = [
  "js-sys",
  "log",
  "once_cell",
+ "quick-protobuf",
  "serde",
  "serde-wasm-bindgen",
  "serde_json",
@@ -2649,6 +2651,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2b63bdb0cd06f1f4dedf69b254734f9b45af66e4a031e42a7480257d9898b435"
 dependencies = [
  "unicode-ident",
+]
+
+[[package]]
+name = "quick-protobuf"
+version = "0.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9d6da84cc204722a989e01ba2f6e1e276e190f22263d0cb6ce8526fcdb0d2e1f"
+dependencies = [
+ "byteorder",
 ]
 
 [[package]]

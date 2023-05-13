@@ -63,6 +63,7 @@ impl<'de> Deserialize<'de> for BiliBiliMessage {
           let is_special = !cmd.eq("DANMU_MSG");
           BiliBiliMessage::DanmuMsg(DanmuMsg {
             info: take_into(msg, "info")?,
+            dm_v2: take_into(msg, "dm_v2")?,
             is_special,
           })
         } else {

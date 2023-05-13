@@ -5,9 +5,12 @@
 
 use std::collections::HashMap;
 
+use base64::Engine;
 use log::error;
+use quick_protobuf::{BytesReader, MessageRead};
 
 use crate::command_packet::bilibili_command::danmu_message::extra::Extra;
+use crate::command_packet::bilibili_command::danmu_message::protobuf::dm_v2::DMv2;
 use crate::command_packet::bilibili_command::{FromRawCommand, ItemWithUserInfo};
 use crate::types::bilibili::bilibili_message::danmu_msg::DanmuMsg;
 use crate::types::bilibili::emoji_data::EmojiData;
@@ -16,6 +19,7 @@ use crate::types::user_info::medal_data::{FromRawError, MedalData};
 use crate::types::user_info::UserInfo;
 
 pub mod extra;
+pub mod protobuf;
 
 #[derive(serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -81,6 +85,7 @@ impl DanmuMessageParser {
   fn parse(self) -> ItemWithUserInfo<DanmuMessage> {
     self
       .parse_special()
+      .parse_v2()
       .parse_meta()
       .parse_content()
       .parse_user_data()
@@ -93,6 +98,42 @@ impl DanmuMessageParser {
   fn parse_special(mut self) -> Self {
     self.result.is_special_type = self.raw.is_special;
 
+    self
+  }
+
+  #[allow(unreachable_code, unused_mut)]
+  fn parse_v2(mut self) -> Self {
+    return self; // todo: disabled due to high frequency request to bilibili server may cause some issue.
+
+    // try decode base64
+    let dm_v2 = self.raw.dm_v2.as_ref().and_then(|dm_v2| {
+      base64::engine::general_purpose::STANDARD
+        .decode(dm_v2)
+        .map_err(|err| error!("failed to parse dm_v2(base64): {:?}\n{}", err, dm_v2))
+        .ok()
+    });
+
+    // try parse protobuf
+    if let Some(dm_v2) = &dm_v2 {
+      let mut reader = BytesReader::from_bytes(dm_v2);
+      let dm_v2 = DMv2::from_reader(&mut reader, dm_v2);
+
+      match dm_v2 {
+        Ok(dm_v2) => {
+          if let Some(user_info) = dm_v2.user_info {
+            if let Some(face) = user_info.face {
+              self.user_info.face = Some(face.to_string())
+            }
+          }
+        }
+        Err(err) => {
+          error!(
+            "failed to parse dm_v2(protobuf): {:?}\n{:?}",
+            err, self.raw.dm_v2
+          );
+        }
+      }
+    }
     self
   }
 

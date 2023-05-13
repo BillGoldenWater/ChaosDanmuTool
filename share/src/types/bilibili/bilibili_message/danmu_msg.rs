@@ -8,5 +8,6 @@ use serde_json::Value;
 #[derive(Debug, serde::Deserialize)]
 pub struct DanmuMsg {
   pub is_special: bool,
+  pub dm_v2: Option<String>,
   pub info: Vec<Value>,
 }
