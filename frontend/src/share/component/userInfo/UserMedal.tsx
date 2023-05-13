@@ -44,27 +44,27 @@ export function UserMedal(props: UserMedalProps) {
 
   return (
     <UserMedalBase
-      isLighted={isLighted}
-      borderColor={borderColor}
-      bgStartColor={bgStartColor}
-      bgEndColor={bgEndColor}
+      $isLighted={isLighted}
+      $borderColor={borderColor}
+      $bgStartColor={bgStartColor}
+      $bgEndColor={bgEndColor}
     >
       <div>{medalName}</div>
-      <UserMedalLevel color={txtColor}>{level}</UserMedalLevel>
+      <UserMedalLevel $color={txtColor}>{level}</UserMedalLevel>
       {guardIcon}
     </UserMedalBase>
   );
 }
 
 interface UserMedalBaseProps {
-  borderColor: Property.Color;
-  bgStartColor: Property.Color;
-  bgEndColor: Property.Color;
-  isLighted?: boolean | null;
+  $borderColor: Property.Color;
+  $bgStartColor: Property.Color;
+  $bgEndColor: Property.Color;
+  $isLighted?: boolean | null;
 }
 
 const UserMedalBase = styled.div<UserMedalBaseProps>`
-  ${(p) => (p.isLighted ? "" : "filter: grayscale(1);")};
+  ${(p) => (p.$isLighted ? "" : "filter: grayscale(1);")};
 
   display: inline-flex;
   align-items: center;
@@ -76,8 +76,8 @@ const UserMedalBase = styled.div<UserMedalBaseProps>`
 
   background: linear-gradient(
     45deg,
-    ${(p) => p.bgStartColor},
-    ${(p) => p.bgEndColor}
+    ${(p) => p.$bgStartColor},
+    ${(p) => p.$bgEndColor}
   );
 
   & > * {
@@ -86,7 +86,7 @@ const UserMedalBase = styled.div<UserMedalBaseProps>`
 `;
 
 interface UserMedalIconProps {
-  color: Property.Color;
+  $color: Property.Color;
 }
 
 const icon = css`
@@ -102,7 +102,7 @@ const icon = css`
 const UserMedalLevel = styled.div<UserMedalIconProps>`
   ${icon};
 
-  color: ${(p) => p.color};
+  color: ${(p) => p.$color};
 
   padding: ${borderValue.small};
 `;

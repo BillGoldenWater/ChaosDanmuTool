@@ -13,10 +13,10 @@ interface UserInfoIconProps {
 }
 
 export function UserInfoIcon({ color, text }: UserInfoIconProps) {
-  return <UserInfoIconBase bgColor={color}>{text}</UserInfoIconBase>;
+  return <UserInfoIconBase $bgColor={color}>{text}</UserInfoIconBase>;
 }
 
-const UserInfoIconBase = styled.div<{ bgColor: Property.Color }>`
+const UserInfoIconBase = styled.div<{ $bgColor: Property.Color }>`
   display: inline-flex;
   align-items: center;
 
@@ -24,7 +24,7 @@ const UserInfoIconBase = styled.div<{ bgColor: Property.Color }>`
 
   ${radius.small};
 
-  background-color: ${(p) => p.bgColor};
+  background-color: ${(p) => p.$bgColor};
 
   ${font.userName}
 `;

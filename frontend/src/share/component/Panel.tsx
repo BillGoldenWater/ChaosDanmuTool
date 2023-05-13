@@ -9,10 +9,10 @@ import { color, padding, radius, shadow } from "./ThemeCtx";
 import { motion } from "framer-motion";
 
 export interface PanelProps {
-  width?: Property.Width;
-  height?: Property.Height;
-  hover?: boolean;
-  noLayout?: boolean;
+  $width?: Property.Width;
+  $height?: Property.Height;
+  $hover?: boolean;
+  $noLayout?: boolean;
 }
 
 const panelFlex = css`
@@ -25,14 +25,14 @@ const panelFlex = css`
 `;
 
 export const Panel = styled(motion.div)<PanelProps>`
-  ${(p) => (p.noLayout ? "" : panelFlex)}
+  ${(p) => (p.$noLayout ? "" : panelFlex)}
 
   ${radius.normal}
 
-  ${(p) => (p.hover ? shadow.content : shadow.contentHover)}
+  ${(p) => (p.$hover ? shadow.content : shadow.contentHover)}
 
-  width: ${(p) => p.width || "100%"};
-  height: ${(p) => p.height || "fit-content"};
+  width: ${(p) => p.$width || "100%"};
+  height: ${(p) => p.$height || "fit-content"};
 
   background-color: ${color.bgContent};
 `;

@@ -39,4 +39,4 @@ const ViewerContainer = styled(Panel)`
   overflow-y: hidden;
 `;
 
-ViewerContainer.defaultProps = { height: "100%", hover: true };
+ViewerContainer.defaultProps = { $height: "100%", $hover: true };

@@ -41,7 +41,7 @@ export function InputBase({
             {...layoutProps}
             ref={setExtraRef}
             style={styles.popper}
-            expand={focus}
+            $expand={focus}
             initial={{ height: "fit-content" }}
             exit={{ height: 0 }}
             transition={{ type: "spring", damping: 50, stiffness: 600 }}
@@ -65,10 +65,10 @@ const MainContainer = styled(motion.div)`
   display: flex;
 `;
 
-const ExtraContainer = styled(motion.div)<{ expand: boolean }>`
+const ExtraContainer = styled(motion.div)<{ $expand: boolean }>`
   position: absolute;
 
-  ${(p) => (p.expand ? "overflow-y: auto;" : "overflow-y: hidden;")};
+  ${(p) => (p.$expand ? "overflow-y: auto;" : "overflow-y: hidden;")};
 
   max-height: 50vh;
 

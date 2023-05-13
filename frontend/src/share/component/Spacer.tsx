@@ -7,23 +7,23 @@ import styled, { css } from "styled-components";
 import { Property } from "csstype";
 
 interface SpacerSizeProps {
-  size: Property.Width;
+  $size: Property.Width;
 }
 
 export interface SpacerProps extends SpacerSizeProps {
-  vertical?: boolean;
+  $vertical?: boolean;
 }
 
 const vertical = css<SpacerSizeProps>`
   display: block;
-  height: ${(p) => p.size};
+  height: ${(p) => p.$size};
 `;
 
 const horizontal = css<SpacerSizeProps>`
   display: inline-block;
-  width: ${(p) => p.size};
+  width: ${(p) => p.$size};
 `;
 
 export const Spacer = styled.div<SpacerProps>`
-  ${(p) => (p.vertical ? vertical : horizontal)};
+  ${(p) => (p.$vertical ? vertical : horizontal)};
 `;

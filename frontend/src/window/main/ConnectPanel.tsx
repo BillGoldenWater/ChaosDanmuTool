@@ -11,7 +11,7 @@ import {
   paddingValue,
   themeCtx,
 } from "../../share/component/ThemeCtx";
-import { Panel } from "../../share/component/Panel";
+import { Panel, PanelProps } from "../../share/component/Panel";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { appCtx } from "../../share/app/AppCtx";
@@ -20,11 +20,14 @@ import { backend } from "../../share/app/BackendApi";
 import { NumberInput } from "../../share/component/input/NumberInput";
 
 interface ConnectStateProps {
-  connected?: boolean;
-  connectedHover?: boolean;
+  $connected?: boolean;
+  $connectedHover?: boolean;
 }
 
-const defaultInnerPanelSize = { height: "25rem", width: "28.125rem" };
+const defaultInnerPanelSize: PanelProps = {
+  $height: "25rem",
+  $width: "28.125rem",
+};
 
 export function ConnectPanel() {
   const ctx = useContext(appCtx);
@@ -36,21 +39,21 @@ export function ConnectPanel() {
   const connecting = ctx.receiverStatus === "connecting";
 
   return (
-    <ConnectPanelBase layout connected={connected}>
+    <ConnectPanelBase layout $connected={connected}>
       <InnerPanel
         {...(connected ? {} : defaultInnerPanelSize)}
         layout
-        hover={!connected}
-        connectedHover={hover}
-        connected={connected}
+        $hover={!connected}
+        $connectedHover={hover}
+        $connected={connected}
         onHoverStart={setHover.bind(null, true)}
         onHoverEnd={setHover.bind(null, false)}
       >
         <RoomidInput connected={connected} hover={hover} />
         <ConnectBtn
           layout={"position"}
-          connected={connected}
-          connectedHover={hover}
+          $connected={connected}
+          $connectedHover={hover}
           onClick={() => {
             if (connected || connecting) {
               backend.disconnectRoom();
@@ -88,19 +91,24 @@ interface RoomidInputProps {
   hover: boolean;
 }
 
-const RoomidInputBase = styled(NumberInput)<RoomidInputProps>`
+interface RoomidInputBaseProps {
+  $connected: boolean;
+  $hover: boolean;
+}
+
+const RoomidInputBase = styled(NumberInput)<RoomidInputBaseProps>`
   &:disabled {
     ${padding.small};
 
-    color: ${(p) => (p.hover ? color.txt : color.txtSecond)} !important;
-    -webkit-text-fill-color: ${(p) => (p.hover ? color.txt : color.txtSecond)};
+    color: ${(p) => (p.$hover ? color.txt : color.txtSecond)} !important;
+    -webkit-text-fill-color: ${(p) => (p.$hover ? color.txt : color.txtSecond)};
 
     background-color: transparent;
     border-color: transparent;
   }
 `;
 
-function RoomidInput({ connected, ...props }: RoomidInputProps) {
+function RoomidInput({ connected, hover }: RoomidInputProps) {
   const ctx = useContext(appCtx);
 
   const [roomid, setRoomid] = useState(() =>
@@ -121,9 +129,9 @@ function RoomidInput({ connected, ...props }: RoomidInputProps) {
 
   return (
     <RoomidInputBase
-      {...props}
       layout
-      connected={connected}
+      $connected={connected}
+      $hover={hover}
       value={roomid}
       onChange={onChange}
       placeholder={"房间号"}
@@ -150,7 +158,7 @@ const btnConnected = css<ConnectStateProps>`
   padding: 0;
 
   transition: color 0.2s ease-out;
-  color: ${(p) => (p.connectedHover ? color.fnErr : color.txtSecond)};
+  color: ${(p) => (p.$connectedHover ? color.fnErr : color.txtSecond)};
 
   ${font.input}
 `;
@@ -159,7 +167,7 @@ const ConnectBtn = styled(motion.button)<ConnectStateProps>`
   position: relative;
   background-color: transparent;
 
-  ${(p) => (p.connected ? btnConnected : btnUnconnected)}
+  ${(p) => (p.$connected ? btnConnected : btnUnconnected)}
 
   border: 0;
 
@@ -237,7 +245,7 @@ const ConnectPanelBase = styled(motion.div)<ConnectStateProps>`
   justify-content: center;
   align-items: center;
 
-  ${(p) => (p.connected ? connected : unconnected)}
+  ${(p) => (p.$connected ? connected : unconnected)}
 `;
 // endregion
 
@@ -248,7 +256,7 @@ const panelUnconnected = css`
   align-items: center;
 `;
 const panelConnected = css<ConnectStateProps>`
-  ${(p) => (p.connectedHover ? padding.normal : padding.small)}
+  ${(p) => (p.$connectedHover ? padding.normal : padding.small)}
 
   flex-direction: row;
   align-items: center;
@@ -259,7 +267,7 @@ const panelConnected = css<ConnectStateProps>`
 const InnerPanel = styled(Panel)<ConnectStateProps>`
   display: flex;
 
-  ${(p) => (p.connected ? panelConnected : panelUnconnected)};
+  ${(p) => (p.$connected ? panelConnected : panelUnconnected)};
 `;
-InnerPanel.defaultProps = { noLayout: true };
+InnerPanel.defaultProps = { $noLayout: true };
 // endregion

@@ -20,7 +20,7 @@ export function UserAvatar({
   const frame = faceFrame ? <UserAvatarFrame src={faceFrame} /> : null;
 
   return (
-    <UserAvatarBase size={size ? size : "1.25rem"}>
+    <UserAvatarBase $size={size ? size : "1.25rem"}>
       <UserAvatarContent src={face || defaultUserInfo.face || ""} />
       {frame}
     </UserAvatarBase>
@@ -28,7 +28,7 @@ export function UserAvatar({
 }
 
 interface UserAvatarBaseProps {
-  size: string;
+  $size: string;
 }
 
 const UserAvatarBase = styled.div<UserAvatarBaseProps>`
@@ -37,12 +37,12 @@ const UserAvatarBase = styled.div<UserAvatarBaseProps>`
 
   vertical-align: bottom;
 
-  width: ${(p) => p.size};
-  height: ${(p) => p.size};
-  min-width: ${(p) => p.size};
-  min-height: ${(p) => p.size};
-  max-width: ${(p) => p.size};
-  max-height: ${(p) => p.size};
+  width: ${(p) => p.$size};
+  height: ${(p) => p.$size};
+  min-width: ${(p) => p.$size};
+  min-height: ${(p) => p.$size};
+  max-width: ${(p) => p.$size};
+  max-height: ${(p) => p.$size};
 `;
 
 const UserAvatarContent = styled.img`

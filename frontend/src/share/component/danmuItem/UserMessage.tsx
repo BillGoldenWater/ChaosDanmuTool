@@ -54,11 +54,11 @@ export function UserMessage(props: PropsWithChildren<UserMessageProps>) {
 
   return (
     <UserMessageBase
-      mergePrev={mergePrev}
-      mergeNext={mergeNext}
-      highlightColor={highlightColor}
+      $mergePrev={mergePrev}
+      $mergeNext={mergeNext}
+      $highlightColor={highlightColor}
     >
-      {!compact && <MessageSider isAvatar={!mergePrev}>{sider}</MessageSider>}
+      {!compact && <MessageSider $isAvatar={!mergePrev}>{sider}</MessageSider>}
       <MessageMain>
         {msgUserInfo}
         <MessageContent>{children}</MessageContent>
@@ -67,12 +67,12 @@ export function UserMessage(props: PropsWithChildren<UserMessageProps>) {
   );
 }
 
-const MessageSider = styled.div<{ isAvatar: boolean }>`
+const MessageSider = styled.div<{ $isAvatar: boolean }>`
   display: flex;
 
   ${(p) =>
-    p.isAvatar ? "align-items: flex-start;" : "align-items: flex-end;"};
-  justify-content: ${(p) => (p.isAvatar ? "start" : "center")};
+    p.$isAvatar ? "align-items: flex-start;" : "align-items: flex-end;"};
+  justify-content: ${(p) => (p.$isAvatar ? "start" : "center")};
 
   min-width: 2.5rem;
 `;
@@ -103,9 +103,9 @@ const MessageContent = styled.div`
 `;
 
 interface UserMessageBaseProps {
-  mergePrev: boolean;
-  mergeNext: boolean;
-  highlightColor: string;
+  $mergePrev: boolean;
+  $mergeNext: boolean;
+  $highlightColor: string;
 }
 
 const UserMessageBase = styled.div<UserMessageBaseProps>`
@@ -117,9 +117,9 @@ const UserMessageBase = styled.div<UserMessageBaseProps>`
   ${border.normal};
   ${padding.small};
 
-  border-color: ${(p) => p.highlightColor};
+  border-color: ${(p) => p.$highlightColor};
   ${(p) => {
-    if (p.mergePrev) {
+    if (p.$mergePrev) {
       return css`
         border-top-width: 0;
         border-top-left-radius: 0;
@@ -130,7 +130,7 @@ const UserMessageBase = styled.div<UserMessageBaseProps>`
     }
   }};
   ${(p) => {
-    if (p.mergeNext) {
+    if (p.$mergeNext) {
       return css`
         border-bottom-width: 0;
         border-bottom-left-radius: 0;
