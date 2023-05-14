@@ -96,7 +96,7 @@ const icon = css`
 
   background-color: ${color.txtWhite};
 
-  border-radius: 0.1875rem;
+  border-radius: 3rem;
 `;
 
 const UserMedalLevel = styled.div<UserMedalIconProps>`
@@ -114,7 +114,7 @@ const GuardIcon = styled.img`
 
   box-sizing: content-box;
 
-  height: 0.75rem;
+  height: 12rem;
 `;
 
 function guardIconUrl(level: 1 | 2 | 3) {

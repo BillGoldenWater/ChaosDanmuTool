@@ -20,7 +20,7 @@ export function UserAvatar({
   const frame = faceFrame ? <UserAvatarFrame src={faceFrame} /> : null;
 
   return (
-    <UserAvatarBase $size={size ? size : "1.25rem"}>
+    <UserAvatarBase $size={size ? size : "20rem"}>
       <UserAvatarContent src={face || defaultUserInfo.face || ""} />
       {frame}
     </UserAvatarBase>

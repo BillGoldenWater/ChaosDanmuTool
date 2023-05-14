@@ -40,7 +40,7 @@ export function UserMessage(props: PropsWithChildren<UserMessageProps>) {
   const userInfo = ctx.getUserInfo(uid);
 
   if (!mergePrev) {
-    sider = <UserAvatar userInfo={userInfo} size={"2.5rem"} />;
+    sider = <UserAvatar userInfo={userInfo} size={"40rem"} />;
     msgUserInfo = (
       <MessageUserInfo>
         <UserInfo userInfo={userInfo} showAvatar={compact} />
@@ -74,7 +74,7 @@ const MessageSider = styled.div<{ $isAvatar: boolean }>`
     p.$isAvatar ? "align-items: flex-start;" : "align-items: flex-end;"};
   justify-content: ${(p) => (p.$isAvatar ? "start" : "center")};
 
-  min-width: 2.5rem;
+  min-width: 40rem;
 `;
 
 const MessageTimestamp = styled.div`
@@ -84,7 +84,7 @@ const MessageTimestamp = styled.div`
 
   color: ${color.txtSecond};
 
-  height: min(1rem, 100%);
+  height: min(16rem, 100%);
 `;
 
 const MessageMain = styled.div`
@@ -97,7 +97,7 @@ const MessageUserInfo = styled.div``;
 
 const MessageContent = styled.div`
   ${font.dmContent};
-  text-shadow: 0 0 0.15rem #000;
+  text-shadow: 0 0 3rem #000;
   word-wrap: anywhere;
   word-break: break-all;
 `;

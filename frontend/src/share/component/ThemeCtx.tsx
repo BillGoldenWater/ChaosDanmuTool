@@ -377,75 +377,75 @@ const shadowTransition = css`
 `;
 export const shadow = {
   content: css`
-    box-shadow: 0.25rem 0.25rem 1rem rgba(0, 0, 0, 0.5);
+    box-shadow: 4rem 4rem 16rem rgba(0, 0, 0, 0.5);
   `,
 
   contentHover: css`
     ${shadowTransition}
     &:hover {
-      box-shadow: 0.25rem 0.25rem 1rem rgba(0, 0, 0, 0.5);
+      box-shadow: 4rem 4rem 16rem rgba(0, 0, 0, 0.5);
     }
   `,
 
   item: css`
-    box-shadow: 0.25rem 0.25rem 0.5rem rgba(0, 0, 0, 0.25);
+    box-shadow: 4rem 4rem 8rem rgba(0, 0, 0, 0.25);
   `,
 
   itemHover: css`
     ${shadowTransition}
     &:hover {
-      box-shadow: 0.25rem 0.25rem 0.5rem rgba(0, 0, 0, 0.25);
+      box-shadow: 4rem 4rem 8rem rgba(0, 0, 0, 0.25);
     }
   `,
 };
 
 export const font = {
   normal: css`
-    font-size: 1rem;
-    line-height: 1.1875rem;
+    font-size: 16rem;
+    line-height: 19rem;
     font-weight: 400;
 
     font-style: normal;
   `,
   second: css`
-    font-size: 0.875rem;
-    line-height: 0.875rem;
+    font-size: 14rem;
+    line-height: 14rem;
     font-weight: 400;
 
     font-style: normal;
   `,
 
   title: css`
-    font-size: 2rem;
+    font-size: 32rem;
     line-height: initial;
     font-weight: 500;
 
     font-style: normal;
   `,
   input: css`
-    font-size: 0.875rem;
-    line-height: 0.875rem;
+    font-size: 14rem;
+    line-height: 14rem;
     font-weight: 400;
 
     font-style: normal;
   `,
   userName: css`
-    font-size: 0.875rem;
-    line-height: 0.875rem;
+    font-size: 14rem;
+    line-height: 14rem;
     font-weight: 500;
 
     font-style: normal;
   `,
   dmTs: css`
-    font-size: 0.75rem;
-    line-height: 0.75rem;
+    font-size: 12rem;
+    line-height: 12rem;
     font-weight: 500;
 
     font-style: normal;
   `,
   dmContent: css`
-    font-size: 1rem;
-    line-height: 1.25rem;
+    font-size: 16rem;
+    line-height: 20rem;
     font-weight: 500;
 
     font-style: normal;
@@ -454,16 +454,16 @@ export const font = {
 
 export const radius = {
   small: css`
-    border-radius: 0.3125rem;
+    border-radius: 5rem;
   `,
   normal: css`
-    border-radius: 0.625rem;
+    border-radius: 10rem;
   `,
 };
 
 export const borderValue = {
-  small: "0.0625rem",
-  normal: "0.125rem",
+  small: "1rem",
+  normal: "2rem",
 };
 export const border = {
   small: css`
@@ -477,10 +477,10 @@ export const border = {
 };
 
 export const paddingValue = {
-  small: "0.3125rem",
-  input: "0.5rem",
-  normal: "0.625rem",
-  window: "0.9375rem",
+  small: "5rem",
+  input: "8rem",
+  normal: "10rem",
+  window: "15rem",
 };
 export const padding = {
   small: css`
@@ -507,8 +507,8 @@ export const zIndex = {
 };
 
 export const GlobalStyle = createGlobalStyle`
-  body {
-    font-size: 0.5cm;
+  :root {
+    font-size: var(--font-size, 0.28mm);
   }
 
   #root {

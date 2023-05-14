@@ -25,8 +25,8 @@ interface ConnectStateProps {
 }
 
 const defaultInnerPanelSize: PanelProps = {
-  $height: "25rem",
-  $width: "28.125rem",
+  $height: "400rem",
+  $width: "450rem",
 };
 
 export function ConnectPanel() {
@@ -145,12 +145,12 @@ function RoomidInput({ connected, hover }: RoomidInputProps) {
 
 // region connect button
 const btnUnconnected = css`
-  width: 9.375rem;
-  height: 9.375rem;
+  width: 150rem;
+  height: 150rem;
 
   color: ${color.theme};
 
-  font-size: 2.5rem;
+  font-size: 40rem;
   font-weight: 400;
 `;
 const btnConnected = css<ConnectStateProps>`
@@ -200,7 +200,7 @@ function BtnConnectingSvg({ connecting }: { connecting: boolean }) {
         clipPath={"url(#innerStroke)"}
         fill={"transparent"}
         stroke={theme.consts.theme}
-        strokeWidth={"calc(0.125rem * 2)"}
+        strokeWidth={"calc(2rem * 2)"}
         strokeDasharray={`${Math.PI * 100}`}
       >
         {connecting ? (

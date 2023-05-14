@@ -45,7 +45,7 @@ export function DanmuMessage(props: TDanmuItemProps) {
 
   if (dm.emojiData) {
     const emoji = dm.emojiData;
-    const emojiHeight = `calc( 4rem * ${emoji.height / emoji.width} )`;
+    const emojiHeight = `calc( 64rem * ${emoji.height / emoji.width} )`;
 
     if (emoji.url.indexOf("http") === 0) {
       content = (
@@ -79,9 +79,9 @@ export function DanmuMessage(props: TDanmuItemProps) {
 
 const Emoji = styled.img`
   display: block;
-  max-width: 4rem;
+  max-width: 64rem;
 `;
 
 const Emot = styled.img`
-  height: 1.5rem;
+  height: 24rem;
 `;

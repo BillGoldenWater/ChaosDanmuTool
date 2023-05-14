@@ -20,7 +20,7 @@ export function UserInfo(props: UserInfoProps) {
   const { isManager, isSvip, isVip, medal, name } = userInfo;
 
   const avatar = (showAvatar != null ? showAvatar : true) && (
-    <UserAvatar userInfo={userInfo} size={"1.25rem"} />
+    <UserAvatar userInfo={userInfo} size={"20rem"} />
   );
 
   const userMedal = medal && medal.isLighted && <UserMedal medalData={medal} />;

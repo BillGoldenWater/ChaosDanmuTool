@@ -59,7 +59,7 @@ const GiftIcon = styled.img`
 
 const CoinGoldIcon = styled.img`
   display: inline-block;
-  max-height: 1rem;
+  max-height: 16rem;
 `;
 
 // noinspection SpellCheckingInspection
