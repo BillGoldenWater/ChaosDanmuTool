@@ -3,4 +3,5 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+#[cfg(target_os = "macos")]
 pub mod macos;
