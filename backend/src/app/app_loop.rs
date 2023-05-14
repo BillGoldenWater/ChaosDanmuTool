@@ -15,7 +15,6 @@ use tokio::{
 use crate::app::config_manager::ConfigManager;
 use crate::network::command_broadcast_server::CommandBroadcastServer;
 use crate::network::danmu_receiver::DanmuReceiver;
-use crate::utils::process_utils::set_nap;
 
 type Sender = UnboundedSender<()>;
 type Receiver = UnboundedReceiver<()>;
@@ -59,7 +58,8 @@ impl AppLoop {
   }
 
   async fn run_loop(&mut self) {
-    set_nap(
+    #[cfg(target_os = "macos")]
+    crate::utils::process_utils::macos::set_nap(
       false,
       "communicating with bilibili server and danmu viewer clients",
     );
@@ -85,7 +85,8 @@ impl AppLoop {
       }
     }
 
-    set_nap(true, "");
+    #[cfg(target_os = "macos")]
+    crate::utils::process_utils::macos::set_nap(true, "");
 
     // send stopped signal
     let result = self.ret_tx.send(());

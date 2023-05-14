@@ -72,7 +72,7 @@ fn print_env_info() {
   info!("build info: {}", build_info());
   #[cfg(target_os = "macos")]
   {
-    use crate::utils::process_utils::is_running_under_rosetta;
+    use crate::utils::process_utils::macos::is_running_under_rosetta;
     use log::warn;
 
     if std::env::consts::ARCH == "x86_64" {

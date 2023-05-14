@@ -221,6 +221,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "block-sys"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2dd7cf50912cddc06dc5ea7c08c5e81c1b2c842a70d19def1848d54c586fed92"
+dependencies = [
+ "objc-sys",
+]
+
+[[package]]
+name = "block2"
+version = "0.2.0-alpha.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "05d5ba46b637575ec80985914d45f6f056b575d40b8482670c6b445a30e691e7"
+dependencies = [
+ "block-sys",
+ "objc2",
+]
+
+[[package]]
 name = "brotli"
 version = "3.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -366,18 +385,17 @@ dependencies = [
  "bytes",
  "chaos_danmu_tool_share",
  "chrono",
- "cocoa",
  "const_format",
  "fern",
  "futures-util",
  "get-port",
  "hyper",
+ "icrate",
  "itertools",
  "libc",
  "log",
  "netstat2",
- "objc",
- "objc_id",
+ "objc2",
  "once_cell",
  "os_type",
  "rand 0.8.5",
@@ -1671,6 +1689,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "icrate"
+version = "0.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b9a9660e2268e6b80b12149081539a9115d43826c1bb2539328604277385b537"
+dependencies = [
+ "block2",
+ "objc2",
+]
+
+[[package]]
 name = "ident_case"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2251,6 +2279,28 @@ dependencies = [
  "objc",
  "objc_id",
 ]
+
+[[package]]
+name = "objc-sys"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "da30ff0a93f6801dc6c4f384ebe70146a40aac8ebf34e4e8ff1f528e859318a3"
+
+[[package]]
+name = "objc2"
+version = "0.3.0-beta.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ef3a6024722b4230242a53e5b5759ce117548983696b8e4b7bc2fd1f8fce621e"
+dependencies = [
+ "objc-sys",
+ "objc2-encode",
+]
+
+[[package]]
+name = "objc2-encode"
+version = "2.0.0-pre.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8f8f7297b786454a87e392631e2b2754ed59a7b413effa8521225d93f46b2192"
 
 [[package]]
 name = "objc_exception"
