@@ -8,59 +8,42 @@ import { TDanmuItemProps } from "./DanmuItem";
 import { UserMessage } from "./UserMessage";
 import styled from "styled-components";
 import { DanmuMessage } from "../../type/rust/command_packet/bilibili_command/danmu_message";
+import { Property } from "csstype";
+import { useMemo } from "react";
+import { Emot as TEmot } from "../../type/rust/types/bilibili/emot";
 
 export function DanmuMessage(props: TDanmuItemProps) {
   const {
     info: { item, mergePrev, mergeNext },
   } = props;
-
-  const dm = item.data.data as DanmuMessage;
   const showSpecial = false; // todo config
-
-  if (dm.isSpecialType && !showSpecial) {
-    return null;
-  }
-
+  const dm = item.data.data as DanmuMessage;
   const uid = dm.uid;
 
-  let content: JSX.Element | (JSX.Element | string)[] = [dm.content];
+  const content = useMemo(() => {
+    if (dm.emojiData) {
+      const emoji = dm.emojiData;
+      const emojiHeight: Property.Height = `calc( 64rem * ${
+        emoji.height / emoji.width
+      } )`;
 
-  for (const emot of dm.emots.values()) {
-    content = content.flatMap((it) => {
-      if (typeof it === "string") {
-        return it
-          .split(emot.emoji)
-          .flatMap((v, idx, arr) =>
-            idx === arr.length - 1
-              ? [v]
-              : [v, <Emot src={emot.url} alt={emot.emoji} />]
-          );
-      } else {
-        return it;
+      if (emoji.url.indexOf("http") === -1) {
+        return emoji.url;
       }
-    });
-  }
 
-  content = content.map((v, idx) => <span key={idx}>{v}</span>);
-
-  if (dm.emojiData) {
-    const emoji = dm.emojiData;
-    const emojiHeight = `calc( 64rem * ${emoji.height / emoji.width} )`;
-
-    if (emoji.url.indexOf("http") === 0) {
-      content = (
-        <Emoji
-          src={emoji.url}
-          alt={emoji.text}
-          style={{
-            height: emojiHeight,
-          }}
-        />
-      );
-    } else {
-      content = [emoji.url];
+      return <Emoji src={emoji.url} alt={emoji.text} $height={emojiHeight} />;
     }
-  }
+
+    if (dm.emots.size === 0) return dm.content;
+
+    const emotResult = parseEmot(dm.emots, dm.content);
+
+    if (emotResult == null) return dm.content;
+
+    return emotResult.map((v, idx) => <span key={idx}>{v}</span>);
+  }, [dm.content, dm.emojiData, dm.emots]);
+
+  if (dm.isSpecialType && !showSpecial) return null;
 
   return (
     <UserMessage
@@ -77,7 +60,7 @@ export function DanmuMessage(props: TDanmuItemProps) {
   );
 }
 
-const Emoji = styled.img`
+const Emoji = styled.img<{ $height: Property.Height }>`
   display: block;
   max-width: 64rem;
 `;
@@ -85,3 +68,42 @@ const Emoji = styled.img`
 const Emot = styled.img`
   height: 24rem;
 `;
+
+function parseEmot(emots: Map<string, TEmot>, str: string) {
+  const result = [];
+
+  let lastIdx = 0;
+  for (let idx = 0; idx < str.length; idx++) {
+    if (str[idx] === "[") {
+      const emotData = getEmotAt(str, idx);
+      if (emotData == null) continue;
+
+      const emot = emots.get(emotData.emot);
+      if (emot == null) continue;
+
+      result.push(str.slice(lastIdx, idx));
+      result.push(<Emot src={emot.url} alt={emot.emoji} />);
+      lastIdx = idx + emotData.length;
+    }
+  }
+
+  if (result.length === 0) {
+    return null;
+  }
+
+  result.push(str.slice(lastIdx));
+  return result;
+}
+
+function getEmotAt(
+  str: string,
+  idx: number
+): { emot: string; length: number } | null {
+  const endIdx = str.indexOf("]", idx);
+  if (endIdx === -1) return null;
+
+  return {
+    emot: str.slice(idx, endIdx + 1),
+    length: endIdx - idx + 1,
+  };
+}
