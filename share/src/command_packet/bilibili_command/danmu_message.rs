@@ -101,10 +101,7 @@ impl DanmuMessageParser {
     self
   }
 
-  #[allow(unreachable_code, unused_mut)]
   fn parse_v2(mut self) -> Self {
-    return self; // todo: disabled due to high frequency request to bilibili server may cause some issue.
-
     // try decode base64
     let dm_v2 = self.raw.dm_v2.as_ref().and_then(|dm_v2| {
       base64::engine::general_purpose::STANDARD

@@ -6,6 +6,9 @@
 import styled from "styled-components";
 import { UserInfo } from "../../type/rust/types/user_info";
 import { defaultUserInfo } from "../../app/Defaults";
+import { useEffect, useState } from "react";
+
+const defaultFaceUrl = defaultUserInfo.face || "";
 
 interface UserAvatarProps {
   userInfo: UserInfo;
@@ -18,10 +21,28 @@ export function UserAvatar({
   size,
 }: UserAvatarProps) {
   const frame = faceFrame ? <UserAvatarFrame src={faceFrame} /> : null;
+  const [faceUrl, setFaceUrl] = useState(defaultFaceUrl);
+
+  useEffect(() => {
+    const img = new Image();
+    let done = false;
+
+    img.onload = () => {
+      setFaceUrl(face || defaultFaceUrl);
+      done = true;
+    };
+
+    img.src = face || defaultFaceUrl;
+    return () => {
+      if (!done) {
+        img.src = "";
+      }
+    };
+  }, [face]);
 
   return (
     <UserAvatarBase $size={size ? size : "20rem"}>
-      <UserAvatarContent src={face || defaultUserInfo.face || ""} />
+      <UserAvatarContent src={faceUrl} loading={"lazy"} />
       {frame}
     </UserAvatarBase>
   );
