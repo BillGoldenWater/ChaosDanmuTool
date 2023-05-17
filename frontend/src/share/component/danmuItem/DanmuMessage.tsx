@@ -63,6 +63,7 @@ export function DanmuMessage(props: TDanmuItemProps) {
 const Emoji = styled.img<{ $height: Property.Height }>`
   display: block;
   max-width: 64rem;
+  height: ${(p) => p.$height};
 `;
 
 const Emot = styled.img`
