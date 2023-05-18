@@ -10,7 +10,7 @@ use crate::network::api_request::bilibili_response::bilibili_get;
 use super::bilibili_response;
 
 static GIFT_CONFIG_API_URL: &str =
-  "https://api.live.bilibili.com/xlive/web-room/v1/giftPanel/giftConfig";
+  "https://api.live.bilibili.com/xlive/web-room/v1/giftPanel/roomGiftConfig";
 
 pub struct GiftConfigGetter {}
 
