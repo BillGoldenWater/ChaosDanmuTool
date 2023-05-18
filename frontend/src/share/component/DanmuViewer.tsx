@@ -22,7 +22,7 @@ import { appCtx } from "../app/AppCtx";
 import { BiliBiliMessageEvent } from "../event/AppEventTarget";
 import { CommandPacket } from "../type/rust/command_packet";
 import { DanmuItem, TDanmuItemInfo } from "./danmuItem/DanmuItem";
-import { motion, MotionValue, useSpring } from "framer-motion";
+import { MotionValue, useSpring } from "framer-motion";
 import { maxScrollTop } from "../utils/ElementUtils";
 import {
   DanmuViewerMaxSize,
@@ -61,8 +61,8 @@ export function DanmuViewer() {
     return (
       <DanmuViewerBase
         ref={setListRef}
-        onHoverStart={setHover.bind(null, true)}
-        onHoverEnd={setHover.bind(null, false)}
+        onMouseEnter={setHover.bind(null, true)}
+        onMouseLeave={setHover.bind(null, false)}
       >
         <div />
         {dmItemList}
@@ -71,7 +71,7 @@ export function DanmuViewer() {
   }, [dmItemList, setHover, setListRef]);
 }
 
-const DanmuViewerBase = styled(motion.div)`
+const DanmuViewerBase = styled.div`
   ${padding.normal};
 
   display: grid;
