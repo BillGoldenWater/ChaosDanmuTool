@@ -31,7 +31,7 @@ export function UserMessage(props: PropsWithChildren<UserMessageProps>) {
   const { children, uid, timestamp, mergePrev, mergeNext, highlightColor } =
     props;
   const ctx = useContext(appCtx);
-  const userInfo = ctx.getUserInfo(uid);
+  const userInfo = useMemo(() => ctx.getUserInfo(uid), [ctx, uid]);
   const compact = false;
 
   // region sider
@@ -119,7 +119,7 @@ const MessageTimestamp = styled.div`
   color: ${color.txtSecond};
 
   // note: intellij formatter would break this (WEB-59064)
-  @container (height > 20rem) {
+  @container (height > 20 rem) {
     align-items: flex-end;
   }
 `;

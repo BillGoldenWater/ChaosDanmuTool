@@ -7,10 +7,14 @@ import styled from "styled-components";
 import { padding } from "./ThemeCtx";
 import {
   Dispatch,
+  ForwardedRef,
+  forwardRef,
+  memo,
   SetStateAction,
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -39,25 +43,32 @@ export function DanmuViewer() {
     scrollAnimation
   );
 
-  return (
-    <DanmuViewerBase
-      ref={setListRef}
-      onHoverStart={setHover.bind(null, true)}
-      onHoverEnd={setHover.bind(null, false)}
-    >
-      <div />
-      {dmList.map((info, idx, arr) => {
+  const dmItemList = useMemo(
+    () =>
+      dmList.map((info, idx, arr) => {
         return (
           <DanmuItemContainer
             key={info.item.uuid}
             ref={idx === arr.size - 1 ? setLatestElement : undefined}
-          >
-            <DanmuItem info={info} />
-          </DanmuItemContainer>
+            {...info}
+          />
         );
-      })}
-    </DanmuViewerBase>
+      }),
+    [dmList, setLatestElement]
   );
+
+  return useMemo(() => {
+    return (
+      <DanmuViewerBase
+        ref={setListRef}
+        onHoverStart={setHover.bind(null, true)}
+        onHoverEnd={setHover.bind(null, false)}
+      >
+        <div />
+        {dmItemList}
+      </DanmuViewerBase>
+    );
+  }, [dmItemList, setHover, setListRef]);
 }
 
 const DanmuViewerBase = styled(motion.div)`
@@ -78,7 +89,20 @@ const DanmuViewerBase = styled(motion.div)`
   }
 `;
 
-const DanmuItemContainer = styled(motion.div)`
+const DanmuItemContainer = memo(forwardRef(DanmuItemContainerInner));
+
+function DanmuItemContainerInner(
+  danmuItem: TDanmuItemInfo,
+  ref: ForwardedRef<HTMLDivElement>
+) {
+  return (
+    <DanmuItemContainerBase ref={ref}>
+      <DanmuItem info={danmuItem} />
+    </DanmuItemContainerBase>
+  );
+}
+
+const DanmuItemContainerBase = styled.div`
   position: relative;
 `;
 

@@ -6,6 +6,7 @@
 import { DanmuMessage } from "./DanmuMessage";
 import { GiftMessage } from "./GiftMessage";
 import { CommandPacket } from "../../type/rust/command_packet";
+import { memo } from "react";
 
 export interface TDanmuItemInfo {
   item: CommandPacket;
@@ -18,7 +19,9 @@ export interface TDanmuItemProps {
   info: TDanmuItemInfo;
 }
 
-export function DanmuItem(props: TDanmuItemProps) {
+export const DanmuItem = memo(DanmuItemInner);
+
+function DanmuItemInner(props: TDanmuItemProps) {
   const {
     info,
     info: { item },
