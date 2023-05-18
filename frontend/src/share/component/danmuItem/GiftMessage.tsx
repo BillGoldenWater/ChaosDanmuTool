@@ -5,7 +5,7 @@
 
 import styled from "styled-components";
 import { TDanmuItemProps } from "./DanmuItem";
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 import { appCtx } from "../../app/AppCtx";
 import { UserMessage, UserMessageProps } from "./UserMessage";
 import { GiftMessage } from "../../type/rust/command_packet/bilibili_command/gift_message";
@@ -20,24 +20,26 @@ export function GiftMessage(props: TDanmuItemProps) {
   const { action, coinType, giftId, giftName, price, timestamp, uid } = item
     .data.data as GiftMessage;
 
-  const giftInfo = ctx.giftConfig.get(giftId);
+  const giftIcon = useMemo(() => {
+    const giftInfo = ctx.giftConfig.get(giftId);
+    if (giftInfo == null) return null;
 
-  const icon = giftInfo ? <GiftIcon src={giftInfo.webp} alt={""} /> : <></>;
+    return <GiftIcon src={giftInfo.webp} />;
+  }, [ctx.giftConfig, giftId]);
 
-  let highlight: UserMessageProps["highlightColor"] = "#00000000";
-  if (coinType === "gold") {
-    highlight = "#ffc800";
-  }
+  const highlight: UserMessageProps["highlightColor"] =
+    coinType === "gold" ? "#ffc800" : "#00000000";
 
-  const priceText =
-    coinType === "gold" ? (
+  const priceText = useMemo(() => {
+    if (coinType !== "gold") return null;
+
+    return (
       <>
         ({(price / 100) * giftNumSum}
         <CoinGoldIcon />)
       </>
-    ) : (
-      <></>
     );
+  }, [coinType, giftNumSum, price]);
 
   return (
     <UserMessage
@@ -47,7 +49,7 @@ export function GiftMessage(props: TDanmuItemProps) {
       timestamp={timestamp}
       highlightColor={highlight}
     >
-      {action} {icon} {giftName} 共 {giftNumSum} 个 {priceText}
+      {action} {giftIcon} {giftName} 共 {giftNumSum} 个 {priceText}
     </UserMessage>
   );
 }
