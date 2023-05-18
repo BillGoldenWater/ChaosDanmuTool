@@ -6,7 +6,12 @@
 import { useEffect, useState } from "react";
 import { TState } from "../type/TState";
 
-export function useHoverState(): TState<boolean> {
+export function useHoverState(): {
+  hover: boolean;
+  setHover: TState<boolean>[1];
+  onEnter: () => void;
+  onLeave: () => void;
+} {
   const [hover, setHover] = useState(false);
   useEffect(() => {
     function onWindowBlur() {
@@ -20,5 +25,10 @@ export function useHoverState(): TState<boolean> {
     };
   }, [hover]);
 
-  return [hover, setHover];
+  return {
+    hover,
+    setHover,
+    onEnter: setHover.bind(null, true),
+    onLeave: setHover.bind(null, false),
+  };
 }

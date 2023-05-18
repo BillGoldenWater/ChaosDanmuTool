@@ -34,7 +34,7 @@ import { useHoverState } from "../hook/useHoverState";
 export function DanmuViewer() {
   const scrollAnimation = true;
 
-  const [hover, setHover] = useHoverState();
+  const { hover, setHover } = useHoverState();
   const msgList = useMsgList(hover);
   const { dmList } = useMsgPreProcess(msgList);
   const [setListRef, setLatestElement] = useAutoScroll(
