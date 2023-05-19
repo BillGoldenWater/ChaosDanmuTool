@@ -6,6 +6,7 @@
 import styled, { css } from "styled-components";
 import { Property } from "csstype";
 import { color, padding, radius, shadow } from "./ThemeCtx";
+import { motion } from "framer-motion";
 
 export interface PanelProps {
   $width?: Property.Width;
@@ -23,7 +24,7 @@ const panelFlex = css`
   ${padding.normal}
 `;
 
-export const Panel = styled.div<PanelProps>`
+const panel = css<PanelProps>`
   ${(p) => (p.$noLayout ? "" : panelFlex)}
 
   ${radius.normal}
@@ -34,4 +35,12 @@ export const Panel = styled.div<PanelProps>`
   height: ${(p) => p.$height || "fit-content"};
 
   background-color: ${color.bgContent};
+`;
+
+export const Panel = styled.div<PanelProps>`
+  ${panel};
+`;
+
+export const MotionPanel = styled(motion.div)<PanelProps>`
+  ${panel};
 `;
