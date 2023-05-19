@@ -4,12 +4,14 @@
  */
 
 import styled from "styled-components";
-import { padding } from "./ThemeCtx";
+import { padding, paddingValue } from "./ThemeCtx";
 import {
+  createRef,
   Dispatch,
   ForwardedRef,
   forwardRef,
   memo,
+  RefObject,
   SetStateAction,
   useCallback,
   useContext,
@@ -22,24 +24,32 @@ import { appCtx } from "../app/AppCtx";
 import { BiliBiliMessageEvent } from "../event/AppEventTarget";
 import { CommandPacket } from "../type/rust/command_packet";
 import { DanmuItem, TDanmuItemInfo } from "./danmuItem/DanmuItem";
-import { MotionValue, useSpring } from "framer-motion";
+import { AnimatePresence, MotionValue, useSpring } from "framer-motion";
 import { maxScrollTop } from "../utils/ElementUtils";
 import {
   DanmuViewerMaxSize,
   GiftMergeIntervalInSeconds,
 } from "../app/Settings";
 import Immutable from "immutable";
-import { useHoverState } from "../hook/useHoverState";
+import { UilPlayCircle } from "@iconscout/react-unicons";
+import { Button } from "./Button";
+import { useKey } from "react-use";
 
 export function DanmuViewer() {
   const scrollAnimation = true;
 
-  const { hover, setHover } = useHoverState();
-  const msgList = useMsgList(hover);
+  const [pause, setPause] = useState(false);
+  const onPauseResume = useCallback(() => setPause((prev) => !prev), []);
+  useKey(" ", onPauseResume);
+
+  const msgList = useMsgList(pause);
   const { dmList } = useMsgPreProcess(msgList);
-  const [setListRef, setLatestElement] = useAutoScroll(
+
+  const listRef = createRef<HTMLDivElement>();
+  const setLatestElement = useAutoScroll(
+    listRef,
     msgList.size === DanmuViewerMaxSize,
-    hover,
+    pause,
     scrollAnimation
   );
 
@@ -59,17 +69,38 @@ export function DanmuViewer() {
 
   return useMemo(() => {
     return (
-      <DanmuViewerBase
-        ref={setListRef}
-        onMouseEnter={setHover.bind(null, true)}
-        onMouseLeave={setHover.bind(null, false)}
-      >
-        <div />
-        {dmItemList}
-      </DanmuViewerBase>
+      <DanmuViewerContainer>
+        <DanmuViewerBase ref={listRef}>
+          <div />
+          {dmItemList}
+        </DanmuViewerBase>
+        <AnimatePresence>
+          {pause && (
+            <ResumeButton
+              initial={{ opacity: 0, scale: 0.8, rotateZ: -180 }}
+              animate={{ opacity: 1, scale: 1, rotateZ: 0 }}
+              exit={{ opacity: 0, scale: 0.8, rotateZ: 90 }}
+              transition={{
+                type: "spring",
+                damping: 30,
+                stiffness: 400,
+              }}
+              onClick={setPause.bind(null, false)}
+            >
+              <UilPlayCircle />
+            </ResumeButton>
+          )}
+        </AnimatePresence>
+      </DanmuViewerContainer>
     );
-  }, [dmItemList, setHover, setListRef]);
+  }, [dmItemList, listRef, pause]);
 }
+
+const DanmuViewerContainer = styled.div`
+  position: relative;
+  height: 100%;
+  width: 100%;
+`;
 
 const DanmuViewerBase = styled.div`
   ${padding.normal};
@@ -89,6 +120,15 @@ const DanmuViewerBase = styled.div`
   }
 `;
 
+const ResumeButton = styled(Button)`
+  position: absolute;
+
+  --spacing: ${paddingValue.normal};
+  bottom: var(--spacing);
+  right: var(--spacing);
+`;
+ResumeButton.defaultProps = { isIcon: true, primary: false };
+
 const DanmuItemContainer = memo(forwardRef(DanmuItemContainerInner));
 
 function DanmuItemContainerInner(
@@ -106,13 +146,13 @@ const DanmuItemContainerBase = styled.div`
   position: relative;
 `;
 
-function useMsgList(hover: boolean) {
+function useMsgList(pause: boolean) {
   const ctx = useContext(appCtx);
 
   const [visible, setVisible] = useState(
     document.visibilityState === "visible"
   );
-  const shouldProcessBuf = !hover && visible;
+  const shouldProcessBuf = !pause && visible;
 
   const [[msgList, msgListBuf], setMsgList] = useState<
     [Immutable.List<CommandPacket>, Immutable.List<CommandPacket>]
@@ -194,32 +234,31 @@ function useMsgList(hover: boolean) {
 }
 
 function useAutoScroll(
+  listRef: RefObject<HTMLDivElement>,
   msgListReachedMaxSize: boolean,
-  hover: boolean,
+  pause: boolean,
   animation: boolean
-): [
-  Dispatch<SetStateAction<HTMLDivElement | null>>,
-  Dispatch<SetStateAction<HTMLDivElement | null>>
-] {
-  const [listRef, setListRef] = useState<HTMLDivElement | null>(null);
+): Dispatch<SetStateAction<HTMLDivElement | null>> {
   const listScroll: MotionValue<number> = useSpring(0, {
     stiffness: 120,
     damping: 20,
   });
 
   const prevElement = useRef<HTMLDivElement>();
-  const prevHover = useRef(false);
+  const prevPause = useRef(false);
   const [latestElement, setLatestElement] = useState<HTMLDivElement | null>(
     null
   );
   useEffect(() => {
-    if (!latestElement || !listRef) return;
+    const list = listRef.current;
+
+    if (!latestElement || !list) return;
 
     function scrollTo(value: number) {
-      if (!listRef) return;
+      if (!list) return;
 
-      listRef.scrollTo({
-        top: maxScrollTop(listRef) - value,
+      list.scrollTo({
+        top: maxScrollTop(list) - value,
       });
     }
 
@@ -238,31 +277,33 @@ function useAutoScroll(
         prevElement.current.offsetTop + prevElement.current.offsetHeight;
       const heightAppended = offsetBottom - prevOffsetBottom;
 
-      if (!hover) {
-        if (prevHover.current) {
-          scroll(maxScrollTop(listRef) - listRef.scrollTop, 0);
+      if (!pause) {
+        if (prevPause.current) {
+          scroll(maxScrollTop(list) - list.scrollTop, 0);
         } else {
           scroll(listScroll.get() + heightAppended, 0);
         }
       } else {
-        scroll(maxScrollTop(listRef) - listRef.scrollTop);
+        scroll(maxScrollTop(list) - list.scrollTop);
       }
     }
 
-    prevHover.current = hover;
+    prevPause.current = pause;
     prevElement.current = latestElement;
-  }, [animation, hover, latestElement, listRef, listScroll]);
+  }, [animation, pause, latestElement, listRef, listScroll]);
 
   useEffect(() => {
-    if (!listRef) return;
+    const list = listRef.current;
+
+    if (!list) return;
     return listScroll.on("change", (value) => {
-      listRef.scrollTo({
-        top: maxScrollTop(listRef) - value,
+      list.scrollTo({
+        top: maxScrollTop(list) - value,
       });
     });
   }, [listRef, listScroll]);
 
-  return [setListRef, setLatestElement];
+  return setLatestElement;
 }
 
 function useMsgPreProcess(msgList: Immutable.List<CommandPacket>): {
