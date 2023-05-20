@@ -45,6 +45,7 @@
         },
         "nsis": {
           "displayLanguageSelector": true,
+          "languages": ["English", "SimpChinese", "TradChinese"],
           "license": "../COPYING"
         }
       },
