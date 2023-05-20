@@ -4,31 +4,16 @@
  */
 
 import Immutable from "immutable";
+import { GiftConfigItem } from "./rust/command_packet/app_command/gift_config_update";
 
-export type TGiftConfig = Map<number, TGiftConfigItem>;
-export type TGiftConfigState = Immutable.Map<number, TGiftConfigItem>;
+export type TGiftConfigArr = GiftConfigItem[];
+export type TGiftConfig = Map<number, GiftConfigItem>;
+export type TGiftConfigState = Immutable.Map<number, GiftConfigItem>;
 
-export interface TGiftConfigItem {
-  id: number;
-  name: string;
-  price: number;
-  coin_type: "gold" | "silver";
-  webp: string;
-}
+export function convertGiftConfig(giftConfigArr: TGiftConfigArr): TGiftConfig {
+  const result = new Map();
 
-type TGiftConfigResponse = Map<string, unknown>;
-
-export function parseGiftConfigResponse(response: unknown): TGiftConfig {
-  const res = response as TGiftConfigResponse;
-  const result: TGiftConfig = new Map();
-
-  for (const itemMap of res.get("list") as Map<string, unknown>[]) {
-    const item = Object.fromEntries(
-      itemMap.entries()
-    ) as unknown as TGiftConfigItem;
-    if (!item.webp.startsWith("https")) {
-      item.webp = item.webp.replace("http", "https");
-    }
+  for (const item of giftConfigArr) {
     result.set(item.id, item);
   }
 

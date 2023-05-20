@@ -3,19 +3,31 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-use serde_json::Value;
-
-#[derive(serde::Serialize, serde::Deserialize, type_exporter::TE, PartialEq, Eq, Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct GiftConfigUpdate {
-  #[te(retype = "unknown")]
-  gift_config_response: Value,
+  gift_config: Vec<GiftConfigItem>,
 }
 
 impl GiftConfigUpdate {
-  pub fn new(gift_config_response: Value) -> GiftConfigUpdate {
-    GiftConfigUpdate {
-      gift_config_response,
-    }
+  pub fn new(gift_config: Vec<GiftConfigItem>) -> GiftConfigUpdate {
+    GiftConfigUpdate { gift_config }
   }
+}
+
+#[derive(serde::Deserialize, serde::Serialize, PartialEq, Eq, Debug, Clone)]
+pub struct GiftConfigItem {
+  pub id: i32,
+  pub name: String,
+  pub price: i32,
+  pub coin_type: CoinType,
+  pub webp: String,
+  pub img_basic: String,
+}
+
+#[derive(serde::Deserialize, serde::Serialize, PartialEq, Eq, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub enum CoinType {
+  Gold,
+  Silver,
 }

@@ -19,10 +19,10 @@ import { TPartialRequired } from "../type/TPartialRequired";
 import { CommandPacket } from "../type/rust/command_packet";
 import { AppCommand } from "../type/rust/command_packet/app_command";
 import { BiliBiliCommand } from "../type/rust/command_packet/bilibili_command";
-import { parseGiftConfigResponse } from "../type/TGiftConfig";
 import { backendApiConfigCache } from "./BackendApi";
 import { defaultConfig } from "./Defaults";
 import { deserialize_command_packet } from "chaos_danmu_tool_share";
+import { convertGiftConfig } from "../type/TGiftConfig";
 
 type Option = {
   host: string;
@@ -148,7 +148,7 @@ export class CommandReceiver {
           case "giftConfigUpdate": {
             de(
               new GiftConfigUpdateEvent(
-                parseGiftConfigResponse(appCommand.data.giftConfigResponse)
+                convertGiftConfig(appCommand.data.giftConfig)
               )
             );
             break;

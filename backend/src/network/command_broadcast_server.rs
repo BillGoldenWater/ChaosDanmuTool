@@ -196,11 +196,12 @@ impl CommandBroadcastServer {
     let gift_config_result = GiftConfigGetter::get().await;
     match gift_config_result {
       Ok(gift_config) => {
-        if let Some(gift_config) = gift_config.data {
-          self
-            .send_cmd(connection_id, GiftConfigUpdate::new(gift_config))
-            .await;
-        }
+        self
+          .send_cmd(
+            connection_id,
+            GiftConfigUpdate::new(gift_config.data.unwrap().list),
+          )
+          .await;
       }
       Err(err) => {
         error!("failed to get gift config: {:}", err)

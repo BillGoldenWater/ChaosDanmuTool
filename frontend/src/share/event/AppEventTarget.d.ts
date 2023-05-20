@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { TGiftConfigMap } from "../type/bilibili/TGiftConfig";
 import type { Config } from "../type/rust/config/Config";
 import type { ReceiverStatus } from "../type/rust/command/commandPacket/appCommand/receiverStatusUpdate/ReceiverStatus";
 import type { ViewerStatus } from "../type/rust/command/commandPacket/appCommand/viewerStatusUpdate/ViewerStatus";
 import { UserInfo } from "../type/rust/cache/userInfo/UserInfo";
 import { CommandPacket } from "../type/rust/command/CommandPacket";
+import { TGiftConfig } from "../type/TGiftConfig";
 
 //region appCommand
 declare class BiliBiliPackParseErrorEvent extends Event {
@@ -24,9 +24,9 @@ declare class ConfigUpdateEvent extends Event {
 }
 
 declare class GiftConfigUpdateEvent extends Event {
-  giftConfig: TGiftConfigMap;
+  giftConfig: TGiftConfig;
 
-  constructor(giftConfig: TGiftConfigMap);
+  constructor(giftConfig: TGiftConfig);
 }
 
 declare class ReceiverStatusUpdateEvent extends Event {

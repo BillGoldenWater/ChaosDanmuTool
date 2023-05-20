@@ -14,8 +14,8 @@ export function GiftMessage(props: TDanmuItemProps) {
   const {
     info: { item, mergePrev, mergeNext, giftNumSum },
   } = props;
-
   const ctx = useContext(appCtx);
+  const compact = false;
 
   const { action, coinType, giftId, giftName, price, timestamp, uid } = item
     .data.data as GiftMessage;
@@ -24,8 +24,8 @@ export function GiftMessage(props: TDanmuItemProps) {
     const giftInfo = ctx.giftConfig.get(giftId);
     if (giftInfo == null) return null;
 
-    return <GiftIcon src={giftInfo.webp} />;
-  }, [ctx.giftConfig, giftId]);
+    return <GiftIcon src={giftInfo.webp} $compact={compact} />;
+  }, [compact, ctx.giftConfig, giftId]);
 
   const highlight: UserMessageProps["highlightColor"] =
     coinType === "gold" ? "#ffc800" : "#00000000";
@@ -54,9 +54,9 @@ export function GiftMessage(props: TDanmuItemProps) {
   );
 }
 
-const GiftIcon = styled.img`
+const GiftIcon = styled.img<{ $compact: boolean }>`
   display: inline-block;
-  max-width: 4rem;
+  max-width: ${(p) => (p.$compact ? "32rem" : "64rem")};
 `;
 
 const CoinGoldIcon = styled.img`
