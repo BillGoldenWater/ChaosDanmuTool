@@ -15,8 +15,8 @@ static GIFT_CONFIG_API_URL: &str =
 pub struct GiftConfigGetter {}
 
 impl GiftConfigGetter {
-  pub async fn get(room_id: u32) -> bilibili_response::ResponseResult<Value> {
-    let url = format!("{}?platform=pc&room_id={}", GIFT_CONFIG_API_URL, room_id);
+  pub async fn get() -> bilibili_response::ResponseResult<Value> {
+    let url = format!("{}?platform=pc", GIFT_CONFIG_API_URL);
 
     bilibili_get(&url).await
   }
