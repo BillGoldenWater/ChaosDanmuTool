@@ -50,11 +50,7 @@ export function UserMessage(props: PropsWithChildren<UserMessageProps>) {
   // region msgUserInfo
   const msgUserInfo = useMemo(() => {
     if (mergePrev) return null;
-    return (
-      <div>
-        <UserInfo userInfo={userInfo} showAvatar={compact} />
-      </div>
-    );
+    return <UserInfo userInfo={userInfo} showAvatar={compact} />;
   }, [compact, mergePrev, userInfo]);
   // endregion
 
