@@ -3,11 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+#[cfg(all(debug_assertions, feature = "lock_debug"))]
 use std::collections::HashMap;
 use std::time::Duration;
 
 use log::error;
 use once_cell::sync::Lazy;
+#[cfg(all(debug_assertions, feature = "lock_debug"))]
 use tokio::sync::RwLock;
 use tokio::{
   sync::{Mutex, MutexGuard},
@@ -16,7 +18,9 @@ use tokio::{
 
 use crate::app_context::AppContext;
 use crate::utils::async_utils::run_blocking;
-use crate::utils::trace_utils::{gen_trace_message, print_trace};
+#[cfg(all(debug_assertions, feature = "lock_debug"))]
+use crate::utils::trace_utils::gen_trace_message;
+use crate::utils::trace_utils::print_trace;
 
 static TIMEOUT_MILLIS: Lazy<u64> = Lazy::new(|| AppContext::i().args.lock_timeout_millis);
 
