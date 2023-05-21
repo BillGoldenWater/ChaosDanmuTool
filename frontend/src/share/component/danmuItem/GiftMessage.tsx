@@ -5,20 +5,20 @@
 
 import styled from "styled-components";
 import { TDanmuItemProps } from "./DanmuItem";
-import { useContext, useMemo } from "react";
-import { appCtx } from "../../app/AppCtx";
+import { useMemo } from "react";
+import { useAppCtx } from "../../app/AppCtx";
 import { UserMessage, UserMessageProps } from "./UserMessage";
 import { GiftMessage } from "../../type/rust/command_packet/bilibili_command/gift_message";
 
 export function GiftMessage(props: TDanmuItemProps) {
   const {
-    info: { item, mergePrev, mergeNext, giftNumSum },
+    info: { item, mergePrev, mergeNext },
   } = props;
-  const ctx = useContext(appCtx);
+  const ctx = useAppCtx();
   const compact = false;
 
-  const { action, coinType, giftId, giftName, price, timestamp, uid } = item
-    .data.data as GiftMessage;
+  const { action, coinType, giftId, giftName, price, timestamp, uid, num } =
+    item.data.data as GiftMessage;
 
   const giftIcon = useMemo(() => {
     const giftInfo = ctx.giftConfig.get(giftId);
@@ -35,11 +35,11 @@ export function GiftMessage(props: TDanmuItemProps) {
 
     return (
       <>
-        ({(price / 100) * giftNumSum}
+        ({(price / 100) * num}
         <CoinGoldIcon />)
       </>
     );
-  }, [coinType, giftNumSum, price]);
+  }, [coinType, num, price]);
 
   return (
     <UserMessage
@@ -49,7 +49,7 @@ export function GiftMessage(props: TDanmuItemProps) {
       timestamp={timestamp}
       highlightColor={highlight}
     >
-      {action} {giftIcon} {giftName} 共 {giftNumSum} 个 {priceText}
+      {action} {giftIcon} {giftName} 共 {num} 个 {priceText}
     </UserMessage>
   );
 }

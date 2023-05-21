@@ -6,15 +6,15 @@
 import styled from "styled-components";
 import { color } from "../../share/component/ThemeCtx";
 import { useHoverState } from "../../share/hook/useHoverState";
-import { useContext, useMemo } from "react";
-import { appCtx } from "../../share/app/AppCtx";
+import { useMemo } from "react";
+import { useAppCtx } from "../../share/app/AppCtx";
 import { UilLinkBroken } from "@iconscout/react-unicons";
 import { Panel } from "../../share/component/Panel";
 import { backend } from "../../share/app/BackendApi";
 import { motion } from "framer-motion";
 
 export function DisconnectPanel() {
-  const ctx = useContext(appCtx);
+  const ctx = useAppCtx();
   const roomid = useMemo(
     () => ctx.config.get("backend.danmuReceiver.roomid"),
     [ctx.config]

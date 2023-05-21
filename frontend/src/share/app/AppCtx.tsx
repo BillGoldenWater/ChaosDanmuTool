@@ -7,6 +7,7 @@ import React, {
   createContext,
   PropsWithChildren,
   useCallback,
+  useContext,
   useEffect,
   useRef,
   useState,
@@ -78,7 +79,7 @@ export interface TAppCtx {
   eventTarget: AppEventTarget;
 }
 
-export const appCtx = createContext<TAppCtx>({
+const AppCtx = createContext<TAppCtx>({
   params: getParams(),
   setViewerId: () => undefined,
 
@@ -96,9 +97,9 @@ export const appCtx = createContext<TAppCtx>({
 
   eventTarget: new AppEventTarget(),
 });
-appCtx.displayName = "AppContext";
+AppCtx.displayName = "AppContext";
 
-const AppCtxProv = appCtx.Provider;
+const AppCtxProv = AppCtx.Provider;
 
 interface Props extends PropsWithChildren {
   firstConfig: Config;
@@ -366,4 +367,8 @@ export function initialAppConstant(
     eventTarget,
     receiver,
   };
+}
+
+export function useAppCtx(): TAppCtx {
+  return useContext(AppCtx);
 }

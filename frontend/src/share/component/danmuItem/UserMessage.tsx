@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { PropsWithChildren, useContext, useMemo } from "react";
-import { appCtx } from "../../app/AppCtx";
+import { PropsWithChildren, useMemo } from "react";
+import { useAppCtx } from "../../app/AppCtx";
 import styled, { css } from "styled-components";
 import { UserAvatar } from "../userInfo/UserAvatar";
 import { UserInfo } from "../userInfo/UserInfo";
@@ -30,7 +30,7 @@ export interface UserMessageProps {
 export function UserMessage(props: PropsWithChildren<UserMessageProps>) {
   const { children, uid, timestamp, mergePrev, mergeNext, highlightColor } =
     props;
-  const ctx = useContext(appCtx);
+  const ctx = useAppCtx();
   const userInfo = useMemo(() => ctx.getUserInfo(uid), [ctx, uid]);
   const compact = false;
 

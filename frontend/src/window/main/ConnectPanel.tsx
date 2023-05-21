@@ -8,12 +8,12 @@ import { color, themeCtx } from "../../share/component/ThemeCtx";
 import { Panel } from "../../share/component/Panel";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { appCtx } from "../../share/app/AppCtx";
+import { useAppCtx } from "../../share/app/AppCtx";
 import { backend } from "../../share/app/BackendApi";
 import { NumberInput } from "../../share/component/input/NumberInput";
 
 export function ConnectPanel() {
-  const ctx = useContext(appCtx);
+  const ctx = useAppCtx();
   const connecting = ctx.receiverStatus === "connecting";
 
   return (
@@ -41,7 +41,7 @@ export function ConnectPanel() {
 
 // region roomid input
 function RoomidInput() {
-  const ctx = useContext(appCtx);
+  const ctx = useAppCtx();
 
   const [roomid, setRoomid] = useState(() =>
     ctx.config.get("backend.danmuReceiver.roomid")

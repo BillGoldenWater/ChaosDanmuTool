@@ -7,13 +7,12 @@ import {
   createContext,
   PropsWithChildren,
   useCallback,
-  useContext,
   useEffect,
   useLayoutEffect,
   useMemo,
   useState,
 } from "react";
-import { appCtx } from "../app/AppCtx";
+import { useAppCtx } from "../app/AppCtx";
 import { Config } from "../type/rust/config";
 import Color from "color";
 import { TPropTo } from "../type/TPropTo";
@@ -186,7 +185,7 @@ themeCtx.displayName = "ThemeContext";
 const ThemeCtxProv = themeCtx.Provider;
 
 export function ThemeCtxProvider({ children }: PropsWithChildren) {
-  const app = useContext(appCtx);
+  const app = useAppCtx();
 
   const toggleTheme: TThemeCtx["toggleTheme"] = useCallback(
     (dark?: boolean, fromFollow?: boolean) => {

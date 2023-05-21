@@ -14,26 +14,23 @@ import {
   RefObject,
   SetStateAction,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
-import { appCtx } from "../app/AppCtx";
+import { useAppCtx } from "../app/AppCtx";
 import { BiliBiliMessageEvent } from "../event/AppEventTarget";
 import { CommandPacket } from "../type/rust/command_packet";
 import { DanmuItem, TDanmuItemInfo } from "./danmuItem/DanmuItem";
 import { AnimatePresence, MotionValue, useSpring } from "framer-motion";
 import { maxScrollTop } from "../utils/ElementUtils";
-import {
-  DanmuViewerMaxSize,
-  GiftMergeIntervalInSeconds,
-} from "../app/Settings";
+import { DanmuViewerMaxSize } from "../app/Settings";
 import Immutable from "immutable";
 import { UilPlayCircle } from "@iconscout/react-unicons";
 import { Button } from "./Button";
 import { useKey } from "react-use";
+import { useWindowVisible } from "../hook/useWindowVisible";
 
 export function DanmuViewer() {
   const scrollAnimation = true;
@@ -42,8 +39,8 @@ export function DanmuViewer() {
   const onPauseResume = useCallback(() => setPause((prev) => !prev), []);
   useKey(" ", onPauseResume);
 
-  const msgList = useMsgList(pause);
-  const { dmList } = useMsgPreProcess(msgList);
+  const { list: msgList } = useMsgState(pause);
+  const dmList = useMsgPreProcess(msgList);
 
   const listRef = createRef<HTMLDivElement>();
   const setLatestElement = useAutoScroll(
@@ -146,91 +143,125 @@ const DanmuItemContainerBase = styled.div`
   position: relative;
 `;
 
-function useMsgList(pause: boolean) {
-  const ctx = useContext(appCtx);
+interface MsgState {
+  list: Immutable.List<CommandPacket>;
+  super_chat: Immutable.List<CommandPacket>;
+  activity: number;
+}
 
-  const [visible, setVisible] = useState(
-    document.visibilityState === "visible"
+function useMsgState(pause: boolean): MsgState {
+  const ctx = useAppCtx();
+
+  const visible = useWindowVisible();
+  const shouldSyncBuf = !pause && visible;
+
+  // region process message
+  const initialMsgStateBuf = useMemo<MsgState>(
+    () => ({
+      list: Immutable.List(),
+      super_chat: Immutable.List(),
+      activity: 0,
+    }),
+    []
   );
-  const shouldProcessBuf = !pause && visible;
+  const msgStateBufRef = useRef<MsgState>(initialMsgStateBuf);
 
-  const [[msgList, msgListBuf], setMsgList] = useState<
-    [Immutable.List<CommandPacket>, Immutable.List<CommandPacket>]
-  >(() => [Immutable.List(), Immutable.List()]);
+  // region state
+  const [msgState, setMsgState] = useState(initialMsgStateBuf);
+
+  const syncBuf = useCallback(() => {
+    if (shouldSyncBuf) setMsgState(msgStateBufRef.current);
+  }, [shouldSyncBuf]);
+
+  useEffect(() => (visible ? syncBuf() : undefined), [visible, syncBuf]);
+  // endregion
+
+  const processMsg = useCallback(
+    (msg: CommandPacket) => {
+      if (msg.cmd !== "biliBiliCommand") {
+        console.error("unexpected non biliBiliCommand");
+        console.error(msg);
+        return;
+      }
+
+      // region handle msg
+      const buf = msgStateBufRef.current;
+      switch (msg.data.cmd) {
+        case "danmuMessage": {
+          buf.list = buf.list.push(msg);
+          break;
+        }
+        case "giftMessage": {
+          const giftMsg = msg.data.data;
+
+          const prevTotal = buf.list.reduce((reduction, value) => {
+            if (value.cmd !== "biliBiliCommand") return reduction;
+            if (value.data.cmd !== "giftMessage") return reduction;
+            if (value.data.data.uid !== giftMsg.uid) return reduction;
+            if (value.data.data.giftId !== giftMsg.giftId) return reduction;
+            return value.data.data.num + reduction;
+          }, 0);
+
+          let newList;
+
+          if (prevTotal !== 0) {
+            giftMsg.num += prevTotal;
+            newList = buf.list
+              .filterNot(
+                (v) =>
+                  v.cmd === "biliBiliCommand" &&
+                  v.data.cmd === "giftMessage" &&
+                  v.data.data.uid === giftMsg.uid &&
+                  v.data.data.giftId === giftMsg.giftId
+              )
+              .push(msg);
+          } else {
+            newList = buf.list.push(msg);
+          }
+
+          buf.list = newList;
+          break;
+        }
+        case "activityUpdate": {
+          buf.activity = msg.data.data.activity;
+          break;
+        }
+        case "raw":
+        case "parseFailed": {
+          return;
+        }
+      }
+      // endregion
+
+      // region handle size limit
+      if (buf.list.size > DanmuViewerMaxSize) {
+        buf.list = buf.list.slice(buf.list.size - DanmuViewerMaxSize);
+      }
+      // endregion
+
+      msgStateBufRef.current = { ...buf };
+      syncBuf();
+    },
+    [syncBuf]
+  );
 
   useEffect(() => {
     function onBiliBiliMessage(event: BiliBiliMessageEvent) {
-      setMsgList(([list, buf]) => {
-        if (!shouldProcessBuf && buf.size > DanmuViewerMaxSize) {
-          return [
-            list,
-            buf
-              .push(event.message)
-              .slice(Math.max(buf.size - DanmuViewerMaxSize, 0), buf.size),
-          ];
-        } else {
-          return [list, buf.push(event.message)];
-        }
-      });
+      processMsg(event.message);
     }
 
     ctx.eventTarget.addEventListener("bilibiliMessage", onBiliBiliMessage);
 
     return () =>
       ctx.eventTarget.removeEventListener("bilibiliMessage", onBiliBiliMessage);
-  }, [ctx.eventTarget, shouldProcessBuf]);
+  }, [ctx.eventTarget, processMsg]);
+  // endregion
 
-  const processBuf = useCallback(() => {
-    setMsgList((prev) => {
-      if (!shouldProcessBuf) {
-        return prev;
-      }
-
-      const [list, buf] = prev;
-
-      const newList = list.merge(buf);
-      return [
-        newList.slice(
-          Math.max(newList.size - DanmuViewerMaxSize, 0),
-          newList.size
-        ),
-        buf.clear(),
-      ];
-    });
-  }, [shouldProcessBuf]);
-
-  const bufUpdateIdRef = useRef<number | null>(null);
-  useEffect(() => {
-    if (
-      msgListBuf.size === 0 ||
-      bufUpdateIdRef.current != null ||
-      !shouldProcessBuf
-    )
-      return;
-
-    bufUpdateIdRef.current = window.setTimeout(() => {
-      processBuf();
-      bufUpdateIdRef.current = null;
-    }, 50);
-  }, [msgListBuf.size, processBuf, shouldProcessBuf]);
-
-  useEffect(() => {
-    function onVisibilityChange() {
-      if (document.visibilityState === "visible") {
-        setVisible(true);
-        processBuf();
-      } else {
-        setVisible(false);
-      }
-    }
-
-    document.addEventListener("visibilitychange", onVisibilityChange);
-
-    return () =>
-      document.removeEventListener("visibilitychange", onVisibilityChange);
-  }, [processBuf]);
-
-  return msgList;
+  return {
+    list: msgState.list,
+    super_chat: msgState.super_chat,
+    activity: msgState.activity,
+  };
 }
 
 function useAutoScroll(
@@ -306,131 +337,66 @@ function useAutoScroll(
   return setLatestElement;
 }
 
-function useMsgPreProcess(msgList: Immutable.List<CommandPacket>): {
-  dmList: Immutable.List<TDanmuItemInfo>;
-  activity: number;
-} {
-  const [dmList, setDmList] = useState(Immutable.List<TDanmuItemInfo>);
-  const [activity, setActivity] = useState(0);
-
-  useEffect(() => {
-    const list: TPreProcessMsgItem[] = [];
-
-    // region count gift, check color and process command
-    const giftCounter = new Map<
-      string,
-      { ts: number; prev: TPreProcessMsgItem }
-    >();
-
-    interface TPreProcessMsgItem {
-      info: TDanmuItemInfo | null;
+function useMsgPreProcess(
+  msgList: Immutable.List<CommandPacket>
+): Immutable.List<TDanmuItemInfo> {
+  return useMemo(() => {
+    interface PreProcessMsgItem {
+      info: TDanmuItemInfo;
       uid: string;
       hasColor: boolean;
     }
 
-    msgList.forEach((it) => {
-      if (it.cmd !== "biliBiliCommand") return;
+    const defaultInfo: TDanmuItemInfo = {
+      item: null as unknown as CommandPacket,
+      mergePrev: false,
+      mergeNext: false,
+    };
 
-      switch (it.data.cmd) {
-        case "danmuMessage": {
-          const dmMsg = it.data.data;
-          const dmInfo = {
-            item: it,
-            mergeNext: false,
-            mergePrev: false,
-            giftNumSum: 0,
-          };
-
-          list.push({
-            info: dmInfo,
-            uid: dmMsg.uid,
-            hasColor: dmMsg.bubbleColor !== "",
-          });
-          break;
+    return msgList
+      .map<null | PreProcessMsgItem>((item) => {
+        if (item.cmd !== "biliBiliCommand") {
+          return null;
         }
-        case "giftMessage": {
-          const giftMsg = it.data.data;
-          const dmInfo = {
-            item: it,
-            mergeNext: false,
-            mergePrev: false,
-            giftNumSum: giftMsg.num,
-          };
-          const item: TPreProcessMsgItem = {
-            info: dmInfo,
-            uid: giftMsg.uid,
-            hasColor: giftMsg.coinType === "gold",
-          };
 
-          const giftIdentifier = `${giftMsg.uid}:${giftMsg.giftId}`;
-          const ts = Number.parseInt(giftMsg.timestamp);
-
-          const prevGift = giftCounter.get(giftIdentifier);
-          if (prevGift) {
-            if (prevGift.ts > ts - GiftMergeIntervalInSeconds) {
-              // in the interval
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              prevGift.prev.info!.giftNumSum += dmInfo.giftNumSum;
-              item.info = null;
-            }
-            prevGift.ts = ts;
-          } else {
-            giftCounter.set(giftIdentifier, { ts, prev: item });
+        switch (item.data.cmd) {
+          case "danmuMessage": {
+            const dmMsg = item.data.data;
+            return {
+              info: { ...defaultInfo, item },
+              uid: dmMsg.uid,
+              hasColor: dmMsg.bubbleColor !== "",
+            };
           }
-
-          list.push(item);
-          break;
+          case "giftMessage": {
+            const giftMsg = item.data.data;
+            return {
+              info: { ...defaultInfo, item },
+              uid: giftMsg.uid,
+              hasColor: giftMsg.coinType === "gold",
+            };
+          }
+          case "activityUpdate":
+          case "raw":
+          case "parseFailed": {
+            return null;
+          }
         }
-        case "activityUpdate": {
-          const activity = it.data.data.activity;
-          setActivity((prev) => (prev !== activity ? activity : prev));
-          break;
-        }
-        case "raw": {
-          list.push({
-            info: {
-              item: it,
-              mergeNext: false,
-              mergePrev: false,
-              giftNumSum: 0,
-            },
-            uid: "",
-            hasColor: false,
-          });
-          break;
-        }
-      }
-    });
-    // endregion
-
-    // region apply merge and unwrap
-    const dmList = list
-      .filter((it) => it.info != null)
+      })
+      .filter((it) => it != null)
       .map((item, idx, arr) => {
+        const it = item as PreProcessMsgItem; // null safety: already filtered
+
         if (idx > 0) {
-          const prevItem = arr[idx - 1];
-          if (prevItem.hasColor === item.hasColor && prevItem.uid == item.uid) {
+          const prevItem = arr.get(idx - 1) as PreProcessMsgItem;
+          if (prevItem.hasColor === it.hasColor && prevItem.uid == it.uid) {
             if (prevItem.info) prevItem.info.mergeNext = true;
-            if (item.info) item.info.mergePrev = true;
+            if (it.info) it.info.mergePrev = true;
           }
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          return item.info!;
+          return it.info;
         } else {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          return item.info!;
+          return it.info;
         }
       });
-    // endregion
-
-    setDmList((prevList) => {
-      const immutableList = Immutable.List(dmList);
-      if (immutableList.equals(prevList)) {
-        return prevList;
-      } else {
-        return immutableList;
-      }
-    });
   }, [msgList]);
-
-  return { dmList, activity };
 }

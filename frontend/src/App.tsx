@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { useContext, useMemo } from "react";
-import { appCtx } from "./share/app/AppCtx";
-import { windows, TWindow } from "./window/Window";
+import { useMemo } from "react";
+import { useAppCtx } from "./share/app/AppCtx";
+import { TWindow, windows } from "./window/Window";
 
 export function App() {
-  const ctx = useContext(appCtx);
+  const ctx = useAppCtx();
 
   return useMemo(
     () =>

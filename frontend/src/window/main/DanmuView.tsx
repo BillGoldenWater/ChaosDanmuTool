@@ -5,16 +5,16 @@
 
 import styled from "styled-components";
 import { ConnectPanel } from "./ConnectPanel";
-import React, { useContext, useMemo } from "react";
+import React, { useMemo } from "react";
 import { MotionPanel } from "../../share/component/Panel";
 import { AnimatePresence, motion } from "framer-motion";
-import { appCtx } from "../../share/app/AppCtx";
+import { useAppCtx } from "../../share/app/AppCtx";
 import { DanmuViewer } from "../../share/component/DanmuViewer";
 import { DisconnectPanel } from "./DisconnectPanel";
 import { paddingValue } from "../../share/component/ThemeCtx";
 
 export function DanmuView() {
-  const ctx = useContext(appCtx);
+  const ctx = useAppCtx();
 
   const connected =
     ctx.receiverStatus === "connected" || ctx.receiverStatus === "reconnecting";

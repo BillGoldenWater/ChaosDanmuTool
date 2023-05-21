@@ -12,7 +12,6 @@ export interface TDanmuItemInfo {
   item: CommandPacket;
   mergePrev: boolean;
   mergeNext: boolean;
-  giftNumSum: number;
 }
 
 export interface TDanmuItemProps {
