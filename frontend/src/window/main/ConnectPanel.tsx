@@ -4,9 +4,9 @@
  */
 
 import styled from "styled-components";
-import { color, themeCtx } from "../../share/component/ThemeCtx";
+import { color, useThemeCtx } from "../../share/component/ThemeCtx";
 import { Panel } from "../../share/component/Panel";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useAppCtx } from "../../share/app/AppCtx";
 import { backend } from "../../share/app/BackendApi";
@@ -86,7 +86,7 @@ const ConnectBtn = styled(motion.button)`
 `;
 
 function BtnConnectingSvg({ connecting }: { connecting: boolean }) {
-  const theme = useContext(themeCtx);
+  const theme = useThemeCtx();
 
   return (
     <BtnConnectSvgBase viewBox={"0 0 100 100"}>

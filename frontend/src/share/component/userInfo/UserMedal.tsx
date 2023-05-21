@@ -5,9 +5,8 @@
 
 import { MedalData } from "../../type/rust/types/user_info/medal_data";
 import styled, { css } from "styled-components";
-import { borderValue, color, font, radius, themeCtx } from "../ThemeCtx";
+import { borderValue, color, font, radius, useThemeCtx } from "../ThemeCtx";
 import { Property } from "csstype";
-import { useContext } from "react";
 import { rgbI2S } from "../../utils/ColorUtils";
 
 interface UserMedalProps {
@@ -28,7 +27,7 @@ export function UserMedal(props: UserMedalProps) {
   } = medalData;
   const { medalName } = info;
 
-  const theme = useContext(themeCtx);
+  const theme = useThemeCtx();
 
   const txtColor = color != null ? rgbI2S(color) : theme.consts.theme;
   const borderColor =

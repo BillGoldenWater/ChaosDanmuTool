@@ -7,6 +7,7 @@ import {
   createContext,
   PropsWithChildren,
   useCallback,
+  useContext,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -169,7 +170,7 @@ export function isHorizontal(): boolean {
 }
 
 const defaultConsts = await genConstants(defaultConfig.frontend.mainView.theme);
-export const themeCtx = createContext<TThemeCtx>({
+const ThemeCtx = createContext<TThemeCtx>({
   theme: defaultConfig.frontend.mainView.theme,
 
   consts: defaultConsts,
@@ -180,9 +181,9 @@ export const themeCtx = createContext<TThemeCtx>({
 
   toggleTheme: () => undefined,
 });
-themeCtx.displayName = "ThemeContext";
+ThemeCtx.displayName = "ThemeContext";
 
-const ThemeCtxProv = themeCtx.Provider;
+const ThemeCtxProv = ThemeCtx.Provider;
 
 export function ThemeCtxProvider({ children }: PropsWithChildren) {
   const app = useAppCtx();
@@ -317,6 +318,10 @@ export function ThemeCtxProvider({ children }: PropsWithChildren) {
       <ThemeProvider theme={ctx}>{children}</ThemeProvider>
     </ThemeCtxProv>
   );
+}
+
+export function useThemeCtx() {
+  return useContext(ThemeCtx);
 }
 
 declare global {
