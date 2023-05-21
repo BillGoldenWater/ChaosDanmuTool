@@ -84,7 +84,7 @@ impl WebSocketConnection {
   }
 
   pub async fn disconnect(&mut self, close_frame: Option<CloseFrame<'static>>) {
-    let mut connected = a_lock(&self.connected).await;
+    let mut connected = a_lock("wsConn_connected", &self.connected).await;
 
     if *connected {
       log_err!(
@@ -100,7 +100,7 @@ impl WebSocketConnection {
   }
 
   pub async fn send(&mut self, message: Message) {
-    let connected = a_lock(&self.connected).await;
+    let connected = a_lock("wsConn_connected", &self.connected).await;
 
     if *connected {
       log_err!("send", self.writer.send(message).await);
@@ -110,7 +110,7 @@ impl WebSocketConnection {
   }
 
   pub async fn feed(&mut self, message: Message) {
-    let connected = a_lock(&self.connected).await;
+    let connected = a_lock("wsConn_connected", &self.connected).await;
 
     if *connected {
       log_err!("feed", self.writer.feed(message).await);
@@ -120,7 +120,7 @@ impl WebSocketConnection {
   }
 
   pub async fn flush(&mut self) {
-    let connected = a_lock(&self.connected).await;
+    let connected = a_lock("wsConn_connected", &self.connected).await;
 
     if *connected {
       log_err!("flush", self.writer.flush().await);
@@ -130,7 +130,7 @@ impl WebSocketConnection {
   }
 
   pub async fn send_many(&mut self, messages: Vec<Message>) {
-    let connected = a_lock(&self.connected).await;
+    let connected = a_lock("wsConn_connected", &self.connected).await;
 
     if *connected {
       for msg in messages {
@@ -144,7 +144,7 @@ impl WebSocketConnection {
   }
 
   pub async fn tick(&mut self) -> Vec<Message> {
-    let mut connected = a_lock(&self.connected).await;
+    let mut connected = a_lock("wsConn_connected", &self.connected).await;
 
     if !*connected {
       return vec![];
@@ -173,7 +173,7 @@ impl WebSocketConnection {
   }
 
   pub async fn is_connected(&self) -> bool {
-    *a_lock(&self.connected).await
+    *a_lock("wsConn_connected", &self.connected).await
   }
 
   pub fn get_id(&self) -> &ConnectionId {

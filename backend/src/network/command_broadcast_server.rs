@@ -94,19 +94,22 @@ impl CommandBroadcastServer {
   }
 
   pub async fn broadcast(&mut self, message: Message) {
-    for conn in a_lock(&self.connections).await.values_mut() {
+    for conn in a_lock("cbs_conns", &self.connections).await.values_mut() {
       conn.send(message.clone()).await;
     }
   }
 
   pub async fn broadcast_many(&mut self, messages: Vec<Message>) {
-    for conn in a_lock(&self.connections).await.values_mut() {
+    for conn in a_lock("cbs_conns", &self.connections).await.values_mut() {
       conn.send_many(messages.clone()).await;
     }
   }
 
   pub async fn send(&mut self, connection_id: &ConnectionId, message: Message) {
-    if let Some(conn) = a_lock(&self.connections).await.get_mut(connection_id) {
+    if let Some(conn) = a_lock("cbs_conns", &self.connections)
+      .await
+      .get_mut(connection_id)
+    {
       conn.send(message).await;
     }
   }
@@ -116,7 +119,10 @@ impl CommandBroadcastServer {
     connection_id: String,
     close_frame: Option<CloseFrame<'static>>,
   ) {
-    if let Some(conn) = a_lock(&self.connections).await.get_mut(&connection_id) {
+    if let Some(conn) = a_lock("cbs_conns", &self.connections)
+      .await
+      .get_mut(&connection_id)
+    {
       conn.disconnect(close_frame).await;
     }
   }
@@ -124,7 +130,7 @@ impl CommandBroadcastServer {
   pub async fn close_all(&mut self) {
     info!("closing all connection");
 
-    let mut connections = a_lock(&self.connections).await;
+    let mut connections = a_lock("cbs_conns", &self.connections).await;
 
     for conn in (*connections).values_mut() {
       conn.disconnect(close_frame(CloseCode::Normal, "")).await;
@@ -135,7 +141,7 @@ impl CommandBroadcastServer {
   }
 
   pub async fn tick(&mut self) {
-    let mut connections = a_lock(&self.connections).await;
+    let mut connections = a_lock("cbs_conns", &self.connections).await;
 
     // region remove disconnected connections
     let mut disconnected_connections: Vec<ConnectionId> = vec![];
@@ -173,7 +179,7 @@ impl CommandBroadcastServer {
     let connection = WebSocketConnection::from_ws_stream(websocket_stream);
 
     let connection_id = connection.get_id().clone();
-    a_lock(&self.connections)
+    a_lock("cbs_conns", &self.connections)
       .await
       .insert(connection_id.clone(), connection);
     self.on_connection(&connection_id).await;

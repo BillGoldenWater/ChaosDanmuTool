@@ -60,12 +60,12 @@ create index if not exists command_history_timestamp_index
   }
 
   pub async fn new_file(&mut self) {
-    *a_lock(&self.session_id).await = gen_session_id();
+    *a_lock("chm_sid",&self.session_id).await = gen_session_id();
   }
 
   pub async fn write(&mut self, command: &CommandPacket) -> Result<()> {
-    let mut db = a_lock(&self.db).await;
-    let session_id = a_lock(&self.session_id).await;
+    let mut db = a_lock("chm_db",&self.db).await;
+    let session_id = a_lock("chm_sid",&self.session_id).await;
 
     sqlx::query(
       "insert into command_history (sessionId, cmd, timestamp, content) values (?,?,?,?)",
@@ -85,8 +85,8 @@ create index if not exists command_history_timestamp_index
       return Ok(());
     }
 
-    let mut db = a_lock(&self.db).await;
-    let session_id = a_lock(&self.session_id).await;
+    let mut db = a_lock("chm_db",&self.db).await;
+    let session_id = a_lock("chm_sid",&self.session_id).await;
 
     let mut cmds = Vec::with_capacity(commands.len());
 
@@ -149,7 +149,7 @@ create index if not exists command_history_timestamp_index
     filters: Vec<(&str, &str)>,
     paging: Option<(u32, u32)>,
   ) -> Result<Vec<CommandPacket>> {
-    let mut db = a_lock(&self.db).await;
+    let mut db = a_lock("chm_db",&self.db).await;
 
     // region construct sql query
     // region construct command
@@ -212,7 +212,7 @@ create index if not exists command_history_timestamp_index
   }
 
   pub async fn history_storages(&self) -> Result<Vec<String>> {
-    let mut db = a_lock(&self.db).await;
+    let mut db = a_lock("chm_db",&self.db).await;
 
     let query_result = sqlx::query("select distinct sessionId from command_history")
       .fetch_all(&mut *db)
@@ -256,7 +256,7 @@ vacuum;
       "#
     };
 
-    let mut db = a_lock(&self.db).await;
+    let mut db = a_lock("chm_db",&self.db).await;
 
     let result = sqlx::query(sql).execute(&mut *db).await;
 
@@ -271,7 +271,7 @@ vacuum;
   pub async fn is_content_indexed(&self) -> Result<bool> {
     let sql = "select count(*) as count from sqlite_master where type = 'index' and name = 'command_history_content_index';";
 
-    let mut db = a_lock(&self.db).await;
+    let mut db = a_lock("chm_db",&self.db).await;
 
     let result = sqlx::query(sql).fetch_one(&mut *db).await?;
 

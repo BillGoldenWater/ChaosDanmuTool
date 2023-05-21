@@ -87,12 +87,16 @@ objc2 = "0.3.0-beta.5"
 icrate = { version = "0.0.2", features = ["Foundation", "Foundation_NSString", "Foundation_NSProcessInfo", "AppKit", "AppKit_NSWindow", "AppKit_NSButton"] }
 
 [features]
+# region tauri
 # by default Tauri runs in production mode
 # when `tauri dev` runs it is executed with `cargo run --no-default-features` if `devPath` is an URL
 default = ["custom-protocol"]
 # this feature is used used for production builds where `devPath` points to the filesystem
 # DO NOT remove this
 custom-protocol = ["tauri/custom-protocol"]
+# endregion
+
+lock_debug = []
 
 #[patch.crates-io]
 #tauri = { git = "https://github.com/BillGoldenWater/tauri.git", rev = "75a0c79dea39e3e8372097152a0fa82cf6493686" }
