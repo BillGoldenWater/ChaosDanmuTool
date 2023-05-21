@@ -4,13 +4,13 @@
  */
 
 use std::collections::HashMap;
+use std::time::Duration;
 
 use log::{error, info};
 use static_object::StaticObject;
 use tokio::net::TcpStream;
 use tokio::sync::Mutex;
 use tokio_tungstenite::tungstenite::protocol::frame::coding::CloseCode;
-use tokio_tungstenite::tungstenite::protocol::CloseFrame;
 use tokio_tungstenite::tungstenite::Message;
 use tokio_tungstenite::{MaybeTlsStream, WebSocketStream};
 
@@ -95,13 +95,23 @@ impl CommandBroadcastServer {
 
   pub async fn broadcast(&mut self, message: Message) {
     for conn in a_lock("cbs_conns", &self.connections).await.values_mut() {
-      conn.send(message.clone()).await;
+      if let Err(err) = conn.send(message.clone()).await {
+        error!(
+          "failed to send message to {} in broadcast: {err:?}",
+          conn.get_id()
+        );
+      }
     }
   }
 
   pub async fn broadcast_many(&mut self, messages: Vec<Message>) {
     for conn in a_lock("cbs_conns", &self.connections).await.values_mut() {
-      conn.send_many(messages.clone()).await;
+      if let Err(err) = conn.send_many(messages.clone()).await {
+        error!(
+          "failed to send message to {} in broadcast_many: {err:?}",
+          conn.get_id()
+        );
+      }
     }
   }
 
@@ -110,20 +120,9 @@ impl CommandBroadcastServer {
       .await
       .get_mut(connection_id)
     {
-      conn.send(message).await;
-    }
-  }
-
-  pub async fn disconnect(
-    &mut self,
-    connection_id: String,
-    close_frame: Option<CloseFrame<'static>>,
-  ) {
-    if let Some(conn) = a_lock("cbs_conns", &self.connections)
-      .await
-      .get_mut(&connection_id)
-    {
-      conn.disconnect(close_frame).await;
+      if let Err(err) = conn.send(message).await {
+        error!("failed to send message to {connection_id}: {err:?}");
+      }
     }
   }
 
@@ -133,7 +132,10 @@ impl CommandBroadcastServer {
     let mut connections = a_lock("cbs_conns", &self.connections).await;
 
     for conn in (*connections).values_mut() {
-      conn.disconnect(close_frame(CloseCode::Normal, "")).await;
+      let result = conn.disconnect(close_frame(CloseCode::Normal, "")).await;
+      if let Err(err) = result {
+        error!("failed to close connection in close_all: {err:?}");
+      }
     }
     connections.clear();
 
@@ -176,7 +178,8 @@ impl CommandBroadcastServer {
   }
 
   pub async fn accept(&mut self, websocket_stream: WebSocket) {
-    let connection = WebSocketConnection::from_ws_stream(websocket_stream);
+    let mut connection = WebSocketConnection::from_ws_stream(websocket_stream);
+    connection.set_send_timeout(Some(Duration::from_secs(5)));
 
     let connection_id = connection.get_id().clone();
     a_lock("cbs_conns", &self.connections)

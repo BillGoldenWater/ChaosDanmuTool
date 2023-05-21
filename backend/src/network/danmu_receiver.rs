@@ -30,7 +30,7 @@ use crate::network::danmu_receiver::packet_processor::PacketProcessor;
 use crate::network::danmu_receiver::ConnectError::{
   FailedToConnect, FailedToGetServerInfo, IllegalRoomid,
 };
-use crate::network::websocket::websocket_connection::WebSocketConnectError;
+use crate::network::websocket::websocket_connection::WebSocketConnectionError;
 use crate::network::websocket::websocket_connection_reusable::WebSocketConnectionReusable;
 use crate::utils::immutable_utils::Immutable;
 use crate::utils::trace_utils::print_trace;
@@ -375,7 +375,7 @@ pub enum ConnectError {
   #[error("failed to get server info")]
   FailedToGetServerInfo(#[from] danmu_server_info_getter::Error),
   #[error("failed to connect")]
-  FailedToConnect(#[from] WebSocketConnectError),
+  FailedToConnect(#[from] WebSocketConnectionError),
   #[error("connection interrupted")]
   ConnectionInterrupted,
 }

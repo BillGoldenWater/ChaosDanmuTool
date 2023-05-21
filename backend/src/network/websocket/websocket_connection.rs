@@ -4,10 +4,13 @@
  */
 
 use std::borrow::Cow;
+use std::time::Duration;
 
 use futures_util::stream::{SplitSink, SplitStream};
 use futures_util::{SinkExt, StreamExt};
 use log::{error, info};
+use tokio::time::error::Elapsed;
+use tokio::time::timeout;
 use tokio::{
   net::TcpStream,
   sync::{
@@ -18,28 +21,11 @@ use tokio::{
 use tokio_tungstenite::tungstenite::error::ProtocolError;
 use tokio_tungstenite::tungstenite::protocol::frame::coding::CloseCode;
 use tokio_tungstenite::tungstenite::protocol::CloseFrame;
-use tokio_tungstenite::tungstenite::Error;
+use tokio_tungstenite::tungstenite::Error as WsError;
 use tokio_tungstenite::{connect_async, tungstenite::Message, MaybeTlsStream, WebSocketStream};
 
 use crate::utils::async_utils::run_blocking;
 use crate::utils::mutex_utils::a_lock;
-
-macro_rules! log_err {
-  ($methodName:literal, $expr:expr) => {{
-    let result = $expr;
-    if let Err(err) = result {
-      match err {
-        Error::ConnectionClosed => {}
-        _ => {
-          error!(
-            "error occurs in {__methodName__} \n{err}",
-            __methodName__ = $methodName
-          );
-        }
-      }
-    }
-  }};
-}
 
 type WebSocket = WebSocketStream<MaybeTlsStream<TcpStream>>;
 type WebSocketWriter = SplitSink<WebSocket, Message>;
@@ -53,14 +39,16 @@ pub struct WebSocketConnection {
 
   rx: UnboundedReceiver<Message>,
   writer: WebSocketWriter,
+
+  send_timeout: Option<Duration>,
 }
 
 impl WebSocketConnection {
-  pub async fn new_connection(url: &str) -> Result<Self, WebSocketConnectError> {
+  pub async fn new_connection(url: &str) -> Result<Self, WebSocketConnectionError> {
     let ws_stream = connect_async(url).await;
 
     if let Err(err) = ws_stream {
-      return Err(WebSocketConnectError::ConnectFailed(err));
+      return Err(WebSocketConnectionError::WsError(err));
     }
 
     let this = Self::from_ws_stream(ws_stream.unwrap().0);
@@ -80,67 +68,80 @@ impl WebSocketConnection {
 
       rx,
       writer,
+
+      send_timeout: None,
     }
   }
 
-  pub async fn disconnect(&mut self, close_frame: Option<CloseFrame<'static>>) {
+  pub fn set_send_timeout(&mut self, timeout: Option<Duration>) {
+    self.send_timeout = timeout;
+  }
+
+  pub async fn disconnect(&mut self, close_frame: Option<CloseFrame<'static>>) -> WsResult<()> {
     let mut connected = a_lock("wsConn_connected", &self.connected).await;
 
     if *connected {
-      log_err!(
-        "disconnect",
-        self.writer.send(Message::Close(close_frame)).await
-      );
-      log_err!("disconnect", self.writer.flush().await);
-      log_err!("disconnect", self.writer.close().await);
-      *connected = false;
+      if let Some(send_timeout) = self.send_timeout {
+        timeout(send_timeout, async {
+          self.writer.send(Message::Close(close_frame)).await?;
+          self.writer.flush().await?;
+          self.writer.close().await?;
+          WsResult::<()>::Ok(())
+        })
+        .await??;
+        *connected = false;
+      } else {
+        self.writer.send(Message::Close(close_frame)).await?;
+        self.writer.flush().await?;
+        self.writer.close().await?;
+        *connected = false;
+      }
     }
 
-    drop(connected)
+    drop(connected);
+    Ok(())
   }
 
-  pub async fn send(&mut self, message: Message) {
+  pub async fn send(&mut self, message: Message) -> WsResult<()> {
     let connected = a_lock("wsConn_connected", &self.connected).await;
 
     if *connected {
-      log_err!("send", self.writer.send(message).await);
+      if let Some(send_timeout) = self.send_timeout {
+        timeout(send_timeout, async {
+          self.writer.send(message).await?;
+          WsResult::<()>::Ok(())
+        })
+        .await??;
+      } else {
+        self.writer.send(message).await?;
+      }
     }
 
-    drop(connected)
+    drop(connected);
+    Ok(())
   }
 
-  pub async fn feed(&mut self, message: Message) {
-    let connected = a_lock("wsConn_connected", &self.connected).await;
-
-    if *connected {
-      log_err!("feed", self.writer.feed(message).await);
-    }
-
-    drop(connected)
-  }
-
-  pub async fn flush(&mut self) {
-    let connected = a_lock("wsConn_connected", &self.connected).await;
-
-    if *connected {
-      log_err!("flush", self.writer.flush().await);
-    }
-
-    drop(connected)
-  }
-
-  pub async fn send_many(&mut self, messages: Vec<Message>) {
+  pub async fn send_many(&mut self, messages: Vec<Message>) -> WsResult<()> {
     let connected = a_lock("wsConn_connected", &self.connected).await;
 
     if *connected {
       for msg in messages {
-        log_err!("send_many", self.writer.feed(msg).await);
+        self.writer.feed(msg).await?;
       }
 
-      log_err!("send_many", self.writer.flush().await);
+      if let Some(send_timeout) = self.send_timeout {
+        timeout(send_timeout, async {
+          self.writer.flush().await?;
+          WsResult::<()>::Ok(())
+        })
+        .await??;
+      } else {
+        self.writer.flush().await?;
+      }
     }
 
-    drop(connected)
+    drop(connected);
+    Ok(())
   }
 
   pub async fn tick(&mut self) -> Vec<Message> {
@@ -181,9 +182,9 @@ impl WebSocketConnection {
   }
 
   fn start_recv_loop(reader: WebSocketReader, tx: UnboundedSender<Message>) {
-    let fut = async move {
+    tauri::async_runtime::spawn(async move {
       reader
-        .for_each(move |item| {
+        .for_each(|item| {
           // reading
           let tx = tx.clone();
 
@@ -193,25 +194,23 @@ impl WebSocketConnection {
           }
         })
         .await;
-    };
-    tauri::async_runtime::spawn(fut);
+    });
   }
 
-  fn new_item(item: Result<Message, Error>, tx: UnboundedSender<Message>) {
-    let item = if let Err(err) = item {
-      // err
-      if let Error::Protocol(ProtocolError::ResetWithoutClosingHandshake) = err {
-        Some(Message::Close(Some(CloseFrame {
-          code: CloseCode::Abnormal,
-          reason: Cow::Owned("unknown (ResetWithoutClosingHandshake)".to_string()),
-        })))
-      } else {
-        error!("had an error: {:?}", err);
-        None
+  fn new_item(item: Result<Message, WsError>, tx: UnboundedSender<Message>) {
+    let item = match item {
+      Ok(item) => Some(item),
+      Err(err) => {
+        if let WsError::Protocol(ProtocolError::ResetWithoutClosingHandshake) = err {
+          Some(Message::Close(Some(CloseFrame {
+            code: CloseCode::Abnormal,
+            reason: Cow::Owned("unknown (ResetWithoutClosingHandshake)".to_string()),
+          })))
+        } else {
+          error!("had an error: {:?}", err);
+          None
+        }
       }
-    } else {
-      // ok
-      Some(item.unwrap())
     };
 
     // forward
@@ -228,15 +227,26 @@ impl Drop for WebSocketConnection {
   fn drop(&mut self) {
     run_blocking(async {
       if self.is_connected().await {
-        self.disconnect(None).await;
-        info!("{}: closed on drop", self.connection_id);
+        let result = self.disconnect(None).await;
+        if let Err(err) = result {
+          error!(
+            "{}: failed to disconnect on drop {err:?}",
+            self.connection_id
+          );
+        } else {
+          info!("{}: closed on drop", self.connection_id);
+        }
       }
     });
   }
 }
 
 #[derive(thiserror::Error, Debug)]
-pub enum WebSocketConnectError {
-  #[error("failed to connect")]
-  ConnectFailed(#[from] Error),
+pub enum WebSocketConnectionError {
+  #[error("websocket error")]
+  WsError(#[from] WsError),
+  #[error("send timeout reached")]
+  SendTimeout(#[from] Elapsed),
 }
+
+pub type WsResult<T> = Result<T, WebSocketConnectionError>;
