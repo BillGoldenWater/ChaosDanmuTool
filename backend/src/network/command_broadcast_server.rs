@@ -144,19 +144,8 @@ impl CommandBroadcastServer {
   pub async fn tick(&mut self) {
     let mut connections = a_lock("cbs_conns", &self.connections).await;
 
-    // region remove disconnected connections
-    let mut disconnected_connections: Vec<ConnectionId> = vec![];
-
-    for (id, conn) in &*connections {
-      if !conn.is_connected() {
-        disconnected_connections.push(id.clone())
-      }
-    }
-
-    for id in disconnected_connections {
-      connections.remove(&id);
-    }
-    // endregion
+    connections.retain(|_, v| v.is_connected());
+    info!("{}", connections.len());
 
     // region receive messages
     for conn in connections.values_mut() {
