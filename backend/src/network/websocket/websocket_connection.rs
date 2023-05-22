@@ -221,14 +221,14 @@ impl Drop for WebSocketConnection {
           WebSocketConnectionError::AlreadyClosed => {}
           _ => {
             error!(
-              "{}: failed to disconnect on drop {err:?}",
+              "{}: failed to disconnect when drop {err:?}",
               self.connection_id
             );
-            return;
           }
         }
+      } else {
+        info!("{}: disconnected when drop", self.connection_id);
       }
-      info!("{}: closed on drop", self.connection_id);
     });
   }
 }
