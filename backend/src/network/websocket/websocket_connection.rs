@@ -233,6 +233,16 @@ impl Drop for WebSocketConnection {
   }
 }
 
+impl std::fmt::Debug for WebSocketConnection {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    f.debug_struct("WebSocketConnection")
+      .field("connection_id", &self.connection_id)
+      .field("connected", &self.connected.load(Ordering::Acquire))
+      .field("send_timeout", &self.send_timeout)
+      .finish()
+  }
+}
+
 #[derive(thiserror::Error, Debug)]
 pub enum WebSocketConnectionError {
   #[error("websocket error")]
