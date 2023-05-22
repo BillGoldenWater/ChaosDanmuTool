@@ -211,7 +211,7 @@ impl DanmuReceiver {
       ReceiverStatus::Connecting => {}
       ReceiverStatus::Connected => {
         // region recv message
-        let messages = self.ws.tick().await;
+        let messages = self.ws.tick();
 
         let mut command_processor = PacketProcessor::default();
         for msg in messages {
@@ -231,7 +231,7 @@ impl DanmuReceiver {
         }
         // endregion
 
-        if !self.ws.is_connected().await && self.status == ReceiverStatus::Connected {
+        if !self.ws.is_connected() && self.status == ReceiverStatus::Connected {
           self.on_error("unknown disconnect").await;
           return;
         }
@@ -293,8 +293,8 @@ impl DanmuReceiver {
     self.connected_data.last_heartbeat_tick_ts = Instant::now();
   }
 
-  pub async fn is_connected(&self) -> bool {
-    self.ws.is_connected().await
+  pub fn is_connected(&self) -> bool {
+    self.ws.is_connected()
   }
 
   pub fn get_status(&self) -> ReceiverStatus {

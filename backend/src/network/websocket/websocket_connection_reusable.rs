@@ -60,17 +60,17 @@ impl WebSocketConnectionReusable {
     Ok(())
   }
 
-  pub async fn tick(&mut self) -> Vec<Message> {
+  pub fn tick(&mut self) -> Vec<Message> {
     if let Some(ws) = &mut self.inner {
-      ws.tick().await
+      ws.tick()
     } else {
       vec![]
     }
   }
 
-  pub async fn is_connected(&self) -> bool {
+  pub fn is_connected(&self) -> bool {
     if let Some(ws) = &self.inner {
-      ws.is_connected().await
+      ws.is_connected()
     } else {
       false
     }

@@ -4,6 +4,7 @@
  */
 
 use std::borrow::Cow;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
 
 use futures_util::stream::{SplitSink, SplitStream};
@@ -13,10 +14,7 @@ use tokio::time::error::Elapsed;
 use tokio::time::timeout;
 use tokio::{
   net::TcpStream,
-  sync::{
-    mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender},
-    Mutex,
-  },
+  sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender},
 };
 use tokio_tungstenite::tungstenite::error::ProtocolError;
 use tokio_tungstenite::tungstenite::protocol::frame::coding::CloseCode;
@@ -25,7 +23,6 @@ use tokio_tungstenite::tungstenite::Error as WsError;
 use tokio_tungstenite::{connect_async, tungstenite::Message, MaybeTlsStream, WebSocketStream};
 
 use crate::utils::async_utils::run_blocking;
-use crate::utils::mutex_utils::a_lock;
 
 type WebSocket = WebSocketStream<MaybeTlsStream<TcpStream>>;
 type WebSocketWriter = SplitSink<WebSocket, Message>;
@@ -35,7 +32,7 @@ pub type ConnectionId = String;
 pub struct WebSocketConnection {
   connection_id: ConnectionId, // const
 
-  connected: Mutex<bool>,
+  connected: AtomicBool,
 
   rx: UnboundedReceiver<Message>,
   writer: WebSocketWriter,
@@ -64,7 +61,7 @@ impl WebSocketConnection {
     WebSocketConnection {
       connection_id: uuid::Uuid::new_v4().to_string(),
 
-      connected: Mutex::new(true),
+      connected: AtomicBool::new(true),
 
       rx,
       writer,
@@ -78,9 +75,11 @@ impl WebSocketConnection {
   }
 
   pub async fn disconnect(&mut self, close_frame: Option<CloseFrame<'static>>) -> WsResult<()> {
-    let mut connected = a_lock("wsConn_connected", &self.connected).await;
-
-    if *connected {
+    if self
+      .connected
+      .compare_exchange(true, false, Ordering::Acquire, Ordering::Relaxed)
+      .is_ok()
+    {
       if let Some(send_timeout) = self.send_timeout {
         timeout(send_timeout, async {
           self.writer.send(Message::Close(close_frame)).await?;
@@ -89,23 +88,19 @@ impl WebSocketConnection {
           WsResult::<()>::Ok(())
         })
         .await??;
-        *connected = false;
       } else {
         self.writer.send(Message::Close(close_frame)).await?;
         self.writer.flush().await?;
         self.writer.close().await?;
-        *connected = false;
       }
+      Ok(())
+    } else {
+      Err(WebSocketConnectionError::AlreadyClosed)
     }
-
-    drop(connected);
-    Ok(())
   }
 
   pub async fn send(&mut self, message: Message) -> WsResult<()> {
-    let connected = a_lock("wsConn_connected", &self.connected).await;
-
-    if *connected {
+    if self.connected.load(Ordering::Acquire) {
       if let Some(send_timeout) = self.send_timeout {
         timeout(send_timeout, async {
           self.writer.send(message).await?;
@@ -115,16 +110,14 @@ impl WebSocketConnection {
       } else {
         self.writer.send(message).await?;
       }
+      Ok(())
+    } else {
+      Err(WebSocketConnectionError::ConnectionClosed)
     }
-
-    drop(connected);
-    Ok(())
   }
 
   pub async fn send_many(&mut self, messages: Vec<Message>) -> WsResult<()> {
-    let connected = a_lock("wsConn_connected", &self.connected).await;
-
-    if *connected {
+    if self.connected.load(Ordering::Acquire) {
       for msg in messages {
         self.writer.feed(msg).await?;
       }
@@ -138,16 +131,14 @@ impl WebSocketConnection {
       } else {
         self.writer.flush().await?;
       }
+      Ok(())
+    } else {
+      Err(WebSocketConnectionError::ConnectionClosed)
     }
-
-    drop(connected);
-    Ok(())
   }
 
-  pub async fn tick(&mut self) -> Vec<Message> {
-    let mut connected = a_lock("wsConn_connected", &self.connected).await;
-
-    if !*connected {
+  pub fn tick(&mut self) -> Vec<Message> {
+    if !self.connected.load(Ordering::Acquire) {
       return vec![];
     }
 
@@ -163,18 +154,16 @@ impl WebSocketConnection {
         // when failed recv
         if err == tokio::sync::mpsc::error::TryRecvError::Disconnected {
           // when disconnected
-          *connected = false;
+          self.connected.store(false, Ordering::Release)
         }
         break;
       }
     }
-
-    drop(connected);
     result
   }
 
-  pub async fn is_connected(&self) -> bool {
-    *a_lock("wsConn_connected", &self.connected).await
+  pub fn is_connected(&self) -> bool {
+    self.connected.load(Ordering::Acquire)
   }
 
   pub fn get_id(&self) -> &ConnectionId {
@@ -226,17 +215,20 @@ impl WebSocketConnection {
 impl Drop for WebSocketConnection {
   fn drop(&mut self) {
     run_blocking(async {
-      if self.is_connected().await {
-        let result = self.disconnect(None).await;
-        if let Err(err) = result {
-          error!(
-            "{}: failed to disconnect on drop {err:?}",
-            self.connection_id
-          );
-        } else {
-          info!("{}: closed on drop", self.connection_id);
+      let result = self.disconnect(None).await;
+      if let Err(err) = result {
+        match err {
+          WebSocketConnectionError::AlreadyClosed => {}
+          _ => {
+            error!(
+              "{}: failed to disconnect on drop {err:?}",
+              self.connection_id
+            );
+            return;
+          }
         }
       }
+      info!("{}: closed on drop", self.connection_id);
     });
   }
 }
@@ -247,6 +239,10 @@ pub enum WebSocketConnectionError {
   WsError(#[from] WsError),
   #[error("send timeout reached")]
   SendTimeout(#[from] Elapsed),
+  #[error("already closed")]
+  AlreadyClosed,
+  #[error("connection closed")]
+  ConnectionClosed,
 }
 
 pub type WsResult<T> = Result<T, WebSocketConnectionError>;

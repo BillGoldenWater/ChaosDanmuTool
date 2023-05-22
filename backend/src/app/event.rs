@@ -60,7 +60,7 @@ pub async fn on_activate(app_handle: &AppHandle<Wry>) {
 pub async fn on_exit(_app_handle: &AppHandle<Wry>) {
   AppLoop::i().stop().await;
 
-  if DanmuReceiver::i().is_connected().await {
+  if DanmuReceiver::i().is_connected() {
     DanmuReceiver::i().disconnect().await;
   }
 

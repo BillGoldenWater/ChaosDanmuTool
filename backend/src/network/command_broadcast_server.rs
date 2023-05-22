@@ -148,7 +148,7 @@ impl CommandBroadcastServer {
     let mut disconnected_connections: Vec<ConnectionId> = vec![];
 
     for (id, conn) in &*connections {
-      if !conn.is_connected().await {
+      if !conn.is_connected() {
         disconnected_connections.push(id.clone())
       }
     }
@@ -162,7 +162,7 @@ impl CommandBroadcastServer {
     let mut incoming_messages = vec![];
 
     for (id, conn) in &mut *connections {
-      let messages = conn.tick().await;
+      let messages = conn.tick();
       for msg in messages {
         incoming_messages.push((id.clone(), msg))
       }
