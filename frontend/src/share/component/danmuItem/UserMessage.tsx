@@ -4,7 +4,6 @@
  */
 
 import { PropsWithChildren, useMemo } from "react";
-import { useAppCtx } from "../../app/AppCtx";
 import styled, { css } from "styled-components";
 import { UserAvatar } from "../userInfo/UserAvatar";
 import { UserInfo } from "../userInfo/UserInfo";
@@ -18,6 +17,7 @@ import {
   radius,
 } from "../ThemeCtx";
 import { formatTime } from "../../utils/FormatUtils";
+import { useUserInfo } from "../../app/UserInfoCacheCtx";
 
 export interface UserMessageProps {
   uid: string;
@@ -30,8 +30,7 @@ export interface UserMessageProps {
 export function UserMessage(props: PropsWithChildren<UserMessageProps>) {
   const { children, uid, timestamp, mergePrev, mergeNext, highlightColor } =
     props;
-  const ctx = useAppCtx();
-  const userInfo = useMemo(() => ctx.getUserInfo(uid), [ctx, uid]);
+  const userInfo = useUserInfo(uid);
   const compact = false;
 
   // region sider

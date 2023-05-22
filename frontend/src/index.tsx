@@ -13,6 +13,7 @@ import { AppCtxProvider } from "./share/app/AppCtx";
 import { GlobalStyle, ThemeCtxProvider } from "./share/component/ThemeCtx";
 import React, { StrictMode } from "react";
 import { wasm_init } from "chaos_danmu_tool_share";
+import { UserInfoCacheProvider } from "./share/app/UserInfoCacheCtx";
 
 wasm_init();
 
@@ -25,10 +26,12 @@ const debug = await backend.isDebug();
 root.render(
   <StrictMode>
     <AppCtxProvider firstConfig={config}>
-      <ThemeCtxProvider>
-        <GlobalStyle />
-        <App />
-      </ThemeCtxProvider>
+      <UserInfoCacheProvider>
+        <ThemeCtxProvider>
+          <GlobalStyle />
+          <App />
+        </ThemeCtxProvider>
+      </UserInfoCacheProvider>
     </AppCtxProvider>
   </StrictMode>
 );
