@@ -19,7 +19,6 @@ use chaos_danmu_tool_share::command_packet::app_command::gift_config_update::Gif
 use chaos_danmu_tool_share::command_packet::app_command::receiver_status_update::ReceiverStatusUpdate;
 use chaos_danmu_tool_share::command_packet::CommandPacket;
 
-use crate::app::config_manager::ConfigManager;
 use crate::command::command_history_manager::CommandHistoryManager;
 use crate::get_cfg;
 use crate::network::api_request::gift_config_getter::GiftConfigGetter;

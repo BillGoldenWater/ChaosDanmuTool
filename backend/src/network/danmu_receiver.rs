@@ -18,7 +18,7 @@ use chaos_danmu_tool_share::command_packet::app_command::receiver_status_update:
 };
 use chaos_danmu_tool_share::config::backend_config::danmu_receiver_config::DanmuReceiverConfig;
 
-use crate::app::config_manager::{modify_cfg, ConfigManager};
+use crate::app::config_manager::modify_cfg;
 use crate::cache::user_info_cache::UserInfoCache;
 use crate::get_cfg;
 use crate::network::api_request::bilibili_response::Error::EmptyData;

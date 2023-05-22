@@ -181,11 +181,11 @@ fn wrap_cfg(config: Config) -> Arc<Mutex<Config>> {
 macro_rules! get_cfg {
   () => {{
     use static_object::StaticObject;
-    ConfigManager::i().get_readonly_config().await
+    $crate::app::config_manager::ConfigManager::i().get_readonly_config().await
   }};
   (sync) => {{
     use static_object::StaticObject;
-    $crate::utils::async_utils::run_blocking(ConfigManager::i().get_readonly_config())
+    $crate::utils::async_utils::run_blocking($crate::app::config_manager::ConfigManager::i().get_readonly_config())
   }};
 }
 

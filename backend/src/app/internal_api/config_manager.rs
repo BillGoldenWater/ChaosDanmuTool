@@ -5,7 +5,7 @@
 
 use tauri::command;
 
-use crate::app::config_manager::{modify_cfg, ConfigManager};
+use crate::app::config_manager::modify_cfg;
 use crate::get_cfg;
 
 #[command]

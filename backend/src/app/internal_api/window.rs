@@ -10,7 +10,7 @@ use static_object::StaticObject;
 use tauri::{command, Manager, WindowEvent, Wry};
 use tokio::sync::RwLock;
 
-use crate::app::config_manager::{modify_cfg, ConfigManager};
+use crate::app::config_manager::modify_cfg;
 use crate::get_cfg;
 use crate::network::command_broadcast_server::CommandBroadcastServer;
 use crate::utils::async_utils::run_blocking;
