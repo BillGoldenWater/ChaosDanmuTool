@@ -159,19 +159,8 @@ impl CommandBroadcastServer {
     // endregion
 
     // region receive messages
-    let mut incoming_messages = vec![];
-
-    for (id, conn) in &mut *connections {
-      let messages = conn.tick();
-      for msg in messages {
-        incoming_messages.push((id.clone(), msg))
-      }
-    }
-
-    drop(connections);
-
-    for (id, msg) in incoming_messages {
-      self.on_message(msg, &id).await;
+    for conn in connections.values_mut() {
+      let _ = conn.tick();
     }
     // endregion
   }
@@ -215,11 +204,5 @@ impl CommandBroadcastServer {
         error!("failed to get gift config: {:}", err)
       }
     }
-  }
-
-  async fn on_message(&mut self, message: Message, connection_id: &String) {
-    info!("{}: {:?} ", connection_id, message);
-
-    self.send(connection_id, message).await;
   }
 }
