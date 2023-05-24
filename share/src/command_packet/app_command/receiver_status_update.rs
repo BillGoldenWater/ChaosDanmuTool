@@ -24,6 +24,4 @@ pub enum ReceiverStatus {
 
   Error,
   Reconnecting,
-
-  Interrupted,
 }

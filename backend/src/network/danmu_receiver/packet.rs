@@ -7,6 +7,7 @@ use crate::b_get;
 use bytes::{BufMut, BytesMut};
 use chaos_danmu_tool_share::utils::brotli_utils::brotli_decompress;
 use log::info;
+use tokio_tungstenite::tungstenite::Message;
 
 use crate::network::danmu_receiver::data_type::DataType;
 use crate::network::danmu_receiver::op_code::OpCode;
@@ -43,6 +44,10 @@ impl Packet {
     result.put_slice(self.body.as_ref());
 
     result
+  }
+
+  pub fn pack_to_message(&self) -> Message {
+    Message::Binary(self.pack().to_vec())
   }
 
   pub fn get_packet_length(&self) -> u32 {
@@ -108,7 +113,11 @@ impl Packet {
   }
 
   pub fn heartbeat() -> Packet {
-    Self::new(vec![], DataType::HeartbeatOrJoin, OpCode::Heartbeat)
+    Self::new(
+      Vec::with_capacity(0),
+      DataType::HeartbeatOrJoin,
+      OpCode::Heartbeat,
+    )
   }
 }
 
@@ -118,4 +127,15 @@ pub struct JoinPacketInfo {
   pub protover: i32,
   pub platform: String,
   pub key: String,
+}
+
+impl Default for JoinPacketInfo {
+  fn default() -> Self {
+    Self {
+      roomid: 0,
+      protover: 3,
+      platform: "web".to_string(),
+      key: String::with_capacity(0),
+    }
+  }
 }

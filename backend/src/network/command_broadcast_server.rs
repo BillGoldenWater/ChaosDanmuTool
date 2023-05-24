@@ -145,7 +145,6 @@ impl CommandBroadcastServer {
     let mut connections = a_lock("cbs_conns", &self.connections).await;
 
     connections.retain(|_, v| v.is_connected());
-    info!("{}", connections.len());
 
     // region receive messages
     for conn in connections.values_mut() {
@@ -175,7 +174,7 @@ impl CommandBroadcastServer {
     self
       .send_cmd(
         connection_id,
-        ReceiverStatusUpdate::new(DanmuReceiver::i().get_status()),
+        ReceiverStatusUpdate::new(DanmuReceiver::i().get_status().await),
       )
       .await;
 

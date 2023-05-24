@@ -13,11 +13,14 @@ use crate::network::danmu_receiver::DanmuReceiver;
 pub async fn connect_room() {
   let result = DanmuReceiver::i().connect().await;
   if let Err(err) = result {
-    dialog_notice!(@error raw, format!("无法连接直播间.\n{:?}", err));
+    dialog_notice!(@error raw, format!("无法连接直播间.\n{err:?}"));
   }
 }
 
 #[command]
 pub async fn disconnect_room() {
-  DanmuReceiver::i().disconnect().await;
+  let result = DanmuReceiver::i().disconnect().await;
+  if let Err(err) = result {
+    dialog_notice!(@error raw, format!("断开连接时发生了错误.\n{err:?}"));
+  }
 }

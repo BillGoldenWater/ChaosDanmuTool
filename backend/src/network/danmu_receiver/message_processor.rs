@@ -3,9 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-use log::error;
+use std::borrow::Cow;
+
+use log::{error, warn};
 use serde::Deserialize;
 use serde_json::Value;
+use tokio_tungstenite::tungstenite::protocol::frame::coding::CloseCode;
+use tokio_tungstenite::tungstenite::protocol::CloseFrame;
+use tokio_tungstenite::tungstenite::Message;
 
 use chaos_danmu_tool_share::command_packet::app_command::bilibili_packet_parse_error::BiliBiliPacketParseError;
 use chaos_danmu_tool_share::command_packet::bilibili_command::activity_update::ActivityUpdate;
@@ -22,14 +27,43 @@ use crate::network::danmu_receiver::packet::Packet;
 use crate::utils::bytes_utils::bytes_to_hex;
 
 #[derive(Default)]
-pub struct PacketProcessor {
+pub struct MessageProcessor {
   pub user_infos: Vec<UserInfo>,
   pub commands: Vec<CommandPacket>,
   pub heartbeat_received: bool,
+
+  pub connection_closed: Option<bool>, // Some for closed, Some(true) for closed Abnormally and require reconnect
 }
 
-impl PacketProcessor {
-  pub fn process(&mut self, packets: Vec<Packet>) {
+impl MessageProcessor {
+  pub fn process(&mut self, messages: Vec<Message>) {
+    for message in messages {
+      self.process_msg(message);
+    }
+  }
+
+  fn process_msg(&mut self, message: Message) {
+    match message {
+      Message::Binary(data) => self.process_packets(Packet::parse_bytes(&data.as_slice())),
+      Message::Close(close_frame) => {
+        let close_frame = close_frame.unwrap_or(CloseFrame {
+          code: CloseCode::Normal,
+          reason: Cow::Borrowed(""),
+        });
+
+        if close_frame.code == CloseCode::Abnormal {
+          warn!("receiver disconnected abnormally, {close_frame:?}");
+          self.connection_closed = Some(true);
+        } else {
+          self.connection_closed = Some(false);
+        }
+      }
+      Message::Ping(..) | Message::Pong(..) | Message::Frame(..) => {}
+      Message::Text(text) => warn!("unexpected text message: {:?}", text),
+    }
+  }
+
+  fn process_packets(&mut self, packets: Vec<Packet>) {
     for packet in packets {
       self.parse_packet(packet)
     }

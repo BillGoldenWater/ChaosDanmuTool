@@ -11,17 +11,25 @@ import { motion } from "framer-motion";
 import { useAppCtx } from "../../share/app/AppCtx";
 import { backend } from "../../share/app/BackendApi";
 import { NumberInput } from "../../share/component/input/NumberInput";
+import { ReceiverStatus } from "../../share/type/rust/command_packet/app_command/receiver_status_update";
 
 export function ConnectPanel() {
   const ctx = useAppCtx();
-  const connecting = ctx.receiverStatus === "connecting";
+
+  async function onConnectBtnClick() {
+    if (ctx.receiverStatus === "reconnecting") {
+      await backend.disconnectRoom();
+    } else if (ctx.receiverStatus === "close") {
+      await backend.connectRoom();
+    }
+  }
 
   return (
     <ConnectPanelBase>
       <InnerPanel>
         <RoomidInput />
         <ConnectBtn
-          onClick={() => backend.connectRoom()}
+          onClick={onConnectBtnClick}
           whileHover={{
             scale: 1.05,
             transition: { type: "spring", damping: 20, stiffness: 500 },
@@ -31,7 +39,7 @@ export function ConnectPanel() {
             transition: { type: "spring", damping: 30, stiffness: 1000 },
           }}
         >
-          <BtnConnectingSvg connecting={connecting} />
+          <BtnConnectingSvg receiverStatus={ctx.receiverStatus} />
           连接
         </ConnectBtn>
       </InnerPanel>
@@ -85,8 +93,26 @@ const ConnectBtn = styled(motion.button)`
   user-select: none;
 `;
 
-function BtnConnectingSvg({ connecting }: { connecting: boolean }) {
+function BtnConnectingSvg({
+  receiverStatus,
+}: {
+  receiverStatus: ReceiverStatus;
+}) {
   const theme = useThemeCtx();
+
+  const spinning =
+    receiverStatus === "connecting" || receiverStatus === "reconnecting";
+  let color = theme.consts.theme;
+  switch (receiverStatus) {
+    case "reconnecting": {
+      color = theme.consts.fnWarn;
+      break;
+    }
+    case "error": {
+      color = theme.consts.fnErr;
+      break;
+    }
+  }
 
   return (
     <BtnConnectSvgBase viewBox={"0 0 100 100"}>
@@ -102,11 +128,11 @@ function BtnConnectingSvg({ connecting }: { connecting: boolean }) {
         xlinkHref={"#circle"}
         clipPath={"url(#innerStroke)"}
         fill={"transparent"}
-        stroke={theme.consts.theme}
+        stroke={color}
         strokeWidth={"calc(2rem * 2)"}
         strokeDasharray={`${Math.PI * 100}`}
       >
-        {connecting ? (
+        {spinning ? (
           <>
             <animate
               attributeName={"stroke-dashoffset"}

@@ -6,6 +6,7 @@
 use serde::Deserialize;
 
 use crate::network::api_request::bilibili_response::bilibili_get;
+use crate::network::api_request::danmu_server_info_getter::Error::IllegalRoomid;
 
 use super::bilibili_response;
 
@@ -24,7 +25,22 @@ impl DanmuServerInfoGetter {
   }
 
   pub async fn get_token_and_url(actual_room_id: u32) -> Result<DanmuServerAndToken, Error> {
-    let res = DanmuServerInfoGetter::get(actual_room_id).await?;
+    let res_result = DanmuServerInfoGetter::get(actual_room_id).await;
+    let res = match res_result {
+      Ok(ok) => ok,
+      Err(err) => {
+        return match &err {
+          bilibili_response::Error::EmptyData(res) => {
+            if res.code == Some(1002002) {
+              Err(IllegalRoomid(actual_room_id))
+            } else {
+              Err(Error::Request(err))
+            }
+          }
+          _ => Err(Error::Request(err)),
+        }
+      }
+    };
 
     let data = res.data.unwrap();
 
@@ -72,4 +88,6 @@ pub struct DanmuServerInfoHostInfo {
 pub enum Error {
   #[error("{0}")]
   Request(#[from] bilibili_response::Error<DanmuServerInfoResponse>),
+  #[error("illegal roomid: {0}")]
+  IllegalRoomid(u32),
 }

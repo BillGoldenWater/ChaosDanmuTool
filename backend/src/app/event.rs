@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+use log::error;
 use static_object::StaticObject;
 use tauri::{App, AppHandle, Assets, Context, Wry};
 
@@ -47,7 +48,10 @@ pub async fn on_setup(app: &mut App<Wry>) {
 
 pub async fn on_ready(app_handle: &AppHandle<Wry>) {
   if let Some(roomid) = AppContext::i().args.connect {
-    DanmuReceiver::i().connect_to(roomid).await;
+    let result = DanmuReceiver::i().connect_to(roomid).await;
+    if let Err(err) = result {
+      error!("failed to connect: {err:?}");
+    }
   }
 
   show_main_window(app_handle.clone());
@@ -60,8 +64,11 @@ pub async fn on_activate(app_handle: &AppHandle<Wry>) {
 pub async fn on_exit(_app_handle: &AppHandle<Wry>) {
   AppLoop::i().stop().await;
 
-  if DanmuReceiver::i().is_connected() {
-    DanmuReceiver::i().disconnect().await;
+  if DanmuReceiver::i().is_connected().await {
+    let result = DanmuReceiver::i().disconnect().await;
+    if let Err(err) = result {
+      error!("failed to disconnect on exit: {err:?}");
+    }
   }
 
   HttpServer::i().stop().await;

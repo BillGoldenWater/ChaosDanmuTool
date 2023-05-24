@@ -67,7 +67,7 @@ impl UserInfoCache {
       }
     }
 
-    let mut db = a_lock("uic_db",&self.db).await;
+    let mut db = a_lock("uic_db", &self.db).await;
 
     let result = sqlx::query(include_str!("sql/user_info_ins_rep.sql"))
       .bind(&info.uid)
@@ -93,7 +93,7 @@ impl UserInfoCache {
   pub async fn get(&mut self, uid: &str) -> Option<UserInfo> {
     static SQL: &str = "select * from user_info where uid = ?;";
 
-    let mut db = a_lock("uic_db",&self.db).await;
+    let mut db = a_lock("uic_db", &self.db).await;
 
     let result = sqlx::query(SQL).bind(uid).fetch_all(&mut *db).await;
     drop(db);
@@ -151,7 +151,7 @@ impl UserInfoCache {
   async fn insert_or_replace_medal_data(&mut self, uid: &str, data: &MedalData) -> Result<()> {
     self.insert_or_replace_medal_info(&data.info).await?;
 
-    let mut db = a_lock("uic_db",&self.db).await;
+    let mut db = a_lock("uic_db", &self.db).await;
 
     sqlx::query(include_str!("sql/medal_data_ins_rep.sql"))
       .bind(uid)
@@ -170,7 +170,7 @@ impl UserInfoCache {
   }
 
   async fn get_medal_data(&mut self, uid: &str) -> Result<MedalData> {
-    let mut db = a_lock("uic_db",&self.db).await;
+    let mut db = a_lock("uic_db", &self.db).await;
 
     let result = sqlx::query(include_str!("sql/medal_data_sel.sql"))
       .bind(uid)
@@ -197,7 +197,7 @@ impl UserInfoCache {
   }
 
   async fn insert_or_replace_medal_info(&mut self, info: &MedalInfo) -> Result<()> {
-    let mut db = a_lock("uic_db",&self.db).await;
+    let mut db = a_lock("uic_db", &self.db).await;
 
     sqlx::query(include_str!("sql/medal_info_ins_rep.sql"))
       .bind(&info.target_id)
@@ -211,7 +211,7 @@ impl UserInfoCache {
   }
 
   async fn get_medal_info(&mut self, target_id: String) -> Result<MedalInfo> {
-    let mut db = a_lock("uic_db",&self.db).await;
+    let mut db = a_lock("uic_db", &self.db).await;
 
     let result = sqlx::query(include_str!("sql/medal_info_sel.sql"))
       .bind(&target_id)

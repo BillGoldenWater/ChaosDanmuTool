@@ -78,19 +78,19 @@ impl ConfigManager {
   }
 
   pub async fn save(&mut self) {
-    let mut changed = a_lock("cm_changed",&self.changed).await;
+    let mut changed = a_lock("cm_changed", &self.changed).await;
 
     info!("save config");
     let result = fs::write(
       self.config_file_path.as_path(),
-      a_lock("cm_cfg",&self.config).await.to_string(),
+      a_lock("cm_cfg", &self.config).await.to_string(),
     );
     if let Err(err) = result {
       error!("failed to write config file\n{:#?}", err);
       return;
     }
     *changed = false;
-    *a_lock("cm_lSTs",&self.last_save_ts).await = Instant::now();
+    *a_lock("cm_lSTs", &self.last_save_ts).await = Instant::now();
     info!("config successfully saved");
 
     drop(changed);
@@ -113,7 +113,7 @@ impl ConfigManager {
     }
 
     info!("reset config");
-    *a_lock("cm_cfg",&self.config).await = serde_json::from_str("{}").unwrap();
+    *a_lock("cm_cfg", &self.config).await = serde_json::from_str("{}").unwrap();
     self.on_change(true).await;
     self.save().await;
   }
@@ -123,27 +123,33 @@ impl ConfigManager {
   }
 
   pub async fn get_readonly_config(&self) -> Immutable<Config> {
-    Immutable::new(a_lock("cm_cfg",&self.config).await.clone())
+    Immutable::new(a_lock("cm_cfg", &self.config).await.clone())
   }
 
   async fn on_change(&mut self, broadcast: bool) {
-    *a_lock("cm_cfg",&self.changed).await = true;
+    *a_lock("cm_cfg", &self.changed).await = true;
     if broadcast {
       CommandBroadcastServer::i()
-        .broadcast_cmd(ConfigUpdate::new(a_lock("cm_cfg",&self.config).await.clone()).into())
+        .broadcast_cmd(ConfigUpdate::new(a_lock("cm_cfg", &self.config).await.clone()).into())
         .await;
     }
   }
 
   pub async fn tick(&mut self) {
     #[allow(clippy::collapsible_if)]
-    if a_lock("cm_cfg",&self.config)
+    if a_lock("cm_cfg", &self.config)
       .await
       .backend
       .config_manager
       .save_on_change
     {
-      if *a_lock("cm_changed",&self.changed).await && a_lock("cm_lSTs",&self.last_save_ts).await.elapsed().as_secs() >= 5 {
+      if *a_lock("cm_changed", &self.changed).await
+        && a_lock("cm_lSTs", &self.last_save_ts)
+          .await
+          .elapsed()
+          .as_secs()
+          >= 5
+      {
         info!("save on change");
         self.save().await;
       }
@@ -151,7 +157,7 @@ impl ConfigManager {
   }
 
   pub async fn on_exit(&mut self) {
-    if a_lock("cm_cfg",&self.config)
+    if a_lock("cm_cfg", &self.config)
       .await
       .backend
       .config_manager
@@ -181,11 +187,15 @@ fn wrap_cfg(config: Config) -> Arc<Mutex<Config>> {
 macro_rules! get_cfg {
   () => {{
     use static_object::StaticObject;
-    $crate::app::config_manager::ConfigManager::i().get_readonly_config().await
+    $crate::app::config_manager::ConfigManager::i()
+      .get_readonly_config()
+      .await
   }};
   (sync) => {{
     use static_object::StaticObject;
-    $crate::utils::async_utils::run_blocking($crate::app::config_manager::ConfigManager::i().get_readonly_config())
+    $crate::utils::async_utils::run_blocking(
+      $crate::app::config_manager::ConfigManager::i().get_readonly_config(),
+    )
   }};
 }
 
@@ -196,7 +206,7 @@ where
   let cfg_m = ConfigManager::i();
 
   let config = cfg_m.get_config();
-  let mut cfg = a_lock("cm_mc_cfg",&config).await;
+  let mut cfg = a_lock("cm_mc_cfg", &config).await;
   do_modify(&mut cfg);
   drop(cfg);
   drop(config);

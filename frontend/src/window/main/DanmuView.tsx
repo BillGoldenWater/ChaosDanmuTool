@@ -16,8 +16,7 @@ import { paddingValue } from "../../share/component/ThemeCtx";
 export function DanmuView() {
   const ctx = useAppCtx();
 
-  const connected =
-    ctx.receiverStatus === "connected" || ctx.receiverStatus === "reconnecting";
+  const connected = ctx.receiverStatus === "connected";
 
   const content = useMemo(() => {
     if (connected) {
@@ -116,7 +115,7 @@ export function DanmuView() {
 
   return (
     <DanmuViewContainer>
-      <AnimatePresence mode={"wait"} initial={false}>
+      <AnimatePresence mode={"popLayout"} initial={false}>
         {content}
       </AnimatePresence>
     </DanmuViewContainer>
