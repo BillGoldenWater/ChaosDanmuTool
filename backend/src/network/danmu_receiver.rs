@@ -319,14 +319,17 @@ async fn get_actual_room_id() -> DRResult<u32> {
     return Ok(cfg.actual_roomid_cache.cached);
   }
 
-  let roomid = RoomInfoGetter::get_actual_room_id(roomid).await?;
+  let actual_roomid = RoomInfoGetter::get_actual_room_id(roomid).await?;
   modify_cfg(
-    |cfg| cfg.backend.danmu_receiver.actual_roomid_cache.cached = roomid,
+    |cfg| {
+      cfg.backend.danmu_receiver.actual_roomid_cache.roomid = roomid;
+      cfg.backend.danmu_receiver.actual_roomid_cache.cached = actual_roomid;
+    },
     true,
   )
   .await;
 
-  Ok(roomid)
+  Ok(actual_roomid)
 }
 
 async fn fetch_config() -> Immutable<DanmuReceiverConfig> {
