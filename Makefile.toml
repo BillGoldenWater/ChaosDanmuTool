@@ -168,20 +168,9 @@ args = ["tauri", "build", "-t", "x86_64-pc-windows-msvc", "-b", "nsis,updater"]
 # endregion
 
 # region dev
-[tasks.dev]
-dependencies = ["build-share", "init-frontend", "gen-ts-binding"]
-run_task = { name = ["dev-tauri"] }
+[tasks.dev-init]
+dependencies = ["setup", "build-share", "init-frontend", "gen-ts-binding"]
 
-[tasks.dev-update]
+[tasks.dev-update-share]
 dependencies = ["build-share-update", "gen-ts-binding"]
-run_task = { name = ["dev-tauri"] }
-
-[tasks.dev-tauri]
-private = true
-command = "cargo"
-args = ["tauri", "dev", "--", "--", "--home-dir", "../devHome", "-L", "500", "--store-raw-msg"]
-
-[tasks.dev-watch-share]
-run_task = { name = "dev-update" }
-watch = { no_git_ignore = true, watch = ["./share/src", "./share/Cargo.toml"] }
 # endregion
