@@ -4,7 +4,6 @@
  */
 
 use std::borrow::Cow;
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
 
 use futures_util::stream::{SplitSink, SplitStream};
@@ -32,7 +31,7 @@ pub type ConnectionId = String;
 pub struct WebSocketConnection {
   connection_id: ConnectionId, // const
 
-  connected: AtomicBool,
+  connected: bool,
 
   rx: UnboundedReceiver<Message>,
   writer: WebSocketWriter,
@@ -61,7 +60,7 @@ impl WebSocketConnection {
     WebSocketConnection {
       connection_id: uuid::Uuid::new_v4().to_string(),
 
-      connected: AtomicBool::new(true),
+      connected: true,
 
       rx,
       writer,
@@ -75,11 +74,8 @@ impl WebSocketConnection {
   }
 
   pub async fn disconnect(&mut self, close_frame: Option<CloseFrame<'static>>) -> WsResult<()> {
-    if self
-      .connected
-      .compare_exchange(true, false, Ordering::Acquire, Ordering::Relaxed)
-      .is_ok()
-    {
+    if self.connected {
+      self.connected = false;
       if let Some(send_timeout) = self.send_timeout {
         timeout(send_timeout, async {
           self.writer.send(Message::Close(close_frame)).await?;
@@ -100,7 +96,7 @@ impl WebSocketConnection {
   }
 
   pub async fn send(&mut self, message: Message) -> WsResult<()> {
-    if self.connected.load(Ordering::Acquire) {
+    if self.connected {
       if let Some(send_timeout) = self.send_timeout {
         timeout(send_timeout, async {
           self.writer.send(message).await?;
@@ -117,7 +113,7 @@ impl WebSocketConnection {
   }
 
   pub async fn send_many(&mut self, messages: Vec<Message>) -> WsResult<()> {
-    if self.connected.load(Ordering::Acquire) {
+    if self.connected {
       for msg in messages {
         self.writer.feed(msg).await?;
       }
@@ -138,14 +134,14 @@ impl WebSocketConnection {
   }
 
   pub fn tick(&mut self) -> Vec<Message> {
-    if !self.connected.load(Ordering::Acquire) {
+    if !self.connected {
       return vec![];
     }
 
     let mut result = vec![];
 
     loop {
-      let rx_result = self.rx.try_recv(); // try_recv
+      let rx_result = self.rx.try_recv();
 
       if let Ok(msg) = rx_result {
         // when message
@@ -154,7 +150,7 @@ impl WebSocketConnection {
         // when failed recv
         if err == tokio::sync::mpsc::error::TryRecvError::Disconnected {
           // when disconnected
-          self.connected.store(false, Ordering::Release)
+          self.connected = false;
         }
         break;
       }
@@ -163,7 +159,7 @@ impl WebSocketConnection {
   }
 
   pub fn is_connected(&self) -> bool {
-    self.connected.load(Ordering::Acquire)
+    self.connected
   }
 
   pub fn get_id(&self) -> &ConnectionId {
@@ -237,7 +233,7 @@ impl std::fmt::Debug for WebSocketConnection {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     f.debug_struct("WebSocketConnection")
       .field("connection_id", &self.connection_id)
-      .field("connected", &self.connected.load(Ordering::Acquire))
+      .field("connected", &self.connected)
       .field("send_timeout", &self.send_timeout)
       .finish()
   }
