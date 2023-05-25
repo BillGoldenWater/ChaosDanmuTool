@@ -93,7 +93,7 @@ impl CommandBroadcastServer {
   }
 
   pub async fn broadcast(&mut self, message: Message) {
-    for conn in a_lock("cbs_conns", &self.connections).await.values_mut() {
+    for conn in a_lock(&self.connections).await.values_mut() {
       if let Err(err) = conn.send(message.clone()).await {
         error!(
           "failed to send message to {} in broadcast: {err:?}",
@@ -104,7 +104,7 @@ impl CommandBroadcastServer {
   }
 
   pub async fn broadcast_many(&mut self, messages: Vec<Message>) {
-    for conn in a_lock("cbs_conns", &self.connections).await.values_mut() {
+    for conn in a_lock(&self.connections).await.values_mut() {
       if let Err(err) = conn.send_many(messages.clone()).await {
         error!(
           "failed to send message to {} in broadcast_many: {err:?}",
@@ -115,10 +115,7 @@ impl CommandBroadcastServer {
   }
 
   pub async fn send(&mut self, connection_id: &ConnectionId, message: Message) {
-    if let Some(conn) = a_lock("cbs_conns", &self.connections)
-      .await
-      .get_mut(connection_id)
-    {
+    if let Some(conn) = a_lock(&self.connections).await.get_mut(connection_id) {
       if let Err(err) = conn.send(message).await {
         error!("failed to send message to {connection_id}: {err:?}");
       }
@@ -128,7 +125,7 @@ impl CommandBroadcastServer {
   pub async fn close_all(&mut self) {
     info!("closing all connection");
 
-    let mut connections = a_lock("cbs_conns", &self.connections).await;
+    let mut connections = a_lock(&self.connections).await;
 
     for conn in (*connections).values_mut() {
       let result = conn.disconnect(close_frame(CloseCode::Normal, "")).await;
@@ -142,7 +139,7 @@ impl CommandBroadcastServer {
   }
 
   pub async fn tick(&mut self) {
-    let mut connections = a_lock("cbs_conns", &self.connections).await;
+    let mut connections = a_lock(&self.connections).await;
 
     connections.retain(|_, v| v.is_connected());
 
@@ -158,7 +155,7 @@ impl CommandBroadcastServer {
     connection.set_send_timeout(Some(Duration::from_secs(5)));
 
     let connection_id = connection.get_id().clone();
-    a_lock("cbs_conns", &self.connections)
+    a_lock(&self.connections)
       .await
       .insert(connection_id.clone(), connection);
     self.on_connection(&connection_id).await;

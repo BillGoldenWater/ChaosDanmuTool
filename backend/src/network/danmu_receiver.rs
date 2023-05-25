@@ -65,7 +65,7 @@ impl DanmuReceiver {
   }
 
   pub async fn connect(&self) -> DrResult<()> {
-    match &mut *a_lock("dr_status", &self.status).await {
+    match &mut *a_lock(&self.status).await {
       status @ ReceiverStatusInner::Close => {
         status.set_status(ReceiverStatusInner::Connecting).await;
       }
@@ -75,7 +75,7 @@ impl DanmuReceiver {
     }
 
     let connect_result = connect(&self.status).await;
-    let mut status = a_lock("dr_status", &self.status).await;
+    let mut status = a_lock(&self.status).await;
     match connect_result {
       Ok(connection) => {
         status
@@ -92,7 +92,7 @@ impl DanmuReceiver {
   }
 
   pub async fn disconnect(&self) -> DrResult<()> {
-    match &mut *a_lock("dr_status", &self.status).await {
+    match &mut *a_lock(&self.status).await {
       status @ ReceiverStatusInner::Close => return Err(DrError::IllegalState(status.to_public())),
       status @ ReceiverStatusInner::Connecting => {
         status.set_status(ReceiverStatusInner::Interrupted).await;
@@ -139,7 +139,7 @@ impl DanmuReceiver {
   }
 
   pub async fn tick(&self) {
-    match &mut *a_lock("dr_status", &self.status).await {
+    match &mut *a_lock(&self.status).await {
       ReceiverStatusInner::Close | ReceiverStatusInner::Connecting => {}
       status @ ReceiverStatusInner::Connected { .. } => {
         Self::tick_connected(status).await;
@@ -292,7 +292,7 @@ impl DanmuReceiver {
     let status = Arc::clone(&self.status);
     tokio::task::spawn(async move {
       let connect_result = connect(&status).await;
-      let mut status = a_lock("dr_status", &status).await;
+      let mut status = a_lock(&status).await;
 
       match connect_result {
         Ok(connection) => {
@@ -321,14 +321,14 @@ impl DanmuReceiver {
   }
 
   pub async fn is_connected(&self) -> bool {
-    match &*a_lock("dr_status", &self.status).await {
+    match &*a_lock(&self.status).await {
       ReceiverStatusInner::Connected { connection, .. } => connection.is_connected(),
       _ => false,
     }
   }
 
   pub async fn get_status(&self) -> ReceiverStatus {
-    a_lock("dr_status", &self.status).await.to_public()
+    a_lock(&self.status).await.to_public()
   }
 }
 
@@ -358,7 +358,7 @@ async fn connect(status: &Arc<Mutex<ReceiverStatusInner>>) -> DrResult<WebSocket
 
 async fn check_interrupted(status: &Arc<Mutex<ReceiverStatusInner>>) -> DrResult<()> {
   if matches!(
-    *a_lock("dr_status", status).await,
+    *a_lock(status).await,
     ReceiverStatusInner::Interrupted
   ) {
     Err(DrError::ConnectionInterrupted)
