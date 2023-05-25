@@ -23,6 +23,7 @@ import { backendApiConfigCache } from "./BackendApi";
 import { defaultConfig } from "./Defaults";
 import { deserialize_command_packet } from "chaos_danmu_tool_share";
 import { convertGiftConfig } from "../type/TGiftConfig";
+import { v4 as uuidV4 } from "uuid";
 
 type Option = {
   host: string;
@@ -35,7 +36,7 @@ type Option = {
 };
 
 export class CommandReceiver {
-  id = window.crypto.randomUUID().slice(0, 6);
+  id = uuidV4().slice(0, 6);
   client: WebSocket | undefined;
   option: Option = {
     host: "localhost",
@@ -60,7 +61,7 @@ export class CommandReceiver {
   }
 
   updateId() {
-    this.id = window.crypto.randomUUID().slice(0, 6);
+    this.id = uuidV4().slice(0, 6);
   }
 
   open() {
