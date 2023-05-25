@@ -8,12 +8,13 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::Instant;
 
-use chaos_danmu_tool_share::command_packet::app_command::config_update::ConfigUpdate;
-use chaos_danmu_tool_share::config::Config;
-use log::{error, info};
+use log::{debug, error, info};
 use static_object::StaticObject;
 use tauri::api::file::read_string;
 use tokio::sync::{Mutex, MutexGuard};
+
+use chaos_danmu_tool_share::command_packet::app_command::config_update::ConfigUpdate;
+use chaos_danmu_tool_share::config::Config;
 
 use crate::app_context::AppContext;
 use crate::network::command_broadcast_server::CommandBroadcastServer;
@@ -80,7 +81,7 @@ impl ConfigManager {
   pub async fn save(&mut self) {
     let mut changed = a_lock("cm_changed", &self.changed).await;
 
-    info!("save config");
+    debug!("save config");
     let result = fs::write(
       self.config_file_path.as_path(),
       a_lock("cm_cfg", &self.config).await.to_string(),
@@ -91,7 +92,7 @@ impl ConfigManager {
     }
     *changed = false;
     *a_lock("cm_lSTs", &self.last_save_ts).await = Instant::now();
-    info!("config successfully saved");
+    info!("config saved");
 
     drop(changed);
   }
@@ -150,7 +151,7 @@ impl ConfigManager {
           .as_secs()
           >= 5
       {
-        info!("save on change");
+        debug!("save on change");
         self.save().await;
       }
     }
@@ -163,7 +164,7 @@ impl ConfigManager {
       .config_manager
       .save_on_exit
     {
-      info!("save on exit");
+      debug!("save on exit");
       self.save().await;
     }
   }
