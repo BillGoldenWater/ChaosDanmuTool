@@ -17,7 +17,10 @@ export function ConnectPanel() {
   const ctx = useAppCtx();
 
   async function onConnectBtnClick() {
-    if (ctx.receiverStatus === "reconnecting") {
+    if (
+      ctx.receiverStatus === "reconnecting" ||
+      ctx.receiverStatus === "connecting"
+    ) {
       await backend.disconnectRoom();
     } else if (ctx.receiverStatus === "close") {
       await backend.connectRoom();

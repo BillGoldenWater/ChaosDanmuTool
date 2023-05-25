@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 use log::{debug, error, info};
@@ -25,6 +26,7 @@ use crate::network::danmu_receiver::message_processor::MessageProcessor;
 use crate::network::danmu_receiver::packet::{JoinPacketInfo, Packet};
 use crate::network::websocket::websocket_connection::WebSocketConnectionError;
 use crate::utils::immutable_utils::Immutable;
+use crate::utils::mutex_utils::a_lock;
 use crate::utils::ws_utils::close_frame;
 
 use super::websocket::websocket_connection::WebSocketConnection;
@@ -36,17 +38,17 @@ pub mod packet;
 
 #[derive(StaticObject)]
 pub struct DanmuReceiver {
-  status: Mutex<ReceiverStatusInner>,
+  status: Arc<Mutex<ReceiverStatusInner>>,
 }
 
 impl DanmuReceiver {
   fn new() -> Self {
     Self {
-      status: Mutex::const_new(ReceiverStatusInner::Close),
+      status: Arc::new(Mutex::const_new(ReceiverStatusInner::Close)),
     }
   }
 
-  pub async fn connect_to(&self, roomid: u32) -> DRResult<()> {
+  pub async fn connect_to(&self, roomid: u32) -> DrResult<()> {
     info!("connecting to {roomid}");
 
     modify_cfg(
@@ -62,19 +64,19 @@ impl DanmuReceiver {
     self.connect().await
   }
 
-  pub async fn connect(&self) -> DRResult<()> {
-    let mut status = self.status.lock().await;
-
-    match &mut *status {
+  pub async fn connect(&self) -> DrResult<()> {
+    match &mut *a_lock("dr_status", &self.status).await {
       status @ ReceiverStatusInner::Close => {
         status.set_status(ReceiverStatusInner::Connecting).await;
       }
       status => {
-        return Err(DRError::IllegalState(status.to_public()));
+        return Err(DrError::IllegalState(status.to_public()));
       }
     }
 
-    match connect().await {
+    let connect_result = connect(&self.status).await;
+    let mut status = a_lock("dr_status", &self.status).await;
+    match connect_result {
       Ok(connection) => {
         status
           .set_status(ReceiverStatusInner::new_connected(connection))
@@ -89,22 +91,37 @@ impl DanmuReceiver {
     }
   }
 
-  pub async fn disconnect(&self) -> DRResult<()> {
-    match &mut *self.status.lock().await {
+  pub async fn disconnect(&self) -> DrResult<()> {
+    match &mut *a_lock("dr_status", &self.status).await {
+      status @ ReceiverStatusInner::Close => return Err(DrError::IllegalState(status.to_public())),
+      status @ ReceiverStatusInner::Connecting => {
+        status.set_status(ReceiverStatusInner::Interrupted).await;
+      }
       status @ ReceiverStatusInner::Connected { .. } => {
         Self::disconnect_connected(status).await?;
       }
-      status @ (ReceiverStatusInner::Reconnecting { .. } | ReceiverStatusInner::Error) => {
+      status @ ReceiverStatusInner::Error => {
         status.set_status(ReceiverStatusInner::Close).await;
       }
-      status @ (ReceiverStatusInner::Close | ReceiverStatusInner::Connecting) => {
-        return Err(DRError::IllegalState(status.to_public()))
+      status @ ReceiverStatusInner::Reconnecting { .. } => {
+        let reconnecting = if let ReceiverStatusInner::Reconnecting { reconnecting, .. } = status {
+          reconnecting
+        } else {
+          unreachable!()
+        };
+
+        if *reconnecting {
+          status.set_status(ReceiverStatusInner::Interrupted).await;
+        } else {
+          status.set_status(ReceiverStatusInner::Close).await;
+        }
       }
+      ReceiverStatusInner::Interrupted => {}
     }
     Ok(())
   }
 
-  async fn disconnect_connected(status: &mut ReceiverStatusInner) -> DRResult<()> {
+  async fn disconnect_connected(status: &mut ReceiverStatusInner) -> DrResult<()> {
     debug!("disconnecting");
     let connection = if let ReceiverStatusInner::Connected { connection, .. } = status {
       connection
@@ -122,7 +139,7 @@ impl DanmuReceiver {
   }
 
   pub async fn tick(&self) {
-    match &mut *self.status.lock().await {
+    match &mut *a_lock("dr_status", &self.status).await {
       ReceiverStatusInner::Close | ReceiverStatusInner::Connecting => {}
       status @ ReceiverStatusInner::Connected { .. } => {
         Self::tick_connected(status).await;
@@ -133,8 +150,9 @@ impl DanmuReceiver {
           .await;
       }
       status @ ReceiverStatusInner::Reconnecting { .. } => {
-        Self::tick_reconnect(status).await;
+        self.tick_reconnect(status).await;
       }
+      ReceiverStatusInner::Interrupted => {}
     }
   }
 
@@ -236,18 +254,24 @@ impl DanmuReceiver {
     *last_heartbeat_tick_ts = Instant::now();
   }
 
-  async fn tick_reconnect(status: &mut ReceiverStatusInner) {
+  async fn tick_reconnect(&self, status: &mut ReceiverStatusInner) {
     // region destruct
-    let (reconnect_time, reconnect_count) = if let ReceiverStatusInner::Reconnecting {
-      reconnect_time,
-      reconnect_count,
-    } = status
-    {
-      (reconnect_time, reconnect_count)
-    } else {
-      unreachable!();
-    };
+    let (reconnecting, reconnect_time, reconnect_count) =
+      if let ReceiverStatusInner::Reconnecting {
+        reconnecting,
+        reconnect_time,
+        reconnect_count,
+      } = status
+      {
+        (reconnecting, reconnect_time, reconnect_count)
+      } else {
+        unreachable!();
+      };
     // endregion
+
+    if *reconnecting {
+      return;
+    }
 
     const RECONNECT_LIMIT: u32 = 5;
     const RECONNECT_INTERVAL: u32 = 2;
@@ -262,35 +286,57 @@ impl DanmuReceiver {
     }
 
     *reconnect_count += 1;
-    debug!("reconnecting (count: {reconnect_count}/{RECONNECT_LIMIT})");
-    match connect().await {
-      Ok(connection) => {
-        status
-          .set_status(ReceiverStatusInner::new_connected(connection))
-          .await;
+    debug!("reconnecting ({reconnect_count}/{RECONNECT_LIMIT})");
+    *reconnecting = true;
+
+    let status = Arc::clone(&self.status);
+    tokio::task::spawn(async move {
+      let connect_result = connect(&status).await;
+      let mut status = a_lock("dr_status", &status).await;
+
+      match connect_result {
+        Ok(connection) => {
+          status
+            .set_status(ReceiverStatusInner::new_connected(connection))
+            .await;
+        }
+        Err(err) => {
+          if let ReceiverStatusInner::Interrupted = *status {
+            status.set_status(ReceiverStatusInner::Close).await;
+          } else {
+            error!("failed to reconnect: {err:?}");
+            if let ReceiverStatusInner::Reconnecting {
+              reconnecting,
+              reconnect_time,
+              ..
+            } = &mut *status
+            {
+              *reconnecting = false;
+              *reconnect_time = Instant::now();
+            }
+          }
+        }
       }
-      Err(err) => {
-        *reconnect_time = Instant::now();
-        error!("failed to reconnect: {err:?}");
-      }
-    }
+    });
   }
 
   pub async fn is_connected(&self) -> bool {
-    match &*self.status.lock().await {
+    match &*a_lock("dr_status", &self.status).await {
       ReceiverStatusInner::Connected { connection, .. } => connection.is_connected(),
       _ => false,
     }
   }
 
   pub async fn get_status(&self) -> ReceiverStatus {
-    self.status.lock().await.to_public()
+    a_lock("dr_status", &self.status).await.to_public()
   }
 }
 
-async fn connect() -> DRResult<WebSocketConnection> {
+async fn connect(status: &Arc<Mutex<ReceiverStatusInner>>) -> DrResult<WebSocketConnection> {
   let roomid = get_actual_room_id().await?;
+  check_interrupted(status).await?;
   let server_info = DanmuServerInfoGetter::get_token_and_url(roomid).await?;
+  check_interrupted(status).await?;
 
   debug!("connecting {}", server_info.url);
   let mut connection = WebSocketConnection::new_connection(&server_info.url).await?;
@@ -310,7 +356,18 @@ async fn connect() -> DRResult<WebSocketConnection> {
   Ok(connection)
 }
 
-async fn get_actual_room_id() -> DRResult<u32> {
+async fn check_interrupted(status: &Arc<Mutex<ReceiverStatusInner>>) -> DrResult<()> {
+  if matches!(
+    *a_lock("dr_status", status).await,
+    ReceiverStatusInner::Interrupted
+  ) {
+    Err(DrError::ConnectionInterrupted)
+  } else {
+    Ok(())
+  }
+}
+
+async fn get_actual_room_id() -> DrResult<u32> {
   let cfg = fetch_config().await;
 
   let roomid = cfg.roomid;
@@ -350,9 +407,12 @@ enum ReceiverStatusInner {
 
   Error,
   Reconnecting {
+    reconnecting: bool,
     reconnect_count: u32,
     reconnect_time: Instant,
   },
+
+  Interrupted,
 }
 
 impl ReceiverStatusInner {
@@ -363,6 +423,7 @@ impl ReceiverStatusInner {
       ReceiverStatusInner::Connected { .. } => ReceiverStatus::Connected,
       ReceiverStatusInner::Error => ReceiverStatus::Error,
       ReceiverStatusInner::Reconnecting { .. } => ReceiverStatus::Reconnecting,
+      ReceiverStatusInner::Interrupted => ReceiverStatus::Interrupted,
     }
   }
 
@@ -377,6 +438,7 @@ impl ReceiverStatusInner {
 
   fn reconnecting_default() -> Self {
     Self::Reconnecting {
+      reconnecting: false,
       reconnect_count: 0,
       reconnect_time: Instant::now(),
     }
@@ -391,10 +453,10 @@ impl ReceiverStatusInner {
   }
 }
 
-pub type DRResult<T> = Result<T, DRError>;
+pub type DrResult<T> = Result<T, DrError>;
 
 #[derive(thiserror::Error, Debug)]
-pub enum DRError {
+pub enum DrError {
   #[error("failed to get actual roomid")]
   FailedToGetActualRoomid(#[from] room_info_getter::Error),
   #[error("failed to get server info")]
