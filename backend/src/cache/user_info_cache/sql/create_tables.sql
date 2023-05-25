@@ -28,7 +28,7 @@ create table if not exists user_info
 
 create table if not exists medal_info
 (
-  targetId     text not null
+  targetId     text not null -- anchorUid
     constraint medal_info_pk
       primary key,
 
@@ -42,7 +42,7 @@ create table if not exists medal_data
   uid         text not null
     constraint medal_data_pk
       primary key,
-  targetId    text not null,
+  targetId    text not null, -- anchorUid
 
   isLighted   integer default 0,
   guardLevel  integer,

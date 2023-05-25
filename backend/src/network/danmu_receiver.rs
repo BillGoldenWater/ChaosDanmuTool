@@ -156,9 +156,11 @@ impl DanmuReceiver {
     let mut processor = MessageProcessor::default();
     processor.process(connection.tick());
 
-    for user_info in processor.user_infos {
-      UserInfoCache::i().update(user_info).await;
+    let result = UserInfoCache::i().update_many(processor.user_infos).await;
+    if let Err(err) = result {
+      error!("failed to update user_info: {err:?}");
     }
+
     if !processor.commands.is_empty() {
       CommandBroadcastServer::i()
         .broadcast_cmd_many(processor.commands)
