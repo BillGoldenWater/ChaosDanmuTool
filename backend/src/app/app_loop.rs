@@ -94,7 +94,10 @@ impl AppLoop {
         warn!("last tick takes {elapsed:.3}s, it's more than should({LOOP_MIN_INTERVAL_SECS:.3}) detail(millis): {loop_cost:?}")
       } else if loop_cost_average > soft_warn_limit {
         warn!("last tick takes {elapsed:.3}s, it's more than expected({LOOP_MIN_INTERVAL_SECS:.3}) detail(millis): {loop_cost:?}");
-        soft_warn_limit = (loop_cost_average * 1.1).min(LOOP_COST_WARN_HARD_LIMIT_SECS);
+        #[cfg(debug_assertions)]
+        {
+          soft_warn_limit = (loop_cost_average * 1.1).min(LOOP_COST_WARN_HARD_LIMIT_SECS);
+        }
       }
     }
 
