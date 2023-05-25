@@ -10,6 +10,7 @@
   "license": "AGPL-3.0-only",
   "scripts": {
     "dev": "./node_modules/.bin/vite",
+    "update_share": "yarn upgrade chaos_danmu_tool_share && vite build --force",
     "build": "./node_modules/.bin/tsc && vite build",
     "preview": "./node_modules/.bin/vite preview",
     "tauri": "cargo tauri"

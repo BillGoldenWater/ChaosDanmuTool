@@ -80,7 +80,7 @@ dependencies = ["build-share"]
 cwd = "./frontend"
 script_runner = "@shell"
 script = """
-yarn upgrade chaos_danmu_tool_share
+yarn update_share
 """
 
 [tasks.clean-share]
