@@ -66,6 +66,7 @@ impl AppLoop {
     );
 
     let mut loop_cost_average = 0.0;
+    #[allow(unused_mut)]
     let mut soft_warn_limit = LOOP_MIN_INTERVAL_SECS;
 
     loop {
