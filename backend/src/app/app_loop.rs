@@ -19,7 +19,8 @@ use crate::network::danmu_receiver::DanmuReceiver;
 type Sender = UnboundedSender<()>;
 type Receiver = UnboundedReceiver<()>;
 
-static LOOP_MIN_INTERVAL_SECS: f64 = 1.0 / 20.0;
+const LOOP_MIN_INTERVAL_SECS: f64 = 1.0 / 20.0;
+const LOOP_COST_WARN_HARD_LIMIT_SECS: f64 = 1.0;
 
 #[derive(StaticObject)]
 pub struct AppLoop {
@@ -64,6 +65,9 @@ impl AppLoop {
       "communicating with bilibili server and danmu viewer clients",
     );
 
+    let mut loop_cost_average = 0.0;
+    let mut soft_warn_limit = LOOP_MIN_INTERVAL_SECS;
+
     loop {
       // detect stop signal
       let recv = self.stop_rx.try_recv();
@@ -76,12 +80,21 @@ impl AppLoop {
       let loop_cost = self.each_iter().await;
       let elapsed = start.elapsed().as_secs_f64();
 
-      // calc and sleep time for reach min interval
+      // sleep for reach min interval
       let need_sleep = LOOP_MIN_INTERVAL_SECS - elapsed;
       if need_sleep > 0.0 {
         sleep(Duration::from_secs_f64(need_sleep)).await;
-      } else {
-        warn!("last tick takes {elapsed:.3}s, it's more than expected({LOOP_MIN_INTERVAL_SECS:.3})\n detail: \n{loop_cost:#?}")
+      }
+
+      // warn for long run time
+      loop_cost_average += elapsed;
+      loop_cost_average /= 2.0;
+
+      if elapsed > LOOP_COST_WARN_HARD_LIMIT_SECS {
+        warn!("last tick takes {elapsed:.3}s, it's more than should({LOOP_MIN_INTERVAL_SECS:.3}) detail(millis): {loop_cost:?}")
+      } else if loop_cost_average > soft_warn_limit {
+        warn!("last tick takes {elapsed:.3}s, it's more than expected({LOOP_MIN_INTERVAL_SECS:.3}) detail(millis): {loop_cost:?}");
+        soft_warn_limit = (loop_cost_average * 1.1).min(LOOP_COST_WARN_HARD_LIMIT_SECS);
       }
     }
 
