@@ -46,7 +46,7 @@ impl DanmuReceiver {
     }
   }
 
-  pub async fn connect_to(&mut self, roomid: u32) -> DRResult<()> {
+  pub async fn connect_to(&self, roomid: u32) -> DRResult<()> {
     info!("connecting to {roomid}");
 
     modify_cfg(
@@ -62,7 +62,7 @@ impl DanmuReceiver {
     self.connect().await
   }
 
-  pub async fn connect(&mut self) -> DRResult<()> {
+  pub async fn connect(&self) -> DRResult<()> {
     let mut status = self.status.lock().await;
 
     match &mut *status {
@@ -89,7 +89,7 @@ impl DanmuReceiver {
     }
   }
 
-  pub async fn disconnect(&mut self) -> DRResult<()> {
+  pub async fn disconnect(&self) -> DRResult<()> {
     match &mut *self.status.lock().await {
       status @ ReceiverStatusInner::Connected { .. } => {
         Self::disconnect_connected(status).await?;
@@ -121,7 +121,7 @@ impl DanmuReceiver {
     Ok(())
   }
 
-  pub async fn tick(&mut self) {
+  pub async fn tick(&self) {
     match &mut *self.status.lock().await {
       ReceiverStatusInner::Close | ReceiverStatusInner::Connecting => {}
       status @ ReceiverStatusInner::Connected { .. } => {
