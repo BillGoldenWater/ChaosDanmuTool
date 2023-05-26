@@ -38,6 +38,12 @@ fn build_tauri_app<A: Assets>(context: Context<A>) -> App {
     } else {
       tauri::Menu::default()
     })
+    .on_window_event(|e| {
+      // fix webview resize delay on some platform
+      if let tauri::WindowEvent::Resized(_) = e.event() {
+        std::thread::sleep(std::time::Duration::from_nanos(1));
+      }
+    })
     .build(context)
     .expect("error while building tauri application")
 }
