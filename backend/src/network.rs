@@ -7,4 +7,4 @@ pub mod api_request;
 pub mod command_broadcast_server;
 pub mod danmu_receiver;
 pub mod http_server;
-pub mod websocket;
+pub mod websocket_connection;

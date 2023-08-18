@@ -10,9 +10,9 @@ use log::{error, info};
 use static_object::StaticObject;
 use tokio::net::TcpStream;
 use tokio::sync::Mutex;
-use tokio_tungstenite::tungstenite::protocol::frame::coding::CloseCode;
-use tokio_tungstenite::tungstenite::Message;
 use tokio_tungstenite::{MaybeTlsStream, WebSocketStream};
+use tokio_tungstenite::tungstenite::Message;
+use tokio_tungstenite::tungstenite::protocol::frame::coding::CloseCode;
 
 use chaos_danmu_tool_share::command_packet::app_command::config_update::ConfigUpdate;
 use chaos_danmu_tool_share::command_packet::app_command::gift_config_update::GiftConfigUpdate;
@@ -23,11 +23,9 @@ use crate::command::command_history_manager::CommandHistoryManager;
 use crate::get_cfg;
 use crate::network::api_request::gift_config_getter::GiftConfigGetter;
 use crate::network::danmu_receiver::DanmuReceiver;
-use crate::network::websocket::websocket_connection::WebSocketConnection;
+use crate::network::websocket_connection::{ConnectionId, WebSocketConnection};
 use crate::utils::mutex_utils::a_lock;
 use crate::utils::ws_utils::close_frame;
-
-use super::websocket::websocket_connection::ConnectionId;
 
 type WebSocket = WebSocketStream<MaybeTlsStream<TcpStream>>;
 

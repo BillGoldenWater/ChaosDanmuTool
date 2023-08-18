@@ -24,12 +24,10 @@ use crate::network::api_request::room_info_getter::{self, RoomInfoGetter};
 use crate::network::command_broadcast_server::CommandBroadcastServer;
 use crate::network::danmu_receiver::message_processor::MessageProcessor;
 use crate::network::danmu_receiver::packet::{JoinPacketInfo, Packet};
-use crate::network::websocket::websocket_connection::WebSocketConnectionError;
+use crate::network::websocket_connection::{WebSocketConnection, WebSocketConnectionError};
 use crate::utils::immutable_utils::Immutable;
 use crate::utils::mutex_utils::a_lock;
 use crate::utils::ws_utils::close_frame;
-
-use super::websocket::websocket_connection::WebSocketConnection;
 
 pub mod data_type;
 pub mod message_processor;
