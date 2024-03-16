@@ -8,11 +8,26 @@ edition = "2021"
 [dependencies]
 tracing = "0.1"
 thiserror = "1"
+anyhow = "1"
 
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 dotenv = "0.15"
 
-tokio = "1"
+tokio = { version = "1", features = ["rt", "rt-multi-thread"] }
+
+http = "1"
 axum = { version = "0.7", features = ["http2", "macros"] }
 reqwest = { version = "0.11", features = ["json", "rustls-tls"] }
-anyhow = "1"
+
+md-5 = "0.10"
+base16ct = "0.2"
+hmac = "0.12"
+sha2 = "0.10"
+
+chrono = "0.4"
+rand = "0.8"
+itertools = "0.12"
+bytes = "1.5.0"
+
+[features]
+bench = []
