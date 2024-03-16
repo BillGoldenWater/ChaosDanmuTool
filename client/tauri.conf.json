@@ -1,0 +1,36 @@
+{
+  "productName": "Chaos Danmu Tool",
+  "version": "0.10.0",
+  "identifier": "indi.goldenwater.chaosdanmutool",
+  "build": {
+    "frontendDist": "../client_ui/dist",
+    "devUrl": "http://localhost:1420",
+    "beforeDevCommand": "trunk serve --config client_ui/Trunk.toml",
+    "beforeBuildCommand": "trunk build --config client_ui/Trunk.toml"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Chaos Danmu Tool",
+        "width": 800,
+        "height": 600,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  }
+}

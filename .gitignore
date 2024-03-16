@@ -1,3 +1,17 @@
+# temp
 old
 
-.DS_Store
+# macos
+**/.DS_Store
+
+# editor
+.idea
+
+# generated
+target
+app-icon.png
+client/gen/schemas
+client_ui/dist
+
+# lock
+Cargo.lock
