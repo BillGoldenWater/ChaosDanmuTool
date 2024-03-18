@@ -1,14 +1,7 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
+#![warn(missing_debug_implementations)]
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+pub mod bili_api;
+pub mod data_primitives;
+pub mod utils;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+// NOTE: #[derive(Debug, Clone, PartialEq, Hash, Serialize, Deserialize)]

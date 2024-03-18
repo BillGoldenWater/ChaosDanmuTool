@@ -6,6 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+share = { path = "../share" }
+
 tracing = "0.1"
 thiserror = "1"
 anyhow = "1"
@@ -13,11 +15,14 @@ anyhow = "1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 dotenv = "0.15"
 
-tokio = { version = "1", features = ["rt", "rt-multi-thread"] }
+tokio = { version = "1", features = ["full"] }
 
 http = "1"
 axum = { version = "0.7", features = ["http2", "macros"] }
 reqwest = { version = "0.11", features = ["json", "rustls-tls"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde-aux = "4"
 
 md-5 = "0.10"
 base16ct = "0.2"
@@ -27,7 +32,8 @@ sha2 = "0.10"
 chrono = "0.4"
 rand = "0.8"
 itertools = "0.12"
-bytes = "1.5.0"
+bytes = "1"
+typed-builder = "0.18"
 
 [features]
 bench = []
