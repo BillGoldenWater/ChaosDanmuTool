@@ -1,15 +1,15 @@
 use anyhow::Context;
 use hmac::{Hmac, Mac};
-use http::{HeaderMap, HeaderName, HeaderValue};
 use itertools::Itertools;
 use md5::{Digest, Md5};
+use reqwest::header::{HeaderMap as ReqHdrMap, HeaderName as ReqHdrK, HeaderValue as ReqHdrV};
 use sha2::Sha256;
 
 pub fn request_sign_header_gen(
     access_key_id: &str,
     access_key_secret: &str,
     body: &str,
-) -> anyhow::Result<HeaderMap> {
+) -> anyhow::Result<ReqHdrMap> {
     // body md5
     let body_md5 = {
         let mut hasher = Md5::new();
@@ -43,8 +43,8 @@ fn sign_inner(
     body_md5: String,
     nonce: String,
     ts: i64,
-) -> anyhow::Result<(HeaderMap, String)> {
-    let mut headers = HeaderMap::with_capacity(9);
+) -> anyhow::Result<(ReqHdrMap, String)> {
+    let mut headers = ReqHdrMap::with_capacity(9);
 
     header_insert(&mut headers, "x-bili-accesskeyid", access_key_id.into())?;
     header_insert(&mut headers, "x-bili-content-md5", body_md5)?;
@@ -84,10 +84,10 @@ fn sign_inner(
     Ok((headers, signature))
 }
 
-fn header_insert(headers: &mut HeaderMap, k: &'static str, v: String) -> anyhow::Result<()> {
+fn header_insert(headers: &mut ReqHdrMap, k: &'static str, v: String) -> anyhow::Result<()> {
     headers.insert(
-        HeaderName::from_static(k),
-        HeaderValue::from_maybe_shared(bytes::Bytes::from(v))
+        ReqHdrK::from_static(k),
+        ReqHdrV::from_maybe_shared(bytes::Bytes::from(v))
             .with_context(|| format!("failed to create {k}"))?,
     );
     Ok(())
