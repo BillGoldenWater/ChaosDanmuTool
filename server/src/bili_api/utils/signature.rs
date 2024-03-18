@@ -59,17 +59,16 @@ fn sign_inner(
 
     // signature
     let signature = {
-        let header_for_sign = headers
+        let mut header_for_sign = String::with_capacity(255);
+        headers
             .iter()
             .sorted_by_key(|(k, _)| k.as_str())
-            .map(|(k, v)| {
-                format!(
-                    "{}:{}",
-                    k.as_str(),
-                    std::str::from_utf8(v.as_bytes()).expect("valid utf8")
-                )
-            })
-            .join("\n");
+            .for_each(|(k, v)| {
+                header_for_sign.push_str(k.as_str());
+                header_for_sign.push(':');
+                header_for_sign.push_str(std::str::from_utf8(v.as_bytes()).expect("valid utf8"));
+                header_for_sign.push('\n');
+            });
 
         let mut hmac = Hmac::<Sha256>::new_from_slice(access_key_secret.as_bytes())
             .expect("HMAC shouldn't throw a error");
