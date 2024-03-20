@@ -1,13 +1,13 @@
-use serde::{Deserialize, Serialize};
-
-use crate::data_primitives::{
-    open_id::OpenId, room_id::RoomId, user_face::UserFace, user_name::UserName,
+use crate::{
+    data_primitives::{open_id::OpenId, room_id::RoomId, user_face::UserFace, user_name::UserName},
+    define_data_type,
 };
 
-#[derive(Debug, Clone, PartialEq, Hash, Serialize, Deserialize)]
-pub struct AnchorInfo {
-    room_id: RoomId,
-    open_id: OpenId,
-    uname: UserName,
-    uface: UserFace,
-}
+define_data_type!(
+    struct AnchorInfo {
+        pub room_id: RoomId,
+        pub open_id: OpenId,
+        pub uname: UserName,
+        pub uface: UserFace,
+    }
+);

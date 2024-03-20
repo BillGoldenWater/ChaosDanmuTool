@@ -24,8 +24,6 @@ pub mod api_app_heartbeat;
 pub mod api_app_start;
 pub mod config;
 
-// NOTE: req/res: #[derive(Debug, Clone, PartialEq, Hash, Serialize, Deserialize)]
-
 #[derive(Debug)]
 pub struct BiliApiClient {
     inner: Arc<BiliApiClientRef>,
