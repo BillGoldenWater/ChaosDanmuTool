@@ -1,13 +1,18 @@
 #![warn(missing_debug_implementations)]
 #![cfg_attr(feature = "bench", feature(test))]
 
-use std::env;
+use std::{env, time::Duration};
 
 use anyhow::Context;
 use bili_api::client::{config::BiliApiClientConfig, BiliApiClient};
+use server::{config::ServerConfig, Server};
+use tokio::time::sleep;
+use tracing::debug;
 use tracing_subscriber::{fmt::format::FmtSpan, EnvFilter};
 
 mod bili_api;
+mod database;
+mod server;
 
 fn main() -> anyhow::Result<()> {
     let rt = tokio::runtime::Builder::new_multi_thread()
@@ -31,8 +36,6 @@ async fn run() -> anyhow::Result<()> {
     let access_key_id = env_var("BILI_ACCESS_KEY_ID")?;
     let access_key_secret = env_var("BILI_ACCESS_KEY_SECRET")?;
 
-    let code = env_var("BILI_CODE")?;
-
     let client = BiliApiClient::new(
         BiliApiClientConfig::builder()
             .api_base("https://live-open.biliapi.com".into())
@@ -42,25 +45,24 @@ async fn run() -> anyhow::Result<()> {
             .build(),
     )?;
 
-    let res = client
-        .app_start(serde_json::from_str(&format!("\"{code}\"")).unwrap())
-        .await
-        .with_context(|| "failed to start")?;
-    dbg!(&res);
-    let game_id = res.game_info.game_id;
-    client
-        .app_heartbeat(game_id.clone())
-        .await
-        .with_context(|| "failed to heartbeat")?;
-    let res = client
-        .app_heartbeat_batched(vec![game_id.clone()])
-        .await
-        .with_context(|| "failed to heartbeat batched")?;
-    dbg!(&res);
-    client
-        .app_end(game_id)
-        .await
-        .with_context(|| "failed to end")?;
+    let server = Server::new(
+        ServerConfig::builder().host("0.0.0.0:25500".into()).build(),
+        client,
+    );
+
+    tokio::spawn(async {
+        sleep(Duration::from_secs_f64(0.1)).await;
+        let res = reqwest::Client::new()
+            .post("http://127.0.0.1:25500/v0/admin/keyGen")
+            .send()
+            .await
+            .unwrap()
+            .bytes()
+            .await;
+        debug!("{res:?}");
+    });
+
+    server.run().await.context("failed to run server")?;
 
     Ok(())
 }

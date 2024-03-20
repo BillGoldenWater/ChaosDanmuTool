@@ -2,6 +2,7 @@
 
 pub mod bili_api;
 pub mod data_primitives;
+pub mod data_type;
 pub mod utils;
 
 #[macro_export]
