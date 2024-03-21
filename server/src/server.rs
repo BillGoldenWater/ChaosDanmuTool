@@ -1,31 +1,22 @@
 use std::sync::Arc;
 
 use anyhow::Context;
-use axum::{
-    extract::State,
-    response::{IntoResponse, Response},
-    routing::post,
-    Router,
+use axum::{extract::State, response::IntoResponse, routing::post, Router};
+use ed25519_dalek::VerifyingKey;
+use share::{
+    data_primitives::auth_key_id::AuthKeyId,
+    server_api::{
+        admin::key_add::{ReqKeyAdd, ResKeyAdd},
+        Request as _, Response,
+    },
 };
-use ed25519_dalek::SigningKey;
-use http::header::CONTENT_TYPE;
-use rand::rngs::OsRng;
 use tracing::{info, instrument};
 
-use self::{
-    api::{
-        admin::key_gen::{ReqKeyGen, ResKeyGen},
-        Request,
-    },
-    config::ServerConfig,
-};
-use crate::{
-    bili_api::client::BiliApiClient,
-    database::data_model::data_primitives::{auth_key_id::AuthKeyId, secret_key::SecretKey},
-};
+use self::{config::ServerConfig, signed_body::SignedBody};
+use crate::bili_api::client::BiliApiClient;
 
-pub mod api;
 pub mod config;
+pub mod signed_body;
 
 #[derive(Debug, Clone)]
 pub struct Server {
@@ -46,7 +37,7 @@ impl Server {
     #[instrument(level = "debug", skip(self))]
     pub async fn run(&self) -> anyhow::Result<()> {
         let router = Router::new()
-            .route(ReqKeyGen::ROUTE, post(Self::admin_key_gen))
+            .route(ReqKeyAdd::ROUTE, post(Self::admin_key_add))
             .with_state(self.clone());
 
         let listener = tokio::net::TcpListener::bind(self.inner.cfg.host.as_ref())
@@ -61,14 +52,26 @@ impl Server {
         Ok(())
     }
 
-    #[instrument(level = "debug", skip(s))]
-    async fn admin_key_gen(State(s): State<Server>) -> impl IntoResponse {
-        bson::to_vec(&ResKeyGen {
+    #[instrument(level = "trace", skip(self))]
+    pub fn get_pub_key(&self, key_id: &AuthKeyId) -> Option<&VerifyingKey> {
+        if key_id.is_admin_key() {
+            return Some(&self.inner.cfg.admin_pub_key);
+        }
+
+        // TODO: key storage
+        todo!()
+    }
+
+    #[instrument(level = "debug", skip(_s, body))]
+    async fn admin_key_add(
+        State(_s): State<Server>,
+        SignedBody { body, is_admin }: SignedBody<ReqKeyAdd>,
+    ) -> impl IntoResponse {
+        dbg!(&body.note);
+        dbg!(&is_admin);
+        Response::Ok(ResKeyAdd {
             key_id: AuthKeyId::new(),
-            secret_key: SecretKey::from_signing_key(SigningKey::generate(&mut OsRng)),
         })
-        .unwrap()
-        .into_response()
     }
 }
 

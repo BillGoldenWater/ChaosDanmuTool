@@ -1,5 +1,6 @@
 use ed25519_dalek::{VerifyingKey, PUBLIC_KEY_LENGTH};
-use share::define_data_primitive;
+
+use crate::define_data_primitive;
 
 define_data_primitive!(PublicKey(
     #[serde(with = "serde_bytes")]
@@ -11,7 +12,7 @@ impl PublicKey {
         Self(verifying_key.to_bytes())
     }
 
-    pub fn to_verifying_key(&self) -> anyhow::Result<VerifyingKey> {
-        VerifyingKey::from_bytes(&self.0).map_err(Into::into)
+    pub fn to_verifying_key(&self) -> Result<VerifyingKey, ed25519_dalek::SignatureError> {
+        VerifyingKey::from_bytes(&self.0)
     }
 }

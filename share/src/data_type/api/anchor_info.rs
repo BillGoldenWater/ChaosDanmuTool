@@ -6,8 +6,8 @@ use crate::{
 
 define_data_type!(
     struct AnchorInfo {
-        user: UserInfo,
-        room_id: RoomId,
+        pub user: UserInfo,
+        pub room_id: RoomId,
     }
 );
 

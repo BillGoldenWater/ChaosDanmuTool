@@ -15,6 +15,20 @@ pub trait Functional {
         Some(self)
     }
 
+    fn into_ok<E>(self) -> Result<Self, E>
+    where
+        Self: Sized,
+    {
+        Ok(self)
+    }
+
+    fn into_err<T>(self) -> Result<T, Self>
+    where
+        Self: Sized,
+    {
+        Err(self)
+    }
+
     fn unit_result<E>(self) -> Result<(), E>
     where
         Self: ResultExt<E> + Sized,

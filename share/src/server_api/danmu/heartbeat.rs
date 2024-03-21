@@ -1,6 +1,4 @@
-use share::define_data_type;
-
-use crate::{server::api::Request, server_api_route_danmu};
+use crate::{define_data_type, server_api::Request, server_api_route_danmu};
 
 define_data_type!(
     struct ReqHeartbeat {}

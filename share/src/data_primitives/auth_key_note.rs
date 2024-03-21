@@ -1,4 +1,4 @@
-use share::define_data_primitive;
+use crate::define_data_primitive;
 
 define_data_primitive!(AuthKeyNote(Box<str>));
 

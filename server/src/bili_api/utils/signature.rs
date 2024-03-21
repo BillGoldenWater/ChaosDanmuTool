@@ -1,9 +1,9 @@
 use anyhow::Context;
 use hmac::{Hmac, Mac};
 use itertools::Itertools;
-use md5::{Digest, Md5};
 use reqwest::header::{HeaderMap as ReqHdrMap, HeaderName as ReqHdrK, HeaderValue as ReqHdrV};
 use sha2::Sha256;
+use share::utils::{hash::hash_md5_str, hex::to_string};
 
 pub fn request_sign_header_gen(
     access_key_id: &str,
@@ -11,15 +11,7 @@ pub fn request_sign_header_gen(
     body: &str,
 ) -> anyhow::Result<ReqHdrMap> {
     // body md5
-    let body_md5 = {
-        let mut hasher = Md5::new();
-        hasher.update(body);
-        let hash = hasher.finalize();
-
-        let mut hash_buf = vec![0_u8; 128 / 8 * 2];
-        base16ct::lower::encode(&hash, &mut hash_buf).expect("dst length correct");
-        String::from_utf8(hash_buf).expect("hex should be valid utf8")
-    };
+    let body_md5 = hash_md5_str(body.as_bytes());
 
     // nonce
     let (nonce, ts) = {
@@ -66,7 +58,8 @@ fn sign_inner(
             .for_each(|(k, v)| {
                 header_for_sign.push_str(k.as_str());
                 header_for_sign.push(':');
-                header_for_sign.push_str(std::str::from_utf8(v.as_bytes()).expect("valid utf8"));
+                header_for_sign
+                    .push_str(std::str::from_utf8(v.as_bytes()).expect("expect valid utf8"));
                 header_for_sign.push('\n');
             });
 
@@ -75,9 +68,7 @@ fn sign_inner(
         hmac.update(header_for_sign.trim_end().as_bytes());
         let sign = hmac.finalize().into_bytes();
 
-        let mut sign_buf = vec![0_u8; 256 / 8 * 2];
-        base16ct::lower::encode(&sign, &mut sign_buf).expect("dst length correct");
-        String::from_utf8(sign_buf).expect("hex should be valid utf8")
+        to_string(&sign)
     };
 
     Ok((headers, signature))

@@ -5,7 +5,7 @@ use reqwest::{Client, ClientBuilder};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use share::{
     data_primitives::{auth_code::AuthCode, game_id::GameId},
-    utils::{functional::Functional, hex::to_string_hex},
+    utils::{functional::Functional, hex::to_string},
 };
 use tracing::instrument;
 
@@ -135,12 +135,8 @@ impl BiliApiClientRef {
             .await
             .with_context(|| "failed to read response body")?;
 
-        let mut res: Response<R> = serde_json::from_slice(&res).with_context(|| {
-            format!(
-                "failed to parse response body, body: {}",
-                to_string_hex(&res)
-            )
-        })?;
+        let mut res: Response<R> = serde_json::from_slice(&res)
+            .with_context(|| format!("failed to parse response body, body: {}", to_string(&res)))?;
 
         if res.err.code != 0 {
             Err(res.err)

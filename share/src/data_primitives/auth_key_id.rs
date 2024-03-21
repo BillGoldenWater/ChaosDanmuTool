@@ -1,5 +1,6 @@
 use bson::oid::ObjectId;
-use share::define_data_primitive;
+
+use crate::define_data_primitive;
 
 define_data_primitive!(AuthKeyId(ObjectId));
 
@@ -10,5 +11,9 @@ impl AuthKeyId {
 
     pub fn admin() -> Self {
         Self(ObjectId::from_bytes(std::array::from_fn(|_| 0)))
+    }
+
+    pub fn is_admin_key(&self) -> bool {
+        self.0.bytes().iter().all(|&it| it == 0)
     }
 }
