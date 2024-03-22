@@ -6,6 +6,7 @@ define_data_type!(
 
 impl Request for ReqHeartbeat {
     const ROUTE: &'static str = server_api_route_danmu!("/heartbeat");
+    type Response = ResHeartbeat;
 }
 
 define_data_type!(

@@ -14,6 +14,7 @@ define_data_type!(
 
 impl Request for ReqKeyAdd {
     const ROUTE: &'static str = server_api_route_admin!("/keyAdd");
+    type Response = ResKeyAdd;
 }
 
 define_data_type!(

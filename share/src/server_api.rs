@@ -5,7 +5,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response as AxumResponse},
 };
-use serde::Serialize;
+use serde::{de::DeserializeOwned, Serialize};
 use tracing::error;
 
 use crate::define_data_type;
@@ -14,8 +14,9 @@ pub mod admin;
 pub mod danmu;
 pub mod request_signature;
 
-pub trait Request {
+pub trait Request: Serialize {
     const ROUTE: &'static str;
+    type Response: DeserializeOwned;
 }
 
 #[macro_export]

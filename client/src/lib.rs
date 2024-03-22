@@ -1,19 +1,18 @@
 use std::env::{self};
 
 use anyhow::{anyhow, Context as _};
-use bson::Bson;
 use ed25519_dalek::{SigningKey, SECRET_KEY_LENGTH};
 use rand::rngs::OsRng;
 use share::{
+    self,
     data_primitives::{auth_key_id::AuthKeyId, auth_key_note::AuthKeyNote, public_key::PublicKey},
-    server_api::{
-        admin::key_add::ReqKeyAdd,
-        request_signature::{RequestSignature, SIGNATURE_HEADER_NAME},
-        Request,
-    },
     utils::{functional::Functional as _, hex},
 };
 use tracing_subscriber::{fmt::format::FmtSpan, EnvFilter};
+
+use crate::client::{client_config::ClientConfig, Client};
+
+pub mod client;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -36,10 +35,10 @@ fn read_admin_sk() -> anyhow::Result<SigningKey> {
     let sk = hex::from_str(&sk).context("failed to decode secret key from hex")?;
 
     if sk.len() != SECRET_KEY_LENGTH {
-        return anyhow!("invalid pub key length").into_err();
+        return anyhow!("invalid secret key length").into_err();
     }
 
-    SigningKey::from_bytes(&sk.try_into().expect("into success")).into_ok()
+    SigningKey::from_bytes(&sk.try_into().expect("expect into success")).into_ok()
 }
 
 async fn main() {
@@ -49,35 +48,22 @@ async fn main() {
         .with_span_events(FmtSpan::NEW | FmtSpan::CLOSE)
         .init();
 
+    let client = Client::new(
+        ClientConfig::builder()
+            .api_base("http://127.0.0.1:25500".into())
+            .key_id(AuthKeyId::admin())
+            .key(read_admin_sk().expect("expect admin sk exists and valid"))
+            .build(),
+    )
+    .expect("expect build success");
+
     let pk = SigningKey::generate(&mut OsRng).verifying_key();
-
-    let body = ReqKeyAdd {
-        public_key: PublicKey::from_verifying_key(&pk),
-        note: AuthKeyNote::new("test node".into()),
-    };
-
-    let body = bson::to_vec(&body).expect("expect serialize success");
-
-    let key_id = AuthKeyId::admin();
-    let mut key = read_admin_sk().expect("expect admin sk exists and valid");
-    let signature = RequestSignature::gen(&body, key_id, &mut key);
-    dbg!(&signature);
-    let sign = bson::to_vec(&signature).expect("expect serialize success");
-    let sign = hex::to_string(&sign);
-    dbg!(&sign);
-
-    let client = reqwest::Client::new();
     let res = client
-        .post(format!("http://127.0.0.1:25500{}", ReqKeyAdd::ROUTE))
-        .header(SIGNATURE_HEADER_NAME, sign)
-        .body(body)
-        .send()
-        .await
-        .expect("expect no issue sending request")
-        .bytes()
-        .await
-        .expect("expect no issue reading response");
-    let res = bson::from_slice::<Bson>(&res);
+        .admin_key_add(
+            PublicKey::from_verifying_key(&pk),
+            AuthKeyNote::new("test node".into()),
+        )
+        .await;
     dbg!(&res);
 
     // tauri::Builder::default()

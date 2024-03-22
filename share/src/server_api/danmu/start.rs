@@ -15,6 +15,7 @@ define_data_type!(
 
 impl Request for ReqStart {
     const ROUTE: &'static str = server_api_route_danmu!("/start");
+    type Response = ResStart;
 }
 
 define_data_type!(
