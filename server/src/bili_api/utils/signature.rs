@@ -3,7 +3,7 @@ use hmac::{Hmac, Mac};
 use itertools::Itertools;
 use reqwest::header::{HeaderMap as ReqHdrMap, HeaderName as ReqHdrK, HeaderValue as ReqHdrV};
 use sha2::Sha256;
-use share::utils::{hash::hash_md5_str, hex::to_string};
+use share::utils::{hash::hash_md5_str, hex};
 
 pub fn request_sign_header_gen(
     access_key_id: &str,
@@ -68,7 +68,7 @@ fn sign_inner(
         hmac.update(header_for_sign.trim_end().as_bytes());
         let sign = hmac.finalize().into_bytes();
 
-        to_string(&sign)
+        hex::to_string(&sign)
     };
 
     Ok((headers, signature))

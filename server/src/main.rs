@@ -8,10 +8,7 @@ use bili_api::client::{config::BiliApiClientConfig, BiliApiClient};
 use ed25519_dalek::{SigningKey, VerifyingKey, PUBLIC_KEY_LENGTH};
 use rand::rngs::OsRng;
 use server::{config::ServerConfig, Server};
-use share::utils::{
-    functional::Functional,
-    hex::{from_str, to_string},
-};
+use share::utils::{functional::Functional, hex};
 use tracing::error;
 use tracing_subscriber::{fmt::format::FmtSpan, EnvFilter};
 
@@ -38,8 +35,8 @@ fn read_admin_pk() -> anyhow::Result<VerifyingKey> {
                 error!("CDT_ADMIN_PK isn't found in environment variable, generating one");
                 let sk = SigningKey::generate(&mut OsRng);
                 let pk = sk.verifying_key();
-                let sk = to_string(sk.as_bytes());
-                let pk = to_string(pk.as_bytes());
+                let sk = hex::to_string(sk.as_bytes());
+                let pk = hex::to_string(pk.as_bytes());
                 error!("CDT_ADMIN_SK={sk}\nCDT_ADMIN_PK={pk}");
                 std::process::exit(0);
             }
@@ -47,7 +44,7 @@ fn read_admin_pk() -> anyhow::Result<VerifyingKey> {
         },
     };
 
-    let pk = from_str(&pk).context("failed to decode pub key from hex")?;
+    let pk = hex::from_str(&pk).context("failed to decode pub key from hex")?;
 
     if pk.len() != PUBLIC_KEY_LENGTH {
         return anyhow!("invalid pub key length").into_err();

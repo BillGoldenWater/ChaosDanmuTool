@@ -11,7 +11,7 @@ use share::{
             heartbeat::{ReqHeartbeat, ResHeartbeat},
             start::{ReqStart, ResStart},
         },
-        request_signature::{RequestSignature, SIGNATURE_HEADER_NAME},
+        request_signed::RequestSigned,
         Request, Response,
     },
     utils::{functional::Functional, hex},
@@ -79,22 +79,17 @@ impl ClientRef {
     }
 
     pub async fn send<Req: Request>(&self, param: &Req) -> anyhow::Result<Req::Response> {
+        let url = format!("{}{}", self.cfg.api_base, Req::ROUTE);
         let body = bson::to_vec(param).with_context(|| "failed to serialize param")?;
-
-        let mut key = self.cfg.key.clone();
-        let signature = RequestSignature::gen(&body, self.cfg.key_id.clone(), &mut key);
-        let signature =
-            bson::to_vec(&signature).with_context(|| "failed to serialize signature")?;
+        let req_signed =
+            RequestSigned::gen(body, self.cfg.key_id.clone(), &mut self.cfg.key.clone())
+                .then_ref(bson::to_vec)
+                .with_context(|| "failed to serialize signature")?;
 
         let res = self
             .client
-            .post(format!(
-                "{base}{route}",
-                base = self.cfg.api_base,
-                route = Req::ROUTE
-            ))
-            .header(SIGNATURE_HEADER_NAME, hex::to_string(&signature))
-            .body(body)
+            .post(url)
+            .body(req_signed)
             .send()
             .await
             .with_context(|| "failed to send request")?

@@ -1,4 +1,5 @@
 #![warn(missing_debug_implementations)]
+#![cfg_attr(feature = "bench", feature(test))]
 
 pub mod data_primitives;
 pub mod data_type;

@@ -12,7 +12,7 @@ use crate::define_data_type;
 
 pub mod admin;
 pub mod danmu;
-pub mod request_signature;
+pub mod request_signed;
 
 pub trait Request: Serialize {
     const ROUTE: &'static str;

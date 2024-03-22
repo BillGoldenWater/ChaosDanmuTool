@@ -7,11 +7,8 @@ use axum::{
 use serde::de::DeserializeOwned;
 use share::{
     define_data_type,
-    server_api::{
-        request_signature::{RequestSignature, SIGNATURE_HEADER_NAME},
-        Response, ResponseError,
-    },
-    utils::{functional::Functional, hex},
+    server_api::{request_signed::RequestSigned, Response, ResponseError},
+    utils::functional::Functional,
 };
 use tracing::debug;
 
@@ -36,54 +33,33 @@ where
         let s = Server::from_ref(state);
         let auth_err = Response::<()>::from(ResponseError::Auth);
 
-        let sign = req
-            .headers()
-            .get(SIGNATURE_HEADER_NAME)
-            .ok_or_else(|| {
-                debug!("auth failed: missing header {SIGNATURE_HEADER_NAME}");
-                auth_err.clone()
-            })?
-            .then(|header_value| header_value.to_str())
-            .map_err(|err| {
-                debug!("auth failed: invalid header value, err: {err}");
-                auth_err.clone()
-            })?
-            .then(hex::from_str)
-            .map_err(|err| {
-                debug!("auth failed: invalid hex, err: {err}");
-                auth_err.clone()
-            })?
-            .then(|bytes| bson::from_slice::<RequestSignature>(&bytes))
-            .map_err(|err| {
-                debug!("auth failed: invalid hex, err: {err}");
-                auth_err.clone()
-            })?;
-
-        let pub_key = s.get_pub_key(sign.key_id()).ok_or_else(|| {
-            debug!("auth failed: invalid key id");
-            auth_err.clone()
-        })?;
-
         let body = req
             .extract::<Bytes, _>()
             .await
             .map_err(Response::<()>::from_unknown_err)?;
 
-        sign.verify(&body, pub_key).map_err(|err| {
+        let req_signed = bson::from_slice::<RequestSigned>(&body).map_err(|err| {
+            debug!("failed to decode request: {err}");
+            Response::<()>::from(ResponseError::Param)
+        })?;
+
+        let pub_key = s.get_pub_key(req_signed.key_id()).ok_or_else(|| {
+            debug!("auth failed: invalid key id");
+            auth_err.clone()
+        })?;
+
+        req_signed.verify(pub_key).map_err(|err| {
             debug!("auth failed: invalid signature, err: {err}");
             auth_err
         })?;
 
-        let body = bson::from_slice(&body).map_err(|err| {
+        let is_admin = req_signed.key_id().is_admin_key();
+        let body = bson::from_slice(&req_signed.into_body()).map_err(|err| {
             debug!("failed to decode body: {err}");
             Response::<()>::from(ResponseError::Param)
         })?;
 
-        Self {
-            body,
-            is_admin: sign.key_id().is_admin_key(),
-        }
-        .into_ok()
+        Self { body, is_admin }.into_ok()
     }
 }
 

@@ -18,6 +18,7 @@ bson.workspace = true
 
 md-5.workspace = true
 base16ct.workspace = true
+base64ct.workspace = true
 ed25519-dalek.workspace = true
 
 chrono.workspace = true
@@ -25,3 +26,6 @@ rand.workspace = true
 itertools.workspace = true
 dashmap.workspace = true
 once_cell.workspace = true
+
+[features]
+bench = []

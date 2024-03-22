@@ -5,7 +5,7 @@ use reqwest::{Client, ClientBuilder};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use share::{
     data_primitives::{auth_code::AuthCode, game_id::GameId},
-    utils::{functional::Functional, hex::to_string},
+    utils::{functional::Functional as _, hex},
 };
 use tracing::instrument;
 
@@ -109,6 +109,7 @@ impl BiliApiClientRef {
         P: Serialize + ?Sized,
         R: DeserializeOwned,
     {
+        // TODO: optimize types using traits
         let body = serde_json::to_string(param).with_context(|| "failed to serialize param")?;
 
         let sign_headers =
@@ -136,8 +137,12 @@ impl BiliApiClientRef {
             .await
             .with_context(|| "failed to read response body")?;
 
-        let mut res: Response<R> = serde_json::from_slice(&res)
-            .with_context(|| format!("failed to parse response body, body: {}", to_string(&res)))?;
+        let mut res: Response<R> = serde_json::from_slice(&res).with_context(|| {
+            format!(
+                "failed to parse response body, body: {}",
+                hex::to_string(&res)
+            )
+        })?;
 
         if res.err.code != 0 {
             Err(res.err)

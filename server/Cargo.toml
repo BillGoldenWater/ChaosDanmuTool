@@ -28,7 +28,6 @@ serde_bytes.workspace = true
 bson.workspace = true
 
 md-5.workspace = true
-base16ct.workspace = true
 hmac.workspace = true
 sha2.workspace = true
 ed25519-dalek.workspace = true
