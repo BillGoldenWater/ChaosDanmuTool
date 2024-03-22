@@ -1,4 +1,4 @@
-use crate::{data_primitives::game_id::GameId, define_data_type};
+use share::{data_primitives::game_id::GameId, define_data_type};
 
 define_data_type!(
     struct GameInfo {

@@ -1,6 +1,5 @@
 #![warn(missing_debug_implementations)]
 
-pub mod bili_api;
 pub mod data_primitives;
 pub mod data_type;
 pub mod server_api;

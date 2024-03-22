@@ -1,9 +1,7 @@
-use share::{
-    bili_api::data_type::api::{
-        anchor_info::AnchorInfo, game_info::GameInfo, websocket_info::WebsocketInfo,
-    },
-    data_primitives::auth_code::AuthCode,
-    define_data_type,
+use share::{data_primitives::auth_code::AuthCode, define_data_type};
+
+use super::data_type::{
+    anchor_info::AnchorInfo, game_info::GameInfo, websocket_info::WebsocketInfo,
 };
 
 define_data_type!(

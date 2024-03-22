@@ -23,6 +23,7 @@ pub mod api_app_end;
 pub mod api_app_heartbeat;
 pub mod api_app_start;
 pub mod config;
+pub mod data_type;
 
 #[derive(Debug)]
 pub struct BiliApiClient {
