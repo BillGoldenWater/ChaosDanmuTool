@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use anyhow::Context;
 use reqwest::{Client, ClientBuilder};
-use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use serde::Deserialize;
 use share::{
     data_primitives::{auth_code::AuthCode, game_id::GameId},
     utils::{functional::Functional as _, hex},
@@ -11,11 +11,12 @@ use tracing::instrument;
 
 use self::{
     api_app_batch_heartbeat::{ReqAppBatchHeartbeat, ResAppBatchHeartbeat},
-    api_app_end::{ReqAppEnd, ResAppEnd},
-    api_app_heartbeat::{ReqAppHeartbeat, ResAppHeartbeat},
+    api_app_end::ReqAppEnd,
+    api_app_heartbeat::ReqAppHeartbeat,
     api_app_start::{ReqAppStart, ResAppStart},
     config::BiliApiClientConfig,
 };
+use super::BiliRequest;
 use crate::bili_api::{response_error::ResponseError, utils::signature::request_sign_header_gen};
 
 pub mod api_app_batch_heartbeat;
@@ -41,26 +42,20 @@ impl BiliApiClient {
     #[instrument(level = "debug", skip(self))]
     pub async fn app_start(&self, code: AuthCode) -> anyhow::Result<ResAppStart> {
         self.inner
-            .send(
-                "/v2/app/start",
-                &ReqAppStart {
-                    app_id: self.app_id(),
-                    code,
-                },
-            )
+            .send(&ReqAppStart {
+                app_id: self.app_id(),
+                code,
+            })
             .await
     }
 
     #[instrument(level = "debug", skip(self))]
     pub async fn app_end(&self, game_id: GameId) -> anyhow::Result<()> {
         self.inner
-            .send::<_, ResAppEnd>(
-                "/v2/app/end",
-                &ReqAppEnd {
-                    app_id: self.app_id(),
-                    game_id,
-                },
-            )
+            .send(&ReqAppEnd {
+                app_id: self.app_id(),
+                game_id,
+            })
             .await
             .unit_result()
     }
@@ -68,7 +63,7 @@ impl BiliApiClient {
     #[instrument(level = "debug", skip(self))]
     pub async fn app_heartbeat(&self, game_id: GameId) -> anyhow::Result<()> {
         self.inner
-            .send::<_, ResAppHeartbeat>("/v2/app/heartbeat", &ReqAppHeartbeat { game_id })
+            .send(&ReqAppHeartbeat { game_id })
             .await
             .unit_result()
     }
@@ -78,9 +73,7 @@ impl BiliApiClient {
         &self,
         game_ids: Vec<GameId>,
     ) -> anyhow::Result<ResAppBatchHeartbeat> {
-        self.inner
-            .send("/v2/app/batchHeartbeat", &ReqAppBatchHeartbeat { game_ids })
-            .await
+        self.inner.send(&ReqAppBatchHeartbeat { game_ids }).await
     }
 
     fn app_id(&self) -> i64 {
@@ -104,12 +97,7 @@ impl BiliApiClientRef {
         })
     }
 
-    pub async fn send<P, R>(&self, endpoint: &str, param: &P) -> anyhow::Result<R>
-    where
-        P: Serialize + ?Sized,
-        R: DeserializeOwned,
-    {
-        // TODO: optimize types using traits
+    pub async fn send<Req: BiliRequest>(&self, param: &Req) -> anyhow::Result<Req::Response> {
         let body = serde_json::to_string(param).with_context(|| "failed to serialize param")?;
 
         let sign_headers =
@@ -125,7 +113,7 @@ impl BiliApiClientRef {
 
         let res = self
             .client
-            .post(format!("{}{endpoint}", self.cfg.api_base))
+            .post(format!("{}{}", self.cfg.api_base, Req::ENDPOINT))
             .headers(sign_headers)
             .header(reqwest::header::ACCEPT, "application/json")
             .header(reqwest::header::CONTENT_TYPE, "application/json")
@@ -137,7 +125,7 @@ impl BiliApiClientRef {
             .await
             .with_context(|| "failed to read response body")?;
 
-        let mut res: Response<R> = serde_json::from_slice(&res).with_context(|| {
+        let mut res: Response<Req::Response> = serde_json::from_slice(&res).with_context(|| {
             format!(
                 "failed to parse response body, body: {}",
                 hex::to_string(&res)

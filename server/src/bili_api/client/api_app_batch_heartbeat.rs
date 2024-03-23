@@ -1,11 +1,19 @@
 use serde_aux::prelude::deserialize_default_from_null;
 use share::{data_primitives::game_id::GameId, define_data_type};
 
+use crate::bili_api::BiliRequest;
+
 define_data_type!(
     struct ReqAppBatchHeartbeat {
         pub game_ids: Vec<GameId>,
     }
 );
+
+impl BiliRequest for ReqAppBatchHeartbeat {
+    const ENDPOINT: &'static str = "/v2/app/batchHeartbeat";
+
+    type Response = ResAppBatchHeartbeat;
+}
 
 define_data_type!(
     struct ResAppBatchHeartbeat {
