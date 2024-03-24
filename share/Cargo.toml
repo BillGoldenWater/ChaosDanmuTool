@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 tracing.workspace = true
 thiserror.workspace = true
+anyhow.workspace = true
 
 axum.workspace = true
 

@@ -1,14 +1,14 @@
 #![warn(missing_debug_implementations)]
 #![cfg_attr(feature = "bench", feature(test))]
 
-use std::env::{self, VarError};
+use std::env::VarError;
 
 use anyhow::{anyhow, Context};
 use bili_api::client::{config::BiliApiClientConfig, BiliApiClient};
 use ed25519_dalek::{SigningKey, VerifyingKey, PUBLIC_KEY_LENGTH};
 use rand::rngs::OsRng;
 use server::{config::ServerConfig, Server};
-use share::utils::{functional::Functional, hex};
+use share::utils::{env, functional::Functional, hex};
 use tracing::error;
 use tracing_subscriber::{fmt::format::FmtSpan, EnvFilter};
 
@@ -23,12 +23,8 @@ fn main() -> anyhow::Result<()> {
     rt.block_on(run())
 }
 
-fn env_var(key: &str) -> anyhow::Result<String> {
-    env::var(key).with_context(|| format!("failed to read {key}"))
-}
-
 fn read_admin_pk() -> anyhow::Result<VerifyingKey> {
-    let pk = match env_var("CDT_ADMIN_PK") {
+    let pk = match env::read("CDT_ADMIN_PK") {
         Ok(data) => data,
         Err(err) => match err.downcast_ref::<VarError>() {
             Some(VarError::NotPresent) => {
@@ -61,9 +57,11 @@ async fn run() -> anyhow::Result<()> {
         .with_span_events(FmtSpan::NEW | FmtSpan::CLOSE)
         .init();
 
-    let app_id = env_var("BILI_APP_ID")?.parse::<i64>().unwrap();
-    let access_key_id = env_var("BILI_ACCESS_KEY_ID")?;
-    let access_key_secret = env_var("BILI_ACCESS_KEY_SECRET")?;
+    let app_id = env::read("BILI_APP_ID")?
+        .parse::<i64>()
+        .context("failed to parse app id")?;
+    let access_key_id = env::read("BILI_ACCESS_KEY_ID")?;
+    let access_key_secret = env::read("BILI_ACCESS_KEY_SECRET")?;
 
     let admin_pk = read_admin_pk()?;
 

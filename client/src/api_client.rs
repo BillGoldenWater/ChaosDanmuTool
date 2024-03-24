@@ -18,20 +18,20 @@ use share::{
 };
 use tracing::instrument;
 
-use self::client_config::ClientConfig;
+use self::api_client_config::ApiClientConfig;
 
-pub mod client_config;
+pub mod api_client_config;
 
 #[derive(Debug, Clone)]
-pub struct Client {
-    inner: Arc<ClientRef>,
+pub struct ApiClient {
+    inner: Arc<ApiClientRef>,
 }
 
-impl Client {
+impl ApiClient {
     #[instrument(level = "debug")]
-    pub fn new(config: ClientConfig) -> anyhow::Result<Self> {
+    pub fn new(config: ApiClientConfig) -> anyhow::Result<Self> {
         Self {
-            inner: ClientRef::new(config)?.into(),
+            inner: ApiClientRef::new(config)?.into(),
         }
         .into_ok()
     }
@@ -62,13 +62,13 @@ impl Client {
 }
 
 #[derive(Debug)]
-struct ClientRef {
+struct ApiClientRef {
     client: reqwest::Client,
-    cfg: ClientConfig,
+    cfg: ApiClientConfig,
 }
 
-impl ClientRef {
-    pub fn new(config: ClientConfig) -> anyhow::Result<Self> {
+impl ApiClientRef {
+    pub fn new(config: ApiClientConfig) -> anyhow::Result<Self> {
         Self {
             client: ClientBuilder::new()
                 .build()
