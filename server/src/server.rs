@@ -13,7 +13,7 @@ use share::{
 use tracing::{info, instrument};
 
 use self::{config::ServerConfig, signed_body::SignedBody};
-use crate::bili_api::client::BiliApiClient;
+use crate::{bili_api::client::BiliApiClient, database::Database};
 
 pub mod config;
 pub mod signed_body;
@@ -24,11 +24,12 @@ pub struct Server {
 }
 
 impl Server {
-    pub fn new(config: ServerConfig, bili_api_client: BiliApiClient) -> Self {
+    pub fn new(config: ServerConfig, bili_api_client: BiliApiClient, database: Database) -> Self {
         Self {
             inner: ServerInner {
                 cfg: config,
                 bili: bili_api_client,
+                db: database,
             }
             .into(),
         }
@@ -79,4 +80,5 @@ impl Server {
 struct ServerInner {
     pub cfg: ServerConfig,
     pub bili: BiliApiClient,
+    pub db: Database,
 }

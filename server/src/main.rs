@@ -5,6 +5,7 @@ use std::env::VarError;
 
 use anyhow::{anyhow, Context};
 use bili_api::client::{config::BiliApiClientConfig, BiliApiClient};
+use database::Database;
 use ed25519_dalek::{SigningKey, VerifyingKey, PUBLIC_KEY_LENGTH};
 use rand::rngs::OsRng;
 use server::{config::ServerConfig, Server};
@@ -63,6 +64,9 @@ async fn run() -> anyhow::Result<()> {
     let access_key_id = env::read("BILI_ACCESS_KEY_ID")?;
     let access_key_secret = env::read("BILI_ACCESS_KEY_SECRET")?;
 
+    let db_uri = env::read("CDT_MONGO_URI")?;
+    let db_name = env::read("CDT_MONGO_NAME")?;
+
     let admin_pk = read_admin_pk()?;
 
     let client = BiliApiClient::new(
@@ -74,12 +78,23 @@ async fn run() -> anyhow::Result<()> {
             .build(),
     )?;
 
+    let database = Database::new(&db_uri, &db_name)
+        .await
+        .context("failed to open database")?;
+
+    // TODO: run under cli arg
+    database
+        .init()
+        .await
+        .context("failed to initialize database")?;
+
     let server = Server::new(
         ServerConfig::builder()
             .host("0.0.0.0:25500".into())
             .admin_pub_key(admin_pk)
             .build(),
         client,
+        database,
     );
 
     server.run().await.context("failed to run server")?;
