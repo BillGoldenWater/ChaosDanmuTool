@@ -43,12 +43,16 @@ where
             Response::<()>::from(ResponseError::Param)
         })?;
 
-        let pub_key = s.get_pub_key(req_signed.key_id()).ok_or_else(|| {
-            debug!("auth failed: invalid key id");
-            auth_err.clone()
-        })?;
+        let pub_key = s
+            .get_pub_key(req_signed.key_id())
+            .await
+            .map_err(Response::from_unknown_err)?
+            .ok_or_else(|| {
+                debug!("auth failed: invalid key id");
+                auth_err.clone()
+            })?;
 
-        req_signed.verify(pub_key).map_err(|err| {
+        req_signed.verify(&pub_key).map_err(|err| {
             debug!("auth failed: invalid signature, err: {err}");
             auth_err
         })?;

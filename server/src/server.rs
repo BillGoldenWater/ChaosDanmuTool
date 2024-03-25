@@ -2,18 +2,23 @@ use std::sync::Arc;
 
 use anyhow::Context;
 use axum::{extract::State, response::IntoResponse, routing::post, Router};
+use bson::doc;
 use ed25519_dalek::VerifyingKey;
 use share::{
-    data_primitives::auth_key_id::AuthKeyId,
+    data_primitives::{auth_key_id::AuthKeyId, DataPrimitive as _},
     server_api::{
         admin::key_add::{ReqKeyAdd, ResKeyAdd},
         Request as _, Response,
     },
+    utils::functional::Functional,
 };
 use tracing::{info, instrument};
 
 use self::{config::ServerConfig, signed_body::SignedBody};
-use crate::{bili_api::client::BiliApiClient, database::Database};
+use crate::{
+    bili_api::client::BiliApiClient,
+    database::{data_model::auth_key_info::AuthKeyInfo, Database},
+};
 
 pub mod config;
 pub mod signed_body;
@@ -54,13 +59,21 @@ impl Server {
     }
 
     #[instrument(level = "trace", skip(self))]
-    pub fn get_pub_key(&self, key_id: &AuthKeyId) -> Option<&VerifyingKey> {
+    pub async fn get_pub_key(&self, key_id: &AuthKeyId) -> anyhow::Result<Option<VerifyingKey>> {
         if key_id.is_admin_key() {
-            return Some(&self.inner.cfg.admin_pub_key);
+            return self.inner.cfg.admin_pub_key.some().into_ok();
         }
 
-        // TODO: key storage
-        todo!()
+        let coll = self.inner.db.coll::<AuthKeyInfo>();
+
+        let id = key_id.to_bson()?;
+        let key = coll.find_one(doc! {"id": id}, None).await?;
+
+        if let Some(key) = key {
+            return key.public_key.to_verifying_key().map(Some).err_into();
+        }
+
+        Ok(None)
     }
 
     #[instrument(level = "debug", skip(_s, body))]

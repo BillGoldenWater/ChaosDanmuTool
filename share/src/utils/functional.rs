@@ -68,11 +68,20 @@ pub trait Functional {
     }
 
     #[inline(always)]
-    fn unit_result<E>(self) -> Result<(), E>
+    fn unit_result<T, E>(self) -> Result<(), E>
     where
-        Self: ResultExt<E> + Sized,
+        Self: ResultExt<T, E> + Sized,
     {
         self.map_unit()
+    }
+
+    #[inline(always)]
+    fn err_into<T, E, R>(self) -> Result<T, R>
+    where
+        Self: ResultExt<T, E> + Sized,
+        E: Into<R>,
+    {
+        self.map_err_into()
     }
 
     #[inline(always)]
@@ -112,13 +121,25 @@ pub trait Functional {
 
 impl<T> Functional for T {}
 
-pub trait ResultExt<E> {
+pub trait ResultExt<T, E> {
     fn map_unit(self) -> Result<(), E>;
+
+    fn map_err_into<R>(self) -> Result<T, R>
+    where
+        E: Into<R>;
 }
 
-impl<T, E> ResultExt<E> for Result<T, E> {
+impl<T, E> ResultExt<T, E> for Result<T, E> {
     #[inline(always)]
     fn map_unit(self) -> Result<(), E> {
         self.map(|_| ())
+    }
+
+    #[inline(always)]
+    fn map_err_into<R>(self) -> Result<T, R>
+    where
+        E: Into<R>,
+    {
+        self.map_err(Into::into)
     }
 }

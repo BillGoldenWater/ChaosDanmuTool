@@ -1,3 +1,7 @@
+use bson::Bson;
+
+use crate::utils::functional::Functional as _;
+
 pub mod auth_body;
 pub mod auth_code;
 pub mod auth_key_id;
@@ -26,5 +30,13 @@ macro_rules! define_data_primitive {
         )]
         $( $($attr_tt)* )?
         pub struct $name($($tt)*);
+
+        impl $crate::data_primitives::DataPrimitive for $name {}
     };
+}
+
+pub trait DataPrimitive: serde::Serialize {
+    fn to_bson(&self) -> anyhow::Result<Bson> {
+        bson::to_bson(self).err_into()
+    }
 }

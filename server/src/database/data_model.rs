@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use itertools::Itertools;
 use mongodb::IndexModel;
 use serde::{de::DeserializeOwned, Serialize};
@@ -5,7 +7,7 @@ use serde::{de::DeserializeOwned, Serialize};
 pub mod auth_key_info;
 pub mod session_info;
 
-pub trait DataModel: Serialize + DeserializeOwned + Send + Sync {
+pub trait DataModel: Debug + Serialize + DeserializeOwned + Send + Sync {
     const NAME: &'static str;
 
     fn indexes() -> Vec<IndexModel>;

@@ -2,7 +2,7 @@ use std::{collections::HashMap, sync::Arc};
 
 use anyhow::Context;
 use itertools::Itertools;
-use mongodb::{Client, Database as MongoDatabase, IndexModel};
+use mongodb::{Client, ClientSession, Collection, Database as MongoDatabase, IndexModel};
 use share::utils::functional::Functional;
 use tracing::{info, instrument, trace};
 
@@ -36,6 +36,14 @@ impl Database {
         this.into_ok()
     }
 
+    pub fn coll<T: DataModel>(&self) -> Collection<T> {
+        self.inner.db.collection(T::NAME)
+    }
+
+    pub async fn start_session(&self) -> anyhow::Result<ClientSession> {
+        self.inner.client.start_session(None).await.err_into()
+    }
+
     #[instrument(level = "debug", skip(self))]
     pub async fn init(&self) -> anyhow::Result<()> {
         async fn init_coll<T: DataModel>(this: &Database) -> anyhow::Result<()> {
@@ -44,8 +52,8 @@ impl Database {
                 .with_context(|| format!("failed to init collection {}", T::NAME))
         }
 
-        init_coll::<AuthKeyInfo>(&self).await?;
-        init_coll::<SessionInfo>(&self).await?;
+        init_coll::<AuthKeyInfo>(self).await?;
+        init_coll::<SessionInfo>(self).await?;
 
         Ok(())
     }
