@@ -1,103 +1,15 @@
 #![warn(missing_debug_implementations)]
 #![cfg_attr(feature = "bench", feature(test))]
 
-use std::env::VarError;
-
-use anyhow::{anyhow, Context};
-use bili_api::client::{config::BiliApiClientConfig, BiliApiClient};
-use database::Database;
-use ed25519_dalek::{SigningKey, VerifyingKey, PUBLIC_KEY_LENGTH};
-use rand::rngs::OsRng;
-use server::{config::ServerConfig, Server};
-use share::utils::{env, functional::Functional, hex};
-use tracing::error;
-use tracing_subscriber::{fmt::format::FmtSpan, EnvFilter};
-
 mod bili_api;
 mod database;
+mod key;
+mod run;
 mod server;
 
 fn main() -> anyhow::Result<()> {
     let rt = tokio::runtime::Builder::new_multi_thread()
         .enable_all()
         .build()?;
-    rt.block_on(run())
-}
-
-fn read_admin_pk() -> anyhow::Result<VerifyingKey> {
-    let pk = match env::read("CDT_ADMIN_PK") {
-        Ok(data) => data,
-        Err(err) => match err.downcast_ref::<VarError>() {
-            Some(VarError::NotPresent) => {
-                error!("CDT_ADMIN_PK isn't found in environment variable, generating one");
-                let sk = SigningKey::generate(&mut OsRng);
-                let pk = sk.verifying_key();
-                let sk = hex::to_string(sk.as_bytes());
-                let pk = hex::to_string(pk.as_bytes());
-                error!("CDT_ADMIN_SK={sk}\nCDT_ADMIN_PK={pk}");
-                std::process::exit(0);
-            }
-            _ => return err.into_err().context("failed to read admin pub key"),
-        },
-    };
-
-    let pk = hex::from_str(&pk).context("failed to decode pub key from hex")?;
-
-    if pk.len() != PUBLIC_KEY_LENGTH {
-        return anyhow!("invalid pub key length").into_err();
-    }
-
-    VerifyingKey::from_bytes(&pk.try_into().expect("expect into success"))
-        .context("invalid pub key")
-}
-
-async fn run() -> anyhow::Result<()> {
-    dotenv::dotenv().ok();
-    tracing_subscriber::fmt()
-        .with_env_filter(EnvFilter::from_default_env())
-        .with_span_events(FmtSpan::NEW | FmtSpan::CLOSE)
-        .init();
-
-    let app_id = env::read("BILI_APP_ID")?
-        .parse::<i64>()
-        .context("failed to parse app id")?;
-    let access_key_id = env::read("BILI_ACCESS_KEY_ID")?;
-    let access_key_secret = env::read("BILI_ACCESS_KEY_SECRET")?;
-
-    let db_uri = env::read("CDT_MONGO_URI")?;
-    let db_name = env::read("CDT_MONGO_NAME")?;
-
-    let admin_pk = read_admin_pk()?;
-
-    let client = BiliApiClient::new(
-        BiliApiClientConfig::builder()
-            .api_base("https://live-open.biliapi.com".into())
-            .app_id(app_id)
-            .access_key_id(access_key_id.into())
-            .access_key_secret(access_key_secret.into())
-            .build(),
-    )?;
-
-    let database = Database::new(&db_uri, &db_name)
-        .await
-        .context("failed to open database")?;
-
-    // TODO: run under cli arg
-    database
-        .init()
-        .await
-        .context("failed to initialize database")?;
-
-    let server = Server::new(
-        ServerConfig::builder()
-            .host("0.0.0.0:25500".into())
-            .admin_pub_key(admin_pk)
-            .build(),
-        client,
-        database,
-    );
-
-    server.run().await.context("failed to run server")?;
-
-    Ok(())
+    rt.block_on(run::run())
 }
