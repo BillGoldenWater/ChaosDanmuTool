@@ -37,7 +37,7 @@ pub async fn main() -> anyhow::Result<()> {
     )
     .context("failed to build api client")?;
 
-    dbg!(&client.status_version().await);
+    dbg!(&client.status_version().await.map(|it| it.to_string()));
 
     let pk = SigningKey::generate(&mut OsRng).verifying_key();
     let res = client

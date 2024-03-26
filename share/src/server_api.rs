@@ -30,6 +30,8 @@ define_data_type!(
 
         #[error("authentication failed")]
         Auth,
+        #[error("guest capacity limit reached")]
+        GuestCapacity,
         #[error("invalid auth code")]
         BiliAuthCode,
         #[error("already has session opened")]

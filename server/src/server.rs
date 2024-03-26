@@ -104,10 +104,10 @@ impl Server {
     #[instrument(level = "debug", skip(_s, body))]
     async fn admin_key_add(
         State(_s): State<Server>,
-        SignedBody { body, is_admin }: SignedBody<ReqKeyAdd>,
+        SignedBody { body, user_type }: SignedBody<ReqKeyAdd>,
     ) -> impl IntoResponse {
         dbg!(&body.note);
-        dbg!(&is_admin);
+        dbg!(&user_type);
         Response::Ok(ResKeyAdd {
             key_id: AuthKeyId::new(),
         })

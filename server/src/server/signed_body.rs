@@ -12,12 +12,15 @@ use share::{
 };
 use tracing::debug;
 
+use self::user_type::UserType;
 use crate::server::Server;
+
+pub mod user_type;
 
 define_data_type!(
     struct SignedBody<T> {
         pub body: T,
-        pub is_admin: bool,
+        pub user_type: UserType,
     }
 );
 
@@ -30,7 +33,7 @@ where
         S: Send + Sync,
         Server: FromRef<S>,
     {
-        let s = Server::from_ref(state);
+        let server = Server::from_ref(state);
         let auth_err = Response::<()>::from(ResponseError::Auth);
 
         let body = req
@@ -43,27 +46,32 @@ where
             Response::<()>::from(ResponseError::Param)
         })?;
 
-        let pub_key = s
+        let pub_key = server
             .get_pub_key(req_signed.key_id())
             .await
-            .map_err(Response::from_unknown_err)?
-            .ok_or_else(|| {
-                debug!("auth failed: invalid key id");
-                auth_err.clone()
+            .map_err(Response::from_unknown_err)?;
+
+        let user_type = if let Some(pub_key) = pub_key {
+            req_signed.verify(&pub_key).map_err(|err| {
+                debug!("auth failed: invalid signature, err: {err}");
+                auth_err
             })?;
 
-        req_signed.verify(&pub_key).map_err(|err| {
-            debug!("auth failed: invalid signature, err: {err}");
-            auth_err
-        })?;
+            if req_signed.key_id().is_admin_key() {
+                UserType::Admin
+            } else {
+                UserType::Registered
+            }
+        } else {
+            UserType::Guest
+        };
 
-        let is_admin = req_signed.key_id().is_admin_key();
         let body = bson::from_slice(&req_signed.into_body()).map_err(|err| {
             debug!("failed to decode body: {err}");
             Response::<()>::from(ResponseError::Param)
         })?;
 
-        Self { body, is_admin }.into_ok()
+        Self { body, user_type }.into_ok()
     }
 }
 

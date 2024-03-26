@@ -1,6 +1,6 @@
 use anyhow::Context;
 use semver::{BuildMetadata, Prerelease, Version};
-use share::utils::{env, functional::Functional};
+use share::utils::env;
 
 use crate::{
     bili_api::client::{config::BiliApiClientConfig, BiliApiClient},
@@ -44,7 +44,6 @@ pub async fn run() -> anyhow::Result<()> {
         .await
         .context("failed to initialize database")?;
 
-    // TODO: guest access
     let server = Server::new(
         ServerConfig::builder()
             .host("0.0.0.0:25500".into())
