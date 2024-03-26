@@ -45,7 +45,6 @@ pub async fn run() -> anyhow::Result<()> {
         .context("failed to initialize database")?;
 
     // TODO: guest access
-    // TODO: axum/reqwest body compression
     let server = Server::new(
         ServerConfig::builder()
             .host("0.0.0.0:25500".into())

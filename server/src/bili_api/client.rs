@@ -90,9 +90,7 @@ struct BiliApiClientRef {
 impl BiliApiClientRef {
     pub fn new(config: BiliApiClientConfig) -> anyhow::Result<Self> {
         Ok(Self {
-            client: ClientBuilder::new()
-                .build()
-                .with_context(|| "failed to build reqwest::Client")?,
+            client: share::utils::reqwest::client()?,
             cfg: config,
         })
     }

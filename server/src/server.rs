@@ -10,13 +10,13 @@ use axum::{
 use bson::doc;
 use ed25519_dalek::VerifyingKey;
 use share::{
-    data_primitives::{auth_key_id::AuthKeyId, version::Version, DataPrimitive as _},
+    data_primitives::{auth_key_id::AuthKeyId, DataPrimitive as _},
     server_api::{
         admin::key_add::{ReqKeyAdd, ResKeyAdd},
         status::version::{ReqVersion, ResVersion},
         Request as _, Response,
     },
-    utils::functional::Functional,
+    utils::{axum::compression_layer, functional::Functional},
 };
 use tracing::{info, instrument};
 
@@ -52,6 +52,7 @@ impl Server {
         let router = Router::new()
             .route(ReqVersion::ROUTE, get(Self::status_version))
             .route(ReqKeyAdd::ROUTE, post(Self::admin_key_add))
+            .layer(compression_layer())
             .with_state(self.clone());
 
         let listener = tokio::net::TcpListener::bind(self.inner.cfg.host.as_ref())

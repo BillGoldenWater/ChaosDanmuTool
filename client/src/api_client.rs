@@ -100,9 +100,7 @@ struct ApiClientRef {
 impl ApiClientRef {
     pub fn new(config: ApiClientConfig) -> anyhow::Result<Self> {
         Self {
-            client: ClientBuilder::new()
-                .build()
-                .context("failed to build reqwest::Client")?,
+            client: share::utils::reqwest::client()?,
             cfg: config,
         }
         .into_ok()
