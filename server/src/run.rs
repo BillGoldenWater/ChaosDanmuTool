@@ -44,7 +44,6 @@ pub async fn run() -> anyhow::Result<()> {
         .await
         .context("failed to initialize database")?;
 
-    // TODO: version check endpoint instead of version in path
     // TODO: guest access
     // TODO: axum/reqwest body compression
     let server = Server::new(

@@ -39,3 +39,4 @@ ed25519-dalek.workspace = true
 
 rand.workspace = true
 typed-builder.workspace = true
+semver.workspace = true
