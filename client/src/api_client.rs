@@ -6,7 +6,7 @@ use semver::Version;
 use share::{
     data_primitives::{auth_code::AuthCode, auth_key_note::AuthKeyNote, public_key::PublicKey},
     server_api::{
-        admin::key_add::{ReqKeyAdd, ResKeyAdd},
+        admin::key_register::{ReqKeyRegister, ResKeyRegister},
         danmu::{
             end::{ReqEnd, ResEnd},
             heartbeat::{ReqHeartbeat, ResHeartbeat},
@@ -64,12 +64,12 @@ impl ApiClient {
 // admin
 impl ApiClient {
     #[instrument(level = "debug", skip(self))]
-    pub async fn admin_key_add(
+    pub async fn admin_key_register(
         &self,
         public_key: PublicKey,
         note: AuthKeyNote,
-    ) -> anyhow::Result<ResKeyAdd> {
-        self.inner.send(&ReqKeyAdd { public_key, note }).await
+    ) -> anyhow::Result<ResKeyRegister> {
+        self.inner.send(&ReqKeyRegister { public_key, note }).await
     }
 }
 

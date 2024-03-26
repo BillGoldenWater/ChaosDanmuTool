@@ -41,7 +41,14 @@ pub async fn main() -> anyhow::Result<()> {
 
     let pk = SigningKey::generate(&mut OsRng).verifying_key();
     let res = client
-        .admin_key_add(
+        .admin_key_register(
+            PublicKey::from_verifying_key(&pk),
+            AuthKeyNote::new("test node".into()),
+        )
+        .await;
+    dbg!(&res);
+    let res = client
+        .admin_key_register(
             PublicKey::from_verifying_key(&pk),
             AuthKeyNote::new("test node".into()),
         )

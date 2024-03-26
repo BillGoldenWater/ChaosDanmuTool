@@ -2,31 +2,29 @@ use std::sync::Arc;
 
 use anyhow::Context;
 use axum::{
-    extract::State,
-    response::IntoResponse,
     routing::{get, post},
     Router,
 };
 use bson::doc;
 use ed25519_dalek::VerifyingKey;
 use share::{
-    data_primitives::{auth_key_id::AuthKeyId, DataPrimitive as _},
-    server_api::{
-        admin::key_add::{ReqKeyAdd, ResKeyAdd},
-        status::version::{ReqVersion, ResVersion},
-        Request as _, Response,
-    },
+    data_primitives::{auth_key_id::AuthKeyId, DataPrimitive},
+    server_api::{admin::key_register::ReqKeyRegister, status::version::ReqVersion, Request as _},
     utils::{axum::compression_layer, functional::Functional},
 };
 use tracing::{info, instrument};
 
-use self::{config::ServerConfig, signed_body::SignedBody};
+use self::{
+    config::ServerConfig,
+    handler::{admin_key_register::admin_key_register, status_version::status_version},
+};
 use crate::{
     bili_api::client::BiliApiClient,
     database::{data_model::auth_key_info::AuthKeyInfo, Database},
 };
 
 pub mod config;
+pub mod handler;
 pub mod signed_body;
 
 #[derive(Debug, Clone)]
@@ -50,8 +48,8 @@ impl Server {
     #[instrument(level = "debug", skip(self))]
     pub async fn run(&self) -> anyhow::Result<()> {
         let router = Router::new()
-            .route(ReqVersion::ROUTE, get(Self::status_version))
-            .route(ReqKeyAdd::ROUTE, post(Self::admin_key_add))
+            .route(ReqVersion::ROUTE, get(status_version))
+            .route(ReqKeyRegister::ROUTE, post(admin_key_register))
             .layer(compression_layer())
             .with_state(self.clone());
 
@@ -86,31 +84,6 @@ impl Server {
         }
 
         Ok(None)
-    }
-}
-
-// status
-impl Server {
-    #[instrument(level = "debug", skip(s))]
-    async fn status_version(State(s): State<Server>) -> impl IntoResponse {
-        Response::Ok(ResVersion {
-            minimum_version: s.inner.cfg.min_client_ver.clone().into(),
-        })
-    }
-}
-
-// admin
-impl Server {
-    #[instrument(level = "debug", skip(_s, body))]
-    async fn admin_key_add(
-        State(_s): State<Server>,
-        SignedBody { body, user_type }: SignedBody<ReqKeyAdd>,
-    ) -> impl IntoResponse {
-        dbg!(&body.note);
-        dbg!(&user_type);
-        Response::Ok(ResKeyAdd {
-            key_id: AuthKeyId::new(),
-        })
     }
 }
 

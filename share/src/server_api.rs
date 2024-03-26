@@ -1,4 +1,4 @@
-use std::fmt::Display;
+use std::str::FromStr as _;
 
 use axum::{
     body::Body,
@@ -30,6 +30,10 @@ define_data_type!(
 
         #[error("authentication failed")]
         Auth,
+
+        #[error("auth key already exists")]
+        AuthKeyExists,
+
         #[error("guest capacity limit reached")]
         GuestCapacity,
         #[error("invalid auth code")]
@@ -49,8 +53,14 @@ define_data_type!(
 );
 
 impl<T> Response<T> {
-    pub fn from_unknown_err(err: impl Display) -> Self {
-        error!("unexpected error: {err}");
+    pub fn from_unknown_err(err: anyhow::Error) -> Self {
+        let mut msg = String::from_str("unexpected error occurs while handling request:").unwrap();
+
+        for err in err.chain() {
+            msg.push_str(&format!("\n{err}"));
+        }
+
+        error!("{msg}");
         Self::Err(ResponseError::Unknown)
     }
 }

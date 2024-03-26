@@ -1,4 +1,5 @@
 use ::core::{future::Future, pin::Pin};
+use anyhow::Context;
 use axum::{
     body::Bytes,
     extract::{FromRef, FromRequest, Request},
@@ -39,6 +40,7 @@ where
         let body = req
             .extract::<Bytes, _>()
             .await
+            .context("failed to read request body")
             .map_err(Response::<()>::from_unknown_err)?;
 
         let req_signed = bson::from_slice::<RequestSigned>(&body).map_err(|err| {

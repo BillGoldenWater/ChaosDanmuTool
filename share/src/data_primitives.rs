@@ -40,4 +40,8 @@ pub trait DataPrimitive: serde::Serialize {
     fn to_bson(&self) -> anyhow::Result<Bson> {
         bson::to_bson(self).err_into()
     }
+
+    fn to_bson_raw_err(&self) -> Result<Bson, bson::ser::Error> {
+        bson::to_bson(self)
+    }
 }

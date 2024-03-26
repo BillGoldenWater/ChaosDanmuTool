@@ -6,19 +6,19 @@ use crate::{
 };
 
 define_data_type!(
-    struct ReqKeyAdd {
+    struct ReqKeyRegister {
         pub public_key: PublicKey,
         pub note: AuthKeyNote,
     }
 );
 
-impl Request for ReqKeyAdd {
-    const ROUTE: &'static str = server_api_route_admin!("/keyAdd");
-    type Response = ResKeyAdd;
+impl Request for ReqKeyRegister {
+    const ROUTE: &'static str = server_api_route_admin!("/keyRegister");
+    type Response = ResKeyRegister;
 }
 
 define_data_type!(
-    struct ResKeyAdd {
+    struct ResKeyRegister {
         pub key_id: AuthKeyId,
     }
 );
