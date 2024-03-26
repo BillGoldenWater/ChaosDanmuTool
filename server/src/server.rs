@@ -1,13 +1,19 @@
 use std::sync::Arc;
 
 use anyhow::Context;
-use axum::{extract::State, response::IntoResponse, routing::post, Router};
+use axum::{
+    extract::State,
+    response::IntoResponse,
+    routing::{get, post},
+    Router,
+};
 use bson::doc;
 use ed25519_dalek::VerifyingKey;
 use share::{
-    data_primitives::{auth_key_id::AuthKeyId, DataPrimitive as _},
+    data_primitives::{auth_key_id::AuthKeyId, version::Version, DataPrimitive as _},
     server_api::{
         admin::key_add::{ReqKeyAdd, ResKeyAdd},
+        status::version::{ReqVersion, ResVersion},
         Request as _, Response,
     },
     utils::functional::Functional,
@@ -28,6 +34,7 @@ pub struct Server {
     inner: Arc<ServerInner>,
 }
 
+// startup logic
 impl Server {
     pub fn new(config: ServerConfig, bili_api_client: BiliApiClient, database: Database) -> Self {
         Self {
@@ -43,6 +50,7 @@ impl Server {
     #[instrument(level = "debug", skip(self))]
     pub async fn run(&self) -> anyhow::Result<()> {
         let router = Router::new()
+            .route(ReqVersion::ROUTE, get(Self::status_version))
             .route(ReqKeyAdd::ROUTE, post(Self::admin_key_add))
             .with_state(self.clone());
 
@@ -57,9 +65,12 @@ impl Server {
 
         Ok(())
     }
+}
 
+// internal api
+impl Server {
     #[instrument(level = "trace", skip(self))]
-    pub async fn get_pub_key(&self, key_id: &AuthKeyId) -> anyhow::Result<Option<VerifyingKey>> {
+    async fn get_pub_key(&self, key_id: &AuthKeyId) -> anyhow::Result<Option<VerifyingKey>> {
         if key_id.is_admin_key() {
             return self.inner.cfg.admin_pub_key.some().into_ok();
         }
@@ -75,7 +86,20 @@ impl Server {
 
         Ok(None)
     }
+}
 
+// status
+impl Server {
+    #[instrument(level = "debug", skip(s))]
+    async fn status_version(State(s): State<Server>) -> impl IntoResponse {
+        Response::Ok(ResVersion {
+            minimum_version: s.inner.cfg.min_client_ver.clone().into(),
+        })
+    }
+}
+
+// admin
+impl Server {
     #[instrument(level = "debug", skip(_s, body))]
     async fn admin_key_add(
         State(_s): State<Server>,

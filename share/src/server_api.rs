@@ -13,17 +13,11 @@ use crate::define_data_type;
 pub mod admin;
 pub mod danmu;
 pub mod request_signed;
+pub mod status;
 
 pub trait Request: Serialize {
     const ROUTE: &'static str;
     type Response: DeserializeOwned;
-}
-
-#[macro_export]
-macro_rules! server_api_route {
-    ($( $route:tt )*) => {
-        concat!("/v0", $( $route )*)
-    };
 }
 
 define_data_type!(

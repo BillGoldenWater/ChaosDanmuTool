@@ -1,5 +1,6 @@
 use anyhow::Context;
-use share::utils::env;
+use semver::{BuildMetadata, Prerelease, Version};
+use share::utils::{env, functional::Functional};
 
 use crate::{
     bili_api::client::{config::BiliApiClientConfig, BiliApiClient},
@@ -43,10 +44,20 @@ pub async fn run() -> anyhow::Result<()> {
         .await
         .context("failed to initialize database")?;
 
+    // TODO: version check endpoint instead of version in path
+    // TODO: guest access
+    // TODO: axum/reqwest body compression
     let server = Server::new(
         ServerConfig::builder()
             .host("0.0.0.0:25500".into())
             .admin_pub_key(admin_pk)
+            .min_client_ver(Version {
+                major: 0,
+                minor: 10,
+                patch: 0,
+                pre: Prerelease::EMPTY,
+                build: BuildMetadata::EMPTY,
+            })
             .build(),
         client,
         database,

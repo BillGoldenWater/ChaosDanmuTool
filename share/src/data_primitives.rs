@@ -13,6 +13,7 @@ pub mod public_key;
 pub mod room_id;
 pub mod user_face;
 pub mod user_name;
+pub mod version;
 pub mod wss_link;
 
 #[macro_export]
