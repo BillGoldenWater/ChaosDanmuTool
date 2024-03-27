@@ -45,6 +45,11 @@ impl Database {
     }
 
     #[instrument(level = "debug", skip(self))]
+    pub async fn shutdown(self) {
+        self.inner.client.clone().shutdown().await;
+    }
+
+    #[instrument(level = "debug", skip(self))]
     pub async fn init(&self) -> anyhow::Result<()> {
         async fn init_coll<T: DataModel>(this: &Database) -> anyhow::Result<()> {
             this.init_coll::<T>()

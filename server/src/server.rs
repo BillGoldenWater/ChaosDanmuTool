@@ -12,6 +12,7 @@ use share::{
     server_api::{admin::key_register::ReqKeyRegister, status::version::ReqVersion, Request as _},
     utils::{axum::compression_layer, functional::Functional},
 };
+use tokio::signal;
 use tracing::{info, instrument};
 
 use self::{
@@ -59,10 +60,35 @@ impl Server {
 
         info!("starting on {}", self.inner.cfg.host);
         axum::serve(listener, router)
+            .with_graceful_shutdown(Self::shutdown_signal())
             .await
             .context("failed to axum::serve")?;
 
         Ok(())
+    }
+
+    async fn shutdown_signal() {
+        let ctrl_c = async {
+            signal::ctrl_c()
+                .await
+                .expect("failed to install Ctrl+C handler");
+        };
+
+        #[cfg(unix)]
+        let terminate = async {
+            signal::unix::signal(signal::unix::SignalKind::terminate())
+                .expect("failed to install signal handler")
+                .recv()
+                .await;
+        };
+
+        #[cfg(not(unix))]
+        let terminate = std::future::pending::<()>();
+
+        tokio::select! {
+            _ = ctrl_c => {},
+            _ = terminate => {},
+        }
     }
 }
 

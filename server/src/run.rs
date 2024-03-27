@@ -57,10 +57,16 @@ pub async fn run() -> anyhow::Result<()> {
             })
             .build(),
         client,
-        database,
+        database.clone(),
     );
 
     server.run().await.context("failed to run server")?;
+
+    println!("shutdown database client");
+
+    database.shutdown().await;
+
+    println!("exiting");
 
     Ok(())
 }
