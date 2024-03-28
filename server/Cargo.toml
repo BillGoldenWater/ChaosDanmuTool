@@ -15,6 +15,7 @@ tracing.workspace = true
 thiserror.workspace = true
 anyhow.workspace = true
 
+futures.workspace = true
 tokio.workspace = true
 
 http.workspace = true

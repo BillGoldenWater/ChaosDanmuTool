@@ -7,6 +7,7 @@ use axum::{
 };
 use serde::de::DeserializeOwned;
 use share::{
+    data_primitives::auth_key_id::AuthKeyId,
     define_data_type,
     server_api::{request_signed::RequestSigned, Response, ResponseError},
     utils::functional::Functional,
@@ -21,6 +22,7 @@ pub mod user_type;
 define_data_type!(
     struct SignedBody<T> {
         pub body: T,
+        pub key_id: AuthKeyId,
         pub user_type: UserType,
     }
 );
@@ -40,18 +42,15 @@ where
         let body = req
             .extract::<Bytes, _>()
             .await
-            .context("failed to read request body")
-            .map_err(Response::<()>::from_unknown_err)?;
+            .context("failed to read request body")?;
 
         let req_signed = bson::from_slice::<RequestSigned>(&body).map_err(|err| {
             debug!("failed to decode request: {err}");
             Response::<()>::from(ResponseError::Param)
         })?;
+        let key_id = req_signed.key_id().clone();
 
-        let pub_key = server
-            .get_pub_key(req_signed.key_id())
-            .await
-            .map_err(Response::from_unknown_err)?;
+        let pub_key = server.get_pub_key(&key_id).await?;
 
         let user_type = if let Some(pub_key) = pub_key {
             req_signed.verify(&pub_key).map_err(|err| {
@@ -59,7 +58,7 @@ where
                 auth_err
             })?;
 
-            if req_signed.key_id().is_admin_key() {
+            if key_id.is_admin_key() {
                 UserType::Admin
             } else {
                 UserType::Registered
@@ -73,7 +72,12 @@ where
             Response::<()>::from(ResponseError::Param)
         })?;
 
-        Self { body, user_type }.into_ok()
+        Self {
+            body,
+            key_id,
+            user_type,
+        }
+        .into_ok()
     }
 }
 

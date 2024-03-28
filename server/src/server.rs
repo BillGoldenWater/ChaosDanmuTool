@@ -7,9 +7,13 @@ use axum::{
 };
 use bson::doc;
 use ed25519_dalek::VerifyingKey;
+use mongodb::{ClientSession, Collection};
 use share::{
     data_primitives::{auth_key_id::AuthKeyId, DataPrimitive},
-    server_api::{admin::key_register::ReqKeyRegister, status::version::ReqVersion, Request as _},
+    server_api::{
+        admin::key_register::ReqKeyRegister, danmu::start::ReqStart, status::version::ReqVersion,
+        Request as _,
+    },
     utils::{axum::compression_layer, functional::Functional},
 };
 use tokio::signal;
@@ -17,11 +21,17 @@ use tracing::{info, instrument};
 
 use self::{
     config::ServerConfig,
-    handler::{admin_key_register::admin_key_register, status_version::status_version},
+    handler::{
+        admin_key_register::admin_key_register, danmu_start::danmu_start,
+        status_version::status_version,
+    },
 };
 use crate::{
-    bili_api::client::BiliApiClient,
-    database::{data_model::auth_key_info::AuthKeyInfo, Database},
+    bili_api::{client::BiliApiClient, response_error::ResponseError as BiliResErr},
+    database::{
+        data_model::{auth_key_info::AuthKeyInfo, session_info::SessionInfo},
+        Database,
+    },
 };
 
 pub mod config;
@@ -51,6 +61,7 @@ impl Server {
         let router = Router::new()
             .route(ReqVersion::ROUTE, get(status_version))
             .route(ReqKeyRegister::ROUTE, post(admin_key_register))
+            .route(ReqStart::ROUTE, post(danmu_start))
             .layer(compression_layer())
             .with_state(self.clone());
 
@@ -94,8 +105,17 @@ impl Server {
 
 // internal api
 impl Server {
+    fn db(&self) -> &Database {
+        &self.inner.db
+    }
+
+    fn bili(&self) -> &BiliApiClient {
+        &self.inner.bili
+    }
+
     #[instrument(level = "trace", skip(self))]
     async fn get_pub_key(&self, key_id: &AuthKeyId) -> anyhow::Result<Option<VerifyingKey>> {
+        // TODO: error context
         if key_id.is_admin_key() {
             return self.inner.cfg.admin_pub_key.some().into_ok();
         }
@@ -110,6 +130,31 @@ impl Server {
         }
 
         Ok(None)
+    }
+
+    #[instrument(level = "trace", skip(self))]
+    async fn session_end(&self, session_info: SessionInfo) -> anyhow::Result<()> {
+        let id = session_info.key_id.to_bson_raw_err()?;
+
+        self.db()
+            .coll::<SessionInfo>()
+            .delete_one(doc! {"key_id": id}, None)
+            .await?;
+
+        let result = self.bili().app_end(session_info.game_id.clone()).await;
+        if let Err(err) = result {
+            'err: {
+                if let Some(err) = err.downcast_ref::<BiliResErr>() {
+                    // TODO: better code check
+                    if err.code == 7003 {
+                        break 'err;
+                    }
+                }
+                return Err(err);
+            }
+        }
+
+        Ok(())
     }
 }
 

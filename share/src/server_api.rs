@@ -40,7 +40,7 @@ define_data_type!(
         BiliAuthCode,
         #[error("already has session opened")]
         SessionExists,
-        #[error("invalid session id")]
+        #[error("no session opened")]
         SessionNotExists,
     }
 );
@@ -68,6 +68,12 @@ impl<T> Response<T> {
 impl<T> From<ResponseError> for Response<T> {
     fn from(value: ResponseError) -> Self {
         Self::Err(value)
+    }
+}
+
+impl<T> From<anyhow::Error> for Response<T> {
+    fn from(value: anyhow::Error) -> Self {
+        Self::from_unknown_err(value)
     }
 }
 

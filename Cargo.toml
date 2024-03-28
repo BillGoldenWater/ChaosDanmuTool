@@ -12,6 +12,7 @@ anyhow = "1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 dotenv = "0.15"
 
+futures = "0.3"
 tokio = { version = "1", features = ["full"] }
 
 http = "1"

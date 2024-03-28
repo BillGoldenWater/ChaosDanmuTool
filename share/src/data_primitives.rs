@@ -1,6 +1,5 @@
+use anyhow::Context as _;
 use bson::Bson;
-
-use crate::utils::functional::Functional as _;
 
 pub mod auth_body;
 pub mod auth_code;
@@ -38,7 +37,7 @@ macro_rules! define_data_primitive {
 
 pub trait DataPrimitive: serde::Serialize {
     fn to_bson(&self) -> anyhow::Result<Bson> {
-        bson::to_bson(self).err_into()
+        bson::to_bson(self).context("failed to convert the primitive to bson")
     }
 
     fn to_bson_raw_err(&self) -> Result<Bson, bson::ser::Error> {

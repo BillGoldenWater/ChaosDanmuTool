@@ -1,7 +1,5 @@
 use anyhow::Context;
-use ed25519_dalek::SigningKey;
-use rand::rngs::OsRng;
-use share::data_primitives::{auth_key_note::AuthKeyNote, public_key::PublicKey};
+use share::{data_primitives::auth_code::AuthCode, utils::env};
 use tauri::Manager;
 
 use crate::{
@@ -39,20 +37,8 @@ pub async fn main() -> anyhow::Result<()> {
 
     dbg!(&client.status_version().await.map(|it| it.to_string()));
 
-    let pk = SigningKey::generate(&mut OsRng).verifying_key();
-    let res = client
-        .admin_key_register(
-            PublicKey::from_verifying_key(&pk),
-            AuthKeyNote::new("test node".into()),
-        )
-        .await;
-    dbg!(&res);
-    let res = client
-        .admin_key_register(
-            PublicKey::from_verifying_key(&pk),
-            AuthKeyNote::new("test node".into()),
-        )
-        .await;
+    let code = env::read("BILI_CODE")?;
+    let res = client.danmu_start(AuthCode::new(code.into()), true).await;
     dbg!(&res);
 
     // app.run(|_app_handle, event| match event {

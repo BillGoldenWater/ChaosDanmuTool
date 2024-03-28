@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use bson::oid::ObjectId;
 
 use crate::define_data_primitive;
@@ -15,5 +17,11 @@ impl AuthKeyId {
 
     pub fn is_admin_key(&self) -> bool {
         self.0.bytes().iter().all(|&it| it == 0)
+    }
+}
+
+impl Display for AuthKeyId {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0.to_hex())
     }
 }

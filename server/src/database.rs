@@ -41,7 +41,11 @@ impl Database {
     }
 
     pub async fn start_session(&self) -> anyhow::Result<ClientSession> {
-        self.inner.client.start_session(None).await.err_into()
+        self.inner
+            .client
+            .start_session(None)
+            .await
+            .context("failed to start database session")
     }
 
     #[instrument(level = "debug", skip(self))]

@@ -19,20 +19,16 @@ use crate::{
 #[instrument(level = "debug", skip(server, body))]
 pub async fn admin_key_register(
     State(server): State<Server>,
-    SignedBody { body, user_type }: SignedBody<ReqKeyRegister>,
+    SignedBody {
+        body, user_type, ..
+    }: SignedBody<ReqKeyRegister>,
 ) -> Result<Response<ResKeyRegister>, Response<()>> {
     if !user_type.is_admin() {
         return Response::Err(ResponseError::Auth).into_err();
     }
 
     let coll = server.inner.db.coll::<AuthKeyInfo>();
-    let mut session = server
-        .inner
-        .db
-        .start_session()
-        .await
-        .context("failed to start db session")
-        .map_err(Response::from_unknown_err)?;
+    let mut session = server.inner.db.start_session().await?;
 
     let key_info = AuthKeyInfo {
         id: AuthKeyId::new(),
@@ -40,6 +36,7 @@ pub async fn admin_key_register(
         note: body.note,
     };
 
+    // TODO: optimize err with mongo's custom err
     let already_exists = session
         .with_transaction(
             (&coll, &key_info),
@@ -63,8 +60,7 @@ pub async fn admin_key_register(
             None,
         )
         .await
-        .context("failed to do check and insert")
-        .map_err(Response::from_unknown_err)?;
+        .context("failed to do check and insert")?;
 
     if already_exists {
         Response::Err(ResponseError::AuthKeyExists).into_err()
