@@ -10,11 +10,13 @@ thiserror = "1"
 anyhow = "1"
 
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tracing-loki = "0.2"
 dotenv = "0.15"
 
 futures = "0.3"
 tokio = { version = "1", features = ["full"] }
 
+url = "2"
 http = "1"
 tower-http = { version = "0.5", features = ["compression-full"] }
 tower = "0.4"

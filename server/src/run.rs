@@ -1,6 +1,7 @@
 use anyhow::Context;
 use semver::{BuildMetadata, Prerelease, Version};
 use share::utils::env;
+use tracing::info;
 
 use crate::{
     bili_api::client::{config::BiliApiClientConfig, BiliApiClient},
@@ -12,7 +13,8 @@ use crate::{
 pub mod init;
 
 pub async fn run() -> anyhow::Result<()> {
-    init::init();
+    let exit = init::init().await.context("failed to init")?;
+    info!("initialized");
 
     let app_id = env::read("BILI_APP_ID")?
         .parse::<i64>()
@@ -62,11 +64,15 @@ pub async fn run() -> anyhow::Result<()> {
 
     server.run().await.context("failed to run server")?;
 
-    println!("shutdown database client");
+    info!("shutdown database client");
 
     database.shutdown().await;
 
-    println!("exiting");
+    info!("shutdown background tasks");
+
+    exit.await.context("failed to shutdown background tasks")?;
+
+    info!("exiting");
 
     Ok(())
 }
