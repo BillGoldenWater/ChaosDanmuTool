@@ -16,5 +16,6 @@ client_ui/dist
 # lock
 Cargo.lock
 
-# secrets
+# env
 .env
+.secrets.env

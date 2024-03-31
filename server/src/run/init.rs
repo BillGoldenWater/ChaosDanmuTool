@@ -7,7 +7,7 @@ use tracing_subscriber::{
 };
 
 pub async fn init() -> anyhow::Result<impl Future<Output = anyhow::Result<()>>> {
-    dotenv::dotenv().ok();
+    env::load();
 
     let loki_name = env::read("CDT_LOKI_NAME")?;
     let loki_env = env::read("CDT_LOKI_ENV")?;
