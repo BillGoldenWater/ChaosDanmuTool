@@ -115,7 +115,6 @@ impl Server {
 
     #[instrument(level = "trace", skip(self))]
     async fn get_pub_key(&self, key_id: &AuthKeyId) -> anyhow::Result<Option<VerifyingKey>> {
-        // TODO: error context
         if key_id.is_admin_key() {
             return self.inner.cfg.admin_pub_key.some().into_ok();
         }
@@ -123,13 +122,20 @@ impl Server {
         let coll = self.inner.db.coll::<AuthKeyInfo>();
 
         let id = key_id.to_bson()?;
-        let key = coll.find_one(doc! {"id": id}, None).await?;
+        let key = coll
+            .find_one(doc! {"id": id}, None)
+            .await
+            .context("failed to find the key")?;
 
         if let Some(key) = key {
-            return key.public_key.to_verifying_key().map(Some).err_into();
+            key.public_key
+                .to_verifying_key()
+                .context("failed to parse the key")?
+                .some()
+        } else {
+            None
         }
-
-        Ok(None)
+        .into_ok()
     }
 
     #[instrument(level = "trace", skip(self))]
