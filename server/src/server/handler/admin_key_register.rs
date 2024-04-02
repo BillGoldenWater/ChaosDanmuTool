@@ -36,7 +36,6 @@ pub async fn admin_key_register(
         note: body.note,
     };
 
-    // TODO: optimize err with mongo's custom err
     let already_exists = session
         .with_transaction(
             (&coll, &key_info),
