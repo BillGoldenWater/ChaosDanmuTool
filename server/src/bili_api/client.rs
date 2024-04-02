@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use anyhow::Context;
-use reqwest::{Client, ClientBuilder};
+use reqwest::Client;
 use serde::Deserialize;
 use share::{
     data_primitives::{auth_code::AuthCode, game_id::GameId},
@@ -17,7 +17,10 @@ use self::{
     config::BiliApiClientConfig,
 };
 use super::BiliRequest;
-use crate::bili_api::{response_error::ResponseError, utils::signature::request_sign_header_gen};
+use crate::bili_api::{
+    response_error::{ret_code::RetCode, ResponseError},
+    utils::signature::request_sign_header_gen,
+};
 
 pub mod api_app_batch_heartbeat;
 pub mod api_app_end;
@@ -130,12 +133,12 @@ impl BiliApiClientRef {
             )
         })?;
 
-        if res.err.code != 0 {
+        if res.err.code != RetCode::Ok {
             Err(res.err)
         } else if let Some(data) = res.data {
             Ok(data)
         } else {
-            res.err.code = i64::MIN;
+            res.err.code = RetCode::OkNoData;
             Err(res.err)
         }
         .map_err(Into::into)

@@ -30,6 +30,7 @@ macro_rules! def_ret_code {
 }
 
 def_ret_code!(RetCode {
+    -9223372036854775808: OkNoData,
     0: Ok,
     4000: InvalidParam,
     4001: InvalidAccessKeyId,
