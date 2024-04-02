@@ -7,7 +7,6 @@ use axum::{
 };
 use bson::doc;
 use ed25519_dalek::VerifyingKey;
-use mongodb::{ClientSession, Collection};
 use share::{
     data_primitives::{auth_key_id::AuthKeyId, DataPrimitive},
     server_api::{
@@ -19,7 +18,7 @@ use share::{
 use tokio::signal;
 use tower::ServiceBuilder;
 use tower_http::trace::{DefaultOnResponse, TraceLayer};
-use tracing::{info, instrument, Level};
+use tracing::{debug, info, instrument, Level, Span};
 
 use self::{
     config::ServerConfig,
@@ -71,7 +70,22 @@ impl Server {
             .layer(
                 ServiceBuilder::new().layer(
                     TraceLayer::new_for_http()
-                        .on_response(DefaultOnResponse::new().level(Level::TRACE)),
+                        .on_request(|req: &http::Request<axum::body::Body>, _: &Span| {
+                            let ip =
+                                match req.headers().get("cf-connecting-ip").map(|it| it.to_str()) {
+                                    Some(Ok(ip)) => ip,
+                                    _ => "unknown",
+                                };
+
+                            debug!(
+                                cmd = "on_req",
+                                "on request [{}] {}: {}",
+                                ip,
+                                req.method(),
+                                req.uri().path()
+                            );
+                        })
+                        .on_response(DefaultOnResponse::new().level(Level::DEBUG)),
                 ),
             )
             .with_state(self.clone());

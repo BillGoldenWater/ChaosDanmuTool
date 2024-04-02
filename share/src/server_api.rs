@@ -6,7 +6,7 @@ use axum::{
     response::{IntoResponse, Response as AxumResponse},
 };
 use serde::{de::DeserializeOwned, Serialize};
-use tracing::error;
+use tracing::{debug, error};
 
 use crate::define_data_type;
 
@@ -79,6 +79,21 @@ impl<T> From<anyhow::Error> for Response<T> {
 
 impl<T: Serialize> IntoResponse for Response<T> {
     fn into_response(self) -> AxumResponse {
+        match &self {
+            Self::Err(ResponseError::Unknown) => {
+                debug!(
+                    cmd = "on_res_unknown_err",
+                    "handler responed with an unknown error"
+                );
+            }
+            Self::Err(err) => {
+                debug!(
+                    cmd = "on_res_err",
+                    "handler responed with an error: {:?}", err
+                );
+            }
+            _ => {}
+        }
         let data = match bson::to_vec(&self) {
             Ok(data) => data,
             Err(err) => {
