@@ -29,6 +29,8 @@ pub async fn init() -> anyhow::Result<impl Future<Output = anyhow::Result<()>>> 
     let loki_handle = tokio::spawn(loki_task);
 
     Ok(async move {
+        info!("shutting down background task");
+
         info!("shutting down loki background task");
         loki_controller.shutdown().await;
         info!("watting loki background task to exit");

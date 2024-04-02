@@ -10,7 +10,7 @@ use share::{
     },
     utils::functional::Functional,
 };
-use tracing::instrument;
+use tracing::{info, instrument};
 
 use crate::{
     database::data_model::session_info::SessionInfo,
@@ -35,6 +35,8 @@ pub async fn danmu_start(
         // TODO: guest
         return ResponseError::Auth.into_err().err_into();
     }
+
+    info!("starting new session for {}", key_id);
 
     let id = key_id.to_bson()?;
     let exists_session = coll

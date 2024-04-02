@@ -42,7 +42,7 @@ pub async fn run() -> anyhow::Result<()> {
 
     // TODO: run under cli arg
     database
-        .init()
+        .sync()
         .await
         .context("failed to initialize database")?;
 
@@ -64,11 +64,7 @@ pub async fn run() -> anyhow::Result<()> {
 
     server.run().await.context("failed to run server")?;
 
-    info!("shutdown database client");
-
     database.shutdown().await;
-
-    info!("shutdown background tasks");
 
     exit.await.context("failed to shutdown background tasks")?;
 

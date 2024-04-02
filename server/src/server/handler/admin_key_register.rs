@@ -9,7 +9,7 @@ use share::{
     },
     utils::functional::Functional,
 };
-use tracing::instrument;
+use tracing::{info, instrument};
 
 use crate::{
     database::data_model::auth_key_info::AuthKeyInfo,

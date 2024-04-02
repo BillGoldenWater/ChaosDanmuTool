@@ -4,7 +4,7 @@ use anyhow::Context;
 use itertools::Itertools;
 use mongodb::{Client, ClientSession, Collection, Database as MongoDatabase, IndexModel};
 use share::utils::functional::Functional;
-use tracing::{info, instrument, trace};
+use tracing::{debug, info, instrument, trace};
 
 use self::data_model::{auth_key_info::AuthKeyInfo, session_info::SessionInfo, DataModel};
 
@@ -24,6 +24,7 @@ struct DatabaseInner {
 impl Database {
     #[instrument(level = "debug", skip(uri))]
     pub async fn new(uri: &str, database: &str) -> anyhow::Result<Self> {
+        info!("creating database client");
         let client = Client::with_uri_str(uri)
             .await
             .context("failed to create client")?;
@@ -50,25 +51,31 @@ impl Database {
 
     #[instrument(level = "debug", skip(self))]
     pub async fn shutdown(self) {
+        info!("shutting down database client");
+
         self.inner.client.clone().shutdown().await;
     }
 
     #[instrument(level = "debug", skip(self))]
-    pub async fn init(&self) -> anyhow::Result<()> {
-        async fn init_coll<T: DataModel>(this: &Database) -> anyhow::Result<()> {
-            this.init_coll::<T>()
+    pub async fn sync(&self) -> anyhow::Result<()> {
+        info!("syncing database collections");
+
+        async fn sync_coll<T: DataModel>(this: &Database) -> anyhow::Result<()> {
+            this.sync_coll::<T>()
                 .await
-                .with_context(|| format!("failed to init collection {}", T::NAME))
+                .with_context(|| format!("failed to sync collection {}", T::NAME))
         }
 
-        init_coll::<AuthKeyInfo>(self).await?;
-        init_coll::<SessionInfo>(self).await?;
+        sync_coll::<AuthKeyInfo>(self).await?;
+        sync_coll::<SessionInfo>(self).await?;
 
         Ok(())
     }
 
     #[instrument(level = "info", skip(self), fields(name = T::NAME))]
-    async fn init_coll<T: DataModel>(&self) -> anyhow::Result<()> {
+    async fn sync_coll<T: DataModel>(&self) -> anyhow::Result<()> {
+        info!("syncing collection: {}", T::NAME);
+
         let db = &self.inner.db;
 
         let coll_exists = db
@@ -78,15 +85,18 @@ impl Database {
             .any(|it| it.eq(T::NAME));
 
         if !coll_exists {
+            info!("creating collection");
             db.create_collection(T::NAME, None).await?;
         }
 
-        self.coll_sync_index::<T>().await?;
+        self.sync_coll_index::<T>().await?;
         Ok(())
     }
 
-    #[instrument(level = "debug", skip(self), fields(name = T::NAME))]
-    async fn coll_sync_index<T: DataModel>(&self) -> Result<(), mongodb::error::Error> {
+    #[instrument(level = "debug", skip(self))]
+    async fn sync_coll_index<T: DataModel>(&self) -> Result<(), mongodb::error::Error> {
+        debug!("syncing index");
+
         let coll = self.inner.db.collection::<T>(T::NAME);
 
         let exists_idx = coll

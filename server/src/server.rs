@@ -140,6 +140,8 @@ impl Server {
 
     #[instrument(level = "trace", skip(self))]
     async fn get_pub_key(&self, key_id: &AuthKeyId) -> anyhow::Result<Option<VerifyingKey>> {
+        debug!("getting public key of {}", key_id);
+
         if key_id.is_admin_key() {
             return self.inner.cfg.admin_pub_key.some().into_ok();
         }
@@ -165,6 +167,8 @@ impl Server {
 
     #[instrument(level = "trace", skip(self))]
     async fn session_end(&self, session_info: SessionInfo) -> anyhow::Result<()> {
+        debug!("ending session of {}", session_info.key_id);
+
         let id = session_info.key_id.to_bson_raw_err()?;
 
         self.db()
