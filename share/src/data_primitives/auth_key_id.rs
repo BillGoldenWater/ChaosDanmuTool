@@ -20,6 +20,12 @@ impl AuthKeyId {
     }
 }
 
+impl From<AuthKeyId> for ObjectId {
+    fn from(value: AuthKeyId) -> Self {
+        value.0
+    }
+}
+
 impl Display for AuthKeyId {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.0.to_hex())

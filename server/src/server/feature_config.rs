@@ -7,7 +7,7 @@ use tracing::{debug, info, instrument};
 
 define_data_type!(
     struct FeatureConfig {
-        limit_guest_num: u32,
+        pub limit_guest_num: u32,
     }
 );
 

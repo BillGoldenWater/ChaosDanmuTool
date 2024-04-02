@@ -1,5 +1,10 @@
 use anyhow::Context;
-use share::{data_primitives::auth_code::AuthCode, utils::env};
+use ed25519_dalek::{ed25519::signature::Keypair, SigningKey};
+use rand::rngs::OsRng;
+use share::{
+    data_primitives::{auth_code::AuthCode, auth_key_note::AuthKeyNote, public_key::PublicKey},
+    utils::env,
+};
 use tauri::Manager;
 
 use crate::{
@@ -35,13 +40,22 @@ pub async fn main() -> anyhow::Result<()> {
     )
     .context("failed to build api client")?;
 
-    dbg!(&client.status_version().await.map(|it| it.to_string()));
+    // dbg!(&client.status_version().await.map(|it| it.to_string()));
 
-    // let code = env::read("BILI_CODE")?;
-    // let res = client.danmu_start(AuthCode::new(code.into()), true).await;
+    // let res = client
+    //     .admin_key_register(
+    //         PublicKey::from_verifying_key(&SigningKey::generate(&mut OsRng).verifying_key()),
+    //         AuthKeyNote::new("test".into()),
+    //     )
+    //     .await;
     // dbg!(&res);
-    let res = client.status_reload().await;
+
+    let code = env::read("BILI_CODE")?;
+    let res = client.danmu_start(AuthCode::new(code.into()), true).await;
     dbg!(&res);
+
+    // let res = client.status_reload().await;
+    // dbg!(&res);
 
     // app.run(|_app_handle, event| match event {
     //     _ => {}

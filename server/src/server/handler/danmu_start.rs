@@ -1,8 +1,9 @@
-use anyhow::Context;
+use anyhow::{anyhow, Context};
 use axum::extract::State;
-use bson::doc;
+use bson::{doc, oid::ObjectId};
+use futures::StreamExt;
 use share::{
-    data_primitives::DataPrimitive,
+    data_primitives::{auth_key_id::AuthKeyId, DataPrimitive},
     data_type::api::anchor_info::AnchorInfo,
     server_api::{
         danmu::start::{ReqStart, ResStart},
@@ -13,7 +14,7 @@ use share::{
 use tracing::{info, instrument};
 
 use crate::{
-    database::data_model::session_info::SessionInfo,
+    database::data_model::{auth_key_info::AuthKeyInfo, session_info::SessionInfo, DataModel},
     server::{signed_body::SignedBody, Server},
 };
 
@@ -31,9 +32,54 @@ pub async fn danmu_start(
     // NOTE: no transaction since single user shouldn't send multiple request at same time,
     // even it happens, there isn't any serious thing could happend
 
-    if user_type.is_guest() {
-        // TODO: guest
-        return ResponseError::Auth.into_err().err_into();
+    if user_type.is_guest() || true {
+        let admin_oid: ObjectId = AuthKeyId::admin().into();
+        let count = coll
+            .aggregate(
+                [
+                    doc! {
+                        "$lookup": {
+                            "from": AuthKeyInfo::NAME,
+                            "localField": "key_id",
+                            "foreignField": "id",
+                            "as": "key_info",
+                        },
+                    },
+                    doc! {
+                        "$match": {
+                            "$and": [
+                                {
+                                    "key_info": {
+                                        "$size": 0,
+                                    },
+                                },
+                                {
+                                    "key_id": {
+                                        "$ne": admin_oid,
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                    doc! {
+                        "$count": "count",
+                    },
+                ],
+                None,
+            )
+            .await
+            .context("failed to run aggregation for count guest")?
+            .next()
+            .await
+            .unwrap_or_else(|| Ok(doc! {"count": 0_i32}))
+            .context("failed to get result of count guest")?
+            .get_i32("count")
+            .context("unexpected error")?;
+
+        let feat_cfg = s.inner.feat_cfg().await;
+        if count as i64 >= feat_cfg.limit_guest_num as i64 {
+            return ResponseError::GuestCapacity.into_err().err_into();
+        }
     }
 
     info!("starting new session for {}", key_id);
