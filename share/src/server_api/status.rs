@@ -1,3 +1,4 @@
+pub mod reload;
 pub mod version;
 
 #[macro_export]

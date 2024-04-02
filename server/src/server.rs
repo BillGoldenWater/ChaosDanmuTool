@@ -10,21 +10,27 @@ use ed25519_dalek::VerifyingKey;
 use share::{
     data_primitives::{auth_key_id::AuthKeyId, DataPrimitive},
     server_api::{
-        admin::key_register::ReqKeyRegister, danmu::start::ReqStart, status::version::ReqVersion,
+        admin::key_register::ReqKeyRegister,
+        danmu::start::ReqStart,
+        status::{reload::ReqReload, version::ReqVersion},
         Request as _,
     },
     utils::{axum::compression_layer, functional::Functional},
 };
-use tokio::signal;
+use tokio::{
+    signal,
+    sync::{RwLock, RwLockReadGuard},
+};
 use tower::ServiceBuilder;
 use tower_http::trace::{DefaultOnResponse, TraceLayer};
 use tracing::{debug, info, instrument, Level, Span};
 
 use self::{
     config::ServerConfig,
+    feature_config::FeatureConfig,
     handler::{
         admin_key_register::admin_key_register, danmu_start::danmu_start,
-        status_version::status_version,
+        status_reload::status_reload, status_version::status_version,
     },
 };
 use crate::{
@@ -39,6 +45,7 @@ use crate::{
 };
 
 pub mod config;
+pub mod feature_config;
 pub mod handler;
 pub mod signed_body;
 
@@ -49,10 +56,16 @@ pub struct Server {
 
 // startup logic
 impl Server {
-    pub fn new(config: ServerConfig, bili_api_client: BiliApiClient, database: Database) -> Self {
+    pub fn new(
+        config: ServerConfig,
+        feature_config: FeatureConfig,
+        bili_api_client: BiliApiClient,
+        database: Database,
+    ) -> Self {
         Self {
             inner: ServerInner {
                 cfg: config,
+                feat_cfg: RwLock::new(feature_config),
                 bili: bili_api_client,
                 db: database,
             }
@@ -64,6 +77,7 @@ impl Server {
     pub async fn run(&self) -> anyhow::Result<()> {
         let router = Router::new()
             .route(ReqVersion::ROUTE, get(status_version))
+            .route(ReqReload::ROUTE, post(status_reload))
             .route(ReqKeyRegister::ROUTE, post(admin_key_register))
             .route(ReqStart::ROUTE, post(danmu_start))
             .layer(compression_layer())
@@ -196,6 +210,13 @@ impl Server {
 #[derive(Debug)]
 struct ServerInner {
     pub cfg: ServerConfig,
+    pub feat_cfg: RwLock<FeatureConfig>,
     pub bili: BiliApiClient,
     pub db: Database,
+}
+
+impl ServerInner {
+    pub async fn feat_cfg(&self) -> RwLockReadGuard<'_, FeatureConfig> {
+        self.feat_cfg.read().await
+    }
 }

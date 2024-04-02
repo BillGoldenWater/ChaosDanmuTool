@@ -37,8 +37,10 @@ pub async fn main() -> anyhow::Result<()> {
 
     dbg!(&client.status_version().await.map(|it| it.to_string()));
 
-    let code = env::read("BILI_CODE")?;
-    let res = client.danmu_start(AuthCode::new(code.into()), true).await;
+    // let code = env::read("BILI_CODE")?;
+    // let res = client.danmu_start(AuthCode::new(code.into()), true).await;
+    // dbg!(&res);
+    let res = client.status_reload().await;
     dbg!(&res);
 
     // app.run(|_app_handle, event| match event {

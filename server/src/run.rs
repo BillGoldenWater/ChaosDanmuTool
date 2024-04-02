@@ -7,7 +7,7 @@ use crate::{
     bili_api::client::{config::BiliApiClientConfig, BiliApiClient},
     database::Database,
     key::read_admin_pk,
-    server::{config::ServerConfig, Server},
+    server::{config::ServerConfig, feature_config::FeatureConfig, Server},
 };
 
 pub mod init;
@@ -26,6 +26,8 @@ pub async fn run() -> anyhow::Result<()> {
     let db_name = env::read("CDT_MONGO_NAME")?;
 
     let admin_pk = read_admin_pk()?;
+
+    let listen_on = env::read("CDT_LISTEN")?;
 
     let client = BiliApiClient::new(
         BiliApiClientConfig::builder()
@@ -46,9 +48,10 @@ pub async fn run() -> anyhow::Result<()> {
         .await
         .context("failed to initialize database")?;
 
+    // TODO: convert http 404 to custom response error
     let server = Server::new(
         ServerConfig::builder()
-            .host("0.0.0.0:25500".into())
+            .host(listen_on.into())
             .admin_pub_key(admin_pk)
             .min_client_ver(Version {
                 major: 0,
@@ -58,6 +61,9 @@ pub async fn run() -> anyhow::Result<()> {
                 build: BuildMetadata::EMPTY,
             })
             .build(),
+        FeatureConfig::load()
+            .await
+            .context("failed to load feature config")?,
         client,
         database.clone(),
     );

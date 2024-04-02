@@ -35,6 +35,7 @@ serde-aux = "4"
 serde_bytes = "0.11"
 serde_with = "3"
 bson = { version = "2", features = ["chrono-0_4"] }
+toml = "0.8"
 
 md-5 = "0.10"
 base16ct = "0.2"

@@ -13,7 +13,7 @@ use share::{
             start::{ReqStart, ResStart},
         },
         request_signed::RequestSigned,
-        status::version::ReqVersion,
+        status::{reload::ReqReload, version::ReqVersion},
         Request, Response,
     },
     utils::{functional::Functional, hex},
@@ -58,6 +58,11 @@ impl ApiClient {
             .minimum_version
             .then(TryInto::try_into)
             .context("failed to parse version")
+    }
+
+    #[instrument(level = "debug", skip(self))]
+    pub async fn status_reload(&self) -> anyhow::Result<()> {
+        self.inner.send(&ReqReload {}).await.unit_result()
     }
 }
 
