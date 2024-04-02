@@ -27,7 +27,10 @@ use self::{
     },
 };
 use crate::{
-    bili_api::{client::BiliApiClient, response_error::ResponseError as BiliResErr},
+    bili_api::{
+        client::BiliApiClient,
+        response_error::{ret_code::RetCode, ResponseError as BiliResErr},
+    },
     database::{
         data_model::{auth_key_info::AuthKeyInfo, session_info::SessionInfo},
         Database,
@@ -149,13 +152,13 @@ impl Server {
 
         let result = self.bili().app_end(session_info.game_id.clone()).await;
         if let Err(err) = result {
-            'err: {
-                if let Some(err) = err.downcast_ref::<BiliResErr>() {
-                    // TODO: better code check
-                    if err.code == 7003 {
-                        break 'err;
-                    }
-                }
+            if !matches!(
+                err.downcast_ref::<BiliResErr>(),
+                Some(BiliResErr {
+                    code: RetCode::InvalidGameId,
+                    ..
+                })
+            ) {
                 return Err(err);
             }
         }
