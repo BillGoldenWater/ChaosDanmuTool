@@ -17,7 +17,9 @@ use share::{
     utils::{axum::compression_layer, functional::Functional},
 };
 use tokio::signal;
-use tracing::{info, instrument};
+use tower::ServiceBuilder;
+use tower_http::trace::{DefaultOnResponse, TraceLayer};
+use tracing::{info, instrument, Level};
 
 use self::{
     config::ServerConfig,
@@ -66,6 +68,12 @@ impl Server {
             .route(ReqKeyRegister::ROUTE, post(admin_key_register))
             .route(ReqStart::ROUTE, post(danmu_start))
             .layer(compression_layer())
+            .layer(
+                ServiceBuilder::new().layer(
+                    TraceLayer::new_for_http()
+                        .on_response(DefaultOnResponse::new().level(Level::TRACE)),
+                ),
+            )
             .with_state(self.clone());
 
         let listener = tokio::net::TcpListener::bind(self.inner.cfg.host.as_ref())
