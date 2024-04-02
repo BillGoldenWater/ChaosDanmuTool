@@ -33,7 +33,7 @@ pub async fn danmu_start(
 
     if user_type.is_guest() {
         // TODO: guest
-        todo!()
+        return ResponseError::Auth.into_err().err_into();
     }
 
     let id = key_id.to_bson()?;
