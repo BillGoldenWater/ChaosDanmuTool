@@ -48,7 +48,6 @@ pub async fn run() -> anyhow::Result<()> {
         .await
         .context("failed to initialize database")?;
 
-    // TODO: convert http 404 to custom response error
     let server = Server::new(
         ServerConfig::builder()
             .host(listen_on.into())

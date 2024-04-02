@@ -23,6 +23,9 @@ pub trait Request: Serialize {
 define_data_type!(
     @derive_ext(thiserror::Error)
     enum ResponseError {
+        #[error("invalid path")]
+        NotFound,
+
         #[error("invalid request param")]
         Param,
         #[error("unknown internal server error")]

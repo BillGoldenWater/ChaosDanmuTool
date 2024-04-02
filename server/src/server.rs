@@ -29,7 +29,7 @@ use self::{
     config::ServerConfig,
     feature_config::FeatureConfig,
     handler::{
-        admin_key_register::admin_key_register, danmu_start::danmu_start,
+        admin_key_register::admin_key_register, danmu_start::danmu_start, fallback::fallback,
         status_reload::status_reload, status_version::status_version,
     },
 };
@@ -102,6 +102,7 @@ impl Server {
                         .on_response(DefaultOnResponse::new().level(Level::DEBUG)),
                 ),
             )
+            .fallback(fallback)
             .with_state(self.clone());
 
         let listener = tokio::net::TcpListener::bind(self.inner.cfg.host.as_ref())
