@@ -1,21 +1,22 @@
 # temp
-old
+/old
 
 # macos
 **/.DS_Store
 
 # editor
-.idea
+/.idea
 
 # generated
-target
-app-icon.png
-client/gen/schemas
-client_ui/dist
+/target
+/app-icon.png
+/client/gen/schemas
+/client_ui/dist
 
 # lock
-Cargo.lock
+/Cargo.lock
 
-# env
-.env
-.secrets.env
+# config
+/.env
+/.secrets.env
+/feature_config.toml
