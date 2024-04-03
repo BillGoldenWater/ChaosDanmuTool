@@ -19,9 +19,15 @@ impl DataModel for AuthKeyInfo {
     const NAME: &'static str = "auth_key";
 
     fn indexes() -> Vec<IndexModel> {
-        vec![IndexModel::builder()
-            .keys(doc! {"id": 1, "public_key": 1})
-            .options(IndexOptions::builder().unique(true).build())
-            .build()]
+        vec![
+            IndexModel::builder()
+                .keys(doc! {"id": 1})
+                .options(IndexOptions::builder().unique(true).build())
+                .build(),
+            IndexModel::builder()
+                .keys(doc! {"public_key": 1})
+                .options(IndexOptions::builder().unique(true).build())
+                .build(),
+        ]
     }
 }

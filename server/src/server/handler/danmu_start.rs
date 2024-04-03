@@ -1,6 +1,7 @@
-use anyhow::{anyhow, Context};
+use anyhow::Context;
 use axum::extract::State;
 use bson::{doc, oid::ObjectId};
+use chrono::Utc;
 use futures::StreamExt;
 use share::{
     data_primitives::{auth_key_id::AuthKeyId, DataPrimitive},
@@ -110,6 +111,7 @@ pub async fn danmu_start(
         SessionInfo {
             key_id: key_id.clone(),
             game_id: res.game_info.game_id.clone(),
+            last_heartbeat: Utc::now(),
         },
         None,
     )
