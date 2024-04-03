@@ -12,9 +12,19 @@ use crate::{
 
 pub mod init;
 
+#[derive(Debug, argh::FromArgs)]
+/// run the cdt server
+struct Args {
+    /// sycn collection and indexes with database
+    #[argh(switch)]
+    run_database_sync: bool,
+}
+
 pub async fn run() -> anyhow::Result<()> {
     let exit = init::init().await.context("failed to init")?;
     info!("initialized");
+
+    let args = argh::from_env::<Args>();
 
     let app_id = env::read("BILI_APP_ID")?
         .parse::<i64>()
@@ -29,6 +39,18 @@ pub async fn run() -> anyhow::Result<()> {
 
     let listen_on = env::read("CDT_LISTEN")?;
 
+    let database = Database::new(&db_uri, &db_name)
+        .await
+        .context("failed to open database")?;
+
+    if args.run_database_sync {
+        database
+            .sync()
+            .await
+            .context("failed to initialize database")?;
+        return Ok(());
+    }
+
     let client = BiliApiClient::new(
         BiliApiClientConfig::builder()
             .api_base("https://live-open.biliapi.com".into())
@@ -37,16 +59,6 @@ pub async fn run() -> anyhow::Result<()> {
             .access_key_secret(access_key_secret.into())
             .build(),
     )?;
-
-    let database = Database::new(&db_uri, &db_name)
-        .await
-        .context("failed to open database")?;
-
-    // TODO: run under cli arg
-    database
-        .sync()
-        .await
-        .context("failed to initialize database")?;
 
     let server = Server::new(
         ServerConfig::builder()
