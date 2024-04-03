@@ -13,9 +13,9 @@ impl UserType {
         matches!(self, UserType::Guest)
     }
 
-    pub fn is_registered(&self) -> bool {
-        matches!(self, UserType::Registered)
-    }
+    // pub fn is_registered(&self) -> bool {
+    //     matches!(self, UserType::Registered)
+    // }
 
     pub fn is_admin(&self) -> bool {
         matches!(self, UserType::Admin)

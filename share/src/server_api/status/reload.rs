@@ -1,7 +1,4 @@
-use crate::{
-    data_primitives::version::Version, define_data_type, server_api::Request,
-    server_api_route_status,
-};
+use crate::{define_data_type, server_api::Request, server_api_route_status};
 
 define_data_type!(
     struct ReqReload {}

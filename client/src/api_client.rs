@@ -1,7 +1,6 @@
 use std::sync::Arc;
 
 use anyhow::Context;
-use reqwest::ClientBuilder;
 use semver::Version;
 use share::{
     data_primitives::{auth_code::AuthCode, auth_key_note::AuthKeyNote, public_key::PublicKey},
@@ -52,7 +51,7 @@ impl ApiClient {
             .send()
             .await
             .context("failed to send request")?
-            .then(|res| ApiClientRef::parse_res::<Req>(res))
+            .then(ApiClientRef::parse_res::<Req>)
             .await
             .context("failed to parse response")?
             .minimum_version

@@ -1,12 +1,8 @@
 use std::time::Duration;
 
 use anyhow::Context;
-use ed25519_dalek::{ed25519::signature::Keypair, SigningKey};
-use rand::rngs::OsRng;
 use share::{
-    data_primitives::{auth_code::AuthCode, auth_key_note::AuthKeyNote, public_key::PublicKey},
-    server_api::danmu::heartbeat::ReqHeartbeat,
-    utils::env,
+    data_primitives::auth_code::AuthCode, server_api::danmu::heartbeat::ReqHeartbeat, utils::env,
 };
 use tauri::Manager;
 
@@ -58,7 +54,7 @@ pub async fn main() -> anyhow::Result<()> {
     dbg!(&res);
 
     loop {
-        std::thread::sleep(Duration::from_secs(ReqHeartbeat::EXPIRE_SECS - 1));
+        std::thread::sleep(Duration::from_secs(ReqHeartbeat::EXPIRE_SECS));
 
         let res = client.danmu_heartbeat().await;
         dbg!(&res);
@@ -76,5 +72,5 @@ pub async fn main() -> anyhow::Result<()> {
     //     _ => {}
     // });
 
-    Ok(())
+    // Ok(())
 }

@@ -9,7 +9,7 @@ use share::{
     },
     utils::functional::Functional,
 };
-use tracing::{info, instrument};
+use tracing::instrument;
 
 use crate::{
     database::data_model::auth_key_info::AuthKeyInfo,
@@ -31,7 +31,7 @@ pub async fn admin_key_register(
     let mut session = server.inner.db.start_session().await?;
 
     let key_info = AuthKeyInfo {
-        id: AuthKeyId::new(),
+        id: AuthKeyId::gen(),
         public_key: body.public_key,
         note: body.note,
     };

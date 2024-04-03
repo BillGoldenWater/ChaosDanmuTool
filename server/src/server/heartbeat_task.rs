@@ -60,7 +60,7 @@ pub fn start_heartbeat_task(server: Server) -> impl Future<Output = anyhow::Resu
                     .await
                     .context("failed to recv heartbeat expired sessions")?;
 
-                if expired.len() > 0 {
+                if !expired.is_empty() {
                     let key_ids = expired
                         .iter()
                         .map(|it| it.key_id.to_bson())

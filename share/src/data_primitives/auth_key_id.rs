@@ -7,7 +7,7 @@ use crate::define_data_primitive;
 define_data_primitive!(AuthKeyId(ObjectId));
 
 impl AuthKeyId {
-    pub fn new() -> Self {
+    pub fn gen() -> Self {
         Self(ObjectId::new())
     }
 

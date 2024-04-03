@@ -33,7 +33,7 @@ pub async fn danmu_start(
     // NOTE: no transaction since single user shouldn't send multiple request at same time,
     // even it happens, there isn't any serious thing could happend
 
-    if user_type.is_guest() || true {
+    if user_type.is_guest() {
         let admin_oid: ObjectId = AuthKeyId::admin().into();
         let count = coll
             .aggregate(

@@ -120,7 +120,7 @@ mod tests {
     fn prepare_data() -> (Vec<u8>, AuthKeyId, SigningKey, VerifyingKey) {
         let sk = SigningKey::generate(&mut OsRng);
         let pk = sk.verifying_key();
-        ((1..=128).collect(), AuthKeyId::new(), sk, pk)
+        ((1..=128).collect(), AuthKeyId::gen(), sk, pk)
     }
 
     #[test]
