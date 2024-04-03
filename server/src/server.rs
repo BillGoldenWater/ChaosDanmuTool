@@ -183,16 +183,12 @@ impl Server {
         .into_ok()
     }
 
-    #[instrument(level = "trace", skip(self))]
+    #[instrument(level = "trace", skip(self, session_info))]
     async fn session_end(&self, session_info: SessionInfo) -> anyhow::Result<()> {
-        debug!("ending session of {}", session_info.key_id);
-
-        let id = session_info.key_id.to_bson_raw_err()?;
-
-        self.db()
-            .coll::<SessionInfo>()
-            .delete_one(doc! {"key_id": id}, None)
-            .await?;
+        debug!(
+            "ending session for {}, game_id: {:?}",
+            session_info.key_id, session_info.game_id
+        );
 
         let result = self.bili().app_end(session_info.game_id.clone()).await;
         if let Err(err) = result {

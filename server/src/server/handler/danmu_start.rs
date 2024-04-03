@@ -83,11 +83,15 @@ pub async fn danmu_start(
         }
     }
 
-    info!("starting new session for {}", key_id);
+    info!(
+        cmd = "on_session_start",
+        "starting new session for {}", key_id
+    );
 
     let id = key_id.to_bson()?;
+    let ident = doc! {"key_id": id.clone()};
     let exists_session = coll
-        .find_one(doc! {"key_id": id.clone()}, None)
+        .find_one(ident.clone(), None)
         .await
         .context("failed to fetch exists session")?;
 
@@ -95,6 +99,10 @@ pub async fn danmu_start(
         if !force {
             return Err(ResponseError::SessionExists).err_into();
         }
+
+        coll.delete_one(ident, None)
+            .await
+            .context("failed to delete session info")?;
 
         s.session_end(exists_session)
             .await

@@ -1,8 +1,11 @@
+use std::time::Duration;
+
 use anyhow::Context;
 use ed25519_dalek::{ed25519::signature::Keypair, SigningKey};
 use rand::rngs::OsRng;
 use share::{
     data_primitives::{auth_code::AuthCode, auth_key_note::AuthKeyNote, public_key::PublicKey},
+    server_api::danmu::heartbeat::ReqHeartbeat,
     utils::env,
 };
 use tauri::Manager;
@@ -52,6 +55,16 @@ pub async fn main() -> anyhow::Result<()> {
 
     let code = env::read("BILI_CODE")?;
     let res = client.danmu_start(AuthCode::new(code.into()), true).await;
+    dbg!(&res);
+
+    std::thread::sleep(Duration::from_secs(5));
+
+    let res = client.danmu_heartbeat().await;
+    dbg!(&res);
+
+    std::thread::sleep(Duration::from_secs(5));
+
+    let res = client.danmu_end().await;
     dbg!(&res);
 
     // let res = client.status_reload().await;
