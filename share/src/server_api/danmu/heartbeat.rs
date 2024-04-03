@@ -9,6 +9,10 @@ impl Request for ReqHeartbeat {
     type Response = ResHeartbeat;
 }
 
+impl ReqHeartbeat {
+    pub const EXPIRE_SECS: u64 = 10;
+}
+
 define_data_type!(
     struct ResHeartbeat {}
 );

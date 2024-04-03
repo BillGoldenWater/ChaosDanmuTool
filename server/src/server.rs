@@ -11,7 +11,7 @@ use share::{
     data_primitives::{auth_key_id::AuthKeyId, DataPrimitive},
     server_api::{
         admin::key_register::ReqKeyRegister,
-        danmu::start::ReqStart,
+        danmu::{end::ReqEnd, heartbeat::ReqHeartbeat, start::ReqStart},
         status::{reload::ReqReload, version::ReqVersion},
         Request as _,
     },
@@ -29,7 +29,8 @@ use self::{
     config::ServerConfig,
     feature_config::FeatureConfig,
     handler::{
-        admin_key_register::admin_key_register, danmu_start::danmu_start, fallback::fallback,
+        admin_key_register::admin_key_register, danmu_end::danmu_end,
+        danmu_heartbeat::danmu_heartbeat, danmu_start::danmu_start, fallback::fallback,
         status_reload::status_reload, status_version::status_version,
     },
 };
@@ -80,6 +81,8 @@ impl Server {
             .route(ReqReload::ROUTE, post(status_reload))
             .route(ReqKeyRegister::ROUTE, post(admin_key_register))
             .route(ReqStart::ROUTE, post(danmu_start))
+            .route(ReqHeartbeat::ROUTE, post(danmu_heartbeat))
+            .route(ReqEnd::ROUTE, post(danmu_end))
             .layer(compression_layer())
             .layer(
                 ServiceBuilder::new().layer(
