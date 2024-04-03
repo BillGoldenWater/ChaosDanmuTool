@@ -57,13 +57,7 @@ define_data_type!(
 
 impl<T> Response<T> {
     pub fn from_unknown_err(err: anyhow::Error) -> Self {
-        let mut msg = String::from_str("unexpected error occurs while handling request:").unwrap();
-
-        for err in err.chain() {
-            msg.push_str(&format!("\n{err}"));
-        }
-
-        error!("{msg}");
+        error!("unexpected error occurs while handling request: {err:?}");
         Self::Err(ResponseError::Unknown)
     }
 }

@@ -10,7 +10,7 @@ impl Request for ReqHeartbeat {
 }
 
 impl ReqHeartbeat {
-    pub const EXPIRE_SECS: u64 = 10;
+    pub const EXPIRE_SECS: u64 = 60;
 }
 
 define_data_type!(

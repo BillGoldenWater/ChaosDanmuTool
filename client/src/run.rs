@@ -57,15 +57,17 @@ pub async fn main() -> anyhow::Result<()> {
     let res = client.danmu_start(AuthCode::new(code.into()), true).await;
     dbg!(&res);
 
-    std::thread::sleep(Duration::from_secs(5));
+    loop {
+        std::thread::sleep(Duration::from_secs(ReqHeartbeat::EXPIRE_SECS - 1));
 
-    let res = client.danmu_heartbeat().await;
-    dbg!(&res);
+        let res = client.danmu_heartbeat().await;
+        dbg!(&res);
+    }
 
-    std::thread::sleep(Duration::from_secs(5));
-
-    let res = client.danmu_end().await;
-    dbg!(&res);
+    // std::thread::sleep(Duration::from_secs(5));
+    //
+    // let res = client.danmu_end().await;
+    // dbg!(&res);
 
     // let res = client.status_reload().await;
     // dbg!(&res);

@@ -33,6 +33,7 @@ use self::{
         danmu_heartbeat::danmu_heartbeat, danmu_start::danmu_start, fallback::fallback,
         status_reload::status_reload, status_version::status_version,
     },
+    heartbeat_task::start_heartbeat_task,
 };
 use crate::{
     bili_api::{
@@ -48,6 +49,7 @@ use crate::{
 pub mod config;
 pub mod feature_config;
 pub mod handler;
+pub mod heartbeat_task;
 pub mod signed_body;
 
 #[derive(Debug, Clone)]
@@ -112,11 +114,19 @@ impl Server {
             .await
             .context("falied to listen")?;
 
+        info!("start heartbeat task");
+        let heartbeat_stop = start_heartbeat_task(self.clone());
+
         info!("starting on {}", self.inner.cfg.host);
         axum::serve(listener, router)
             .with_graceful_shutdown(Self::shutdown_signal())
             .await
             .context("failed to axum::serve")?;
+
+        info!("stop heartbeat task");
+        heartbeat_stop
+            .await
+            .context("failed to stop heartbeat task")?;
 
         Ok(())
     }
