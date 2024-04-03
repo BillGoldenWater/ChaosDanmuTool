@@ -17,7 +17,7 @@ use crate::database::data_model::session_info::SessionInfo;
 
 pub fn start_heartbeat_task(server: Server) -> impl Future<Output = anyhow::Result<()>> {
     const HEARTBEAT_INTERVAL: u64 = 20;
-    const MAX_RETRY: u32 = 5;
+    const MAX_RETRY: u32 = 12;
     const BATCH_SIZE: usize = 199;
 
     let (tx, mut rx) = tokio::sync::mpsc::channel::<()>(1);
@@ -139,7 +139,7 @@ pub fn start_heartbeat_task(server: Server) -> impl Future<Output = anyhow::Resu
                     }
                     Err(err) => {
                         if retry_count < MAX_RETRY {
-                            let backoff_time = 2_u64.pow(retry_count);
+                            let backoff_time = 1.25_f64.powf(retry_count as f64).round() as u64;
                             retry_count += 1;
                             warn!(
                                 cmd = "on_heartbeat_retry",
