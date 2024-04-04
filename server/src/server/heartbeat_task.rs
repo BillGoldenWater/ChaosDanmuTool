@@ -95,6 +95,7 @@ pub fn start_heartbeat_task(server: Server) -> impl Future<Output = anyhow::Resu
                     .await
                     .context("failed to recv sessions for heartbeat")?;
 
+                let mut session_count = sessions.len();
                 for chunk in sessions.chunks(BATCH_SIZE) {
                     debug!("sending heartbeat request");
                     let res = server
@@ -104,9 +105,11 @@ pub fn start_heartbeat_task(server: Server) -> impl Future<Output = anyhow::Resu
                         .context("failed to make heartbeat request")?;
 
                     if !res.failed_game_ids.is_empty() {
+                        let failed_count = res.failed_game_ids.len();
+                        session_count = session_count.saturating_sub(failed_count);
                         warn!(
                             cmd = "on_heartbeat_bili_failed",
-                            session_count = %res.failed_game_ids.len(),
+                            session_count = %failed_count,
                             "failed game_ids: {:?}",
                             res.failed_game_ids
                         );
@@ -119,7 +122,7 @@ pub fn start_heartbeat_task(server: Server) -> impl Future<Output = anyhow::Resu
                     }
                 }
 
-                sessions.len().into_ok()
+                session_count.into_ok()
             }
 
             let coll = server.db().coll::<SessionInfo>();
