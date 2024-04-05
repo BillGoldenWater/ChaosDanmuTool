@@ -18,7 +18,7 @@ use crate::database::data_model::session_info::SessionInfo;
 pub fn start_heartbeat_task(server: Server) -> impl Future<Output = anyhow::Result<()>> {
     const HEARTBEAT_INTERVAL: u64 = 20;
     const MAX_RETRY: u32 = 12;
-    const BATCH_SIZE: usize = 199;
+    const BATCH_SIZE: usize = 200;
 
     let (tx, mut rx) = tokio::sync::mpsc::channel::<()>(1);
 
