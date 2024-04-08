@@ -168,6 +168,7 @@ pub fn start_heartbeat_task(server: Server) -> impl Future<Output = anyhow::Resu
                 }
             }
 
+            // TODO: remove repeated
             tokio::select! {
                 _ = sleep(Duration::from_secs(HEARTBEAT_INTERVAL)) => {},
                 _ = rx.recv() => {

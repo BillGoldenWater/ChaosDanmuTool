@@ -9,6 +9,7 @@ use crate::{
 define_data_type!(
     struct ReqStart {
         pub code: AuthCode,
+        // TODO: remove force, let client call /danmu/end when needed
         pub force: bool,
     }
 );
@@ -20,6 +21,8 @@ impl Request for ReqStart {
 
 define_data_type!(
     struct ResStart {
+        // TODO: add game_id, let client call heartbeat endpoint with game id
+        // for check "is this session ended by another client and started a new one"
         pub ws_info: WebsocketInfo,
         pub user: UserInfo,
     }

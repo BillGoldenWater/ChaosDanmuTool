@@ -109,6 +109,7 @@ impl Server {
             )
             .fallback(fallback)
             .with_state(self.clone());
+        // TODO: logging for latency
 
         let listener = tokio::net::TcpListener::bind(self.inner.cfg.host.as_ref())
             .await

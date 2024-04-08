@@ -23,7 +23,7 @@ impl DataModel for SessionInfo {
     fn indexes() -> Vec<IndexModel> {
         vec![
             IndexModel::builder()
-                .keys(doc! {"key_id": 1})
+                .keys(doc! {"key_id": 1, "game_id": 1})
                 .options(IndexOptions::builder().unique(true).build())
                 .build(),
             IndexModel::builder()
